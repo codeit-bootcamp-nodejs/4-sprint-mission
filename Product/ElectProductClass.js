@@ -2,13 +2,50 @@
 
 
 export class ElectronicProduct extends Product{
-    favoriteCount = 0;
-    constructor({name,description, price, tags, images,manufacturer=""}){
-        super({name,description, price, tags , images});
+    #name
+    #description
+    #price
+    #tags
+    #images
+    #favoriteCount
+
+    constructor({name,description, price, tags, images,favoriteCount,manufacturer=""}){
+        super({name,description, price, tags , images,favoriteCount});
         this.manufacturer = manufacturer;
     }
 
+
+
+
+    favorite(){
+        this.#favoriteCount += 1;
+    }
+
+    get name(){
+        return this.#name
+    }
+    get description(){
+        return this.#description
+    }
+    get price(){
+        return this.#price
+    }
+
+        //전자제품 10% 세일!
+    // get price(){
+    //     price = price * 0.9
+    //     this.#price = this.#price
+    // }
+
+    get tags(){
+        return this.#tags
+    }
+    get favoriteCount(){
+        return this.#favoriteCount
+    }
+    
     // 다형성 
     // 켑슐화
     // 
+
 }

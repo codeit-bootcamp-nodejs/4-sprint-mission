@@ -1,18 +1,42 @@
 
 export class Product{
-    constructor({name,description, price, tags, images,}){
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.tags = tags;
-        this.images = images;
+    #name
+    #description
+    #price
+    #tags
+    #images
+    #favoriteCount
+
+    constructor({name,description, price, tags, images,favoriteCount}){
+        this.#name = name;
+        this.#description = description;
+        this.#price = price;
+        this.#tags = tags;
+        this.#images = images;
+        this.#favoriteCount = favoriteCount;
     }
 
-    favoriteCount= 0; //수정필요
 
     favorite(){
-        this.favoriteCount += 1;
+        this.#favoriteCount += 1;
     }
+
+    get name(){
+        return this.#name
+    }
+    get description(){
+        return this.#description
+    }
+    get price(){
+        return this.#price
+    }
+    get tags(){
+        return this.#tags
+    }
+    get favoriteCount(){
+        return this.#favoriteCount
+    }
+
 }
 
 
