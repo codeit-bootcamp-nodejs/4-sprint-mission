@@ -31,7 +31,8 @@ export class ElectronicProduct extends Product{
         return this.#price
     }
 
-        //전자제품 10% 세일!
+    //전자제품 10% 세일!
+    //세일 시 price라는 getter에 polymorphism 적용!
     // get price(){
     //     price = price * 0.9
     //     this.#price = this.#price
@@ -43,7 +44,7 @@ export class ElectronicProduct extends Product{
     get favoriteCount(){
         return this.#favoriteCount
     }
-    
+
     // 다형성 
     // 켑슐화
     // 
