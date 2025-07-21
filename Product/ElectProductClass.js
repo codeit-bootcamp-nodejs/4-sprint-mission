@@ -9,8 +9,8 @@ export class ElectronicProduct extends Product{
     #images
     #favoriteCount
 
-    constructor({name,description, price, tags, images,favoriteCount,manufacturer=""}){
-        super({name,description, price, tags , images,favoriteCount});
+    constructor({name,description, price, tags, images, manufacturer="",favoriteCount}){
+        super({name,description, price, tags , images});
         this.manufacturer = manufacturer;
     }
 

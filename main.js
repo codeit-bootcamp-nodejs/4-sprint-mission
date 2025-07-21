@@ -19,7 +19,7 @@ async function main(){
     //product, elec product의 배열을 instacne로 변환함
     let product_inst = await pre_process.getProductInstance(medium_data[0]);
     let elec_inst = await pre_process.getElecProductInstance(medium_data[1]);
-    // await console.log('product_inst = ', product_inst);
+    // await console.log('product_inst = ', product_inst.);
     // await console.log('elect_inst : ', elec_inst);
     }
 
