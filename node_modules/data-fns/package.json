@@ -1,0 +1,74 @@
+{
+  "name": "data-fns",
+  "version": "1.1.0",
+  "author": "skulptur",
+  "license": "MIT",
+  "module": "dist/data-fns.esm.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "keywords": [
+    "functional",
+    "data",
+    "structure",
+    "native",
+    "util",
+    "helper"
+  ],
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test --passWithNoTests",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why",
+    "generate-docs": "ts-readme && markdown-toc -i ./README.md"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "jsxSingleQuote": true,
+    "arrowParens": "always"
+  },
+  "size-limit": [
+    {
+      "path": "dist/data-fns.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/data-fns.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.10.2",
+    "husky": "^6.0.0",
+    "markdown-toc": "^1.2.0",
+    "size-limit": "^4.10.2",
+    "ts-readme": "^1.1.3",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "unit-fns": "^0.1.6"
+  }
+}
