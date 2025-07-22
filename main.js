@@ -60,3 +60,6 @@ const alist = await Aapi.getArticleList();
 alist.list.forEach((item) => {
   articles.push(new Article(item));
 });
+
+console.log(products)
+console.log(articles)
