@@ -4,6 +4,7 @@ export class Article {
     this.content = content;
     this.writer = writer;
     this.likeCount = likeCount;
+    this.createAt = new Date();
   }
   like() {
     return this.like++;
