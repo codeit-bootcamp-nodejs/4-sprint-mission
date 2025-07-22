@@ -27,7 +27,7 @@ export async function getProduct(){
     }
 }
 
-export async function createProduct(name="",description="",price=0, tags="",images=""){
+export async function createProduct({name="",description="",price=0, tags="",images=""}){
     try{
         await axios.post(url,{
             'name' : name,
@@ -42,9 +42,17 @@ export async function createProduct(name="",description="",price=0, tags="",imag
 
 }
 
-export async function patchProduct(){
+export async function patchProduct({name, description, price,tags,images},productId){
+    url= `https://panda-market-api-crud.vercel.app/products/${productId}`
     try{
-        await axios.patch(url)
+        await axios.patch(url,{
+            'name': name,
+            'description': description,
+            'price': price,
+            'tags':tags,
+            'images':images
+        }
+        )
     }catch(error){
         console.error(error);
     }
