@@ -21,12 +21,13 @@ export function getArticle(articleId){
     .catch( (error) => console.error(error));
 }
 
-export function postArticle(ttle="", contnt="", img=""){
+export function postArticle({ttle="", contnt="", img=""}){
     let data = {};
     data = {title: ttle, 
         content: contnt,
         image :img}
-    a = axios.post(article_url,data).catch( (error) => console.error(error));
+    axios.post(article_url,data)
+    .catch( (error) => console.error(error));
     
 }
 
