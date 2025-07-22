@@ -30,11 +30,28 @@ export async function getProductInstance(array){
 }
 
 // 배열중 elec인 배열로부터 입력을 받아 elec instace의 배열을 만듦
-export function getElecProductInstance(array){
+export async function getElecProductInstance(array){
     let elec_inst_array = [];
     for (let i of array){
         let new_elec = new ElectronicProduct(i);
         elec_inst_array.push(new_elec);
     }
     return elec_inst_array;
+}
+
+export async function getProductslist(){
+    let input_data = await ProductService.getProductList(3,20,"");
+        // console.log('input data(from HTTP): ',input_data);
+    
+        //데이터를 elec product와 그냥 product로 분류함
+        let medium_data = await pre_process.getProductarray(input_data);
+        // await console.log('product의 배열: ',medium_data[0], medium_data[0].length);
+        // await console.log('elec_product의 배열', medium_data[1], medium_data[1].length);
+        
+        //product, elec product의 배열을 instacne로 변환함
+        let product_inst = await pre_process.getProductInstance(medium_data[0]);
+        let elec_inst = await pre_process.getElecProductInstance(medium_data[1]);
+        // await console.log('product_inst = ', product_inst.);
+        // await console.log('elect_inst : ', elec_inst);
+        return [product_inst,elec_inst];
 }
