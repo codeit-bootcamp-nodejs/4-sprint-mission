@@ -11,7 +11,7 @@ export async function getProductarray(response){
     let elec_products = [];
     // console.log("count of response[list]", response["list"].length)
     for (let product of response["list"]){
-        if (product.tags[0] == "전자제품" || product.tags[0] =='전자제품'){
+        if (product.tags.includes == "전자제품" || product.tags.includes =='전자제품'){
             elec_products.push(product);
         }else{
             products.push(product);

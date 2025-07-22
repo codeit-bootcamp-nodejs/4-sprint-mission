@@ -9,4 +9,5 @@ export class Article{
     like(){
         this.likeCount += 1; 
     }
+    
 }
