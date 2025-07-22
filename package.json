@@ -1,0 +1,9 @@
+{
+  "main": "4-Sprint-Mission/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node 4-Sprint-Mission/main.js",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  }
+}
