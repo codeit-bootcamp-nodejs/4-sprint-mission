@@ -4,6 +4,7 @@ import axios from 'axios'
 let url = 'https://panda-market-api-crud.vercel.app/products'
 
 export async function getProductList(page=1, pageSize=10, keyword=""){
+    
     try{
         let response = await axios.get(url,
             {params: {
@@ -19,7 +20,8 @@ export async function getProductList(page=1, pageSize=10, keyword=""){
 
     
 
-export async function getProduct(){
+export async function getProduct(productId){
+    url= `https://panda-market-api-crud.vercel.app/products/${productId}`
     try{
         await axios.get(url);
     }catch(error){
@@ -58,7 +60,8 @@ export async function patchProduct({name, description, price,tags,images},produc
     }
 }
 
-export async function deleteProduct(){
+export async function deleteProduct(productId){
+    url= `https://panda-market-api-crud.vercel.app/products/${productId}`
     try{
         await axios.delete(url)
     }catch(error){

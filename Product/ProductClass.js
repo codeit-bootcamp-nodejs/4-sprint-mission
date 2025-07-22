@@ -16,22 +16,6 @@ export class Product{
         this.favoriteCount += 1;
     }
 
-    get name(){
-        return this.name
-    }
-    get description(){
-        return this.description
-    }
-    get price(){
-        return this.price
-    }
-    get tags(){
-        return this.tags
-    }
-    get favoriteCount(){
-        return this.favoriteCount
-    }
-
 }
 
 
