@@ -1,0 +1,8 @@
+{
+  "singleQuote": true,      // 작은따옴표 사용 (true)
+  "semi": true,             // 세미콜론 사용 (true)
+  "tabWidth": 2,            // 탭 너비 2칸
+  "useTabs": false,         // 탭 대신 스페이스 사용
+  "printWidth": 80,         // 한 줄 최대 길이 80
+  "trailingComma": "all",   // 객체나 배열 마지막 요소에 항상 콤마 추가
+}
