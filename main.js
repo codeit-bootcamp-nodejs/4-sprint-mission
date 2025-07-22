@@ -1,23 +1,16 @@
 // ProductService.js 파일에서 필요한 클래스와 함수들을 한 번에 불러옴(import)
 import {
-  Product, // 상품(기본) 클래스
-  ElectronicProduct, // 전자제품 전용 클래스(상속)
-  getProductList, // 상품 목록 불러오는 함수
-  getProduct, // 상품 1개 불러오는 함수
-  createProduct, // 상품 생성(등록) 함수
-  patchProduct, // 상품 수정 함수
-  deleteProduct, // 상품 삭제 함수
-} from './ProductService.js'; // Product 관련 기능이 들어있는 파일에서 가져옴
+  ElectronicProduct,
+  getProductList,
+  createProduct,
+} from './ProductService.js';
 
 // ArticleService.js 파일에서 필요한 클래스와 함수들을 한 번에 불러옴(import)
 import {
-  Article, // 게시글(Article) 클래스
-  getArticleList, // 게시글 목록 불러오는 함수
-  getArticle, // 게시글 1개 불러오는 함수
-  createArticle, // 게시글 생성(등록) 함수
-  patchArticle, // 게시글 수정 함수
-  deleteArticle, // 게시글 삭제 함수
-} from './ArticleService.js'; // Article 관련 기능이 들어있는 파일에서 가져옴
+  Article,
+  getArticleList,
+  createArticle,
+} from './ArticleService.js';
 
 // 즉시 실행되는 비동기 함수(주로 테스트나 메인 실행 코드에 사용)
 (async () => {
