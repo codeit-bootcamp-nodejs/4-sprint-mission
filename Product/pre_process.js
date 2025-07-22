@@ -40,7 +40,7 @@ export async function getElecProductInstance(array){
 }
 
 export async function getProductslist(){
-    let input_data = await ProductService.getProductList(3,20,"");
+    let input_data = await ProductService.getProductList(1,10,"");
         // console.log('input data(from HTTP): ',input_data);
     
         //데이터를 elec product와 그냥 product로 분류함

@@ -2,12 +2,6 @@
 
 
 export class ElectronicProduct extends Product{
-    #name
-    #description
-    #price
-    #tags
-    #images
-    #favoriteCount
 
     constructor({name,description, price, tags, images, manufacturer="",favoriteCount}){
         super({name,description, price, tags , images,favoriteCount});
@@ -18,17 +12,17 @@ export class ElectronicProduct extends Product{
 
 
     favorite(){
-        this.#favoriteCount += 1;
+        this.favoriteCount += 1;
     }
 
     get name(){
-        return this.#name
+        return this.name
     }
     get description(){
-        return this.#description
+        return this.description
     }
     get price(){
-        return this.#price
+        return this.price
     }
 
     //전자제품 10% 세일!
@@ -39,10 +33,11 @@ export class ElectronicProduct extends Product{
     // }
 
     get tags(){
-        return this.#tags
+        return this.tags
     }
+    
     get favoriteCount(){
-        return this.#favoriteCount
+        return this.favoriteCount
     }
 
     // 다형성 
