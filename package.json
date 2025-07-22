@@ -1,0 +1,18 @@
+{
+  "name": "4-sprint-mission",
+  "version": "1.0.0",
+  "description": "판다마켓 API를 활용한 상품/게시글 CRUD 실습 프로젝트",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "keywords": [
+    "nodejs",
+    "api",
+    "crud",
+    "market"
+  ],
+  "author": "",
+  "license": "ISC"
+}
