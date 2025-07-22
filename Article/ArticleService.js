@@ -14,8 +14,9 @@ export function getArticleList(page_input=1, pageSize_input=10, keyword_input=""
     .catch( (error) => console.error(error));
 }
 
-export function getArticle(){
-    return axios.get(url)
+export function getArticle(articleId){
+    article_url = `https://panda-market-api-crud.vercel.app/articles/${articleId}`
+    return axios.get(article_url)
     .then( (response) => response.data)
     .catch( (error) => console.error(error));
 }
@@ -29,12 +30,20 @@ export function postArticle(ttle="", contnt="", img=""){
     
 }
 
-export function patchArticle(){
-    a = axios.patch(article_url).catch( (error) => console.error(error));
+export function patchArticle({title,content,image},articleId){
+    article_url = `https://panda-market-api-crud.vercel.app/articles/${articleId}`
+    axios.patch(article_url,
+         {"title":title,
+        "content":content,
+        "image":image
+    }).
+    catch( (error) => console.error(error));
     
 }
 
-export function deleteArticle(){
-    a = axios.delete(article_url).catch( (error) => console.error(error));
+export function deleteArticle(articleId){
+    article_url = `https://panda-market-api-crud.vercel.app/articles/${articleId}`
+    axios.delete(article_url).
+    catch( (error) => console.error(error));
     
 }
