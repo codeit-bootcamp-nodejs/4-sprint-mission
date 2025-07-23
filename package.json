@@ -1,0 +1,22 @@
+{
+  "name": "sprintmisson2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "eslint": "^9.31.0",
+    "prettier": "^3.6.2"
+  },
+  "dependencies": {
+    "eslint-config-prettier": "^10.1.8"
+  }
+}
