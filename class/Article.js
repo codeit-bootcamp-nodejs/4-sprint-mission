@@ -1,4 +1,5 @@
-// models/Article.js
+// models/Article.js/
+// content.js에서 온 자료들을 상속
 import Content from './1.Content.js';
 
 export default class Article extends Content {
