@@ -1,3 +1,4 @@
+ //getProductList
  export async function getProductList(params) {
      const url = new URL(`https://panda-market-api-crud.vercel.app/products`);
      Object.keys(params).forEach((key) =>
@@ -9,12 +10,14 @@
      return data;
  }
 
+ //getProduct
  export async function getProduct() {
      const res = await fetch (`https://panda-market-api-crud.vercel.app/products`);
      const data = await res.json();
      return data;
  }
 
+ //createProduct
  export async function createProduct(productData) {
      const res = await fetch (`https://panda-market-api-crud.vercel.app/products`, {
      method: 'POST',
@@ -28,6 +31,7 @@
    return data;
  }
 
+ //patchProduct
  export async function patchProduct(id, productData) {
      const res = await fetch(`https://panda-market-api-crud.vercel.app/products/${id}`, {
          method: 'PATCH',
@@ -40,6 +44,7 @@
      return data;
  }
 
+ //deleteProduct
  export async function deleteProduct(id) {
      const res = await fetch(`https://panda-market-api-crud.vercel.app/products/${id}`, {
          method: 'DELETE',
@@ -48,6 +53,7 @@
      return data;
  }
 
+ //비동기, 오류 처리
  export async function checkProduct(id) {
    const res = await fetch(`https://panda-market-api-crud.vercel.app/products/${id}`);
 
