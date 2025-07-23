@@ -15,14 +15,14 @@ export class Product {
 export class ElectronicProduct extends Product {
   constructor(
     name,
-    desciption,
+    description,
     price,
     tags,
     images,
-    mmanufacturer,
+    manufacturer,
     favoriteCount
   ) {
-    super(name, desciption, price, tags, images, favoriteCount);
-    this.mmanufacturer = mmanufacturer;
+    super(name, description, price, tags, images, favoriteCount);
+    this.manufacturer = manufacturer;
   }
 }
