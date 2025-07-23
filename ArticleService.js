@@ -4,7 +4,7 @@
 const BASE_URL = ''; // 실제 API URL로 변경하세요
 
 // 1. 게시글 목록 조회
-function getArticleList(page = 1, pageSize = 10, keyword = '') {
+export function getArticleList(page = 1, pageSize = 10, keyword = '') {
     const queryParams = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
