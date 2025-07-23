@@ -38,7 +38,10 @@ class Article {
     this.content = content;
     this.writer = writer;
     this.likeCount = 0;
-    this.createAt = new Date();
+    const date = new Date()
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    this.createAt = `${hour}시 ${minute}분`
   }
   like() {
     this.likeCount++;
