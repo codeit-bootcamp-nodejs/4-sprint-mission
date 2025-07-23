@@ -1,14 +1,14 @@
 export class Product {
-  constructor(name, desciption, price, tags, images, favoriteCount = 0) {
+  constructor(name, description, price, tags, images, favoriteCount = 0) {
     this.name = name;
-    this.desciption = desciption;
+    this.description = description;
     this.price = price;
     this.tags = tags;
     this.images = images;
     this.favoriteCount = favoriteCount;
   }
   favorite() {
-    return this.favoriteCount++;
+    this.favoriteCount++;
   }
 }
 

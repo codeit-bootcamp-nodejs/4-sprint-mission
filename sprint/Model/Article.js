@@ -7,6 +7,6 @@ export class Article {
     this.createAt = new Date();
   }
   like() {
-    return this.like++;
+    this.like++;
   }
 }
