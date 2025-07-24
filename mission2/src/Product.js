@@ -1,21 +1,57 @@
-class Product {
+export class Product {
   constructor(name, description, price, tags, images, favoriteCount) {
-  this.name = name;
-  this.description = description;
-  this.price = price;
-  this.tags = tags;
-  this.images = images;
-  this.favoriteCount = favoriteCount
+  this._name = name;
+  this._description = description;
+  this._price = price;
+  this._tags = tags;
+  this._images = images;
+  this._favoriteCount = favoriteCount
+  }
+
+  set price(input) {
+    this._price = input;
+  }
+
+  set tags(input) {
+    this._tags = input;
+  }
+
+  set images(input) {
+    this._images = input;
+  }
+
+  get price() {
+    return this._price;
+  }
+  
+  get tags() {
+    return this._tags;
+  }
+
+  get images() {
+    return this._images;
+  }
+
+  get favoriteCount() {
+    return this._favoriteCount;
   }
 
   favorite() {
-    favoriteCount ++;
+    this.favoriteCount ++;
   }
 }
 
-class ElectronicProduct extends Product{
+export class ElectronicProduct extends Product{
   constructor(name, description, price, tags, images, favoriteCount, manufacturer) {
     super(name, description, price, tags, images, favoriteCount);
-    this.manufacturer = manufacturer;
+    this._manufacturer = manufacturer;
+  }
+
+  set manufacturer(input) {
+    this._manufacturer = input;
+  }
+
+  get manufacturer() {
+    return this._manufacturer;
   }
 }
