@@ -4,7 +4,7 @@
 const BASE_URL = ''; // 실제 API URL로 변경하세요
 
 // 1. 게시글 목록 조회
-export function getArticleList(page = 1, pageSize = 10, keyword = '') {
+export async function getArticleList(page = 1, pageSize = 10, keyword = '') {
     const queryParams = new URLSearchParams({
         page: page.toString(),
         pageSize: pageSize.toString(),
@@ -32,7 +32,7 @@ export function getArticleList(page = 1, pageSize = 10, keyword = '') {
 }
 
 // 2. 특정 게시글 조회
-function getArticle(articleId) {
+exprt acync function getArticle(articleId) {
     return fetch(`${BASE_URL}/articles/${articleId}`, {
         method: 'GET',
     })
@@ -54,7 +54,7 @@ function getArticle(articleId) {
 }
 
 // 3. 게시글 생성
-function createArticle(title, content, image) {
+export async function createArticle(title, content, image) {
     const requestBody = {
         title: title,
         content: content,
@@ -86,7 +86,7 @@ function createArticle(title, content, image) {
 }
 
 // 4. 게시글 수정
-function patchArticle(articleId, updateData) {
+export async function patchArticle(articleId, updateData) {
     return fetch(`${BASE_URL}/articles/${articleId}`, {
         method: 'PATCH',
         headers: {
@@ -112,7 +112,7 @@ function patchArticle(articleId, updateData) {
 }
 
 // 5. 게시글 삭제
-function deleteArticle(articleId) {
+export async function deleteArticle(articleId) {
     return fetch(`${BASE_URL}/articles/${articleId}`, {
         method: 'DELETE',
     })
