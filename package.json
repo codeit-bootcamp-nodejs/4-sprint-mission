@@ -1,0 +1,21 @@
+{
+  "name": "4-sprint-mission",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimaeong/4-sprint-mission.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kimaeong/4-sprint-mission/issues"
+  },
+  "homepage": "https://github.com/kimaeong/4-sprint-mission#readme",
+  "description": ""
+}
