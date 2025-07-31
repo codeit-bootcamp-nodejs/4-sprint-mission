@@ -1,0 +1,13 @@
+{
+  "name": "firstmission",
+  "version": "1.0.0",
+  "description": "## 미션 목표 - API 리퀘스트 보내는 코드 구현 - Git과 Github 활용하기",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
