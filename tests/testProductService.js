@@ -58,4 +58,13 @@ export async function testAllProductService() {
   } catch (err) {
     console.log(`❌`, err);
   }
+
+  console.log("-------상품 리스트 조회--------");
+  try {
+    const query = { page: 1, pageSize: 3, keyword: "전자" };
+    const res = await ProductService.getProductList(query);
+    console.log(res.list);
+  } catch (err) {
+    console.log(`❌`, err);
+  }
 }

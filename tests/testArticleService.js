@@ -56,4 +56,12 @@ export async function testAllArticleService() {
   } catch (err) {
     console.log("❌", err);
   }
+  console.log("--------기사 목록 조회---------");
+  try {
+    const query = { page: 1, pageSize: 3, keyword: "게시글" };
+    const res = await ArticleService.getArticleList(query);
+    console.log(res.list);
+  } catch (err) {
+    console.log("❌", err);
+  }
 }

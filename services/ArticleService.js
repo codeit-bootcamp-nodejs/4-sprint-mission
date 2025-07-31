@@ -5,9 +5,9 @@ const ArticleService = {
   getArticleList(query) {
     const url = new URL(BASE_URL);
 
-    for (let key in query) {
-      if (query[key] !== undefined) {
-        url.searchParams.append(key, query[key]);
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined) {
+        url.searchParams.append(key, value);
       }
     }
 
@@ -17,7 +17,7 @@ const ArticleService = {
         return res.json();
       })
       .catch((err) => {
-        console.log("[error] 요청 실패:", err.message);
+        console.error("[error] 요청 실패:", err.message);
         throw err;
       });
   },
@@ -30,7 +30,7 @@ const ArticleService = {
         return res.json();
       })
       .catch((err) => {
-        console.log("[error] 요청 실패:", err.message);
+        console.error("[error] 요청 실패:", err.message);
         throw err;
       });
   },
@@ -49,7 +49,7 @@ const ArticleService = {
         return res.json();
       })
       .catch((err) => {
-        console.log("[error] 요청 실패:", err.message);
+        console.error("[error] 요청 실패:", err.message);
         throw err;
       });
   },
@@ -68,7 +68,7 @@ const ArticleService = {
         return res.json();
       })
       .catch((err) => {
-        console.log("[error] 요청 실패:", err.message);
+        console.error("[error] 요청 실패:", err.message);
         throw err;
       });
   },
@@ -83,7 +83,7 @@ const ArticleService = {
         return res.json();
       })
       .catch((err) => {
-        console.log("[error] 요청 실패:", err.message);
+        console.error("[error] 요청 실패:", err.message);
         throw err;
       });
   },
