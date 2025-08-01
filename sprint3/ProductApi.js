@@ -20,10 +20,10 @@ ProductRouter.get('/', async (req,res) =>{
             }
         });
 
-        res.send(Product);
+        res.status(200).send(Product);
         console.log(`get product : ${Product.length}`);
     }catch(error){
-        res.send("interner Server Error");
+        res.status(500).send("interner Server Error");
     }
 });
 
@@ -33,10 +33,10 @@ ProductRouter.get('/:id', async (req,res) =>{
         const Product = await prisma.product.findUnique({
             where:{id}
         });
-        res.send(Product);
+        res.status(200).send(Product);
         console.log(`get product : ${Product}`);
     }catch(error){
-        res.end("interner Server Error");
+        res.status(500).end("interner Server Error");
     }
     
 });
@@ -54,9 +54,10 @@ ProductRouter.post('/', async (req,res) =>{
                 tags,
             }
         });
-        res.send(Product);
+        res.status(201).send(Product);
+        console.log("post success");
     }catch(error){
-        res.send("interner Server Error");
+        res.status(500).send("interner Server Error");
     }
 });
 
@@ -65,7 +66,7 @@ ProductRouter.patch('/:id', async (req,res) =>{
     const id = req.params.id ;
 
     try{
-        prisma.product.update({
+        const product= prisma.product.update({
             where: {id},
             data: {
                 name,
@@ -74,8 +75,10 @@ ProductRouter.patch('/:id', async (req,res) =>{
                 tags
             }
         })
+        res.status(201).send(product);
+        console.log("patch success");
     }catch(error){
-        res.send("server error")
+        res.status(500).send("server error");
     }
 });
 
@@ -86,9 +89,10 @@ ProductRouter.delete('/:id', async (req,res) =>{
         prisma.product.delete({
             where:{id}
         });
-        res.send("deleting successed");
+        res.status(200).send("deleting successed");
+        console.log("deleting success");
     }catch(error){
-        res.send("error");
+        res.status(500).send("server error");
     }
 });
 
