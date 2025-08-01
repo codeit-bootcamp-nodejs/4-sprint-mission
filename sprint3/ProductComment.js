@@ -69,7 +69,7 @@ ProductCommentRouter.delete('', (req,res) => {
             id:CommentId
         }
     });
-
-    res.send("deleting comment completed");
     console.log("deleting comment completed");
+    res.send("deleting comment completed");
+    
 });
