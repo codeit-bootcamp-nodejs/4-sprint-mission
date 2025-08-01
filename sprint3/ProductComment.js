@@ -15,7 +15,7 @@ ProductCommentRouter.post('', (req,res) => {
             where: {id}
         });
         if (!product){
-            res.send("no product");
+            res.status(404).send("no product");
         }
     
         //comment 형식이 어떻게 req로부터 올지?
@@ -34,7 +34,7 @@ ProductCommentRouter.patch('', (req,res) => {
             where: {id}
         });
         if (!product){
-            res.send("no product");
+            res.status(404).send("no product");
         }
     
         //comment 형식이 어떻게 req로부터 올지?
@@ -59,7 +59,7 @@ ProductCommentRouter.delete('', (req,res) => {
             where: {id}
         });
         if (!product){
-            res.send("no product");
+            res.status(404).send("no product");
         }
     
         const newComment = prisma.Productcomment.delete({

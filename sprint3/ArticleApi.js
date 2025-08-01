@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const ArticleRouter = express.Router();
 
 
-//need troubleshooting at networking, validating, console.log, 
+//need validating, console.log, 
 ArticleRouter.get('/', async (req,res) =>{
     try{
         const {sort, offset, title, content} = req.query;

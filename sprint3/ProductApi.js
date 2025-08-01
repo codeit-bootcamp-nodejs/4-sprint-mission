@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 const app = express()
 const ProductRouter = express.Router()
 
-// have to sort, pagination, add status code, validating, console.log
+// have to sort, pagination , validating, console.log
 
 ProductRouter.get('/', async (req,res) =>{
 

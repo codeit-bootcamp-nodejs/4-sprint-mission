@@ -17,7 +17,7 @@ ArticleCommentRouter.post('', (req,res) => {
         where: {id}
     });
     if (!article){
-        res.send("no article");
+        res.status(404).send("no article");
     }
 
     //comment 형식이 어떻게 req로부터 올지?
@@ -36,7 +36,7 @@ ArticleCommentRouter.patch('/:id', (req,res) => {
         where: {id}
     });
     if (!article){
-        res.send("no article");
+        res.status(404).send("no article");
     }
 
     //comment 형식이 어떻게 req로부터 올지?
@@ -61,7 +61,7 @@ ArticleCommentRouter.delete('/:id', (req,res) => {
         where: {id}
     });
     if (!article){
-        res.send("no article");
+        res.status(404).send("no article");
     }
 
     const newComment = prisma.Articlecomment.delete({
@@ -70,7 +70,7 @@ ArticleCommentRouter.delete('/:id', (req,res) => {
         }
     });
 
-    res.send("deleting comment completed");
+    res.status(200).send("deleting comment completed");
     console.log("deleting comment completed");
 });
 
