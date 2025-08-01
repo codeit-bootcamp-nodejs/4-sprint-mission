@@ -4,9 +4,11 @@ import prisma from '@prisma/client'
 app = express()
 ProductRouter = express.Router()
 
-ProductRouter.get('/', (req,res) =>{
+// have to sort, pagination, add status code, validating
 
-    // have to 
+ProductRouter.get('/', async (req,res) =>{
+
+    
     const {offset, sort, name, description} = req.query;
     try{
         const Product = await prisma.product.findMany({
@@ -60,14 +62,25 @@ ProductRouter.patch('/:id', async (req,res) =>{
     const {name, description, price, tags} = req.body;
     const id = req.params.id ;
 
-    prisma.product.update({
-        where: {id},
-        data: {
-            
-        }
-    })
+    try{
+        prisma.product.update({
+            where: {id},
+            data: {
+                name,
+                description,
+                price,
+                tags
+            }
+        })
+    }catch(error){
+        res.send("server error")
+    }
 });
 
 ProductRouter.delete('/:id', async (req,res) =>{
+    const id = req.params.id ;
 
+    try{
+        prisma.product 
+    }
 });
