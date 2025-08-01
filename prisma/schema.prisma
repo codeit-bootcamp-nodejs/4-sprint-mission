@@ -15,30 +15,44 @@ datasource db {
 }
 
 model Product{
-  id            integer     @id @default(autoincrement())
+  id            integer           @id @default(autoincrement())
   name          text        
   description   text    
   price         decimal
-  tags          
-  createdAt     timestamp   @default(now())
-  updatedAt     timestamp   @updatedAt
-  comment       Comment[]   @relation(fields:[commentId], reference:[id])
-  commentId     integer
+  tags          text
+  createdAt     timestamp         @default(now())
+  updatedAt     timestamp         @updatedAt
+  comment       ProductComment[]   
 }
 
 model Article{
-  id          integer       @id @default(autoincrement())
+  id          integer              @id @default(autoincrement())
   title       text          
   content     text
-  createdAt   timestamp     @default(now())
-  updatedAt   timestamp     @updatedAt
-  comment     Comment[]     @relation(fields:[commentId], reference:[id])
-  commentId   integer
+  createdAt   timestamp            @default(now())
+  updatedAt   timestamp            @updatedAt
+  comment     ArticleComment[]     @relation(fields:['commentId'], reference:['id'])
 }
 
-model Comment{
+model ProductComment{
   id          integer       @id @default(autoincrement())
   content     text          
   createdAt   timestamp     @default(now())
   updatedAt   timestamp     @updatedAt
+  product     Product       @relation(fields:['productId'], reference:['id'])
+  productId   integer       
+  
 }
+
+model ArticleComment{
+  id          integer       @id @default(autoincrement())
+  content     text          
+  createdAt   timestamp     @default(now())
+  updatedAt   timestamp     @updatedAt
+  article     Article[]     @relation(fields:['articleId'], reference:['id'])
+  articleId   integer      
+  
+}
+
+
+ 
