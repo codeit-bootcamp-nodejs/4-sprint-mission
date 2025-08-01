@@ -4,7 +4,7 @@ import prisma from '@prisma/client'
 app = express()
 ProductRouter = express.Router()
 
-// have to sort, pagination, add status code, validating
+// have to sort, pagination, add status code, validating, console.log
 
 ProductRouter.get('/', async (req,res) =>{
 
@@ -81,6 +81,11 @@ ProductRouter.delete('/:id', async (req,res) =>{
     const id = req.params.id ;
 
     try{
-        prisma.product 
+        prisma.product.delete({
+            where:{id}
+        });
+        res.send("deleting successed");
+    }catch(error){
+        res.send("error");
     }
 });
