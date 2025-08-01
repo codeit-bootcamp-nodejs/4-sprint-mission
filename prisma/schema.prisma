@@ -22,12 +22,23 @@ model Product{
   tags          
   createdAt     timestamp   @default(now())
   updatedAt     timestamp   @updatedAt
+  comment       Comment[]   @relation(fields:[commentId], reference:[id])
+  commentId     integer
 }
 
 model Article{
   id          integer       @id @default(autoincrement())
   title       text          
   content     text
+  createdAt   timestamp     @default(now())
+  updatedAt   timestamp     @updatedAt
+  comment     Comment[]     @relation(fields:[commentId], reference:[id])
+  commentId   integer
+}
+
+model Comment{
+  id          integer       @id @default(autoincrement())
+  content     text          
   createdAt   timestamp     @default(now())
   updatedAt   timestamp     @updatedAt
 }

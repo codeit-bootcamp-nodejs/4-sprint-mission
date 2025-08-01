@@ -3,6 +3,8 @@ import express from 'express'
 
 const ArticleRouter = express.Router();
 
+
+//need troubleshooting at networking, validating, console.log, 
 ArticleRouter.get('/', (req,res) =>{
     const {sort, offset, title, content} = req.body;
     const Articles = prisma.Article.findMany({
@@ -14,7 +16,7 @@ ArticleRouter.get('/', (req,res) =>{
 ArticleRouter.get('/:id', (req,res) =>{
     const id = req.params.id;
     const Article = prisma.Article.findUnique({
-        data: {id};
+        data: {id}
     });
     res.send(Article);
 });
