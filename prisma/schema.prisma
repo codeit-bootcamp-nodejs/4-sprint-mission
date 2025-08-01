@@ -24,3 +24,10 @@ model Product{
   updatedAt     timestamp   @updatedAt
 }
 
+model Article{
+  id          integer       @id @default(autoincrement())
+  title       text          
+  content     text
+  createdAt   timestamp     @default(now())
+  updatedAt   timestamp     @updatedAt
+}
