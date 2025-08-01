@@ -1,8 +1,10 @@
 import express from 'express'
-import prisma from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
-app = express()
-ProductRouter = express.Router()
+const prisma = new PrismaClient();
+
+const app = express()
+const ProductRouter = express.Router()
 
 // have to sort, pagination, add status code, validating, console.log
 
@@ -21,7 +23,7 @@ ProductRouter.get('/', async (req,res) =>{
         res.send(Product);
         console.log(`get product : ${Product.length}`);
     }catch(error){
-        res.end("interner Server Error");
+        res.send("interner Server Error");
     }
 });
 

@@ -8,10 +8,13 @@
   "author": "SonJuneYoung",
   "license": "ISC",
   "description": "",
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.13.0",
     "axios": "^1.10.0",
-    "express": "^5.1.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
     "prisma": "^6.13.0"
   }
 }

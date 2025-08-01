@@ -1,21 +1,24 @@
-import prisma from 'prisma'
+
 import express from 'express'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient();
 
 const ArticleRouter = express.Router();
 
 
 //need troubleshooting at networking, validating, console.log, 
-ArticleRouter.get('/', (req,res) =>{
-    const {sort, offset, title, content} = req.body;
-    const Articles = prisma.Article.findMany({
+ArticleRouter.get('/', async (req,res) =>{
+    const {sort, offset, title, content} = req.query;
+    const Articles = await prisma.Article.findMany({
 
     })
 });
 
 
-ArticleRouter.get('/:id', (req,res) =>{
+ArticleRouter.get('/:id', async (req,res) =>{
     const id = req.params.id;
-    const Article = prisma.Article.findUnique({
+    const Article = await prisma.Article.findUnique({
         data: {id}
     });
     res.send(Article);
