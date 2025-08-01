@@ -14,7 +14,9 @@ ArticleRouter.get('/', async (req,res) =>{
         const Articles = await prisma.Article.findMany({
 
          })
+        
     } catch(error){
+        console.log("get Article failed");
         res.status(500).send("server error")
     }
     
@@ -29,9 +31,11 @@ ArticleRouter.get('/:id', async (req,res) =>{
         const Article = await prisma.Article.findUnique({
             data: {id}
         });
+        console.log("get Article success");
         res.status(200).send(Article);
         
     } catch(error){
+        console.log("get Article failed because of server error");
         res.status(500).send("server error")
     }
     
@@ -50,8 +54,9 @@ ArticleRouter.post('/', (req,res) =>{
             }
         });
         res.status(201).send(Article);
-        
+        console.log("post Article success");
     } catch(error){
+        console.log("get Article failed because of server");
         res.status(500).send("server error")
     }
     
@@ -69,9 +74,11 @@ ArticleRouter.patch('/:id', (req,res) =>{
                 content
             }
         })
+        console.log("patch Article success")
         res.status(201).send(Article);
 
     } catch(error){
+        console.log("patch Article failed because of server");
         res.status(500).send("server error")
     }
     
@@ -84,10 +91,11 @@ ArticleRouter.delete('/:id', (req,res) =>{
         prisma.Article.delete({
             where:{id}
         });
-        console.log("data deleting success");
+        console.log("deleting article success");
         res.send(200).send("deleting completed");
 
     } catch(error){
+        console.log("patch Article failed because of server");
         res.status(500).send("server error")
     }
     

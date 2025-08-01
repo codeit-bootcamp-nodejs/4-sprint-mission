@@ -19,11 +19,13 @@ ProductRouter.get('/', async (req,res) =>{
                 description
             }
         });
-
-        res.status(200).send(Product);
         console.log(`get product : ${Product.length}`);
+        res.status(200).send(Product);
+        
     }catch(error){
+        console.log('get product failed because of server error');
         res.status(500).send("interner Server Error");
+        
     }
 });
 
@@ -33,9 +35,12 @@ ProductRouter.get('/:id', async (req,res) =>{
         const Product = await prisma.product.findUnique({
             where:{id}
         });
-        res.status(200).send(Product);
+
         console.log(`get product : ${Product}`);
+        res.status(200).send(Product);
+        
     }catch(error){
+        console.log('get product failed because of server error');
         res.status(500).end("interner Server Error");
     }
     
@@ -54,9 +59,11 @@ ProductRouter.post('/', async (req,res) =>{
                 tags,
             }
         });
-        res.status(201).send(Product);
         console.log("post success");
+        res.status(201).send(Product);
+        
     }catch(error){
+        console.log('post product failed because of server error');
         res.status(500).send("interner Server Error");
     }
 });
@@ -74,10 +81,12 @@ ProductRouter.patch('/:id', async (req,res) =>{
                 price,
                 tags
             }
-        })
-        res.status(201).send(product);
+        });
         console.log("patch success");
+        res.status(201).send(product);
+        
     }catch(error){
+        console.log('patch product failed because of server error');
         res.status(500).send("server error");
     }
 });
@@ -89,9 +98,11 @@ ProductRouter.delete('/:id', async (req,res) =>{
         prisma.product.delete({
             where:{id}
         });
-        res.status(200).send("deleting successed");
         console.log("deleting success");
+        res.status(200).send("deleting successed");
+        
     }catch(error){
+        console.log('deleting product failed because of server error');
         res.status(500).send("server error");
     }
 });
