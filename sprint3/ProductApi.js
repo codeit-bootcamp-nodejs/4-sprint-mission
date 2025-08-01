@@ -5,6 +5,8 @@ app = express()
 ProductRouter = express.Router()
 
 ProductRouter.get('/', (req,res) =>{
+
+    // have to 
     const {offset, sort, name, description} = req.query;
     try{
         const Product = await prisma.product.findMany({
