@@ -15,42 +15,42 @@ datasource db {
 }
 
 model Product{
-  id            integer           @id @default(autoincrement())
-  name          text        
-  description   text    
-  price         decimal
-  tags          text
-  createdAt     timestamp         @default(now())
-  updatedAt     timestamp         @updatedAt
+  id            Int           @id @default(autoincrement())
+  name          String        
+  description   String    
+  price         Decimal
+  tags          String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
   comment       ProductComment[]   
 }
 
 model Article{
-  id          integer              @id @default(autoincrement())
-  title       text          
-  content     text
-  createdAt   timestamp            @default(now())
-  updatedAt   timestamp            @updatedAt
-  comment     ArticleComment[]     @relation(fields:['commentId'], reference:['id'])
+  id           Int             @id @default(autoincrement())
+  title        String          
+  content      String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  comment      ArticleComment[]       
 }
 
 model ProductComment{
-  id          integer       @id @default(autoincrement())
-  content     text          
-  createdAt   timestamp     @default(now())
-  updatedAt   timestamp     @updatedAt
-  product     Product       @relation(fields:['productId'], reference:['id'])
-  productId   integer       
+  id           Int             @id @default(autoincrement())
+  content      String            
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  product      Product             @relation(fields:[productId], references:[id])
+  productId    Int         
   
 }
 
 model ArticleComment{
-  id          integer       @id @default(autoincrement())
-  content     text          
-  createdAt   timestamp     @default(now())
-  updatedAt   timestamp     @updatedAt
-  article     Article[]     @relation(fields:['articleId'], reference:['id'])
-  articleId   integer      
+  id           Int             @id @default(autoincrement())
+  content      String          
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  article      Article             @relation(fields:[articleId], references:[id])
+  articleId    Int       
   
 }
 
