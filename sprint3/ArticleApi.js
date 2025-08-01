@@ -44,7 +44,7 @@ ArticleRouter.patch('/:id', (req,res) =>{
             content
         }
     })
-} )
+} );
 
 
 ArticleRouter.delete('/:id', (req,res) =>{
@@ -53,4 +53,6 @@ ArticleRouter.delete('/:id', (req,res) =>{
         where:{id}
     });
     console.log("data deleting success")
-} )
+} );
+
+export default ArticleRouter;
