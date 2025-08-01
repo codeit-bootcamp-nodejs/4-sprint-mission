@@ -15,7 +15,7 @@ datasource db {
 }
 
 model Product{
-  id            Int           @id @default(autoincrement())
+  id            Int              @id @default(autoincrement())
   name          String        
   description   String    
   price         Decimal
@@ -26,7 +26,7 @@ model Product{
 }
 
 model Article{
-  id           Int             @id @default(autoincrement())
+  id           Int                @id @default(autoincrement())
   title        String          
   content      String
   createdAt    DateTime           @default(now())
@@ -35,21 +35,21 @@ model Article{
 }
 
 model ProductComment{
-  id           Int             @id @default(autoincrement())
+  id           Int                @id @default(autoincrement())
   content      String            
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
-  product      Product             @relation(fields:[productId], references:[id])
+  product      Product            @relation(fields:[productId], references:[id])
   productId    Int         
   
 }
 
 model ArticleComment{
-  id           Int             @id @default(autoincrement())
+  id           Int                @id @default(autoincrement())
   content      String          
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
-  article      Article             @relation(fields:[articleId], references:[id])
+  article      Article            @relation(fields:[articleId], references:[id])
   articleId    Int       
   
 }
