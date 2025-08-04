@@ -24,7 +24,7 @@ ProductRouter.get('/', async (req,res) =>{
         if (typeof(skip) != 'number' ||typeof(take) != 'number'){
             throw Error;
         }
-        
+
     }catch(error){
         console.log("get product failed because of input type ")
         res.status(400).send("400 bad request")
@@ -74,6 +74,16 @@ ProductRouter.get('/:id', async (req,res) =>{
 
 ProductRouter.post('/', async (req,res) =>{
     const {name,description, price, tags} = req.body;
+    try{
+        if (typeof(name) =='undefined' || typeof(description) =='undefined'||
+            typeof(price) == 'undefined' || typeof(tags)=='undefined'){
+                throw Error
+            }
+    } catch(error){
+        res.status(400).send("required input is missing");
+    }
+
+
 
     try{
         const Product = await prisma.product.create({
