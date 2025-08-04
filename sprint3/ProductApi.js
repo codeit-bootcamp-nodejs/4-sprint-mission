@@ -10,50 +10,50 @@ const ProductRouter = express.Router()
 
 //게시글 전체 불러오기
 ProductRouter.get('/', async (req,res) =>{
+    let {sort = 'recent', skip = '20', take= '10', searchName, searchDescription} = req.query;
+    skip = parseInt(skip);
+    take = parseInt(take);
+
     try{
-        const {sort = 'recent', skip = 40, take= 10, searchName, searchDescription} = req.query;
+        
         let orderBy ;
 
-        if (sort === oldest){        
+        if (sort === 'oldest'){        
             orderBy = {createdAt : 'desc'};
-        }else if (sort == recent){
+        }else if (sort == 'recent'){
             orderBy = {createdAt : 'asc'};
         }else{
-            throw Error;
+            throw new Error;
         }
 
         if (typeof(skip) != 'number' ||typeof(take) != 'number'){
-            throw Error;
+            throw new Error;
         }
 
     }catch(error){
-        console.log("get product failed because of input type ")
-        res.status(400).send("400 bad request")
+        console.error(error);
+        return res.status(400).send("400 bad request");
     }
-
 
     try{
         const {name, description} = req.query;
         const Product = await prisma.product.findMany({
-            // include: {
-            //     comment: true
-            // },
-            skip,
+            // skip: 20,
             take,
             where: {
                 AND:[
-                    searchName? {name: {contains : searchName}} : {},
-                    searchDescription? {content: {contains : searchDescription}} : {}
-                ]
+                    searchName? {name: {contains : searchName}} : undefined,
+                    searchDescription? {content: {contains : searchDescription}} : undefined
+                ].filter(Boolean)
                 
             }
         });
         console.log(`get product : ${Product.length}`);
-        res.status(200).send(Product);
+        return res.status(200).send(Product);
         
     }catch(error){
-        console.log('get product failed because of server error');
-        res.status(500).send("interner Server Error");
+        console.error(error);
+        return res.status(500).send("interner Server Error");
         
     }
 });
@@ -70,11 +70,11 @@ ProductRouter.get('/:id', async (req,res) =>{
         });
 
         console.log(`get product : ${Product}`);
-        res.status(200).send(Product);
+        return res.status(200).send(Product);
         
     }catch(error){
         console.log('get product failed because of server error');
-        res.status(500).end("interner Server Error");
+        return res.status(500).end("interner Server Error");
     }
     
 });
@@ -93,11 +93,11 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
             }
         });
         console.log("post success");
-        res.status(201).send(Product);
+        return res.status(201).send(Product);
         
     }catch(error){
         console.log('post product failed because of server error');
-        res.status(500).send("interner Server Error");
+        return res.status(500).send("interner Server Error");
     }
 });
 
@@ -117,11 +117,11 @@ ProductRouter.patch('/:id/modify', async (req,res) =>{
             }
         });
         console.log("patch success");
-        res.status(201).send(product);
+        return res.status(201).send(product);
         
     }catch(error){
         console.log('patch product failed because of server error');
-        res.status(500).send("server error");
+        return res.status(500).send("server error");
     }
 });
 
@@ -134,11 +134,11 @@ ProductRouter.delete('/:id', async (req,res) =>{
             where:{id}
         });
         console.log("deleting success");
-        res.status(200).send("deleting successed");
+        return res.status(200).send("deleting successed");
         
     }catch(error){
         console.log('deleting product failed because of server error');
-        res.status(500).send("server error");
+        return res.status(500).send("server error");
     }
 });
 
@@ -158,9 +158,9 @@ ProductRouter.get('/comments', async (req,res) =>{
             res.status(300).send("There isn't comment. Write the first comment!");
         }
 
-        res.status(300).send(comments);
+        return res.status(300).send(comments);
     }catch(error){
-        res.status(500).send("there was error during finding comments");
+        return res.status(500).send("there was error during finding comments");
     }
 });    
 
@@ -181,7 +181,7 @@ ProductRouter.post('/:id', async (req,res) =>{
             throw Error;
         }
     }catch(error){
-        res.status(404).send("no product");
+        return res.status(404).send("no product");
     }
     
 
@@ -208,7 +208,7 @@ ProductRouter.patch('/:id', async (req,res) =>{
             throw Error;
         }
     }catch(error){
-        res.status(404).send("no product");
+        return res.status(404).send("no product");
     }
     
     try{
@@ -223,10 +223,10 @@ ProductRouter.patch('/:id', async (req,res) =>{
                 commentContent
             }
         });
-        res.status(201).send(newcomment);
+        return res.status(201).send(newcomment);
 
     }catch(error){
-        res.status(500).send("server error occured during updating comment");
+        return res.status(500).send("server error occured during updating comment");
         console.log("server error occured during updating comment");
     }
    

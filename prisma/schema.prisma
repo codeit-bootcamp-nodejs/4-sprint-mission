@@ -1,3 +1,9 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,40 +13,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id          Int              @id @default(autoincrement())
-  name        String
-  description String
-  price       Decimal
-  tags        String
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  comment     ProductComment[]
+
+
+model Product{
+  id                Int              @id @default(autoincrement())
+  name              String        
+  description       String    
+  price             Decimal
+  tags              String
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  comment           ProductComment[]   
 }
 
-model Article {
-  id             Int              @id @default(autoincrement())
-  title          String
-  articleContent String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  comment        ArticleComment[]
+model Article{
+  id                  Int                @id @default(autoincrement())
+  title               String          
+  articleContent      String
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  comment             ArticleComment[]       
 }
 
-model ProductComment {
-  id             Int      @id @default(autoincrement())
-  commentContent String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  productId      Int
-  product        Product  @relation(fields: [productId], references: [id])
+model ProductComment{
+  id                  Int                @id @default(autoincrement())
+  commentContent      String            
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  product             Product            @relation(fields:[productId], references:[id])
+  productId           Int         
+  
 }
 
-model ArticleComment {
-  id             Int      @id @default(autoincrement())
-  commentContent String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  articleId      Int
-  article        Article  @relation(fields: [articleId], references: [id])
+model ArticleComment{
+  id                  Int                @id @default(autoincrement())
+  commentContent      String             
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  article             Article            @relation(fields:[articleId], references:[id])
+  articleId           Int       
+  
 }
+
+
+ 
