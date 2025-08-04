@@ -6,6 +6,8 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
+    "eslint": "^9.32.0",
+    "prettier": "3.6.2",
     "prisma": "^6.13.0"
   },
   "type": "module"
