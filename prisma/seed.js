@@ -7,7 +7,7 @@ const prisma =  new PrismaClient();
 async function main(){
     //product 10개, 댓글 각각 3개씩 생성
     for (let i = 0; i < 10; i++){
-        let name = `$product{i}`;
+        let name = `product${i}`;
         let description = `${i}`;
         let price = 1000;
         let tags = `${i}st number`;
