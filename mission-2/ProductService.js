@@ -7,8 +7,8 @@ const axiosInstance = axios.create({
 export async function getProduct(id) {
     if (id === undefined) return `id 값을 입력하지 않았습니다.`;
     try {
-        const request = await axiosInstance.get(`/products/${id}`);
-        return request.data;
+        const {data} = await axiosInstance.get(`/products/${id}`);
+        return data;
     } catch (e) {
         console.error(e);
         if (e.response) {
@@ -26,8 +26,8 @@ export async function getProductList(page = 1, pageSize = 10, keyword) {
         keyword
     }
     try {
-        const resuest = await axiosInstance.get(`/products`, { params });
-        return resuest.data;
+        const {data} = await axiosInstance.get(`/products`, { params });
+        return data;
     } catch (e) {
         console.error(e);
         if (e.response) {
@@ -47,8 +47,8 @@ export async function createProduct({ name = 'default', description = 'default',
         images
     }
     try {
-        const request = await axiosInstance.post(`/products`, params);
-        return request.data;
+        const {data} = await axiosInstance.post(`/products`, params);
+        return data;
     } catch (e) {
         console.error(e);
         if (e.response) {
@@ -69,8 +69,8 @@ export async function patchProduct(id, { name = 'default', description = 'defaul
         images
     }
     try {
-        const request = await axiosInstance.patch(`/products/${id}`, params);
-        return request.data;
+        const {data} = await axiosInstance.patch(`/products/${id}`, params);
+        return data;
     } catch (e) {
         console.error(e);
         if (e.response) {
@@ -84,8 +84,8 @@ export async function patchProduct(id, { name = 'default', description = 'defaul
 export async function deleteProduct(id) {
     if (id === undefined) return `id 값을 입력하지 않았습니다.`;
     try {
-        const request = await axiosInstance.delete(`/products/${id}`);
-        return request.data;
+        const {data} = await axiosInstance.delete(`/products/${id}`);
+        return data;
     } catch (e) {
         console.error(e);
         if (e.response) {
