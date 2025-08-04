@@ -10,6 +10,7 @@ export async function getProduct(id) {
         const request = await axiosInstance.get(`/products/${id}`);
         return request.data;
     } catch (e) {
+        console.error(e);
         if (e.response) {
             console.log(e.response.status);
             console.log(e.response.data);
@@ -28,6 +29,7 @@ export async function getProductList(page = 1, pageSize = 10, keyword) {
         const resuest = await axiosInstance.get(`/products`, { params });
         return resuest.data;
     } catch (e) {
+        console.error(e);
         if (e.response) {
             console.log(e.response.status);
             console.log(e.response.data);
@@ -48,6 +50,7 @@ export async function createProduct({ name = 'default', description = 'default',
         const request = await axiosInstance.post(`/products`, params);
         return request.data;
     } catch (e) {
+        console.error(e);
         if (e.response) {
             console.log(e.response.status);
             console.log(e.response.data);
@@ -69,6 +72,7 @@ export async function patchProduct(id, { name = 'default', description = 'defaul
         const request = await axiosInstance.patch(`/products/${id}`, params);
         return request.data;
     } catch (e) {
+        console.error(e);
         if (e.response) {
             console.log(e.response.status);
             console.log(e.response.data);
@@ -83,6 +87,7 @@ export async function deleteProduct(id) {
         const request = await axiosInstance.delete(`/products/${id}`);
         return request.data;
     } catch (e) {
+        console.error(e);
         if (e.response) {
             console.log(e.response.status);
             console.log(e.response.data);
