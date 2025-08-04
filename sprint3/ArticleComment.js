@@ -11,7 +11,7 @@ ArticleCommentRouter.get('', (req,res) => {
 });
 
 
-ArticleCommentRouter.post('', (req,res) => {
+ArticleCommentRouter.post('/', (req,res) => {
     const id = req.params.id ;
     const article = prisma.article.findUnique({
         where: {id}

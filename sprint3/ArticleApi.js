@@ -1,7 +1,7 @@
 
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
-
+import { ArticleValid } from './MiddleWares.js';
 const prisma = new PrismaClient();
 
 const ArticleRouter = express.Router();
@@ -77,27 +77,9 @@ ArticleRouter.get('/:id', async (req,res) =>{
 
 
 
-ArticleRouter.post('/', (req,res) =>{
-    try {
-        const {title, content} = req.body;
-        if (title == 'undefined' || title =='null' ||
-            content == "undefined"|| content =='null'
-        ){
-            throw Error;
-        }
-    } catch(error){
-        res.status(400).send("title or content is null")
-    }
+ArticleRouter.post('/', ArticleValid, (req,res) =>{
+    const {title, content} = req.body;
     
-    try{
-        if (title.length>20 ||content.length>800 ){
-            throw Error;
-        }
-    }catch(error){
-        res.status(400).send("title or content is too long")
-    }
-
-
     try{
         const Article =  prisma.Article.create({
             data: {
