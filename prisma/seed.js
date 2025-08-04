@@ -1,11 +1,12 @@
-import prisma from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+
 const prisma =  new PrismaClient();
 
 
 
-function main(){
+async function main(){
     //product 10개, 댓글 각각 3개씩 생성
-    for (i = 0; i < 10; i++){
+    for (let i = 0; i < 10; i++){
         let name = `$product{i}`
         let description = `${i}`
         let price = `${i}000 won`
@@ -21,7 +22,7 @@ function main(){
         });
         let productId = productInstance.id ;
 
-        for (j = 0; j < 3; j++){
+        for (let j = 0; j < 3; j++){
             let commentContent = `comment ${i}`
             prisma.ProductComment.create({
                 data: {
@@ -33,8 +34,8 @@ function main(){
     }
 
     //article
-    for(x = 0; x < 10; x++){
-        for (y = 0 ; y < 3; y++){
+    for(let x = 0; x < 10; x++){
+        for (let y = 0 ; y < 3; y++){
             let title = `title ${x+1}`;
             let articleContent = `text ${x+1} `
 
@@ -51,7 +52,7 @@ function main(){
             
             prisma.articleComment.create({
                 data:{
-                    articleComment,
+                    commentContent,
                     articleId
                 }
             })
@@ -75,7 +76,6 @@ main()
     console.log(`seeding 끝`)
 }).catch( (e) =>{
     console.error(e);
-    process.exit(1);
 }).finally(async () => {
     await prisma.$disconnect();
 })
