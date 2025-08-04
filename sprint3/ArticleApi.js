@@ -24,7 +24,7 @@ ArticleRouter.get('/', async (req,res) =>{
         if (typeof(skip) != 'number' ||typeof(take) != 'number'){
             throw Error;
         }
-        
+
     }catch(error){
         console.log("get article failed because of input type ")
         res.status(400).send("400 bad request")
@@ -72,9 +72,27 @@ ArticleRouter.get('/:id', async (req,res) =>{
 
 
 ArticleRouter.post('/', (req,res) =>{
+    try {
+        const {title, content} = req.body;
+        if (title == 'undefined' || title =='null' ||
+            content == "undefined"|| content =='null'
+        ){
+            throw Error;
+        }
+    } catch(error){
+        res.status(400).send("title or content is null")
+    }
+    
+    try{
+        if (title.length>20 ||content.length>800 ){
+            throw Error;
+        }
+    }catch(error){
+        res.status(400).send("title or content is too long")
+    }
+
 
     try{
-        const {title, content} = req.body;
         const Article =  prisma.Article.create({
             data: {
                 title,
@@ -83,6 +101,7 @@ ArticleRouter.post('/', (req,res) =>{
         });
         res.status(201).send(Article);
         console.log("post Article success");
+
     } catch(error){
         console.log("get Article failed because of server");
         res.status(500).send("server error")
