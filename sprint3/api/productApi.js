@@ -89,3 +89,35 @@ app.delete("/products/:id", async (req, res) => {
     res.status(500).json({ error: "서버 에러" });
   }
 });
+
+app.get("/products", async (req, res) => {
+  const { offset = 0, limit = 10, search } = req.query;
+
+  const where = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: "insenstive" } },
+          { description: { contains: search, mode: "insenstive" } },
+        ],
+      }
+    : {};
+
+  try {
+    const product = await prisma.product.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: parseInt(offset),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createAt: true,
+      },
+    });
+
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
