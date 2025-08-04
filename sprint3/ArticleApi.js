@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const ArticleRouter = express.Router();
 
 
-//need validating, console.log, 
+//모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
     try{
         let {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
@@ -55,7 +55,7 @@ ArticleRouter.get('/', async (req,res) =>{
 });
      
 
-
+//게시글 상세 페이지
 ArticleRouter.get('/:id', async (req,res) =>{
 
     try{
@@ -76,8 +76,8 @@ ArticleRouter.get('/:id', async (req,res) =>{
 });
 
 
-
-ArticleRouter.post('/', ArticleValid, (req,res) =>{
+//   '/post/postarticle' 이란 사이트에서 article 생성하기
+ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
     const {title, content} = req.body;
     
     try{
@@ -95,10 +95,9 @@ ArticleRouter.post('/', ArticleValid, (req,res) =>{
         res.status(500).send("server error")
     }
     
-    
 });
 
-
+//   'article/:id/modfiy'라는 사이트에서 article 수정하기
 ArticleRouter.patch('/:id/modify', (req,res) =>{
     try{
         const {title,content} = req.body; 
@@ -119,7 +118,7 @@ ArticleRouter.patch('/:id/modify', (req,res) =>{
     
 } );
 
-
+// article 삭제하기 
 ArticleRouter.delete('/:id', (req,res) =>{
     try{
         const id = req.params.id;
@@ -135,5 +134,92 @@ ArticleRouter.delete('/:id', (req,res) =>{
     }
     
 });
+
+// 모든 댓글 불러오기
+ArticleRouter.get('/comments', (req,res) =>{
+    try{
+            const article = prisma.Articlecomment.findMany();
+        } catch(error){
+            res.status(500).send('there was error during finding comments in server')
+        }
+});
+
+// 게시글 상세 페이지에서 댓글 달기
+ArticleRouter.post('/:id', ArticleValid, (req,res) =>{
+    try{
+            const id = req.params.id ;
+            const article = prisma.article.findUnique({
+                where: {id}
+            });
+            if (!article){
+                throw Error;
+            }       
+    
+        } catch(error){
+            res.status(400).send("invalid Article ID");
+        }
+        try{
+            const content = req.body.commentcontent;
+            if (content =='undefined'|| content.length>500){
+                throw Error;
+            }
+        } catch (error){
+            res.status(400).send('message content is too long or undefined')
+        }
+        try{
+            const newComment = prisma.Articlecomment.create({
+            data: {
+                commentcontent
+            }
+        });
+        } catch(error){
+            console.log("comment POST Error Occured");
+            res.status(500).send("there was error during making comment");
+        }
+        
+});
+
+//게시글 상세 페이지에서 댓글 수정하기
+ArticleRouter.patch('/:id', (req,res) =>{
+    try{
+        const id = req.params.id ;
+        const article = prisma.article.findUnique({
+            where: {id}
+        });
+        if (!article){
+            throw Error;
+        }
+    }catch(error){
+        res.status(404).send("no article");
+    }
+    
+    try{
+        const CommentId = req.body.Id;
+        const commentContent = req.body.commentContent;
+        const newComment = prisma.Articlecomment.update({
+            where:{
+                id:CommentId
+            },
+            data: {
+                commentContent
+            }     
+    });
+        res.status(201).send(newComment);
+    }catch(error){
+        res.status(500).send("there was error updating comment in server");
+        console.log("there was error updating comment in server");
+    }
+});
+
+//게시글 상세페이지에서 댓글 삭제하기 
+
+
+
+
+
+
+
+
+
 
 export default ArticleRouter;
