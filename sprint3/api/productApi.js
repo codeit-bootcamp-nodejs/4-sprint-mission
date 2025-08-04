@@ -48,3 +48,28 @@ app.get("/products/:id", async (req, res) => {
     res.status(500).json({ error: "서버 에러" });
   }
 });
+
+app.patch("/products/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  const { name, description, price, tags } = req.body;
+
+  try {
+    const product = await prisma.product.update({
+      where: { id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(description !== undefined && { description }),
+        ...(price !== undefined && { price }),
+        ...(tags !== undefined && { tags }),
+      },
+    });
+
+    res.status(200).json(product);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
+    }
+
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
