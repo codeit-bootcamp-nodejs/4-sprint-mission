@@ -13,10 +13,23 @@ ProductRouter.get('/', async (req,res) =>{
     
     const {offset, sort, name, description} = req.query;
     try{
+        const {sort = 'recent', skip = 40, take= 10, searchName, searchDescription} = req.query;
+        let orderBy ;
+        if (sort === oldest){        
+            orderBy = {createdAt : 'desc'};
+        }else {
+            orderBy = {createdAt : 'asc'};
+        }
+
         const Product = await prisma.product.findMany({
-            where:{
-                name,
-                description
+            include: {
+                comment
+            },
+            skip,
+            take,
+            where: {
+                title: {contains : searchTitle},
+                content: {contains : searchContent}
             }
         });
         console.log(`get product : ${Product.length}`);

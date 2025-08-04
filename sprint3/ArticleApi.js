@@ -10,9 +10,25 @@ const ArticleRouter = express.Router();
 //need validating, console.log, 
 ArticleRouter.get('/', async (req,res) =>{
     try{
-        const {sort, offset, title, content} = req.query;
+        const {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
+        let orderBy ;
+        if (sort === oldest){        
+            orderBy = {createdAt : 'desc'};
+        }else {
+            orderBy = {createdAt : 'asc'};
+        }
+
+
         const Articles = await prisma.Article.findMany({
-            include
+            include: {
+                Comment
+            },
+            skip,
+            take,
+            where: {
+                title:{contains : searchTitle},
+                content:{contains : searchContent}
+            }
          })
         
     } catch(error){
