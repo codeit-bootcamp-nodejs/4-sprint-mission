@@ -29,7 +29,7 @@ model Product{
 model Article{
   id                  Int                @id @default(autoincrement())
   title               String          
-  Articlecontent      String
+  articleContent      String
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   comment             ArticleComment[]       
@@ -47,7 +47,7 @@ model ProductComment{
 
 model ArticleComment{
   id                  Int                @id @default(autoincrement())
-  commentContent      String          
+  commentContent      String             
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   article             Article            @relation(fields:[articleId], references:[id])
