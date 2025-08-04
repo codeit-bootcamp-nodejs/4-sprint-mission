@@ -1,0 +1,13 @@
+.eslintrc.js
+
+.prettierrc
+
+.vscode/
+
+node_modules/
+
+sprintMission2/
+
+/generated/prisma
+
+.env
