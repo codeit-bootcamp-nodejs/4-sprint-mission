@@ -10,20 +10,22 @@ const ArticleRouter = express.Router();
 //need validating, console.log, 
 ArticleRouter.get('/', async (req,res) =>{
     try{
-        const {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
+        let {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
         let orderBy ;
 
-        if (sort === oldest){        
-            orderBy = {createdAt : 'desc'};
-        }else if (sort == recent){
+        if (sort == 'oldest'){        
             orderBy = {createdAt : 'asc'};
+        }else if (sort == 'recent'){
+            orderBy = {createdAt : 'desc'};
         }else{
             throw Error;
         }
 
-        if (typeof(skip) != 'number' ||typeof(take) != 'number'){
-            throw Error;
-        }
+        skip = parseInt(skip);
+        take = parseInt(take);
+        // if (typeof(skip) != 'number' ||typeof(take) != 'number'){
+        //     throw Error;
+        // }
 
     }catch(error){
         console.log("get article failed because of input type ")
@@ -32,14 +34,16 @@ ArticleRouter.get('/', async (req,res) =>{
     
     try{
         const Articles = await prisma.Article.findMany({
-            include: {
-                comment:true
-            },
+            // include: {
+            //     comment:true
+            // },
             skip,
             take,
             where: {
-                title:{contains : searchTitle},
-                content:{contains : searchContent}
+                AND:[
+                    searchTitle? {title:{contains : searchTitle}} : {},
+                    searchContnet? {content:{contains : searchContent}} : {}
+                ]   
             }
          })
         
@@ -56,15 +60,16 @@ ArticleRouter.get('/:id', async (req,res) =>{
 
     try{
         const id = req.params.id;
+        id = parseInt(id);
         const Article = await prisma.Article.findUnique({
-            data: {id},
+            where: {id},
             include : {comment: true}
         });
         console.log("get Article success");
         res.status(200).send(Article);
         
     } catch(error){
-        console.log("get Article failed because of server error");
+        console.log("get Article/id failed because of server error");
         res.status(500).send("server error")
     }
     
