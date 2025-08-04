@@ -34,14 +34,17 @@ ProductRouter.get('/', async (req,res) =>{
     try{
         const {name, description} = req.query;
         const Product = await prisma.product.findMany({
-            include: {
-                comment: true
-            },
+            // include: {
+            //     comment: true
+            // },
             skip,
             take,
             where: {
-                title: {contains : searchTitle},
-                content: {contains : searchContent}
+                AND:[
+                    searchName? {name: {contains : searchName}} : {},
+                    searchDescription? {content: {contains : searchDescription}} : {}
+                ]
+                
             }
         });
         console.log(`get product : ${Product.length}`);
