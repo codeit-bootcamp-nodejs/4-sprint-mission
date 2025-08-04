@@ -12,7 +12,7 @@ ArticleRouter.get('/', async (req,res) =>{
     try{
         const {sort, offset, title, content} = req.query;
         const Articles = await prisma.Article.findMany({
-
+            include
          })
         
     } catch(error){
