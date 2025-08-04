@@ -3,13 +3,13 @@ import { Product, ElectronicProduct } from "../Model/Product.js";
 
 const BASE_URL = "https://panda-market-api-crud.vercel.app/products";
 
-// Product 상품 목록을 검색하는 함수
+/**  Product 상품 목록을 검색하는 함수 */
 export async function getProductList(page = 1, pageSize = 10, keyword = "") {
   const url = new URL(BASE_URL);
   url.searchParams.append("page", page);
   url.searchParams.append("pageSize", pageSize);
 
-  if (typeof keyword === "string" && keyword.trim()) {
+  if (typeof keyword === "string") {
     url.searchParams.append("keyword", keyword.trim());
   }
 
@@ -24,7 +24,7 @@ export async function getProductList(page = 1, pageSize = 10, keyword = "") {
   }
 }
 
-// Product ID의 상세정보를 조회하는 함수
+/**  Product ID의 상세정보를 조회하는 함수 */
 export async function getProduct(id) {
   try {
     const res = await axios.get(`${BASE_URL}/${id}`);
@@ -35,7 +35,7 @@ export async function getProduct(id) {
   }
 }
 
-// Proudct 새로운 상품을 추가하는 함수
+/**  Proudct 새로운 상품을 추가하는 함수 */
 export async function createProduct({
   name,
   description,
@@ -55,7 +55,7 @@ export async function createProduct({
   }
 }
 
-// Product ID의 정보를 변경하는 함수
+/**  Product ID의 정보를 변경하는 함수 */
 export async function patchProduct(id, update) {
   console.log("업데이트", update);
   try {
@@ -67,7 +67,7 @@ export async function patchProduct(id, update) {
   }
 }
 
-// Product ID를 삭제하는 함수
+/**  Product ID를 삭제하는 함수 */
 export async function deleteProduct(id) {
   console.log("삭제할 ID :", id);
   try {
@@ -79,7 +79,7 @@ export async function deleteProduct(id) {
   }
 }
 
-//검색한 상품 목록을 class로 생성하는 함수
+/** 검색한 상품 목록을 class로 생성하는 함수 */
 export async function loadProducts(page, pageSize, keyword) {
   try {
     const response = await getProductList(page, pageSize, keyword);
