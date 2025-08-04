@@ -99,7 +99,7 @@ ArticleRouter.post('/', ArticleValid, (req,res) =>{
 });
 
 
-ArticleRouter.patch('/:id', (req,res) =>{
+ArticleRouter.patch('/:id/modify', (req,res) =>{
     try{
         const {title,content} = req.body; 
         const id = req.params.id;

@@ -27,31 +27,31 @@ model Product{
 }
 
 model Article{
-  id           Int                @id @default(autoincrement())
-  title        String          
-  content      String
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  comment      ArticleComment[]       
+  id                  Int                @id @default(autoincrement())
+  title               String          
+  Articlecontent      String
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  comment             ArticleComment[]       
 }
 
 model ProductComment{
-  id           Int                @id @default(autoincrement())
-  content      String            
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  product      Product            @relation(fields:[productId], references:[id])
-  productId    Int         
+  id                  Int                @id @default(autoincrement())
+  commentContent      String            
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  product             Product            @relation(fields:[productId], references:[id])
+  productId           Int         
   
 }
 
 model ArticleComment{
-  id           Int                @id @default(autoincrement())
-  content      String          
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
-  article      Article            @relation(fields:[articleId], references:[id])
-  articleId    Int       
+  id                  Int                @id @default(autoincrement())
+  commentContent      String          
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  article             Article            @relation(fields:[articleId], references:[id])
+  articleId           Int       
   
 }
 
