@@ -50,3 +50,26 @@ app.get("/articles/:id", async (req, res) => {
     res.status(500).json({ message: "서버 에러" });
   }
 });
+
+app.patch("/articles/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  const { title, content } = req.body;
+
+  try {
+    const article = await prisma.article.update({
+      where: { id },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(content !== undefined && { content }),
+      },
+    });
+
+    res.status(200).json(article);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+    }
+
+    res.status(500).json({ message: "서버 에러" });
+  }
+});
