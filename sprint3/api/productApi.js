@@ -73,3 +73,19 @@ app.patch("/products/:id", async (req, res) => {
     res.status(500).json({ error: "서버 에러" });
   }
 });
+
+app.delete("/products/:id", async (req, res) => {
+  const id = Number(req.params.id);
+
+  try {
+    await prisma.product.delete({ where: { id } });
+
+    res.status(200).json({ message: `${id} 삭제 완료` });
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
+    }
+
+    res.status(500).json({ error: "서버 에러" });
+  }
+});
