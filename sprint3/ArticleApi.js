@@ -12,22 +12,11 @@ const ArticleRouter = express.Router();
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
     let {sort='recent', skip='40', take='10', searchTitle, searchContent} = req.query;
-        // sort = sort.trim() === "" ? 'recent' : sort;
-        // skip = skip.trim() === "" ? '40' : skip;
-        // take = take.trim() === "" ? '10' : take;
 
     let orderBy ;
     skip = parseInt(skip);
     take = parseInt(take);
     try{
-        // let {sort='recent', skip='40', take='10', searchTitle, searchContent} = req.query;
-        // sort = sort.trim() === "" ? 'recent' : sort;
-        // skip = skip.trim() === "" ? '40' : skip;
-        // take = take.trim() === "" ? '10' : take;
-
-        // let orderBy ;
-        // skip = parseInt(skip);
-        // take = parseInt(take);
 
         if (sort == 'oldest'){        
             orderBy = {createdAt : 'asc'};
@@ -37,10 +26,6 @@ ArticleRouter.get('/', async (req,res) =>{
             throw new Error;
         }
 
-        
-        // if (typeof(skip) != 'number' ||typeof(take) != 'number'){
-        //     throw Error;
-        // }
         console.log(sort, skip, take, searchTitle, searchContent);
 
     }catch(error){
@@ -70,7 +55,7 @@ ArticleRouter.get('/', async (req,res) =>{
      
 
 //게시글 상세 페이지
-ArticleRouter.get('/:id', async (req,res) =>{
+ArticleRouter.get('/detail/:id', async (req,res) =>{
 
     try{
         let id = req.params.id;
@@ -150,11 +135,16 @@ ArticleRouter.delete('/:id', (req,res) =>{
 });
 
 // 모든 댓글 불러오기
-ArticleRouter.get('/comments', (req,res) =>{
+ArticleRouter.get('/comments', async(req,res) =>{
     try{
-            const article = prisma.Articlecomment.findMany();
+        const article =await prisma.ArticleComment.findMany(
+            
+        )
+        res.send(article)
+        ;
         } catch(error){
-            res.status(500).send('there was error during finding comments in server')
+            console.error(error)
+            return res.status(500).send('there was error during finding comments in server')
         }
 });
 

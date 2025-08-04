@@ -38,7 +38,7 @@ ProductRouter.get('/', async (req,res) =>{
     try{
         const {name, description} = req.query;
         const Product = await prisma.product.findMany({
-            // skip: 20,
+            // skip,
             take,
             where: {
                 AND:[
@@ -59,8 +59,9 @@ ProductRouter.get('/', async (req,res) =>{
 });
 
 //게시글 상세페이지
-ProductRouter.get('/:id', async (req,res) =>{
-    const id = req.params.id;
+ProductRouter.get('/detail/:id', async (req,res) =>{
+    let id = req.params.id;
+    id = parseInt(id);
     try{
         const Product = await prisma.product.findUnique({
             where:{id},
@@ -73,7 +74,7 @@ ProductRouter.get('/:id', async (req,res) =>{
         return res.status(200).send(Product);
         
     }catch(error){
-        console.log('get product failed because of server error');
+        console.error(error);
         return res.status(500).end("interner Server Error");
     }
     
@@ -153,13 +154,14 @@ ProductRouter.delete('/:id', async (req,res) =>{
 //모든 댓글 보기
 ProductRouter.get('/comments', async (req,res) =>{
     try{
-        const comments= prisma.productComment.findMany();
-        if (!comment){
-            res.status(300).send("There isn't comment. Write the first comment!");
+        const comments= await prisma.productComment.findMany();
+        if (!comments){
+            return res.status(300).send("There isn't comment. Write the first comment!");
         }
 
         return res.status(300).send(comments);
     }catch(error){
+        console.error(error);
         return res.status(500).send("there was error during finding comments");
     }
 });    
