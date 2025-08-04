@@ -89,3 +89,35 @@ app.delete("/article/:id", async (req, res) => {
     res.status(500).json({ message: "서버 에러" });
   }
 });
+
+app.get("/article", async (req, res) => {
+  const { offset = 0, limit = 10, search } = req.query;
+
+  const where = search
+    ? {
+        OR: [
+          { title: { contains: search, mode: "insensitive" } },
+          { content: { contains: search, mode: "insensitive" } },
+        ],
+      }
+    : {};
+
+  try {
+    const articles = await prisma.article.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: parseInt(offset),
+      take: parseInt(limit),
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json(articles);
+  } catch (err) {
+    res.status(500).json({ message: "서버 에러" });
+  }
+});
