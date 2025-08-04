@@ -1,12 +1,41 @@
 import multer from "multer"
 
-function ProductValid(req,res,next){
+export function ProductValid(req,res,next){
     const {name,description, price, tags} = req.body;
+    try{
+        if (typeof(name) =='undefined' || typeof(description) =='undefined'||
+            typeof(price) == 'undefined' || typeof(tags)=='undefined'){
+                throw Error;
+        }else{
+            next();
+        }
+    } catch(error){
+        res.status(400).send("400 bad request");
+    }
 }
 
 
-function ArticleValid(req,res,next){
-    const {title, content} = req.body;
+export function ArticleValid(req,res,next){
+    try {
+        const {title, content} = req.body;
+        if (title == 'undefined' || title =='null' ||
+            content == "undefined"|| content =='null'
+        ){
+            throw Error;
+        }else{
+            next();
+        }
+    } catch(error){
+        res.status(400).send("400 bad request")
+    }
+
+    try{
+        if (title.length>20 ||content.length>800 ){
+            throw Error;
+        }
+    }catch(error){
+        res.status(400).send("title or content is too long")
+    }
 }
 
 
@@ -14,3 +43,5 @@ function ArticleValid(req,res,next){
 somefunction('', multer.single, (req,res) =>{
 
 })
+
+
