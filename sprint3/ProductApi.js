@@ -35,7 +35,7 @@ ProductRouter.get('/', async (req,res) =>{
         const {name, description} = req.query;
         const Product = await prisma.product.findMany({
             include: {
-                comment
+                comment: true
             },
             skip,
             take,
@@ -58,7 +58,10 @@ ProductRouter.get('/:id', async (req,res) =>{
     const id = req.params.id;
     try{
         const Product = await prisma.product.findUnique({
-            where:{id}
+            where:{id},
+            include: {
+                comment:true
+            }
         });
 
         console.log(`get product : ${Product}`);

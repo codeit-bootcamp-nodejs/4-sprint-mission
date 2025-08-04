@@ -33,7 +33,7 @@ ArticleRouter.get('/', async (req,res) =>{
     try{
         const Articles = await prisma.Article.findMany({
             include: {
-                Comment
+                comment:true
             },
             skip,
             take,
@@ -57,7 +57,8 @@ ArticleRouter.get('/:id', async (req,res) =>{
     try{
         const id = req.params.id;
         const Article = await prisma.Article.findUnique({
-            data: {id}
+            data: {id},
+            include : {comment: true}
         });
         console.log("get Article success");
         res.status(200).send(Article);
