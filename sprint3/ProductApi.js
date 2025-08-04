@@ -6,8 +6,7 @@ const prisma = new PrismaClient();
 const app = express()
 const ProductRouter = express.Router()
 
-// have to sort, pagination , validating, console.log
-
+//게시글 전체 불러오기
 ProductRouter.get('/', async (req,res) =>{
     try{
         const {sort = 'recent', skip = 40, take= 10, searchName, searchDescription} = req.query;
@@ -57,6 +56,7 @@ ProductRouter.get('/', async (req,res) =>{
     }
 });
 
+//게시글 상세페이지
 ProductRouter.get('/:id', async (req,res) =>{
     const id = req.params.id;
     try{
@@ -77,8 +77,8 @@ ProductRouter.get('/:id', async (req,res) =>{
     
 });
 
-
-ProductRouter.post('/', ProductValid, async (req,res) =>{
+//게시글 posting
+ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
     const {name,description, price, tags} = req.body;
 
     try{
@@ -99,7 +99,8 @@ ProductRouter.post('/', ProductValid, async (req,res) =>{
     }
 });
 
-ProductRouter.patch('/:id', async (req,res) =>{
+//게시글 수정하기
+ProductRouter.patch('/:id/modify', async (req,res) =>{
     const {name, description, price, tags} = req.body;
     const id = req.params.id ;
 
@@ -122,6 +123,7 @@ ProductRouter.patch('/:id', async (req,res) =>{
     }
 });
 
+//게시글 삭제하기 
 ProductRouter.delete('/:id', async (req,res) =>{
     const id = req.params.id ;
 
@@ -137,5 +139,100 @@ ProductRouter.delete('/:id', async (req,res) =>{
         res.status(500).send("server error");
     }
 });
+
+
+
+
+
+//------------------------------댓글-----------------
+
+
+
+//모든 댓글 보기
+ProductRouter.get('/comments', async (req,res) =>{
+    try{
+        const comments= prisma.productComment.findMany();
+        if (!comment){
+            res.status(300).send("There isn't comment. Write the first comment!");
+        }
+
+        res.status(300).send(comments);
+    }catch(error){
+        res.status(500).send("there was error during finding comments");
+    }
+});    
+
+    
+
+
+
+
+//게시글 상세페이지에서 댓글 달기
+ProductRouter.post('/:id', async (req,res) =>{
+    try{
+        const id = req.params.id ;
+        const product = prisma.product.findUnique({
+            where: {id}
+        });
+
+        if (!product){
+            throw Error;
+        }
+    }catch(error){
+        res.status(404).send("no product");
+    }
+    
+
+    const commentContent = req.body.commentContent;
+
+    const newComment = prisma.ProductComment.create({
+        data: {
+            commentContent
+        }
+    });
+
+});
+
+
+//게시글 상세페이지에서 댓글 수정하기
+ProductRouter.patch('/:id', async (req,res) =>{
+    try{
+        const id = req.params.id ;
+        const product = prisma.product.findUnique({
+            where: {id}
+        });
+
+        if (!product){
+            throw Error;
+        }
+    }catch(error){
+        res.status(404).send("no product");
+    }
+    
+    try{
+        const CommentId = req.body.Id;
+        const commentContent = req.body.commentContent;
+
+        const newComment = prisma.ProductComment.update({
+            where:{
+                id:CommentId
+            },
+            data: {
+                commentContent
+            }
+        });
+        res.status(201).send(newcomment);
+
+    }catch(error){
+        res.status(500).send("server error occured during updating comment");
+        console.log("server error occured during updating comment");
+    }
+   
+    
+});
+
+//댓글 삭제하기
+
+
 
 export default ProductRouter;
