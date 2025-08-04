@@ -9,18 +9,30 @@ const ProductRouter = express.Router()
 // have to sort, pagination , validating, console.log
 
 ProductRouter.get('/', async (req,res) =>{
-
-    
-    const {offset, sort, name, description} = req.query;
     try{
         const {sort = 'recent', skip = 40, take= 10, searchName, searchDescription} = req.query;
         let orderBy ;
+
         if (sort === oldest){        
             orderBy = {createdAt : 'desc'};
-        }else {
+        }else if (sort == recent){
             orderBy = {createdAt : 'asc'};
+        }else{
+            throw Error;
         }
 
+        if (typeof(skip) != 'number' ||typeof(take) != 'number'){
+            throw Error;
+        }
+        
+    }catch(error){
+        console.log("get product failed because of input type ")
+        res.status(400).send("400 bad request")
+    }
+
+
+    try{
+        const {name, description} = req.query;
         const Product = await prisma.product.findMany({
             include: {
                 comment

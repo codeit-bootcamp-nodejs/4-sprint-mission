@@ -12,13 +12,25 @@ ArticleRouter.get('/', async (req,res) =>{
     try{
         const {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
         let orderBy ;
+
         if (sort === oldest){        
             orderBy = {createdAt : 'desc'};
-        }else {
+        }else if (sort == recent){
             orderBy = {createdAt : 'asc'};
+        }else{
+            throw Error;
         }
 
-
+        if (typeof(skip) != 'number' ||typeof(take) != 'number'){
+            throw Error;
+        }
+        
+    }catch(error){
+        console.log("get article failed because of input type ")
+        res.status(400).send("400 bad request")
+    }
+    
+    try{
         const Articles = await prisma.Article.findMany({
             include: {
                 Comment
