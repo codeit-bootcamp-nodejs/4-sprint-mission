@@ -42,23 +42,23 @@ export function ArticleValid(req,res,next){
 
 
 // 일단 multer 사용법
-const app = express();
+// const app = express();
 
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb){
-        cb(null, 'uploads/');
-    },
-    filename: function(req, file, cb){
-        cb(null, Date.now()+ '-'+ file.originalname)
-    }
-});
-const upload = multer({ storage: storage})
+// const storage = multer.diskStorage({
+//     destination: function(req, file, cb){
+//         cb(null, 'uploads/');
+//     },
+//     filename: function(req, file, cb){
+//         cb(null, Date.now()+ '-'+ file.originalname)
+//     }
+// });
+// const upload = multer({ storage: storage})
 
-app.post('/upload', multer.single('myFile'), (req,res) =>{
-    console.log(req.file);
-    res.send("파일 업로드 완료!");
-});
+// app.post('/upload', multer.single('myFile'), (req,res) =>{
+//     console.log(req.file);
+//     res.send("파일 업로드 완료!");
+// });
 
 
 

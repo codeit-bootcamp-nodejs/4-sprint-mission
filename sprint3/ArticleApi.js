@@ -11,47 +11,59 @@ const ArticleRouter = express.Router();
 
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
+    let {sort='recent', skip='40', take='10', searchTitle, searchContent} = req.query;
+        // sort = sort.trim() === "" ? 'recent' : sort;
+        // skip = skip.trim() === "" ? '40' : skip;
+        // take = take.trim() === "" ? '10' : take;
+
+    let orderBy ;
+    skip = parseInt(skip);
+    take = parseInt(take);
     try{
-        let {sort = 'recent', skip = 40, take= 10, searchTitle, searchContent} = req.query;
-        let orderBy ;
+        // let {sort='recent', skip='40', take='10', searchTitle, searchContent} = req.query;
+        // sort = sort.trim() === "" ? 'recent' : sort;
+        // skip = skip.trim() === "" ? '40' : skip;
+        // take = take.trim() === "" ? '10' : take;
+
+        // let orderBy ;
+        // skip = parseInt(skip);
+        // take = parseInt(take);
 
         if (sort == 'oldest'){        
             orderBy = {createdAt : 'asc'};
         }else if (sort == 'recent'){
             orderBy = {createdAt : 'desc'};
         }else{
-            throw Error;
+            throw new Error;
         }
 
-        skip = parseInt(skip);
-        take = parseInt(take);
+        
         // if (typeof(skip) != 'number' ||typeof(take) != 'number'){
         //     throw Error;
         // }
+        console.log(sort, skip, take, searchTitle, searchContent);
 
     }catch(error){
         console.log("get article failed because of input type ")
-        res.status(400).send("400 bad request")
+        return res.status(400).send("400 bad request")
     }
+
     
     try{
         const Articles = await prisma.Article.findMany({
-            // include: {
-            //     comment:true
-            // },
             skip,
             take,
             where: {
                 AND:[
-                    searchTitle? {title:{contains : searchTitle}} : {},
-                    searchContnet? {content:{contains : searchContent}} : {}
-                ]   
+                    searchTitle? {title:{contains : searchTitle}} : undefined,
+                    searchContent? {content:{contains : searchContent}} : undefined
+                ].filter(Boolean)
             }
          })
-        
+        res.send(Articles);
     } catch(error){
-        console.log("get Article failed");
-        res.status(500).send("server error")
+        console.error(error);
+        return res.status(500).send("server error")
     }
     
 });
@@ -61,18 +73,18 @@ ArticleRouter.get('/', async (req,res) =>{
 ArticleRouter.get('/:id', async (req,res) =>{
 
     try{
-        const id = req.params.id;
+        let id = req.params.id;
         id = parseInt(id);
         const Article = await prisma.Article.findUnique({
             where: {id},
             include : {comment: true}
         });
         console.log("get Article success");
-        res.status(200).send(Article);
+        return res.status(200).send(Article);
         
     } catch(error){
-        console.log("get Article/id failed because of server error");
-        res.status(500).send("server error")
+        console.error(error);
+        return res.status(500).send("server error")
     }
     
 });
@@ -89,12 +101,12 @@ ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
                 content
             }
         });
-        res.status(201).send(Article);
+        return res.status(201).send(Article);
         console.log("post Article success");
 
     } catch(error){
         console.log("get Article failed because of server");
-        res.status(500).send("server error")
+        return res.status(500).send("server error")
     }
     
 });
@@ -111,11 +123,11 @@ ArticleRouter.patch('/:id/modify', (req,res) =>{
             }
         })
         console.log("patch Article success")
-        res.status(201).send(Article);
+        return res.status(201).send(Article);
 
     } catch(error){
         console.log("patch Article failed because of server");
-        res.status(500).send("server error")
+        return res.status(500).send("server error")
     }
     
 } );
@@ -128,11 +140,11 @@ ArticleRouter.delete('/:id', (req,res) =>{
             where:{id}
         });
         console.log("deleting article success");
-        res.send(200).send("deleting completed");
+        return res.send(200).send("deleting completed");
 
     } catch(error){
         console.log("patch Article failed because of server");
-        res.status(500).send("server error")
+        return res.status(500).send("server error")
     }
     
 });
@@ -158,26 +170,28 @@ ArticleRouter.post('/:id', ArticleValid, (req,res) =>{
             }       
     
         } catch(error){
-            res.status(400).send("invalid Article ID");
+            return res.status(400).send("invalid Article ID");
         }
-        try{
-            const content = req.body.commentcontent;
-            if (content =='undefined'|| content.length>500){
-                throw Error;
-            }
-        } catch (error){
-            res.status(400).send('message content is too long or undefined')
+
+    try{
+        const content = req.body.commentcontent;
+        if (content =='undefined'|| content.length>500){
+            throw Error;
         }
-        try{
-            const newComment = prisma.Articlecomment.create({
-            data: {
-                commentcontent
-            }
-        });
-        } catch(error){
-            console.log("comment POST Error Occured");
-            res.status(500).send("there was error during making comment");
+    } catch (error){
+        return res.status(400).send('message content is too long or undefined')
+    }
+
+    try{
+        const newComment = prisma.Articlecomment.create({
+        data: {
+            commentcontent
         }
+    });
+    } catch(error){
+        console.log("comment POST Error Occured");
+        return res.status(500).send("there was error during making comment");
+    }
         
 });
 
@@ -192,7 +206,7 @@ ArticleRouter.patch('/:id', (req,res) =>{
             throw Error;
         }
     }catch(error){
-        res.status(404).send("no article");
+        return res.status(404).send("no article");
     }
     
     try{
@@ -206,9 +220,9 @@ ArticleRouter.patch('/:id', (req,res) =>{
                 commentContent
             }     
     });
-        res.status(201).send(newComment);
+        return res.status(201).send(newComment);
     }catch(error){
-        res.status(500).send("there was error updating comment in server");
+        return res.status(500).send("there was error updating comment in server");
         console.log("there was error updating comment in server");
     }
 });
