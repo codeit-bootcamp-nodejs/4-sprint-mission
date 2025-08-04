@@ -1,6 +1,8 @@
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { ProductValid } from './MiddleWares.js';
+
+
 const prisma = new PrismaClient();
 
 const app = express()
