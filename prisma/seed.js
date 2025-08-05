@@ -23,7 +23,7 @@ async function main(){
         let productId = productInstance.id ;
 
         for (let j = 0; j < 3; j++){
-            let commentContent = `comment ${i}`
+            let commentContent = `comment ${j}`
             await prisma.ProductComment.create({
                 data: {
                     commentContent,
