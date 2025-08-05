@@ -236,7 +236,37 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 });
 
 //댓글 삭제하기
+ProductRouter.patch('/detail/:id', async (req,res) =>{
+    try{
+        const id = req.params.id ;
+        const product = prisma.product.findUnique({
+            where: {id}
+        });
 
+        if (!product){
+            throw Error;
+        }
+    }catch(error){
+        return res.status(404).send("no product");
+    }
+    
+    try{
+        const CommentId = req.body.Id;
+
+        const newComment = prisma.ProductComment.update({
+            where:{
+                id:CommentId
+            }
+        });
+        return res.status(200).send(newcomment);
+
+    }catch(error){
+        return res.status(500).send("server error occured during updating comment");
+        console.log("server error occured during updating comment");
+    }
+   
+    
+});
 
 
 export default ProductRouter;
