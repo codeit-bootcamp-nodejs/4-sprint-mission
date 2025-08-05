@@ -1,4 +1,4 @@
-import ProductDbService from "../services/ProductDbService.js";
+import ProductService from "../services/ProductService.js";
 
 const ProductController = {
   async createProduct(req, res) {
@@ -12,7 +12,7 @@ const ProductController = {
       }
 
       const productData = { name, description, price, tags };
-      const newProduct = await ProductDbService.createProduct(productData);
+      const newProduct = await ProductService.createProduct(productData);
 
       res.status(201).json(newProduct);
     } catch (err) {
@@ -24,7 +24,7 @@ const ProductController = {
   async findUniqueProduct(req, res) {
     try {
       const { id } = req.params;
-      const product = await ProductDbService.findUniqueProduct(Number(id));
+      const product = await ProductService.findUniqueProduct(Number(id));
 
       res.status(200).json(product);
     } catch (err) {
@@ -38,10 +38,7 @@ const ProductController = {
       const { id } = req.params;
       const updateData = req.body;
 
-      const product = await ProductDbService.patchProduct(
-        Number(id),
-        updateData
-      );
+      const product = await ProductService.patchProduct(Number(id), updateData);
       res.status(201).json(product);
     } catch (err) {
       console.error(err);
@@ -52,9 +49,9 @@ const ProductController = {
   async deleteProduct(req, res) {
     try {
       const { id } = req.params;
-      await ProductDbService.deleteProduct(Number(id));
+      await ProductService.deleteProduct(Number(id));
 
-      res.status(201).json({ success: true });
+      res.status(201).json({ success: "상품 삭제 성공" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "상품 삭제 실패" });
@@ -64,7 +61,7 @@ const ProductController = {
   async findManyProduct(req, res) {
     try {
       const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
-      const products = await ProductDbService.findManyProduct({
+      const products = await ProductService.findManyProduct({
         offset,
         limit,
         order,

@@ -1,6 +1,6 @@
 import prisma from "../prismaClient.js";
 
-const ProductDbService = {
+const ProductService = {
   async createProduct(productData) {
     const newProduct = await prisma.product.create({
       data: productData,
@@ -62,4 +62,4 @@ const ProductDbService = {
   },
 };
 
-export default ProductDbService;
+export default ProductService;
