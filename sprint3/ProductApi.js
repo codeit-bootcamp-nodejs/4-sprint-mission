@@ -127,7 +127,7 @@ ProductRouter.patch('/:id/modify', async (req,res) =>{
 });
 
 //게시글 삭제하기 
-ProductRouter.delete('/:id', async (req,res) =>{
+ProductRouter.delete('/detail/:id', async (req,res) =>{
     const id = req.params.id ;
 
     try{
@@ -172,7 +172,7 @@ ProductRouter.get('/comments', async (req,res) =>{
 
 
 //게시글 상세페이지에서 댓글 달기
-ProductRouter.post('/:id', async (req,res) =>{
+ProductRouter.post('/detail/:id', async (req,res) =>{
     try{
         const id = req.params.id ;
         const product = prisma.product.findUnique({
@@ -199,7 +199,7 @@ ProductRouter.post('/:id', async (req,res) =>{
 
 
 //게시글 상세페이지에서 댓글 수정하기
-ProductRouter.patch('/:id', async (req,res) =>{
+ProductRouter.patch('/detail/:id', async (req,res) =>{
     try{
         const id = req.params.id ;
         const product = prisma.product.findUnique({

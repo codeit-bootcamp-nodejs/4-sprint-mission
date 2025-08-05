@@ -75,25 +75,25 @@ const ArticleCommentRouter = express.Router()
 //     res.send(comment);
 // });
 
-ArticleCommentRouter.delete('/:id', (req,res) => {
-    const id = req.params.id ;
+// ArticleCommentRouter.delete('/:id', (req,res) => {
+//     const id = req.params.id ;
 
-    const article = prisma.article.findUnique({
-        where: {id}
-    });
-    if (!article){
-        res.status(404).send("no article");
-    }
+//     const article = prisma.article.findUnique({
+//         where: {id}
+//     });
+//     if (!article){
+//         res.status(404).send("no article");
+//     }
 
-    const newComment = prisma.Articlecomment.delete({
-        where:{
-            id:CommentId
-        }
-    });
+//     const newComment = prisma.Articlecomment.delete({
+//         where:{
+//             id:CommentId
+//         }
+//     });
 
-    res.status(200).send("deleting comment completed");
-    console.log("deleting comment completed");
-});
+//     res.status(200).send("deleting comment completed");
+//     console.log("deleting comment completed");
+// });
 
 
 
