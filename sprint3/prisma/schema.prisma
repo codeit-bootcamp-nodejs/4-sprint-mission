@@ -21,12 +21,25 @@ model Product {
   tags          String[] 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  comments      Comment[]
 }
 
 model Article {
-  id          Int   @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   content     String
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  comments    Comment[]
+}
+
+model Comment {
+  id          Int       @id @default(autoincrement())
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  productId   Int?
+  product     Product?  @relation(fields: [productId], references: [id])
+  articleId   Int?
+  article     Article?  @relation(fields: [articleId], references: [id])
 }
