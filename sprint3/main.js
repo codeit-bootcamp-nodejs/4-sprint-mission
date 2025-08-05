@@ -10,6 +10,7 @@ import { PrismaClient } from '@prisma/client'
 
 const app = express();
 
+app.use(express.json());
 app.use('/article', ArticleRouter);
 app.use('/product', ProductRouter);
 // app.use('/upload', fileRouter);

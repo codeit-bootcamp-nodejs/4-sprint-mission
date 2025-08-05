@@ -9,6 +9,7 @@ const prisma = new PrismaClient();
 const ArticleRouter = express.Router();
 
 
+
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
     let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
@@ -19,7 +20,6 @@ ArticleRouter.get('/', async (req,res) =>{
     skip = parseInt(skip);
     take = parseInt(take);
     try{
-
         if (sort == 'oldest'){        
             orderBy = {createdAt : 'desc'};
         }else if (sort == 'recent'){
@@ -88,7 +88,7 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
 //   '/post/postarticle' 이란 사이트에서 article 생성하기
 ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
     const {title, content} = req.body;
-    
+    console.log("post start");
     try{
         const Article =  prisma.Article.create({
             data: {
@@ -96,8 +96,9 @@ ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
                 content
             }
         });
-        return res.status(201).send(Article);
         console.log("post Article success");
+        return res.status(201).send(Article);
+        
 
     } catch(error){
         console.log("get Article failed because of server");

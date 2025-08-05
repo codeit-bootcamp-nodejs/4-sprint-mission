@@ -12,36 +12,37 @@ export function ProductValid(req,res,next){
             next();
         }
     } catch(error){
-        res.status(400).send("400 bad request");
+        return res.status(400).send("400 bad request");
     }
 }
 
 
 export function ArticleValid(req,res,next){
+    // console.log('articlevalid first')
     try {
         const {title, content} = req.body;
         if (title == 'undefined' || title =='null' ||
             content == "undefined"|| content =='null'
         ){
-            throw Error;
+            throw new Error;
         }else{
-            next();
+            // console.log('articlevalid second')
         }
     } catch(error){
-        res.status(400).send("400 bad request")
+        return res.status(400).send("400 bad request")
     }
 
     try{
-        if (title.length>20 ||content.length>800 ){
+        // console.log('articlevalid 3')
+        if (title.length>50 ||content.length>800 ){
             throw Error;
         }
+        next()
     }catch(error){
-        res.status(400).send("title or content is too long")
+        // console.log('articlevalid 4')
+        return res.status(400).send(`
+            
+            `)
     }
 }
-
-
-
-
-
 
