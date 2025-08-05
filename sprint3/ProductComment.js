@@ -56,22 +56,22 @@ const ProductCommentRouter= express.Router()
 //     res.send(comment);
 // });
 
-ProductCommentRouter.delete('', (req,res) => {
-    const id = req.params.id ;
+// ProductCommentRouter.delete('', (req,res) => {
+//     const id = req.params.id ;
     
-    const product = prisma.product.findUnique({
-        where: {id}
-    });
-    if (!product){
-        res.status(404).send("no product");
-    }
+//     const product = prisma.product.findUnique({
+//         where: {id}
+//     });
+//     if (!product){
+//         res.status(404).send("no product");
+//     }
 
-    const newComment = prisma.Productcomment.delete({
-        where:{
-            id:CommentId
-        }
-    });
-    console.log("deleting comment completed");
-    res.send("deleting comment completed");
+//     const newComment = prisma.Productcomment.delete({
+//         where:{
+//             id:CommentId
+//         }
+//     });
+//     console.log("deleting comment completed");
+//     res.send("deleting comment completed");
     
-});
+// });

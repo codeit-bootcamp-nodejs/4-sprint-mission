@@ -1,3 +1,4 @@
+
 import express from 'express'
 import { PrismaClient } from '@prisma/client'
 import { ProductValid } from './MiddleWares.js';
@@ -5,8 +6,9 @@ import { ProductValid } from './MiddleWares.js';
 
 const prisma = new PrismaClient();
 
-const app = express()
 const ProductRouter = express.Router()
+
+
 
 //게시글 전체 불러오기
 ProductRouter.get('/', async (req,res) =>{
@@ -103,7 +105,7 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
 });
 
 //게시글 수정하기
-ProductRouter.patch('/:id/modify', async (req,res) =>{
+ProductRouter.patch('/detail/:id', async (req,res) =>{
     const {name, description, price, tags} = req.body;
     const id = req.params.id ;
 
@@ -153,13 +155,14 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
 
 //모든 댓글 보기
 ProductRouter.get('/comments', async (req,res) =>{
+    console.log('HI');
     try{
-        const comments= await prisma.productComment.findMany();
+        const comments= await prisma.ProductComment.findMany();
         if (!comments){
             return res.status(300).send("There isn't comment. Write the first comment!");
         }
-
-        return res.status(300).send(comments);
+        
+        return res.status(200).send(comments);
     }catch(error){
         console.error(error);
         return res.status(500).send("there was error during finding comments");

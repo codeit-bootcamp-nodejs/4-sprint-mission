@@ -12,7 +12,6 @@ const app = express();
 app.use('/article', ArticleRouter);
 app.use('/product', ProductRouter);
 
-
 console.log(process.env.DATABASE_URL);
 
 app.listen(3000, () =>{
