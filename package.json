@@ -1,0 +1,22 @@
+{
+  "name": "mission3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "zod": "^4.0.14"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
+  }
+}
