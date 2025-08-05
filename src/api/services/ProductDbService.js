@@ -29,10 +29,35 @@ const ProductDbService = {
     });
   },
 
-  async findManyProduct() {
+  async findManyProduct({ offset, limit, order, keyword }) {
+    let orderBy;
+    switch (order) {
+      case "oldest":
+        orderBy = { createdAt: "asc" };
+        break;
+      case "recent":
+      default:
+        orderBy = { createdAt: "desc" };
+    }
+
+    let where = {};
+    if (keyword) {
+      where = {
+        OR: [
+          { name: { contains: keyword, mode: "insensitive" } },
+          { description: { contains: keyword, mode: "insensitive" } },
+        ],
+      };
+    }
+
     const products = await prisma.product.findMany({
-      take: 10,
+      select: { id: true, name: true, price: true, createdAt: true },
+      skip: parseInt(offset),
+      take: parseInt(limit),
+      orderBy,
+      where,
     });
+
     return products;
   },
 };

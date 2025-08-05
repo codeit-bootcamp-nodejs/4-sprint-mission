@@ -26,7 +26,7 @@ const ProductController = {
       const { id } = req.params;
       const product = await ProductDbService.findUniqueProduct(Number(id));
 
-      res.status(201).json(product);
+      res.status(200).json(product);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "상품 조회 실패" });
@@ -52,9 +52,9 @@ const ProductController = {
   async deleteProduct(req, res) {
     try {
       const { id } = req.params;
-      const bool = await ProductDbService.deleteProduct(Number(id));
+      await ProductDbService.deleteProduct(Number(id));
 
-      res.status(201).json(bool);
+      res.status(201).json({ success: true });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "상품 삭제 실패" });
@@ -63,8 +63,14 @@ const ProductController = {
 
   async findManyProduct(req, res) {
     try {
-      const products = await ProductDbService.findManyProduct();
-      res.status(201).json(products);
+      const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
+      const products = await ProductDbService.findManyProduct({
+        offset,
+        limit,
+        order,
+        keyword,
+      });
+      res.status(200).json(products);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "상품 목록 조회 실패" });
