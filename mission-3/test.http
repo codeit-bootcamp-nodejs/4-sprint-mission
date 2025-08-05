@@ -1,0 +1,32 @@
+// Product test
+
+### 상품 목록 조회
+GET http://localhost:3000/product?page=0&keyword=마우스
+
+### 상품 단건 조회
+GET http://localhost:3000/product/1
+
+### 상품 생성
+POST http://localhost:3000/product
+Content-Type: application/json
+
+{
+  "name": "게이밍 마우스",
+  "description": "초정밀 센서 탑재",
+  "price": 45000,
+  "tags": ["gaming", "mouse", "sensor"]
+}
+
+### 상품 수정
+PATCH http://localhost:3000/product/1
+Content-Type: application/json
+
+{
+  "price": 49900,
+  "tags": ["gaming", "mouse", "RGB"]
+}
+
+### 상품 삭제
+DELETE http://localhost:3000/product/2
+
+
