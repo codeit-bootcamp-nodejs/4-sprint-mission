@@ -4,13 +4,6 @@ const ProductController = {
   async createProduct(req, res) {
     try {
       const { name, description, price, tags } = req.body;
-
-      if (!name || !price) {
-        return res
-          .status(400)
-          .json({ error: "상품 이름과 가격은 필수값입니다." });
-      }
-
       const productData = { name, description, price, tags };
       const newProduct = await ProductService.createProduct(productData);
 
