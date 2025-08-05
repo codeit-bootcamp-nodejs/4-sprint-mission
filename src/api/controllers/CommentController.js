@@ -1,7 +1,7 @@
 import CommentService from "../services/CommentService.js";
 
 const CommentController = {
-  async createComment(req, res) {
+  async createComment(req, res, next) {
     try {
       const { content, productId, articleId } = req.body;
 
@@ -26,12 +26,11 @@ const CommentController = {
         const target = req.body.productId ? "상품" : "게시글";
         return res.status(404).json({ error: `존재하지 않는 ${target}` });
       }
-      console.error(err);
-      res.status(500).json({ error: "댓글 등록 실패" });
+      next(err);
     }
   },
 
-  async updateComment(req, res) {
+  async updateComment(req, res, next) {
     try {
       const { id } = req.params;
       const updateData = req.body;
@@ -40,17 +39,16 @@ const CommentController = {
         Number(id),
         updateData
       );
-      res.status(201).json(comment);
+      res.status(201).json(comment, next);
     } catch (err) {
       if (err.code === "P2025") {
         res.status(404).json({ error: "해당 댓글이 존재하지 않음" });
       }
-      console.error(err);
-      res.status(500).json({ error: "댓글 수정 실패" });
+      next(err);
     }
   },
 
-  async deleteComment(req, res) {
+  async deleteComment(req, res, next) {
     try {
       const { id } = req.params;
       await CommentService.deleteComment(Number(id));
@@ -59,11 +57,10 @@ const CommentController = {
       if (err.code === "P2025") {
         res.status(404).json({ error: "해당 댓글이 존재하지 않음" });
       }
-      console.error(err);
-      res.status(500).json({ error: "댓글 삭제 실패" });
+      next(err);
     }
   },
-  async findManyComment(req, res) {
+  async findManyComment(req, res, next) {
     try {
       const { productId, articleId, cursor, limit = 10 } = req.query;
 
@@ -82,8 +79,7 @@ const CommentController = {
 
       res.status(200).json(comments);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "댓글 목록 조회 실패" });
+      next(err);
     }
   },
 };

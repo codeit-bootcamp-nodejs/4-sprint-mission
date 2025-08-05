@@ -1,7 +1,7 @@
 import ArticleService from "../services/ArticleService.js";
 
 const ArticleController = {
-  async createArticle(req, res) {
+  async createArticle(req, res, next) {
     try {
       const { title, content } = req.body;
       if (!title || !content) {
@@ -12,23 +12,21 @@ const ArticleController = {
 
       res.status(201).json(newArticle);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "게시글 게시 오류 발생" });
+      next(err);
     }
   },
 
-  async findUniqueArticle(req, res) {
+  async findUniqueArticle(req, res, next) {
     try {
       const { id } = req.params;
       const article = await ArticleService.findUniqueArticle(Number(id));
       res.status(200).json(article);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: `id:${id} , 게시글 조회 실패` });
+      next(err);
     }
   },
 
-  async updateArticle(req, res) {
+  async updateArticle(req, res, next) {
     try {
       const { id } = req.params;
       const updateData = req.body;
@@ -38,23 +36,21 @@ const ArticleController = {
       );
       res.status(201).json(article);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: `id:${id} , 게시글 수정 실패` });
+      next(err);
     }
   },
 
-  async deleteArticle(req, res) {
+  async deleteArticle(req, res, next) {
     try {
       const { id } = req.params;
       await ArticleService.deleteArticle(Number(id));
       res.status(201).json({ success: "상품 삭제 성공" });
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: `id:${id} , 게시글 삭제 실패` });
+      next(err);
     }
   },
 
-  async findManyArticle(req, res) {
+  async findManyArticle(req, res, next) {
     try {
       const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
       const articles = await ArticleService.findManyArticle({
@@ -65,8 +61,7 @@ const ArticleController = {
       });
       res.status(200).json(articles);
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: `게시글 조회 실패` });
+      next(err);
     }
   },
 };
