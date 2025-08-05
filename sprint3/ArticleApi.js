@@ -137,10 +137,22 @@ ArticleRouter.delete('/detail/:id', (req,res) =>{
 // 모든 댓글 불러오기
 ArticleRouter.get('/comments', async(req,res) =>{
     try{
-        const article =await prisma.ArticleComment.findMany(
-            
-        )
-        res.send(article)
+        let {take = '10',skip= '1',commentId = '1'} = req.query;
+        take = ParseInt(take);
+        skip = ParseInt(skip);
+        commentId = ParseInt(commentId);
+        const articleComment =await prisma.ArticleComment.findMany({
+            take,
+            skip,
+            cursor: {
+                id: comment_id
+            },
+            orderBy:{
+                id: 'asc'
+            }
+        });
+
+        return res.status(300).send(articleComment)
         ;
         } catch(error){
             console.error(error)
