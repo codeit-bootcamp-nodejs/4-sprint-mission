@@ -18,7 +18,7 @@ productRouter.route('/')
             ]
         } : {};
         try{
-            const getDataList = await prisma.product.findMany({
+            const getProductList = await prisma.product.findMany({
                 where,
                 select:{
                     id: true,
@@ -32,7 +32,7 @@ productRouter.route('/')
                     createdAt: 'desc'
                 }
             })
-            res.status(200).json(getDataList);
+            res.status(200).json(getProductList);
         }catch(e){
             console.error(e);
             res.status(500).json({error:'server error'})
@@ -60,7 +60,7 @@ productRouter.route('/:id')
     .get(async (req, res)=>{
         const id = parseInt(req.params.id);
         try{
-            const getData = await prisma.product.findUniqueOrThrow({
+            const getProduct = await prisma.product.findUniqueOrThrow({
                 where: { id },
                 select: {
                     id: true,
@@ -71,7 +71,7 @@ productRouter.route('/:id')
                     createdAt: true,
                 }
             })
-            res.status(200).json(getData);
+            res.status(200).json(getProduct);
         }catch(e){
             console.error(e);
             if(e.code === 'P2025'){
