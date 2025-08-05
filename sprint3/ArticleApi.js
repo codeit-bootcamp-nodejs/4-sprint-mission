@@ -138,14 +138,14 @@ ArticleRouter.delete('/detail/:id', (req,res) =>{
 ArticleRouter.get('/comments', async(req,res) =>{
     try{
         let {take = '10',skip= '1',commentId = '1'} = req.query;
-        take = ParseInt(take);
-        skip = ParseInt(skip);
-        commentId = ParseInt(commentId);
+        take = parseInt(take);
+        skip = parseInt(skip);
+        commentId = parseInt(commentId);
         const articleComment =await prisma.ArticleComment.findMany({
             take,
             skip,
             cursor: {
-                id: comment_id
+                id: commentId
             },
             orderBy:{
                 id: 'asc'

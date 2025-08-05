@@ -155,9 +155,21 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
 
 //모든 댓글 보기
 ProductRouter.get('/comments', async (req,res) =>{
-    console.log('HI');
     try{
-        const comments= await prisma.ProductComment.findMany();
+        let {take = '10',skip= '1',commentId = '1'} = req.query;
+        take = parseInt(take);
+        skip = parseInt(skip);
+        commentId = parseInt(commentId);
+        const comments= await prisma.ProductComment.findMany({
+            take,
+            skip,
+            cursor: {
+                id: commentId
+            },
+            orderBy:{
+                id: 'asc'
+            }
+        });
         if (!comments){
             return res.status(300).send("There isn't comment. Write the first comment!");
         }
