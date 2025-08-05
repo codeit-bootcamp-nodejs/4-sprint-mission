@@ -11,11 +11,11 @@ const ArticleRouter = express.Router();
 
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
-    let {sort='recent', skip='40', take='10', searchtitle, searchcontent} = req.query;
+    let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
     console.log(sort, skip, take, searchtitle, searchcontent);
     let orderBy ;
-    searchtitle? String(searchtitle) : undefined ;
-    searchcontent? String(searchcontent) : undefined;
+    // searchtitle = searchtitle? String(searchtitle) : undefined ;
+    // searchcontent? String(searchcontent) : undefined;
     skip = parseInt(skip);
     take = parseInt(take);
     try{
@@ -27,8 +27,6 @@ ArticleRouter.get('/', async (req,res) =>{
         }else{
             orderBy = {createdAt : 'desc'};
         }
-
-        console.log(orderBy,sort, skip, take, searchtitle, searchcontent);
 
     }catch(error){
         console.error(error)
@@ -53,7 +51,7 @@ ArticleRouter.get('/', async (req,res) =>{
                             contains : searchcontent
                         }
                     } 
-                ].filter(Boolean)
+                ]
             },
             orderBy:orderBy
          })
