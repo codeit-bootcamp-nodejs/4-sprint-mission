@@ -11,25 +11,27 @@ const ArticleRouter = express.Router();
 
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
-    let {sort='recent', skip='40', take='10', searchTitle, searchContent} = req.query;
-
+    let {sort='recent', skip='40', take='10', searchtitle, searchcontent} = req.query;
+    console.log(sort, skip, take, searchtitle, searchcontent);
     let orderBy ;
+    searchtitle? String(searchtitle) : undefined ;
+    searchcontent? String(searchcontent) : undefined;
     skip = parseInt(skip);
     take = parseInt(take);
     try{
 
         if (sort == 'oldest'){        
-            orderBy = {createdAt : 'asc'};
-        }else if (sort == 'recent'){
             orderBy = {createdAt : 'desc'};
+        }else if (sort == 'recent'){
+            orderBy = {createdAt : 'asc'};
         }else{
-            throw new Error;
+            orderBy = {createdAt : 'desc'};
         }
 
-        console.log(sort, skip, take, searchTitle, searchContent);
+        console.log(orderBy,sort, skip, take, searchtitle, searchcontent);
 
     }catch(error){
-        console.log("get article failed because of input type ")
+        console.error(error)
         return res.status(400).send("400 bad request")
     }
 
@@ -40,10 +42,20 @@ ArticleRouter.get('/', async (req,res) =>{
             take,
             where: {
                 AND:[
-                    searchTitle? {title:{contains : searchTitle}} : undefined,
-                    searchContent? {content:{contains : searchContent}} : undefined
+                    {
+                        title:{
+                            contains : searchtitle ,
+                            mode : 'insensitive'
+                        }
+                    },
+                    {
+                        articleContent:{
+                            contains : searchcontent
+                        }
+                    } 
                 ].filter(Boolean)
-            }
+            },
+            orderBy:orderBy
          })
         res.send(Articles);
     } catch(error){

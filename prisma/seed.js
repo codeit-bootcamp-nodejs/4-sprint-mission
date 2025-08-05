@@ -36,18 +36,19 @@ async function main(){
 
     //article 10개, 댓글 각각 3개씩 생성
     for(let x = 0; x < 10; x++){
+        let title = `title ${x+1}`;
+        let articleContent = `text ${x+1} `
+
+        let commentContent = `conmment ${y}`;
+
+        let articleInstance = await prisma.Article.create({
+            data:{
+                title,
+                articleContent
+            }
+        });
         for (let y = 0 ; y < 3; y++){
-            let title = `title ${x+1}`;
-            let articleContent = `text ${x+1} `
-
-            let commentContent = `conmment ${y}`;
-
-            let articleInstance = await prisma.Article.create({
-                data:{
-                    title,
-                    articleContent
-                }
-            });
+            
 
             let articleId = articleInstance.id;
             
