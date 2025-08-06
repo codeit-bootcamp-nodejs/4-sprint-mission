@@ -41,7 +41,9 @@ ProductRouter.get('/', async (req,res) =>{
         
     }catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
         
     }
 });
@@ -52,7 +54,9 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
     id = parseInt(id);
 
     if (!id){
-        next(new Error("invalid parameter"));
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     try{
@@ -68,7 +72,9 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
         
     }catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
     
 });
@@ -77,7 +83,9 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
 ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
     const {name,description, price, tags} = req.body;
     if (!name|| !description ||!price || !tags){
-        next(new Error("invalid body data"))
+        const err = new Error("invalid body data");
+        err.status = 400;
+        next(err)
     }
 
     try{
@@ -94,7 +102,9 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
         
     }catch(error){
         console.log('post product failed because of server error');
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
 });
 
@@ -104,11 +114,15 @@ ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
     const id = Number(req.params.id) ;
 
     if (!id){
-        next(new Error("invalid parameter"));
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     if (!name|| !description ||!price || !tags){
-        next(new Error("invalid body data"));
+        const err = new Error("invalid body data");
+        err.status = 400;
+        next(err);
     }
 
     try{
@@ -126,7 +140,9 @@ ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
         
     }catch(error){
         console.log('patch product failed because of server error');
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
 });
 
@@ -134,7 +150,9 @@ ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
 ProductRouter.delete('/detail/:id', async (req,res) =>{
     const id = Number(req.params.id) ;
     if (!id){
-            next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     try{
@@ -146,7 +164,9 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
         
     }catch(error){
         console.log('deleting product failed because of server error');
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
 });
 
@@ -183,7 +203,9 @@ ProductRouter.get('/comments', async (req,res) =>{
         return res.status(200).send(comments);
     }catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
 });    
 
@@ -198,7 +220,9 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
     id = Number(req.params.id) ;
 
     if (!id){
-        next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
 
@@ -207,7 +231,9 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
     });
 
     if (!product){
-        next(new Error("no content"));
+        const err = new Error("No content")
+        err.status = 404;
+        next(err);
     }
 
 
@@ -215,7 +241,9 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
     try{
         const commentContent = req.body.commentContent;
         if(!commentContent || commentContent.length>1000){
-            next(new Error("invalid body data"));
+            const err = new Error("invalid body data");
+            err.status = 400;
+            next(err);
         }
         const newComment = await prisma.ProductComment.create({
             data: {
@@ -225,7 +253,9 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
         });
         res.send(newComment);
     }catch(error){
-        next(new Error("Server Error")); 
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err); 
     }
     
 
@@ -238,10 +268,14 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
     const CommentId = Number(req.body.id);
 
     if (!id){
-        next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
     if (!CommentId){
-        next(new Error("invalid body data"))
+        const err = new Error("invalid body data");
+        err.status = 400;
+        next(err)
     }
 
     const product = await prisma.product.findUnique({
@@ -249,7 +283,9 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
     });
 
     if (!product){
-        next(new Error("no content"));
+        const err = new Error("No content")
+        err.status = 404;
+        next(err);
     }
 
 
@@ -269,7 +305,9 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 
     }catch(error){
         console.error(error);
-        next(new Error("Server Error")); 
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err); 
     }
    
     
@@ -281,7 +319,9 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     const id = Number(req.params.id) ;
 
     if (!id){
-        next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     const product = await prisma.product.findUnique({
@@ -289,11 +329,15 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     });
 
     if (!product){
-        next(new Error("no content"));
+        const err = new Error("No content")
+        err.status = 404;
+        next(err);
     }
     const CommentId = Number(req.params.commentId);
     if (!CommentId){
-        next(new Error("invalid parameter"));
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     try{
@@ -306,7 +350,9 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     }catch(error){
         console.error(error);
-        next(new Error("Server Error")); 
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err); 
     }
 })
 

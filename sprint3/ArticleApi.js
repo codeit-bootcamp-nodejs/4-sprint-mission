@@ -25,9 +25,6 @@ ArticleRouter.get('/', async (req,res) =>{
         orderBy = {createdAt : 'desc'};
     }
 
-    next(new Error("Server Error"))
-
-    
     try{
         const Articles = await prisma.Article.findMany({
             skip,
@@ -53,7 +50,9 @@ ArticleRouter.get('/', async (req,res) =>{
         res.send(Articles);
     } catch(error){
         console.error(error);
-        next(new Error("Server Error"))
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
     
 });
@@ -66,7 +65,9 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
         let id = req.params.id;
         id = parseInt(id);
         if (!id){
-            next(new Error("invalid parameter"))
+            const err = new Error("invalid parameter")
+            err.status = 400;
+            next(err);
         }
         const Article = await prisma.Article.findUnique({
             where: {id},
@@ -77,7 +78,9 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
         
     } catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);;
     }
     
 });
@@ -89,7 +92,9 @@ ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
     // console.log("post start");
 
     if (!title || !articleContent){
-        next(new Error("invalid body data"));
+        const err = new Error("invalid body data");
+        err.status = 400;
+        next(err)
     }
 
     try{
@@ -105,7 +110,9 @@ ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
 
     } catch(error){
         console.log("post Article failed because of server");
-        next(new Error("Server Error"))
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
     
 });
@@ -117,11 +124,15 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
         const id = Number(req.params.id);
 
         if (!id){
-            next(new Error("invalid parameter"))
+            const err = new Error("invalid parameter")
+            err.status = 400;
+            next(err);
         }
 
         if (!title || !articleContent){
-        next(new Error("invalid body data"));
+            const err = new Error("invalid body data");
+            err.status = 400;
+            next(err)
         }
 
         const Article = await prisma.Article.update({
@@ -138,7 +149,9 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
 
     } catch(error){
         console.log("patch Article failed because of server");
-        next(new Error("Server Error"))
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
     
 } );
@@ -149,7 +162,9 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
         const id = Number(req.params.id);
 
         if (!id){
-            next(new Error("invalid parameter"))
+            const err = new Error("invalid parameter")
+            err.status = 400;
+            next(err);
         }
 
         const article = await prisma.Article.findUnique({
@@ -157,7 +172,9 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
         })
 
         if (!article){
-            next(new Error("no content"))
+            const err = new Error("No content")
+            err.status = 404
+            next(err);
         }
 
         await prisma.Article.delete({
@@ -168,7 +185,9 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
 
     } catch(error){
         console.log("delete Article failed because of server");
-        next(new Error("Server Error"))
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
     
 });
@@ -196,7 +215,9 @@ ArticleRouter.get('/comments', async(req,res) =>{
 
         } catch(error){
             console.error(error)
-            next(new Error("Server Error"))
+            const err = new Error("Server Error");
+            err.status = 500;
+            next(err);
         }
 });
 
@@ -205,14 +226,18 @@ ArticleRouter.post('/detail/:id', async (req,res) =>{
 
     const id = Number(req.params.id) ;
     if (!id){
-        next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     const article = prisma.article.findUnique({
         where: {id}
     });
     if (!article){
-        next(new Error("no content"));
+        const err = new Error("No content")
+        err.status = 404
+        next(err);
     }
 
     const commentContent = req.body.commentContent;
@@ -232,7 +257,9 @@ ArticleRouter.post('/detail/:id', async (req,res) =>{
         return res.send(newComment)
     } catch(error){
         console.error(error);
-        next(new Error("Server Error"))
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);
     }
         
 });
@@ -246,24 +273,28 @@ ArticleRouter.patch('/detail/:id', async (req,res) =>{
     });
 
     if (!id){
-        next(new Error("invalid parameter"));
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
     if (!article){
-        next(new Error("No content"));
+        const err = new Error("No content")
+        err.status = 404
+        next(err);
     }
 
-
-    console.error(error);
-    next(new Error("Server Error"));
-    
     try{
         const CommentId = Number(req.body.id);
         const commentContent = req.body.commentContent;
         if(!CommentId){
-            next(new Error("invalid parameter"))
+            const err = new Error("invalid parameter")
+            err.status = 400;
+            next(err);
         }
         if(!commentContent){
-            next(new Error("invalid body data"))
+            const err = new Error("invalid body data");
+            err.status = 400;
+            next(err)
         }
 
         const newComment = await prisma.ArticleComment.update({
@@ -278,7 +309,9 @@ ArticleRouter.patch('/detail/:id', async (req,res) =>{
         return res.status(201).send(newComment);
     }catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);;
         
     }
 });
@@ -291,7 +324,9 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     const CommentId= Number(req.params.commentId);
 
     if(!CommentId || !id){
-        next(new Error("invalid parameter"))
+        const err = new Error("invalid parameter")
+        err.status = 400;
+        next(err);
     }
 
     const article = await prisma.article.findUnique({
@@ -299,7 +334,9 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     });
 
     if (!article){
-        next(new Error("No content"));
+        const err = new Error("No content")
+        err.status = 404
+        next(err);
     }
     
     try{
@@ -312,7 +349,9 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     }catch(error){
         console.error(error);
-        next(new Error("Server Error"));
+        const err = new Error("Server Error");
+        err.status = 500;
+        next(err);;
         
     }
 });
