@@ -1,10 +1,15 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
+import productCommentRouter from './productCommentRouter.js';
 
 const productRouter = express.Router();
 const prisma = new PrismaClient();
 
 productRouter.use(express.json());
+productRouter.use('/:id/comment', (req, res, next) =>{
+    req.parentId = parseInt(req.params.id);
+    next();
+}, productCommentRouter);
 
 productRouter.route('/')
     .get(async (req, res)=>{
