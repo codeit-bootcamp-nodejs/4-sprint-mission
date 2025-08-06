@@ -1,17 +1,17 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 
-const app = express();
+const router = express.Router();
 
 const prisma = new PrismaClient();
 
-app.use(express.json());
+router.use(express.json());
 
-app.post("/products/:productId/comments", async (req, res) => {
-  const { productId } = req.params;
+router.post("/:productId/comments", async (req, res) => {
+  const productId = Number(req.params.productId);
   const { content } = req.body;
 
-  if (!productId || !content) {
+  if (isNaN(productId) || !content) {
     return res.status(400).json({ error: "productId와 content는 필수입니다." });
   }
 
@@ -19,7 +19,7 @@ app.post("/products/:productId/comments", async (req, res) => {
     const comment = await prisma.comment.create({
       data: {
         content,
-        product: { connect: { id: parseInt(productId) } },
+        product: { connect: { id: productId } },
       },
     });
 
@@ -29,11 +29,11 @@ app.post("/products/:productId/comments", async (req, res) => {
   }
 });
 
-app.post("/articles/:articleId/comments", async (req, res) => {
-  const { articleId } = req.params;
+router.post("/articles/:articleId/comments", async (req, res) => {
+  const articleId = Number(req.params.articleId);
   const { content } = req.body;
 
-  if (!articleId || !content) {
+  if (isNaN(articleId) || !content) {
     return res
       .status(400)
       .json({ error: "articleId와 content는 필수입니다. " });
@@ -43,7 +43,7 @@ app.post("/articles/:articleId/comments", async (req, res) => {
     const comment = await prisma.comment.create({
       data: {
         content,
-        article: { connect: { id: parseInt(articleId) } },
+        article: { connect: { id: articleId } },
       },
     });
     res.status(201).json(comment);
@@ -52,7 +52,7 @@ app.post("/articles/:articleId/comments", async (req, res) => {
   }
 });
 
-app.patch("/products/:productId/comments/:commentId", async (req, res) => {
+router.patch("/products/:productId/comments/:commentId", async (req, res) => {
   const commentId = Number(req.params.commentId);
   const productId = Number(req.params.productId);
   const { content } = req.body;
@@ -87,3 +87,5 @@ app.patch("/products/:productId/comments/:commentId", async (req, res) => {
     res.status(500).json({ error: "댓글 업데이트 실패", code: err.code });
   }
 });
+
+export default router;
