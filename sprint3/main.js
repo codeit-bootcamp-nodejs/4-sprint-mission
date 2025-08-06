@@ -1,11 +1,9 @@
 import ArticleRouter  from "./ArticleApi.js";
 import ProductRouter from "./ProductApi.js";
-// import fileRouter from "./file.js";
+import fileRouter from "./file.js";
 
 import express from 'express';
-import prisma from '@prisma/client';
 import 'dotenv/config';
-import { PrismaClient } from '@prisma/client'
 
 
 const app = express();
@@ -13,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use('/article', ArticleRouter);
 app.use('/product', ProductRouter);
-// app.use('/upload', fileRouter);
+app.use('/file', fileRouter);
 app.use( (err,req,res,next) =>{
     if (err){
         res.json( err.message|| "Server Error Occured");
