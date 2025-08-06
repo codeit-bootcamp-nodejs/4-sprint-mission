@@ -1,13 +1,14 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import commentRouter from "./commentApi.js";
 
-const app = express();
+const router = express.Router();
 
 const prisma = new PrismaClient();
 
-app.use(express.json());
+router.use(express.json());
 
-app.post("/", async (req, res) => {
+router.post("/", async (req, res) => {
   const { name, description, price, tags } = req.body;
 
   if (!name || !price) {
@@ -34,7 +35,7 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.get("/products/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
@@ -49,7 +50,7 @@ app.get("/products/:id", async (req, res) => {
   }
 });
 
-app.patch("/products/:id", async (req, res) => {
+router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const { name, description, price, tags } = req.body;
 
@@ -74,7 +75,7 @@ app.patch("/products/:id", async (req, res) => {
   }
 });
 
-app.delete("/products/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
@@ -90,7 +91,7 @@ app.delete("/products/:id", async (req, res) => {
   }
 });
 
-app.get("/products", async (req, res) => {
+router.get("/", async (req, res) => {
   const { offset = 0, limit = 10, name, description } = req.query;
 
   const filter = [];
@@ -125,6 +126,6 @@ app.get("/products", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server started ");
-});
+router.use("/", commentRouter);
+
+export default router;
