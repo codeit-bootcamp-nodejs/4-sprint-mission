@@ -91,28 +91,31 @@ app.delete("/products/:id", async (req, res) => {
 });
 
 app.get("/products", async (req, res) => {
-  const { offset = 0, limit = 10, search } = req.query;
+  const { offset = 0, limit = 10, name, description } = req.query;
 
-  const where = search
-    ? {
-        OR: [
-          { name: { contains: search, mode: "insenstive" } },
-          { description: { contains: search, mode: "insenstive" } },
-        ],
-      }
-    : {};
+  const filter = [];
+
+  if (name) {
+    filter.push({ name: { contains: name } });
+  }
+
+  if (description) {
+    filter.push({ description: { contains: description } });
+  }
+
+  const where = filter.length > 0 ? { AND: filter } : {};
 
   try {
     const product = await prisma.product.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: parseInt(offset),
-      take: parseInt(limit),
+      skip: parseInt(offset, 10),
+      take: parseInt(limit, 10),
       select: {
         id: true,
         name: true,
         price: true,
-        createAt: true,
+        createdAt: true,
       },
     });
 
@@ -120,4 +123,8 @@ app.get("/products", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "서버 에러" });
   }
+});
+
+app.listen(3000, () => {
+  console.log("Server started ");
 });
