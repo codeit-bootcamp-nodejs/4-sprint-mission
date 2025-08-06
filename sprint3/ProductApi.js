@@ -12,20 +12,20 @@ const ProductRouter = express.Router()
 
 //게시글 전체 불러오기
 ProductRouter.get('/', async (req,res) =>{
-    let {sort = 'recent', skip = '20', take= '10', searchName, searchDescription} = req.query;
+    let {sort = 'recent', skip = '10', take= '10', searchName, searchDescription} = req.query;
     skip = parseInt(skip);
     take = parseInt(take);
-
+    let orderBy ;
     try{
         
-        let orderBy ;
+        
 
         if (sort === 'oldest'){        
             orderBy = {createdAt : 'desc'};
         }else if (sort == 'recent'){
             orderBy = {createdAt : 'asc'};
         }else{
-            throw new Error;
+            orderBy = {createdAt : 'desc'};
         }
 
         if (typeof(skip) != 'number' ||typeof(take) != 'number'){
@@ -40,15 +40,15 @@ ProductRouter.get('/', async (req,res) =>{
     try{
         const {name, description} = req.query;
         const Product = await prisma.product.findMany({
-            // skip,
+            skip,
             take,
             where: {
                 AND:[
                     searchName? {name: {contains : searchName}} : undefined,
                     searchDescription? {content: {contains : searchDescription}} : undefined
                 ].filter(Boolean)
-                
-            }
+            },
+            orderBy
         });
         console.log(`get product : ${Product.length}`);
         return res.status(200).send(Product);
@@ -107,10 +107,10 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
 //게시글 수정하기
 ProductRouter.patch('/detail/:id', async (req,res) =>{
     const {name, description, price, tags} = req.body;
-    const id = req.params.id ;
+    const id = Number(req.params.id) ;
 
     try{
-        const product= prisma.product.update({
+        const product= await prisma.product.update({
             where: {id},
             data: {
                 name,
@@ -130,10 +130,10 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 
 //게시글 삭제하기 
 ProductRouter.delete('/detail/:id', async (req,res) =>{
-    const id = req.params.id ;
+    const id = Number(req.params.id) ;
 
     try{
-        prisma.product.delete({
+        await prisma.Product.delete({
             where:{id}
         });
         console.log("deleting success");
@@ -251,7 +251,7 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 });
 
 //댓글 삭제하기
-ProductRouter.patch('/detail/:id', async (req,res) =>{
+ProductRouter.delete('/detail/:id', async (req,res) =>{
     try{
         const id = req.params.id ;
         const product = prisma.product.findUnique({
