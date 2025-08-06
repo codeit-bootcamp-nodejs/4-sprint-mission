@@ -47,7 +47,7 @@ ArticleRouter.get('/', async (req,res,next) =>{
             orderBy:orderBy
          })
 
-        res.send(Articles);
+        res.status(200).send(Articles);
     } catch(error){
         console.error(error);
         const err = new Error("Server Error");
@@ -150,7 +150,7 @@ ArticleRouter.patch('/:id/modify', async (req,res,next) =>{
             }
         })
         console.log("patch Article success")
-        return res.status(201).send(Article);
+        return res.status(200).send(Article);
 
     } catch(error){
         console.log("patch Article failed because of server");
@@ -186,7 +186,7 @@ ArticleRouter.delete('/detail/:id', async(req,res,next) =>{
             where:{id}
         });
         console.log("deleting article success");
-        return res.status(200).send("deleting completed");
+        return res.status(204).send("deleting completed");
 
     } catch(error){
         console.log("delete Article failed because of server");
@@ -217,7 +217,7 @@ ArticleRouter.get('/comments', async(req,res,next) =>{
             }
         });
 
-        return res.status(300).send(articleComment);
+        return res.status(200).send(articleComment);
 
         } catch(error){
             console.error(error)
@@ -260,7 +260,7 @@ ArticleRouter.post('/detail/:id', async (req,res,next) =>{
             }
         }
         });
-        return res.send(newComment)
+        return res.status(201).send(newComment);
     } catch(error){
         console.error(error);
         const err = new Error("Server Error");
@@ -312,7 +312,7 @@ ArticleRouter.patch('/detail/:id', async (req,res,next) =>{
             }
         });
         
-        return res.status(201).send(newComment);
+        return res.status(200).send(newComment);
     }catch(error){
         console.error(error);
         const err = new Error("Server Error");
@@ -351,7 +351,7 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res,next) =>{
                 id:CommentId
             }
             })
-        return res.status(200).send("deleting success");
+        return res.status(204).send("deleting success");
 
     }catch(error){
         console.error(error);

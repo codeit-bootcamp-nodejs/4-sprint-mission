@@ -143,7 +143,7 @@ ProductRouter.patch('/detail/:id/modify', async (req,res,next) =>{
             }
         });
         console.log("patch success");
-        return res.status(201).send(product);
+        return res.status(200).send(product);
         
     }catch(error){
         console.log('patch product failed because of server error');
@@ -176,7 +176,7 @@ ProductRouter.delete('/detail/:id', async (req,res,next) =>{
             where:{id}
         });
         console.log("deleting success");
-        return res.status(200).send("deleting successed");
+        return res.status(204).send("deleting successed");
         
     }catch(error){
         console.log('deleting product failed because of server error');
@@ -266,7 +266,7 @@ ProductRouter.post('/detail/:id', async (req,res,next) =>{
                 product:{connect: {id}}
             }
         });
-        res.send(newComment);
+        res.status(201).send(newComment);
     }catch(error){
         const err = new Error("Server Error");
         err.status = 500;
@@ -314,7 +314,7 @@ ProductRouter.patch('/detail/:id', async (req,res,next) =>{
                 commentContent
             }
         });
-        return res.status(201).send(newComment);
+        return res.status(200).send(newComment);
 
     }catch(error){
         console.error(error);
@@ -359,7 +359,7 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res,next) =>{
                 id:CommentId
             }
         });
-        return res.status(200).send("delete success");
+        return res.status(204).send("delete success");
 
     }catch(error){
         console.error(error);
