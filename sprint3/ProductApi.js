@@ -16,29 +16,16 @@ ProductRouter.get('/', async (req,res) =>{
     skip = parseInt(skip);
     take = parseInt(take);
     let orderBy ;
-    try{
-        
-        
 
-        if (sort === 'oldest'){        
-            orderBy = {createdAt : 'desc'};
-        }else if (sort == 'recent'){
-            orderBy = {createdAt : 'asc'};
-        }else{
-            orderBy = {createdAt : 'desc'};
-        }
-
-        if (typeof(skip) != 'number' ||typeof(take) != 'number'){
-            throw new Error;
-        }
-
-    }catch(error){
-        console.error(error);
-        return res.status(400).send("400 bad request");
+    if (sort === 'oldest'){        
+        orderBy = {createdAt : 'desc'};
+    }else if (sort == 'recent'){
+        orderBy = {createdAt : 'asc'};
+    }else{
+        orderBy = {createdAt : 'desc'};
     }
 
     try{
-        const {name, description} = req.query;
         const Product = await prisma.product.findMany({
             skip,
             take,
@@ -50,12 +37,11 @@ ProductRouter.get('/', async (req,res) =>{
             },
             orderBy
         });
-        console.log(`get product : ${Product.length}`);
         return res.status(200).send(Product);
         
     }catch(error){
         console.error(error);
-        return res.status(500).send("interner Server Error");
+        next(new Error("Server Error"));
         
     }
 });
@@ -64,6 +50,11 @@ ProductRouter.get('/', async (req,res) =>{
 ProductRouter.get('/detail/:id', async (req,res) =>{
     let id = req.params.id;
     id = parseInt(id);
+
+    if (!id){
+        next(new Error("invalid parameter"));
+    }
+
     try{
         const Product = await prisma.product.findUnique({
             where:{id},
@@ -77,7 +68,7 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
         
     }catch(error){
         console.error(error);
-        return res.status(500).end("interner Server Error");
+        next(new Error("Server Error"));
     }
     
 });
@@ -85,6 +76,9 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
 //게시글 posting
 ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
     const {name,description, price, tags} = req.body;
+    if (!name|| !description ||!price || !tags){
+        next(new Error("invalid body data"))
+    }
 
     try{
         const Product = await prisma.product.create({
@@ -100,7 +94,7 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
         
     }catch(error){
         console.log('post product failed because of server error');
-        return res.status(500).send("interner Server Error");
+        next(new Error("Server Error"));
     }
 });
 
@@ -108,6 +102,14 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
 ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
     const {name, description, price, tags} = req.body;
     const id = Number(req.params.id) ;
+
+    if (!id){
+        next(new Error("invalid parameter"));
+    }
+
+    if (!name|| !description ||!price || !tags){
+        next(new Error("invalid body data"));
+    }
 
     try{
         const product= await prisma.product.update({
@@ -124,13 +126,16 @@ ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
         
     }catch(error){
         console.log('patch product failed because of server error');
-        return res.status(500).send("server error");
+        next(new Error("Server Error"));
     }
 });
 
 //게시글 삭제하기 
 ProductRouter.delete('/detail/:id', async (req,res) =>{
     const id = Number(req.params.id) ;
+    if (!id){
+            next(new Error("invalid parameter"))
+    }
 
     try{
         await prisma.Product.delete({
@@ -141,7 +146,7 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
         
     }catch(error){
         console.log('deleting product failed because of server error');
-        return res.status(500).send("server error");
+        next(new Error("Server Error"));
     }
 });
 
@@ -160,6 +165,7 @@ ProductRouter.get('/comments', async (req,res) =>{
         take = parseInt(take);
         skip = parseInt(skip);
         commentId = parseInt(commentId);
+
         const comments= await prisma.ProductComment.findMany({
             take,
             skip,
@@ -177,7 +183,7 @@ ProductRouter.get('/comments', async (req,res) =>{
         return res.status(200).send(comments);
     }catch(error){
         console.error(error);
-        return res.status(500).send("there was error during finding comments");
+        next(new Error("Server Error"));
     }
 });    
 
@@ -190,29 +196,38 @@ ProductRouter.get('/comments', async (req,res) =>{
 ProductRouter.post('/detail/:id', async (req,res) =>{
     let id;
     id = Number(req.params.id) ;
-    try{
-        
-        const product = await prisma.Product.findUnique({
-            where: {id}
-        });
 
-        if (!product){
-            throw Error;
+    if (!id){
+        next(new Error("invalid parameter"))
+    }
+
+
+    const product = await prisma.Product.findUnique({
+        where: {id}
+    });
+
+    if (!product){
+        next(new Error("no content"));
+    }
+
+
+    
+    try{
+        const commentContent = req.body.commentContent;
+        if(!commentContent || commentContent.length>1000){
+            next(new Error("invalid body data"));
         }
+        const newComment = await prisma.ProductComment.create({
+            data: {
+                commentContent,
+                product:{connect: {id}}
+            }
+        });
+        res.send(newComment);
     }catch(error){
-        return res.status(404).send("no product");
+        next(new Error("Server Error")); 
     }
     
-
-    const commentContent = req.body.commentContent;
-
-    const newComment = await prisma.ProductComment.create({
-        data: {
-            commentContent,
-            product:{connect: {id}}
-        }
-    });
-    res.send(newComment);
 
 });
 
@@ -221,17 +236,23 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
 ProductRouter.patch('/detail/:id', async (req,res) =>{
     const id = Number(req.params.id) ;
     const CommentId = Number(req.body.id);
-    try{
-        const product = await prisma.product.findUnique({
-            where: {id}
-        });
 
-        if (!product){
-            throw Error;
-        }
-    }catch(error){
-        return res.status(404).send("no product");
+    if (!id){
+        next(new Error("invalid parameter"))
     }
+    if (!CommentId){
+        next(new Error("invalid body data"))
+    }
+
+    const product = await prisma.product.findUnique({
+        where: {id}
+    });
+
+    if (!product){
+        next(new Error("no content"));
+    }
+
+
     
     try{
         const commentContent = req.body.commentContent;
@@ -244,13 +265,11 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
                 commentContent
             }
         });
-        console.log()
         return res.status(201).send(newComment);
 
     }catch(error){
         console.error(error);
-        return res.status(500).send("server error occured during updating comment");
-        console.log("server error occured during updating comment");
+        next(new Error("Server Error")); 
     }
    
     
@@ -258,22 +277,26 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 
 //댓글 삭제하기
 ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
-    try{
-        const id = Number(req.params.id) ;
-        const product = await prisma.product.findUnique({
-            where: {id}
-        });
 
-        if (!product){
-            throw Error;
-        }
-    }catch(error){
-        return res.status(404).send("no product");
+    const id = Number(req.params.id) ;
+
+    if (!id){
+        next(new Error("invalid parameter"))
     }
-    
-    try{
-        const CommentId = Number(req.params.commentId);
 
+    const product = await prisma.product.findUnique({
+        where: {id}
+    });
+
+    if (!product){
+        next(new Error("no content"));
+    
+    const CommentId = Number(req.params.commentId);
+    if (!CommentId){
+        next(new Error("invalid parameter"))
+    }
+
+    try{
         await prisma.ProductComment.delete({
             where:{
                 id:CommentId
@@ -283,11 +306,8 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     }catch(error){
         console.error(error);
-        return res.status(500).send("server error occured during updating comment");
-        console.log("server error occured during updating comment");
+        next(new Error("Server Error")); 
     }
-   
-    
 });
 
 
