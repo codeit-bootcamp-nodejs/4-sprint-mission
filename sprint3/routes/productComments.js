@@ -57,10 +57,6 @@ router.patch("/:productId/comments/:commentId", async (req, res) => {
 
     res.status(200).json(updated);
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
-    }
-
     res.status(500).json({ error: "댓글 업데이트 실패", code: err.code });
   }
 });
