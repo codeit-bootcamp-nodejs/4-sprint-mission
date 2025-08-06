@@ -1,6 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import commentRouter from "./commentApi.js";
+import commentRouter from "./productComments.js";
 
 const router = express.Router();
 
