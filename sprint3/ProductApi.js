@@ -105,7 +105,7 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
 });
 
 //게시글 수정하기
-ProductRouter.patch('/detail/:id', async (req,res) =>{
+ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
     const {name, description, price, tags} = req.body;
     const id = Number(req.params.id) ;
 
@@ -188,9 +188,11 @@ ProductRouter.get('/comments', async (req,res) =>{
 
 //게시글 상세페이지에서 댓글 달기
 ProductRouter.post('/detail/:id', async (req,res) =>{
+    let id;
+    id = Number(req.params.id) ;
     try{
-        const id = req.params.id ;
-        const product = prisma.product.findUnique({
+        
+        const product = await prisma.Product.findUnique({
             where: {id}
         });
 
@@ -204,20 +206,23 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
 
     const commentContent = req.body.commentContent;
 
-    const newComment = prisma.ProductComment.create({
+    const newComment = await prisma.ProductComment.create({
         data: {
-            commentContent
+            commentContent,
+            product:{connect: {id}}
         }
     });
+    res.send(newComment);
 
 });
 
 
 //게시글 상세페이지에서 댓글 수정하기
 ProductRouter.patch('/detail/:id', async (req,res) =>{
+    const id = Number(req.params.id) ;
+    const CommentId = Number(req.body.id);
     try{
-        const id = req.params.id ;
-        const product = prisma.product.findUnique({
+        const product = await prisma.product.findUnique({
             where: {id}
         });
 
@@ -229,10 +234,9 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
     }
     
     try{
-        const CommentId = req.body.Id;
         const commentContent = req.body.commentContent;
 
-        const newComment = prisma.ProductComment.update({
+        const newComment = await prisma.ProductComment.update({
             where:{
                 id:CommentId
             },
@@ -240,9 +244,11 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
                 commentContent
             }
         });
-        return res.status(201).send(newcomment);
+        console.log()
+        return res.status(201).send(newComment);
 
     }catch(error){
+        console.error(error);
         return res.status(500).send("server error occured during updating comment");
         console.log("server error occured during updating comment");
     }
@@ -251,10 +257,10 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
 });
 
 //댓글 삭제하기
-ProductRouter.delete('/detail/:id', async (req,res) =>{
+ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     try{
-        const id = req.params.id ;
-        const product = prisma.product.findUnique({
+        const id = Number(req.params.id) ;
+        const product = await prisma.product.findUnique({
             where: {id}
         });
 
@@ -266,16 +272,17 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
     }
     
     try{
-        const CommentId = req.body.Id;
+        const CommentId = Number(req.params.commentId);
 
-        const newComment = prisma.ProductComment.update({
+        await prisma.ProductComment.delete({
             where:{
                 id:CommentId
             }
         });
-        return res.status(200).send(newcomment);
+        return res.status(200).send("delete success");
 
     }catch(error){
+        console.error(error);
         return res.status(500).send("server error occured during updating comment");
         console.log("server error occured during updating comment");
     }
