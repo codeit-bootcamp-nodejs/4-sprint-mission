@@ -59,6 +59,7 @@ ProductRouter.get('/detail/:id', async (req,res,next) =>{
         return next(err);
     }
 
+    
     try{
         const Product = await prisma.product.findUnique({
             where:{id},
@@ -66,6 +67,12 @@ ProductRouter.get('/detail/:id', async (req,res,next) =>{
                 comment:true
             }
         });
+
+        if (!product){
+            const err = new Error("No content")
+            err.status = 404;
+            return next(err);
+        }
 
         console.log(`get product : ${Product}`);
         return res.status(200).send(Product);
@@ -155,6 +162,15 @@ ProductRouter.delete('/detail/:id', async (req,res,next) =>{
         return next(err);
     }
 
+    const product = await prisma.Product.findUnique({
+            where:{id}
+    });
+    if (!product){
+        const err = new Error("No content")
+        err.status = 404;
+        return next(err);
+    }
+
     try{
         await prisma.Product.delete({
             where:{id}
@@ -225,7 +241,6 @@ ProductRouter.post('/detail/:id', async (req,res,next) =>{
         return next(err);
     }
 
-
     const product = await prisma.Product.findUnique({
         where: {id}
     });
@@ -287,8 +302,6 @@ ProductRouter.patch('/detail/:id', async (req,res,next) =>{
         err.status = 404;
         return next(err);
     }
-
-
     
     try{
         const commentContent = req.body.commentContent;
