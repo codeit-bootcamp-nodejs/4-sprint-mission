@@ -38,7 +38,7 @@ app.get("/articles/:id", async (req, res) => {
         id: true,
         title: true,
         content: true,
-        creartedAt: true,
+        createdAt: true,
       },
     });
     if (!article) {
@@ -74,7 +74,7 @@ app.patch("/articles/:id", async (req, res) => {
   }
 });
 
-app.delete("/article/:id", async (req, res) => {
+app.delete("/articles/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
