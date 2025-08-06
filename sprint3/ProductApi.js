@@ -290,10 +290,10 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     if (!product){
         next(new Error("no content"));
-    
+    }
     const CommentId = Number(req.params.commentId);
     if (!CommentId){
-        next(new Error("invalid parameter"))
+        next(new Error("invalid parameter"));
     }
 
     try{
@@ -308,7 +308,7 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
         console.error(error);
         next(new Error("Server Error")); 
     }
-});
+})
 
 
 export default ProductRouter;
