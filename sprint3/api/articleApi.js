@@ -90,24 +90,27 @@ app.delete("/articles/:id", async (req, res) => {
   }
 });
 
-app.get("/article", async (req, res) => {
-  const { offset = 0, limit = 10, search } = req.query;
+app.get("/articles", async (req, res) => {
+  const { offset = 0, limit = 10, title, content } = req.query;
 
-  const where = search
-    ? {
-        OR: [
-          { title: { contains: search, mode: "insensitive" } },
-          { content: { contains: search, mode: "insensitive" } },
-        ],
-      }
-    : {};
+  const filter = [];
+
+  if (title) {
+    filter.push({ title: { contains: title } });
+  }
+
+  if (content) {
+    filter.push({ content: { contains: content } });
+  }
+
+  const where = filter.length > 0 ? { AND: filter } : {};
 
   try {
     const articles = await prisma.article.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: parseInt(offset),
-      take: parseInt(limit),
+      skip: parseInt(offset, 10),
+      take: parseInt(limit, 10),
       select: {
         id: true,
         title: true,
