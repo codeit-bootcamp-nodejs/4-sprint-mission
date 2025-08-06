@@ -13,23 +13,19 @@ const ArticleRouter = express.Router();
 //모든 게시글 불러오기, 댓글 미포함
 ArticleRouter.get('/', async (req,res) =>{
     let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
-    console.log(sort, skip, take, searchtitle, searchcontent);
     let orderBy ;
     skip = parseInt(skip);
     take = parseInt(take);
-    try{
-        if (sort == 'oldest'){        
-            orderBy = {createdAt : 'desc'};
-        }else if (sort == 'recent'){
-            orderBy = {createdAt : 'asc'};
-        }else{
-            orderBy = {createdAt : 'desc'};
-        }
 
-    }catch(error){
-        console.error(error)
-        return res.status(400).send("400 bad request")
+    if (sort == 'oldest'){        
+        orderBy = {createdAt : 'desc'};
+    }else if (sort == 'recent'){
+        orderBy = {createdAt : 'asc'};
+    }else{
+        orderBy = {createdAt : 'desc'};
     }
+
+    next(new Error("Server Error"))
 
     
     try{
@@ -53,10 +49,11 @@ ArticleRouter.get('/', async (req,res) =>{
             },
             orderBy:orderBy
          })
+
         res.send(Articles);
     } catch(error){
         console.error(error);
-        return res.status(500).send("server error")
+        next(new Error("Server Error"))
     }
     
 });
@@ -68,6 +65,9 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
     try{
         let id = req.params.id;
         id = parseInt(id);
+        if (!id){
+            next(new Error("invalid parameter"))
+        }
         const Article = await prisma.Article.findUnique({
             where: {id},
             include : {comment: true}
@@ -77,7 +77,7 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
         
     } catch(error){
         console.error(error);
-        return res.status(500).send("server error")
+        next(new Error("Server Error"));
     }
     
 });
@@ -86,7 +86,12 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
 //   '/article/postarticle' 이란 사이트에서 article 생성하기
 ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
     const {title, articleContent} = req.body;
-    console.log("post start");
+    // console.log("post start");
+
+    if (!title || !articleContent){
+        next(new Error("invalid body data"));
+    }
+
     try{
         const Article =  await prisma.Article.create({
             data: {
@@ -100,7 +105,7 @@ ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
 
     } catch(error){
         console.log("post Article failed because of server");
-        return res.status(500).send("server error")
+        next(new Error("Server Error"))
     }
     
 });
@@ -110,6 +115,15 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
     try{
         const {title,articleContent} = req.body; 
         const id = Number(req.params.id);
+
+        if (!id){
+            next(new Error("invalid parameter"))
+        }
+
+        if (!title || !articleContent){
+        next(new Error("invalid body data"));
+        }
+
         const Article = await prisma.Article.update({
             where:{
                 id
@@ -124,7 +138,7 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
 
     } catch(error){
         console.log("patch Article failed because of server");
-        return res.status(500).send("server error")
+        next(new Error("Server Error"))
     }
     
 } );
@@ -133,9 +147,19 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
 ArticleRouter.delete('/detail/:id', async(req,res) =>{
     try{
         const id = Number(req.params.id);
+
         if (!id){
-            return res.send("error occured")
+            next(new Error("invalid parameter"))
         }
+
+        const article = await prisma.Article.findUnique({
+            where:{id}
+        })
+
+        if (!article){
+            next(new Error("no content"))
+        }
+
         await prisma.Article.delete({
             where:{id}
         });
@@ -144,7 +168,7 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
 
     } catch(error){
         console.log("delete Article failed because of server");
-        return res.send(error)
+        next(new Error("Server Error"))
     }
     
 });
@@ -156,6 +180,7 @@ ArticleRouter.get('/comments', async(req,res) =>{
         take = parseInt(take);
         skip = parseInt(skip);
         commentId = parseInt(commentId);
+
         const articleComment =await prisma.ArticleComment.findMany({
             take,
             skip,
@@ -167,33 +192,32 @@ ArticleRouter.get('/comments', async(req,res) =>{
             }
         });
 
-        return res.status(300).send(articleComment)
-        ;
+        return res.status(300).send(articleComment);
+
         } catch(error){
             console.error(error)
-            return res.status(500).send('there was error during finding comments in server')
+            next(new Error("Server Error"))
         }
 });
 
 // 게시글 상세 페이지에서 댓글 달기
 ArticleRouter.post('/detail/:id', async (req,res) =>{
-    let id;
-    try{
-            id = Number(req.params.id) ;
-            const article = prisma.article.findUnique({
-                where: {id}
-            });
-            if (!article){
-                throw new Error(error);
-            }       
-    
-        } catch(error){
-            return res.status(400).send(error);
-        }
+
+    const id = Number(req.params.id) ;
+    if (!id){
+        next(new Error("invalid parameter"))
+    }
+
+    const article = prisma.article.findUnique({
+        where: {id}
+    });
+    if (!article){
+        next(new Error("no content"));
+    }
 
     const commentContent = req.body.commentContent;
     if (!commentContent|| commentContent.length>500){
-        return res.send("content error!")
+        next(new Error("invalid body"))
     }
 
     try{
@@ -208,41 +232,53 @@ ArticleRouter.post('/detail/:id', async (req,res) =>{
         return res.send(newComment)
     } catch(error){
         console.error(error);
-        return res.send(error);
+        next(new Error("Server Error"))
     }
         
 });
 
 //게시글 상세 페이지에서 댓글 수정하기
 ArticleRouter.patch('/detail/:id', async (req,res) =>{
-    try{
-        const id = Number(req.params.id) ;
-        const article = prisma.article.findUnique({
-            where: {id}
-        });
-        if (!article){
-            throw Error;
-        }
-    }catch(error){
-        console.error(error);
-        return res.send(error);
+
+    const id = Number(req.params.id) ;
+    const article = prisma.article.findUnique({
+        where: {id}
+    });
+
+    if (!id){
+        next(new Error("invalid parameter"));
     }
+    if (!article){
+        next(new Error("No content"));
+    }
+
+
+    console.error(error);
+    next(new Error("Server Error"));
     
     try{
         const CommentId = Number(req.body.id);
         const commentContent = req.body.commentContent;
+        if(!CommentId){
+            next(new Error("invalid parameter"))
+        }
+        if(!commentContent){
+            next(new Error("invalid body data"))
+        }
+
         const newComment = await prisma.ArticleComment.update({
             where:{
                 id:CommentId
             },
             data: {
                 commentContent
-            }     
-    });
+            }
+        });
+        
         return res.status(201).send(newComment);
     }catch(error){
         console.error(error);
-        return res.status(500).send("there was error updating comment in server");
+        next(new Error("Server Error"));
         
     }
 });
@@ -253,16 +289,20 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     const id = Number(req.params.id) ;
     const CommentId= Number(req.params.commentId);
-    const article = prisma.article.findUnique({
+
+    if(!CommentId || !id){
+        next(new Error("invalid parameter"))
+    }
+
+    const article = await prisma.article.findUnique({
         where: {id}
     });
 
     if (!article){
-        res.send(error)
+        next(new Error("No content"));
     }
     
     try{
-        console.log("there is article")
         await prisma.ArticleComment.delete({
             where:{
                 id:CommentId
@@ -272,7 +312,7 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
 
     }catch(error){
         console.error(error);
-        return res.status(500).send("there was error updating comment in server");
+        next(new Error("Server Error"));
         
     }
 });
