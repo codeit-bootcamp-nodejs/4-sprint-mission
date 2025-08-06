@@ -205,6 +205,7 @@ ArticleRouter.get('/comments', async(req,res,next) =>{
         skip = parseInt(skip);
         commentId = parseInt(commentId);
 
+        
         const articleComment =await prisma.ArticleComment.findMany({
             take,
             skip,
