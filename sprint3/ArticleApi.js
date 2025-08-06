@@ -15,8 +15,6 @@ ArticleRouter.get('/', async (req,res) =>{
     let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
     console.log(sort, skip, take, searchtitle, searchcontent);
     let orderBy ;
-    // searchtitle = searchtitle? String(searchtitle) : undefined ;
-    // searchcontent? String(searchcontent) : undefined;
     skip = parseInt(skip);
     take = parseInt(take);
     try{
@@ -85,15 +83,15 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
 });
 
 
-//   '/post/postarticle' 이란 사이트에서 article 생성하기
-ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
-    const {title, content} = req.body;
+//   '/article/postarticle' 이란 사이트에서 article 생성하기
+ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
+    const {title, articleContent} = req.body;
     console.log("post start");
     try{
-        const Article =  prisma.Article.create({
+        const Article =  await prisma.Article.create({
             data: {
                 title,
-                content
+                articleContent
             }
         });
         console.log("post Article success");
@@ -101,21 +99,24 @@ ArticleRouter.post('/postArticle', ArticleValid, (req,res) =>{
         
 
     } catch(error){
-        console.log("get Article failed because of server");
+        console.log("post Article failed because of server");
         return res.status(500).send("server error")
     }
     
 });
 
 //   'article/:id/modfiy'라는 사이트에서 article 수정하기
-ArticleRouter.patch('/:id/modify', (req,res) =>{
+ArticleRouter.patch('/:id/modify', async (req,res) =>{
     try{
-        const {title,content} = req.body; 
-        const id = req.params.id;
-        const Article = prisma.Article.update({
+        const {title,articleContent} = req.body; 
+        const id = Number(req.params.id);
+        const Article = await prisma.Article.update({
+            where:{
+                id
+            },
             data: {
                 title,
-                content
+                articleContent
             }
         })
         console.log("patch Article success")
@@ -129,18 +130,21 @@ ArticleRouter.patch('/:id/modify', (req,res) =>{
 } );
 
 // article 삭제하기 
-ArticleRouter.delete('/detail/:id', (req,res) =>{
+ArticleRouter.delete('/detail/:id', async(req,res) =>{
     try{
-        const id = req.params.id;
-        prisma.Article.delete({
+        const id = Number(req.params.id);
+        if (!id){
+            return res.send("error occured")
+        }
+        await prisma.Article.delete({
             where:{id}
         });
         console.log("deleting article success");
-        return res.send(200).send("deleting completed");
+        return res.status(200).send("deleting completed");
 
     } catch(error){
-        console.log("patch Article failed because of server");
-        return res.status(500).send("server error")
+        console.log("delete Article failed because of server");
+        return res.send(error)
     }
     
 });
@@ -172,46 +176,47 @@ ArticleRouter.get('/comments', async(req,res) =>{
 });
 
 // 게시글 상세 페이지에서 댓글 달기
-ArticleRouter.post('/detail/:id', ArticleValid, (req,res) =>{
+ArticleRouter.post('/detail/:id', async (req,res) =>{
+    let id;
     try{
-            const id = req.params.id ;
+            id = Number(req.params.id) ;
             const article = prisma.article.findUnique({
                 where: {id}
             });
             if (!article){
-                throw Error;
+                throw new Error(error);
             }       
     
         } catch(error){
-            return res.status(400).send("invalid Article ID");
+            return res.status(400).send(error);
         }
 
-    try{
-        const content = req.body.commentcontent;
-        if (content =='undefined'|| content.length>500){
-            throw Error;
-        }
-    } catch (error){
-        return res.status(400).send('message content is too long or undefined')
+    const commentContent = req.body.commentContent;
+    if (!commentContent|| commentContent.length>500){
+        return res.send("content error!")
     }
 
     try{
-        const newComment = prisma.Articlecomment.create({
+        const newComment = await prisma.ArticleComment.create({
         data: {
-            commentcontent
+            commentContent,
+            article: {
+                connect: {id: id}
+            }
         }
-    });
+        });
+        return res.send(newComment)
     } catch(error){
-        console.log("comment POST Error Occured");
-        return res.status(500).send("there was error during making comment");
+        console.error(error);
+        return res.send(error);
     }
         
 });
 
 //게시글 상세 페이지에서 댓글 수정하기
-ArticleRouter.patch('/detail/:id', (req,res) =>{
+ArticleRouter.patch('/detail/:id', async (req,res) =>{
     try{
-        const id = req.params.id ;
+        const id = Number(req.params.id) ;
         const article = prisma.article.findUnique({
             where: {id}
         });
@@ -219,13 +224,14 @@ ArticleRouter.patch('/detail/:id', (req,res) =>{
             throw Error;
         }
     }catch(error){
-        return res.status(404).send("no article");
+        console.error(error);
+        return res.send(error);
     }
     
     try{
-        const CommentId = req.body.Id;
+        const CommentId = Number(req.body.id);
         const commentContent = req.body.commentContent;
-        const newComment = prisma.Articlecomment.update({
+        const newComment = await prisma.ArticleComment.update({
             where:{
                 id:CommentId
             },
@@ -235,29 +241,29 @@ ArticleRouter.patch('/detail/:id', (req,res) =>{
     });
         return res.status(201).send(newComment);
     }catch(error){
+        console.error(error);
         return res.status(500).send("there was error updating comment in server");
-        console.log("there was error updating comment in server");
+        
     }
 });
 
 //게시글 상세페이지에서 댓글 삭제하기 
 
-ArticleRouter.patch('/detail/:id', (req,res) =>{
-    try{
-        const id = req.params.id ;
-        const article = prisma.article.findUnique({
-            where: {id}
-        });
-        if (!article){
-            throw Error;
-        }
-    }catch(error){
-        return res.status(404).send("no article");
+ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
+
+    const id = Number(req.params.id) ;
+    const CommentId= Number(req.params.commentId);
+    const article = prisma.article.findUnique({
+        where: {id}
+    });
+
+    if (!article){
+        res.send(error)
     }
     
     try{
-        const CommentId = req.body.Id;
-        prisma.Articlecomment.delete({
+        console.log("there is article")
+        await prisma.ArticleComment.delete({
             where:{
                 id:CommentId
             }
@@ -265,16 +271,11 @@ ArticleRouter.patch('/detail/:id', (req,res) =>{
         return res.status(200).send("deleting success");
 
     }catch(error){
+        console.error(error);
         return res.status(500).send("there was error updating comment in server");
-        console.log("there was error updating comment in server");
+        
     }
 });
-
-
-
-
-
-
 
 
 export default ArticleRouter;
