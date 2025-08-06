@@ -14,8 +14,13 @@ app.use(express.json());
 app.use('/article', ArticleRouter);
 app.use('/product', ProductRouter);
 // app.use('/upload', fileRouter);
+app.use( (err,req,res,next) =>{
+    if (err){
+        res.json( err.message|| "Server Error Occured");
+    }
+})
 
-console.log(process.env.DATABASE_URL);
+
 
 app.listen(3000, () =>{
     console.log("server is running at http://localhost:3000")

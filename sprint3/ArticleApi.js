@@ -11,7 +11,7 @@ const ArticleRouter = express.Router();
 
 
 //모든 게시글 불러오기, 댓글 미포함
-ArticleRouter.get('/', async (req,res) =>{
+ArticleRouter.get('/', async (req,res,next) =>{
     let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
     let orderBy ;
     skip = parseInt(skip);
@@ -52,14 +52,14 @@ ArticleRouter.get('/', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
     
 });
      
 
 //게시글 상세 페이지
-ArticleRouter.get('/detail/:id', async (req,res) =>{
+ArticleRouter.get('/detail/:id', async (req,res,next) =>{
 
     try{
         let id = req.params.id;
@@ -67,12 +67,17 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
         if (!id){
             const err = new Error("invalid parameter")
             err.status = 400;
-            next(err);
+            return next(err);
         }
         const Article = await prisma.Article.findUnique({
             where: {id},
             include : {comment: true}
         });
+        if (!Article){
+            const err = new Error("No content")
+            err.status = 404
+            return next(err);
+        }
         console.log("get Article success");
         return res.status(200).send(Article);
         
@@ -80,21 +85,21 @@ ArticleRouter.get('/detail/:id', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);;
+        return next(err);
     }
     
 });
 
 
 //   '/article/postarticle' 이란 사이트에서 article 생성하기
-ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
+ArticleRouter.post('/postArticle', ArticleValid, async (req,res,next) =>{
     const {title, articleContent} = req.body;
     // console.log("post start");
 
     if (!title || !articleContent){
         const err = new Error("invalid body data");
         err.status = 400;
-        next(err)
+        return next(err)
     }
 
     try{
@@ -112,13 +117,13 @@ ArticleRouter.post('/postArticle', ArticleValid, async (req,res) =>{
         console.log("post Article failed because of server");
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
     
 });
 
 //   'article/:id/modfiy'라는 사이트에서 article 수정하기
-ArticleRouter.patch('/:id/modify', async (req,res) =>{
+ArticleRouter.patch('/:id/modify', async (req,res,next) =>{
     try{
         const {title,articleContent} = req.body; 
         const id = Number(req.params.id);
@@ -126,13 +131,13 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
         if (!id){
             const err = new Error("invalid parameter")
             err.status = 400;
-            next(err);
+            return next(err);
         }
 
         if (!title || !articleContent){
             const err = new Error("invalid body data");
             err.status = 400;
-            next(err)
+            return next(err)
         }
 
         const Article = await prisma.Article.update({
@@ -151,20 +156,20 @@ ArticleRouter.patch('/:id/modify', async (req,res) =>{
         console.log("patch Article failed because of server");
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
     
 } );
 
 // article 삭제하기 
-ArticleRouter.delete('/detail/:id', async(req,res) =>{
+ArticleRouter.delete('/detail/:id', async(req,res,next) =>{
     try{
         const id = Number(req.params.id);
 
         if (!id){
             const err = new Error("invalid parameter")
             err.status = 400;
-            next(err);
+            return next(err);
         }
 
         const article = await prisma.Article.findUnique({
@@ -174,7 +179,7 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
         if (!article){
             const err = new Error("No content")
             err.status = 404
-            next(err);
+            return next(err);
         }
 
         await prisma.Article.delete({
@@ -187,13 +192,13 @@ ArticleRouter.delete('/detail/:id', async(req,res) =>{
         console.log("delete Article failed because of server");
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
     
 });
 
 // 모든 댓글 불러오기
-ArticleRouter.get('/comments', async(req,res) =>{
+ArticleRouter.get('/comments', async(req,res,next) =>{
     try{
         let {take = '10',skip= '1',commentId = '1'} = req.query;
         take = parseInt(take);
@@ -217,18 +222,18 @@ ArticleRouter.get('/comments', async(req,res) =>{
             console.error(error)
             const err = new Error("Server Error");
             err.status = 500;
-            next(err);
+            return next(err);
         }
 });
 
 // 게시글 상세 페이지에서 댓글 달기
-ArticleRouter.post('/detail/:id', async (req,res) =>{
+ArticleRouter.post('/detail/:id', async (req,res,next) =>{
 
     const id = Number(req.params.id) ;
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     const article = prisma.article.findUnique({
@@ -237,7 +242,7 @@ ArticleRouter.post('/detail/:id', async (req,res) =>{
     if (!article){
         const err = new Error("No content")
         err.status = 404
-        next(err);
+        return next(err);
     }
 
     const commentContent = req.body.commentContent;
@@ -259,13 +264,13 @@ ArticleRouter.post('/detail/:id', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
         
 });
 
 //게시글 상세 페이지에서 댓글 수정하기
-ArticleRouter.patch('/detail/:id', async (req,res) =>{
+ArticleRouter.patch('/detail/:id', async (req,res,next) =>{
 
     const id = Number(req.params.id) ;
     const article = prisma.article.findUnique({
@@ -275,12 +280,12 @@ ArticleRouter.patch('/detail/:id', async (req,res) =>{
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
     if (!article){
         const err = new Error("No content")
         err.status = 404
-        next(err);
+        return next(err);
     }
 
     try{
@@ -289,12 +294,12 @@ ArticleRouter.patch('/detail/:id', async (req,res) =>{
         if(!CommentId){
             const err = new Error("invalid parameter")
             err.status = 400;
-            next(err);
+            return next(err);
         }
         if(!commentContent){
             const err = new Error("invalid body data");
             err.status = 400;
-            next(err)
+            return next(err)
         }
 
         const newComment = await prisma.ArticleComment.update({
@@ -311,14 +316,14 @@ ArticleRouter.patch('/detail/:id', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);;
+        return next(err);;
         
     }
 });
 
 //게시글 상세페이지에서 댓글 삭제하기 
 
-ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
+ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res,next) =>{
 
     const id = Number(req.params.id) ;
     const CommentId= Number(req.params.commentId);
@@ -326,7 +331,7 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     if(!CommentId || !id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     const article = await prisma.article.findUnique({
@@ -336,7 +341,7 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     if (!article){
         const err = new Error("No content")
         err.status = 404
-        next(err);
+        return next(err);
     }
     
     try{
@@ -351,7 +356,7 @@ ArticleRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);;
+        return next(err);;
         
     }
 });

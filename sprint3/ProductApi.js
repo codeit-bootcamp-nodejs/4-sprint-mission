@@ -11,7 +11,7 @@ const ProductRouter = express.Router()
 
 
 //게시글 전체 불러오기
-ProductRouter.get('/', async (req,res) =>{
+ProductRouter.get('/', async (req,res,next) =>{
     let {sort = 'recent', skip = '10', take= '10', searchName, searchDescription} = req.query;
     skip = parseInt(skip);
     take = parseInt(take);
@@ -43,20 +43,20 @@ ProductRouter.get('/', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
         
     }
 });
 
 //게시글 상세페이지
-ProductRouter.get('/detail/:id', async (req,res) =>{
+ProductRouter.get('/detail/:id', async (req,res,next) =>{
     let id = req.params.id;
     id = parseInt(id);
 
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     try{
@@ -74,18 +74,18 @@ ProductRouter.get('/detail/:id', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
     
 });
 
 //게시글 posting
-ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
+ProductRouter.post('/postProduct', ProductValid, async (req,res,next) =>{
     const {name,description, price, tags} = req.body;
     if (!name|| !description ||!price || !tags){
         const err = new Error("invalid body data");
         err.status = 400;
-        next(err)
+        return next(err)
     }
 
     try{
@@ -104,25 +104,25 @@ ProductRouter.post('/postProduct', ProductValid, async (req,res) =>{
         console.log('post product failed because of server error');
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
 });
 
 //게시글 수정하기
-ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
+ProductRouter.patch('/detail/:id/modify', async (req,res,next) =>{
     const {name, description, price, tags} = req.body;
     const id = Number(req.params.id) ;
 
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     if (!name|| !description ||!price || !tags){
         const err = new Error("invalid body data");
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     try{
@@ -142,17 +142,17 @@ ProductRouter.patch('/detail/:id/modify', async (req,res) =>{
         console.log('patch product failed because of server error');
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
 });
 
 //게시글 삭제하기 
-ProductRouter.delete('/detail/:id', async (req,res) =>{
+ProductRouter.delete('/detail/:id', async (req,res,next) =>{
     const id = Number(req.params.id) ;
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     try{
@@ -166,7 +166,7 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
         console.log('deleting product failed because of server error');
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
 });
 
@@ -179,7 +179,7 @@ ProductRouter.delete('/detail/:id', async (req,res) =>{
 
 
 //모든 댓글 보기
-ProductRouter.get('/comments', async (req,res) =>{
+ProductRouter.get('/comments', async (req,res,next) =>{
     try{
         let {take = '10',skip= '1',commentId = '1'} = req.query;
         take = parseInt(take);
@@ -205,7 +205,7 @@ ProductRouter.get('/comments', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err);
+        return next(err);
     }
 });    
 
@@ -215,14 +215,14 @@ ProductRouter.get('/comments', async (req,res) =>{
 
 
 //게시글 상세페이지에서 댓글 달기
-ProductRouter.post('/detail/:id', async (req,res) =>{
+ProductRouter.post('/detail/:id', async (req,res,next) =>{
     let id;
     id = Number(req.params.id) ;
 
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
 
@@ -233,7 +233,7 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
     if (!product){
         const err = new Error("No content")
         err.status = 404;
-        next(err);
+        return next(err);
     }
 
 
@@ -243,7 +243,7 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
         if(!commentContent || commentContent.length>1000){
             const err = new Error("invalid body data");
             err.status = 400;
-            next(err);
+            return next(err);
         }
         const newComment = await prisma.ProductComment.create({
             data: {
@@ -255,7 +255,7 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
     }catch(error){
         const err = new Error("Server Error");
         err.status = 500;
-        next(err); 
+        return next(err); 
     }
     
 
@@ -263,19 +263,19 @@ ProductRouter.post('/detail/:id', async (req,res) =>{
 
 
 //게시글 상세페이지에서 댓글 수정하기
-ProductRouter.patch('/detail/:id', async (req,res) =>{
+ProductRouter.patch('/detail/:id', async (req,res,next) =>{
     const id = Number(req.params.id) ;
     const CommentId = Number(req.body.id);
 
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
     if (!CommentId){
         const err = new Error("invalid body data");
         err.status = 400;
-        next(err)
+        return next(err)
     }
 
     const product = await prisma.product.findUnique({
@@ -285,7 +285,7 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
     if (!product){
         const err = new Error("No content")
         err.status = 404;
-        next(err);
+        return next(err);
     }
 
 
@@ -307,21 +307,21 @@ ProductRouter.patch('/detail/:id', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err); 
+        return next(err); 
     }
    
     
 });
 
 //댓글 삭제하기
-ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
+ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res,next) =>{
 
     const id = Number(req.params.id) ;
 
     if (!id){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     const product = await prisma.product.findUnique({
@@ -331,13 +331,13 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
     if (!product){
         const err = new Error("No content")
         err.status = 404;
-        next(err);
+        return next(err);
     }
     const CommentId = Number(req.params.commentId);
     if (!CommentId){
         const err = new Error("invalid parameter")
         err.status = 400;
-        next(err);
+        return next(err);
     }
 
     try{
@@ -352,7 +352,7 @@ ProductRouter.delete('/detail/:id/comment/:commentId', async (req,res) =>{
         console.error(error);
         const err = new Error("Server Error");
         err.status = 500;
-        next(err); 
+        return next(err); 
     }
 })
 
