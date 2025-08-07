@@ -1,7 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import fs from 'fs';
-import errorHandler from '../middlewares/routerErrorHandler';
+import errorHandler from '../middlewares/routerErrorHandler.js';
 
 const fileRouter = express.Router();
 const upload = multer({dest: 'uploads/'})

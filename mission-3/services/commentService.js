@@ -1,17 +1,19 @@
-import { PrismaClient } from '@prisma/client';
-import express from 'express';
-import errorHandler from '../middlewares/routerErrorHandler.js';
-import { commentValidator, getCommentList } from '../validators/commentStruct.js';
-import { assert, create } from 'superstruct';
-import { idValidator } from '../validators/struct.js';
+import { PrismaClient } from "@prisma/client";
+import { getListValidator, commentValidator } from "../validators/commentStruct.js";
+import { idValidator } from "../validators/struct.js";
+import errorHandler from "../middlewares/routerErrorHandler.js";
+import { create, assert } from 'superstruct';
 
-const productCommentRouter = express.Router();
 const prisma = new PrismaClient();
 
-productCommentRouter.route('/')
-    .get(errorHandler(async (req, res) =>{
-        const {page, cursorId, nums} = create(req.query, getCommentList);
+function getCommentList(){
+    return errorHandler(async (req, res) =>{
+        const {page, cursorId, nums} = create(req.query, getListValidator);
+        const parentType = req.parentType;
+        const where = parentType === 'product'
+            ? { productId: { not: null }} : {articleId: { not: null }};
         const comment = await prisma.comment.findMany({
+            where,
             select: {
                 id: true,
                 content: true,
@@ -24,29 +26,34 @@ productCommentRouter.route('/')
             }
         })
         res.status(200).json(comment);
-    }))
-    .post(errorHandler(async (req, res)=>{
+    })
+}
+
+function createComment(){
+    return errorHandler(async (req, res)=>{
         assert(req.body, commentValidator);
         const id = req.parentId;
+        const parentType = req.parentType;
         const {content} = req.body;
         const comment = await prisma.comment.create({
             data: {
                 content,
-                product: {
+                [parentType]: {
                     connect:{
                         id,
                     }
                 }
             },
             include: {
-                product: true,
+                [parentType]: true,
             }
         })
         res.status(201).json(comment);
-    }))
-    
-productCommentRouter.route('/:id')
-    .patch(errorHandler(async (req, res)=>{
+    })
+}
+
+function patchComment(){
+    return errorHandler(async (req, res)=>{
         assert(req.body, commentValidator)
         const id = create(req.params, idValidator);
         const {content} = req.body;
@@ -57,13 +64,17 @@ productCommentRouter.route('/:id')
             }
         })
         res.status(200).json(comment);
-    }))
-    .delete(errorHandler(async (req, res)=>{
+    })
+}
+
+function deleteComment(){
+    return errorHandler(async (req, res)=>{
         const id = create(req.params, idValidator);
         const comment = await prisma.comment.delete({
             where: id,
         })
         res.status(200).json(comment)
-    }))
+    })
+}
 
-export default productCommentRouter;
+export {getCommentList, createComment, patchComment, deleteComment};

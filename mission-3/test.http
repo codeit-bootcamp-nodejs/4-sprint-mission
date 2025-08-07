@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ### 상품 수정
-PATCH http://localhost:3000/product/11
+PATCH http://localhost:3000/product/13
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### 상품 삭제
-DELETE http://localhost:3000/product/11
+DELETE http://localhost:3000/product/13
 
 // Article tests
 
@@ -56,7 +56,7 @@ Content-Type: application/json
 }
 
 ### 게시글 삭제
-DELETE http://localhost:3000/article/6
+DELETE http://localhost:3000/article/10
 
 ### 게시글 댓글 작성
 POST http://localhost:3000/article/3/comment
@@ -78,7 +78,7 @@ Content-Type: application/json
 }
 
 ### 게시글 댓글 삭제
-DELETE http://localhost:3000/article/3/comment/4
+DELETE http://localhost:3000/article/3/comment/10
 
 ### 상품 댓글 작성
 POST http://localhost:3000/product/3/comment
@@ -92,7 +92,7 @@ Content-Type: application/json
 GET http://localhost:3000/product/3/comment?cursorId=3
 
 ### 상품 댓글 수정
-PATCH http://localhost:3000/product/3/comment/7
+PATCH http://localhost:3000/product/3/comment/6
 Content-Type: application/json
 
 {
@@ -100,7 +100,7 @@ Content-Type: application/json
 }
 
 ### 상품 댓글 삭제
-DELETE http://localhost:3000/product/3/comment/8
+DELETE http://localhost:3000/product/3/comment/11
 
 ### 파일 업로드 테스트
 POST http://localhost:3000/uploads

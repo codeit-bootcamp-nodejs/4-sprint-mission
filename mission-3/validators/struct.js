@@ -13,7 +13,7 @@ export function validAndParsingInteger(data){ // 기본 값 설정
     return coerce(integer(), string(), (val) => /^\d+$/.test(val) ? parseInt(val) : parseInt(data))
 } // coerce(출력타입, 입력타입, 변환함수)
 
-export const getList = object({
+export const getListValidator = object({
     keyword: defaulted(string(), ''),
     page: defaulted(validAndParsingInteger(0), 0),
     nums: defaulted(validAndParsingInteger(10), 10),
