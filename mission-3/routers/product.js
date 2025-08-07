@@ -2,7 +2,8 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import productCommentRouter from './productCommentRouter.js';
 import { assert, create } from 'superstruct';
-import { createProduct, getProductList, idValidator, patchProduct } from '../validators/productStruct.js';
+import { createProduct, patchProduct } from '../validators/productStruct.js';
+import {idValidator, getList} from '../validators/struct.js';
 import errorHandler from '../middlewares/routerErrorHandler.js';
 import parentIdParser from '../middlewares/parnetIdParser.js';
 
@@ -13,7 +14,7 @@ productRouter.use('/:id/comment', parentIdParser, productCommentRouter);
 
 productRouter.route('/')
     .get(errorHandler(async (req, res)=>{
-        const {keyword, page, nums} = create(req.query, getProductList)
+        const {keyword, page, nums} = create(req.query, getList)
         const productList = await prisma.product.findMany({
             where: {
                 OR: [
