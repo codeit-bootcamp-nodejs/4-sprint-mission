@@ -60,3 +60,25 @@ router.patch("/:articleId/comments/:commentId", async (req, res) => {
     res.status(500).json({ error: "댓글 업데이트 실패", code: err.code });
   }
 });
+
+router.delete("/:articleId/comments/:commentId", async (req, res) => {
+  const commentId = Number(req.params.commentId);
+  const articleId = Number(req.params.articleId);
+
+  try {
+    await prisma.comment.delete({
+      where: {
+        id: commentId,
+        articleId: articleId,
+      },
+    });
+
+    res.status(200).json({ message: `${commentId} 삭제 완료` });
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
+    }
+
+    res.status(500).json({ error: "댓글 삭제 실패", code: err.code });
+  }
+});
