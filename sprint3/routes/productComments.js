@@ -83,4 +83,28 @@ router.delete("/:productId/comments/:commentId", async (req, res) => {
   }
 });
 
+router.get("/:productId/comments", async (req, res) => {
+  const productId = Number(req.params.productId);
+  const { cursor = 1, limit = 10 } = req.query;
+
+  try {
+    const productComments = await prisma.comment.findMany({
+      where: { productId },
+      take: parseInt(limit, 10),
+      skip: 1,
+      cursor: { id: parseInt(cursor, 10) },
+      orderBy: { id: "asc" },
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+      },
+    });
+
+    res.status(200).json(productComments);
+  } catch (err) {
+    res.status(500).json({ error: "댓글 조회 실패", code: err.code });
+  }
+});
+
 export default router;
