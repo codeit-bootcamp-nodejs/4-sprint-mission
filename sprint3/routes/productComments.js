@@ -1,5 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import { validateNewComment } from "../middlewares/validate.js";
 
 const router = express.Router();
 
@@ -7,13 +8,9 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/:productId/comments", async (req, res) => {
+router.post("/:productId/comments", validateNewComment, async (req, res) => {
   const productId = Number(req.params.productId);
   const { content } = req.body;
-
-  if (isNaN(productId) || !content) {
-    return res.status(400).json({ error: "productId와 content는 필수입니다." });
-  }
 
   try {
     const comment = await prisma.comment.create({

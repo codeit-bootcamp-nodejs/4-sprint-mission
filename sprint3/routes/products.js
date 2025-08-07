@@ -1,6 +1,10 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import commentRouter from "./productComments.js";
+import {
+  validateProdCreate,
+  validateProdUpdate,
+} from "../middlewares/validate.js";
 
 const router = express.Router();
 
@@ -8,16 +12,8 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/", async (req, res) => {
+router.post("/", validateProdCreate, async (req, res) => {
   const { name, description, price, tags } = req.body;
-
-  if (!name || !price) {
-    return res.status(400).json({ error: "필수 항목 누락" });
-  }
-
-  if (!Array.isArray(tags)) {
-    return res.status(400).json({ error: "tags는 문자열 배열이어야 합니다." });
-  }
 
   try {
     const product = await prisma.product.create({
@@ -50,7 +46,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", validateProdUpdate, async (req, res) => {
   const id = Number(req.params.id);
   const { name, description, price, tags } = req.body;
 

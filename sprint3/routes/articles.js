@@ -1,6 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import commentRouter from "./articleComments.js";
+import { validateArtCreate } from "../middlewares/validate.js";
 
 const router = express.Router();
 
@@ -8,12 +9,8 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/", async (req, res) => {
+router.post("/", validateArtCreate, async (req, res) => {
   const { title, content } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ message: "필수 항목 누락" });
-  }
 
   try {
     const articles = await prisma.article.create({
