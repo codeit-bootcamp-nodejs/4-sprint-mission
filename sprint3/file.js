@@ -61,5 +61,8 @@ async function resizeImage(file){
     )
 }
 
+const ImagePath = 'sprint3/UploadedFile'
+
+
 
 export default fileRouter;
