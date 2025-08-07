@@ -3,10 +3,12 @@ import productRouter from './routers/product.js';
 import articleRouter from './routers/article.js';
 import jsonErrorHandler from './middlewares/jsonErrorHandler.js';
 import fileRouter from './routers/file.js';
+import cors from 'cors';
 
 const app = express();
 const PORT = 3000;
 
+app.use(cors())
 app.use(express.json());
 app.use(express.static('uploads'));
 app.use(express.urlencoded({ extended: true }))
