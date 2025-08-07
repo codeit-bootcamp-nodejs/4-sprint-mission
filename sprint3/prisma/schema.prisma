@@ -42,4 +42,7 @@ model Comment {
   product     Product?  @relation(fields: [productId], references: [id])
   articleId   Int?
   article     Article?  @relation(fields: [articleId], references: [id])
+
+  @@unique([id, articleId])
+  @@unique([id, productId])
 }
