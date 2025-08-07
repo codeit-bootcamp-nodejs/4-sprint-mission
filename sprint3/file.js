@@ -3,6 +3,7 @@ import multer from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import imageResize from 'image-resize';
 
 const app = express();
 const fileRouter = express.Router();
@@ -36,11 +37,13 @@ fileRouter.get('',(req,res,next) =>{
     }
 })
 
-fileRouter.post('/upload', upload.single('FormName'), (req,res,next) =>{
+fileRouter.post('/upload', upload.single('FormName'), async (req,res,next) =>{
     try{
+        console.log(req.file)
         if (!req.file){
             return res.status(400).json({error: "no file uploaded"});
         }
+        
         return res.send(`${req.file.path}`);
     } catch(error){
         console.error(error);
@@ -48,5 +51,15 @@ fileRouter.post('/upload', upload.single('FormName'), (req,res,next) =>{
     }
     
 });
+
+async function resizeImage(file){
+    const newImage= await imageResize(file,{
+            format:'png',
+            width: 640 ,
+            height: 640
+        }
+    )
+}
+
 
 export default fileRouter;
