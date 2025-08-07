@@ -1,13 +1,14 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import commentRouter from "./articleComments.js";
 
-const app = express();
+const router = express.Router();
 
 const prisma = new PrismaClient();
 
-app.use(express.json());
+router.use(express.json());
 
-app.post("/articles", async (req, res) => {
+router.post("/", async (req, res) => {
   const { title, content } = req.body;
 
   if (!title || !content) {
@@ -28,7 +29,7 @@ app.post("/articles", async (req, res) => {
   }
 });
 
-app.get("/articles/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
@@ -51,7 +52,7 @@ app.get("/articles/:id", async (req, res) => {
   }
 });
 
-app.patch("/articles/:id", async (req, res) => {
+router.patch("/:id", async (req, res) => {
   const id = Number(req.params.id);
   const { title, content } = req.body;
 
@@ -74,7 +75,7 @@ app.patch("/articles/:id", async (req, res) => {
   }
 });
 
-app.delete("/articles/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   const id = Number(req.params.id);
 
   try {
@@ -90,7 +91,7 @@ app.delete("/articles/:id", async (req, res) => {
   }
 });
 
-app.get("/articles", async (req, res) => {
+router.get("/", async (req, res) => {
   const { offset = 0, limit = 10, title, content } = req.query;
 
   const filter = [];
@@ -124,3 +125,7 @@ app.get("/articles", async (req, res) => {
     res.status(500).json({ message: "서버 에러" });
   }
 });
+
+router.use("/", commentRouter);
+
+export default router;
