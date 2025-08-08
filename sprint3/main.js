@@ -2,11 +2,13 @@ import ArticleRouter  from "./ArticleApi.js";
 import ProductRouter from "./ProductApi.js";
 import fileRouter from "./file.js";
 
+import cors from 'cors';
 import express from 'express';
 import 'dotenv/config';
 
 
 const app = express();
+
 
 app.use(cors());
 app.use(express.json());
