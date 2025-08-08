@@ -9,7 +9,6 @@ function getArticleList(page, pageSize, keyword) {
         keyword
     })
         .then(res => {
-            // console.log(res.data)
             return res.data;
         })
         .catch(e => {
@@ -20,7 +19,6 @@ function getArticleList(page, pageSize, keyword) {
 function getArticle(articleId) {
     axios.get(apiUrl+`/articles/${articleId}`)
         .then(res => {
-            // console.log(res.data)
             return res.data;
         })
         .catch(e => {
@@ -35,7 +33,6 @@ function createArticle(title, content, image) {
         image
     })
         .then(res => {
-            // console.log(res.data)
             return res.data;
         })
         .catch(e => {
@@ -50,7 +47,6 @@ function patchArticle(articleId, title, content, image) {
         image
     })
         .then(res => {
-            // console.log(res.data)
             return res.data;
         })
         .catch(e => {
@@ -61,7 +57,6 @@ function patchArticle(articleId, title, content, image) {
 function deleteArticle(articleId) {
     axios.delete(apiUrl+`/articles/${articleId}`)
         .then(res => {
-            // console.log(res.data)
             return res.data;
         })
         .catch(e => {
