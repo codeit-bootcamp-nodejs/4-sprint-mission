@@ -3,7 +3,9 @@ import { PrismaClient } from "@prisma/client";
 import commentRouter from "./productComments.js";
 import {
   validateProdCreate,
+  validateId,
   validateProdUpdate,
+  validateProdQuery,
 } from "../middlewares/validate.js";
 
 const router = express.Router();
@@ -12,7 +14,7 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/", validateProdCreate, async (req, res) => {
+router.post("/", validateProdCreate, async (req, res, next) => {
   const { name, description, price, tags } = req.body;
 
   try {
@@ -27,11 +29,11 @@ router.post("/", validateProdCreate, async (req, res) => {
 
     res.status(201).json(product);
   } catch (err) {
-    res.status(500).json({ error: "서버 에러" });
+    next(err);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateId, async (req, res, next) => {
   const id = Number(req.params.id);
 
   try {
@@ -42,11 +44,11 @@ router.get("/:id", async (req, res) => {
 
     res.json(product);
   } catch (err) {
-    res.status(500).json({ error: "서버 에러" });
+    next(err);
   }
 });
 
-router.patch("/:id", validateProdUpdate, async (req, res) => {
+router.patch("/:id", validateId, validateProdUpdate, async (req, res, next) => {
   const id = Number(req.params.id);
   const { name, description, price, tags } = req.body;
 
@@ -63,15 +65,11 @@ router.patch("/:id", validateProdUpdate, async (req, res) => {
 
     res.status(200).json(product);
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
-    }
-
-    res.status(500).json({ error: "서버 에러" });
+    next(err);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateId, async (req, res, next) => {
   const id = Number(req.params.id);
 
   try {
@@ -79,15 +77,11 @@ router.delete("/:id", async (req, res) => {
 
     res.status(200).json({ message: `${id} 삭제 완료` });
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
-    }
-
-    res.status(500).json({ error: "서버 에러" });
+    next(err);
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", validateProdQuery, async (req, res, next) => {
   const { offset = 0, limit = 10, name, description } = req.query;
 
   const filter = [];
@@ -115,10 +109,13 @@ router.get("/", async (req, res) => {
         createdAt: true,
       },
     });
+    if (product.length === 0) {
+      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
+    }
 
     res.status(200).json(product);
   } catch (err) {
-    res.status(500).json({ error: "서버 에러" });
+    next(err);
   }
 });
 

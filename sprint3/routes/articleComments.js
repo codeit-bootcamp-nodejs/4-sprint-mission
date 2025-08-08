@@ -8,25 +8,29 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/:articleId/comments", validateNewComment, async (req, res) => {
-  const articleId = Number(req.params.articleId);
-  const { content } = req.body;
+router.post(
+  "/:articleId/comments",
+  validateNewComment,
+  async (req, res, next) => {
+    const articleId = Number(req.params.articleId);
+    const { content } = req.body;
 
-  try {
-    const comment = await prisma.comment.create({
-      data: {
-        content,
-        article: { connect: { id: articleId } },
-      },
-    });
+    try {
+      const comment = await prisma.comment.create({
+        data: {
+          content,
+          article: { connect: { id: articleId } },
+        },
+      });
 
-    res.status(201).json(comment);
-  } catch (err) {
-    res.status(500).json({ error: "댓글 등록 실패", code: err.code });
+      res.status(201).json(comment);
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
-router.patch("/:articleId/comments/:commentId", async (req, res) => {
+router.patch("/:articleId/comments/:commentId", async (req, res, next) => {
   const commentId = Number(req.params.commentId);
   const articleId = Number(req.params.articleId);
   const { content } = req.body;
@@ -54,11 +58,11 @@ router.patch("/:articleId/comments/:commentId", async (req, res) => {
 
     res.status(200).json(updated);
   } catch (err) {
-    res.status(500).json({ error: "댓글 업데이트 실패", code: err.code });
+    next(err);
   }
 });
 
-router.delete("/:articleId/comments/:commentId", async (req, res) => {
+router.delete("/:articleId/comments/:commentId", async (req, res, next) => {
   const commentId = Number(req.params.commentId);
   const articleId = Number(req.params.articleId);
 
@@ -72,15 +76,11 @@ router.delete("/:articleId/comments/:commentId", async (req, res) => {
 
     res.status(200).json({ message: `${commentId} 삭제 완료` });
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
-    }
-
-    res.status(500).json({ error: "댓글 삭제 실패", code: err.code });
+    next(err);
   }
 });
 
-router.get("/:articleId/comments", async (req, res) => {
+router.get("/:articleId/comments", async (req, res, next) => {
   const articleId = Number(req.params.articleId);
   const { cursor = 1, limit = 10 } = req.query;
 
@@ -100,7 +100,7 @@ router.get("/:articleId/comments", async (req, res) => {
 
     res.status(200).json(productComments);
   } catch (err) {
-    res.status(500).json({ error: "댓글 조회 실패", code: err.code });
+    next(err);
   }
 });
 

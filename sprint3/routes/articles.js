@@ -1,7 +1,11 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import commentRouter from "./articleComments.js";
-import { validateArtCreate } from "../middlewares/validate.js";
+import {
+  validateArtCreate,
+  validateId,
+  validateArtQuery,
+} from "../middlewares/validate.js";
 
 const router = express.Router();
 
@@ -9,7 +13,7 @@ const prisma = new PrismaClient();
 
 router.use(express.json());
 
-router.post("/", validateArtCreate, async (req, res) => {
+router.post("/", validateArtCreate, async (req, res, next) => {
   const { title, content } = req.body;
 
   try {
@@ -22,11 +26,11 @@ router.post("/", validateArtCreate, async (req, res) => {
 
     res.status(201).json(articles);
   } catch (err) {
-    res.status(500).json({ message: "서버 에러" });
+    next(err);
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", validateId, async (req, res, next) => {
   const id = Number(req.params.id);
 
   try {
@@ -45,11 +49,11 @@ router.get("/:id", async (req, res) => {
 
     res.status(200).json(article);
   } catch (err) {
-    res.status(500).json({ message: "서버 에러" });
+    next(err);
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", validateId, async (req, res, next) => {
   const id = Number(req.params.id);
   const { title, content } = req.body;
 
@@ -64,15 +68,11 @@ router.patch("/:id", async (req, res) => {
 
     res.status(200).json(article);
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
-    }
-
-    res.status(500).json({ message: "서버 에러" });
+    next(err);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", validateId, async (req, res, next) => {
   const id = Number(req.params.id);
 
   try {
@@ -80,15 +80,11 @@ router.delete("/:id", async (req, res) => {
 
     res.status(200).json({ message: `${id} 삭제 완료` });
   } catch (err) {
-    if (err.code === "P2025") {
-      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
-    }
-
-    res.status(500).json({ message: "서버 에러" });
+    next(err);
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", validateArtQuery, async (req, res, next) => {
   const { offset = 0, limit = 10, title, content } = req.query;
 
   const filter = [];
@@ -116,10 +112,13 @@ router.get("/", async (req, res) => {
         createdAt: true,
       },
     });
+    if (articles.length === 0) {
+      return res.status(404).json({ error: "게시글을 찾을 수 없습니다." });
+    }
 
     res.status(200).json(articles);
   } catch (err) {
-    res.status(500).json({ message: "서버 에러" });
+    next(err);
   }
 });
 
