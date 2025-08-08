@@ -21,7 +21,7 @@ app.use( (err,req,res,next) =>{
     }
 })
 
-console.log(process.env.DATABASE_URL)
+// console.log(process.env.DATABASE_URL)
 
 app.listen(3000, () =>{
     console.log("server is running at http://localhost:3000")
