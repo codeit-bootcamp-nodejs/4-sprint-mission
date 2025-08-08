@@ -1,127 +1,127 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import commentRouter from "./articleComments.js";
-import {
-  validateArtCreate,
-  validateId,
-  validateArtQuery,
-} from "../middlewares/validate.js";
+import commentarticleRouter from "./articleComments.js";
+import { validateArtCreate, validateId, validateArtQuery } from "../middlewares/validate.js";
 
-const router = express.Router();
+const articleRouter = express.Router();
 
 const prisma = new PrismaClient();
 
-router.use(express.json());
+articleRouter.use(express.json());
 
-router.post("/", validateArtCreate, async (req, res, next) => {
-  const { title, content } = req.body;
+articleRouter
+  .route("/")
+  .get(validateArtQuery, async (req, res, next) => {
+    const { offset = 0, limit = 10, title, content } = req.query;
 
-  try {
-    const articles = await prisma.article.create({
-      data: {
-        title,
-        content,
-      },
-    });
+    const filter = [];
 
-    res.status(201).json(articles);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/:id", validateId, async (req, res, next) => {
-  const id = Number(req.params.id);
-
-  try {
-    const article = await prisma.article.findUnique({
-      where: { id },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-      },
-    });
-    if (!article) {
-      return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+    if (title) {
+      filter.push({ title: { contains: title } });
     }
 
-    res.status(200).json(article);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.patch("/:id", validateId, async (req, res, next) => {
-  const id = Number(req.params.id);
-  const { title, content } = req.body;
-
-  try {
-    const article = await prisma.article.update({
-      where: { id },
-      data: {
-        ...(title !== undefined && { title }),
-        ...(content !== undefined && { content }),
-      },
-    });
-
-    res.status(200).json(article);
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.delete("/:id", validateId, async (req, res, next) => {
-  const id = Number(req.params.id);
-
-  try {
-    await prisma.article.delete({ where: { id } });
-
-    res.status(200).json({ message: `${id} 삭제 완료` });
-  } catch (err) {
-    next(err);
-  }
-});
-
-router.get("/", validateArtQuery, async (req, res, next) => {
-  const { offset = 0, limit = 10, title, content } = req.query;
-
-  const filter = [];
-
-  if (title) {
-    filter.push({ title: { contains: title } });
-  }
-
-  if (content) {
-    filter.push({ content: { contains: content } });
-  }
-
-  const where = filter.length > 0 ? { AND: filter } : {};
-
-  try {
-    const articles = await prisma.article.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      skip: parseInt(offset, 10),
-      take: parseInt(limit, 10),
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-      },
-    });
-    if (articles.length === 0) {
-      return res.status(404).json({ error: "게시글을 찾을 수 없습니다." });
+    if (content) {
+      filter.push({ content: { contains: content } });
     }
 
-    res.status(200).json(articles);
-  } catch (err) {
-    next(err);
-  }
-});
+    const where = filter.length > 0 ? { AND: filter } : {};
 
-router.use("/", commentRouter);
+    try {
+      const articles = await prisma.article.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip: parseInt(offset, 10),
+        take: parseInt(limit, 10),
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          createdAt: true,
+        },
+      });
+      if (articles.length === 0) {
+        return res.status(404).json({ error: "게시글을 찾을 수 없습니다." });
+      }
 
-export default router;
+      res.status(200).json(articles);
+    } catch (err) {
+      next(err);
+    }
+  })
+
+  .post(validateArtCreate, async (req, res, next) => {
+    const { title, content } = req.body;
+
+    try {
+      const articles = await prisma.article.create({
+        data: {
+          title,
+          content,
+        },
+      });
+
+      res.status(201).json(articles);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+articleRouter
+  .route("/:id")
+  .get(validateId, async (req, res, next) => {
+    const id = Number(req.params.id);
+
+    try {
+      const article = await prisma.article.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          title: true,
+          content: true,
+          createdAt: true,
+        },
+      });
+      if (!article) {
+        return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });
+      }
+
+      res.status(200).json(article);
+    } catch (err) {
+      next(err);
+    }
+  })
+
+  .patch(validateId, async (req, res, next) => {
+    const id = Number(req.params.id);
+    const { title, content } = req.body;
+
+    try {
+      const article = await prisma.article.update({
+        where: { id },
+        data: {
+          ...(title !== undefined && { title }),
+          ...(content !== undefined && { content }),
+        },
+      });
+
+      res.status(200).json(article);
+    } catch (err) {
+      next(err);
+    }
+  })
+
+  .delete(validateId, async (req, res, next) => {
+    const id = Number(req.params.id);
+
+    try {
+      await prisma.article.delete({ where: { id } });
+
+      res.status(200).json({ message: `${id} 삭제 완료` });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+articleRouter.use("/", commentarticleRouter);
+
+export default articleRouter;
