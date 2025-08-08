@@ -6,15 +6,15 @@ const articleRouter = express.Router();
 
 const prisma = new PrismaClient();
 
-const Schema = z.object({
+const schema = z.object({ //유효성 검사 설정하기
   title: z.string().min(1, { message: "제목을 입력해주세요" }),
   content: z.string().min(10, { message: "내용은 최소 10자 이상이어야 합니다." }).max(200, { message: "내용은 최대 200자까지 가능합니다." }),
 });
 
-articleRouter.route('/') //Article 등록하기
+articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를 article table에 post하기
   .post(async(req, res) => {
     try {
-     const validatedData = Schema.parse(req.body);
+      const validatedData = schema.parse(req.body);
       const article = await prisma.article.create({
                data: {
                title: validatedData.title,
@@ -24,28 +24,29 @@ articleRouter.route('/') //Article 등록하기
 
       return res.status(201).json(article);
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ error: err.errors });
-      }
-
-      return res.status(500).json({ error: 'Article is not posted'});
+      if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
+        console.error(err);
+        res.status(400).json({ error: err. errors });
     }
-  })
+    console.error(err);
+    res.status(500).json({ error: 'Article is not posted' }); //그외는 500에러로 출력
+  }
+})
 
-  .get(async(req, res) => { //검색어로 Article 조회 및 전체 Article 조회
+  .get(async(req, res) => { //page와 keyword query를 통해서 원하는 article 찾기
     try {
       const page = parseInt(req.query.page);
       const keyword = req.query.keyword;
-      const where = keyword
+      const where = keyword //title과 content 에서 원하는 keyword가 있는 데이터를 찾도록 만든 변수
       ? {
           OR: [
             {
-              name: {
+              title: {
                 contains: keyword,
               },
             },
             {
-              description: {
+              content: {
                 contains: keyword,
               },
             },
@@ -54,10 +55,10 @@ articleRouter.route('/') //Article 등록하기
       : undefined;
 
       const articles = await prisma.article.findMany({
-        skip: (page - 1) * 5,
+        skip: (page - 1) * 5, //offset pagination
         take: 5,
-        orderBy: {
-          createdAt: 'asc',
+        orderBy: { // 아스키 코드가 느린 순새대로 정렬하기(최신순)
+          createdAt: 'desc',
         },
         select: {
           id: true,
@@ -75,7 +76,7 @@ articleRouter.route('/') //Article 등록하기
   });
 
 articleRouter.route('/:id')
-  .patch(async(req, res) => { //id를 통해 Article 수정하기
+  .patch(async(req, res) => { // Id를 통해서 article를 찾아내 수정하기
     const articleId = Number(req.params.id);
     const { title, content } = req.body;
 
@@ -93,7 +94,7 @@ articleRouter.route('/:id')
     }
 })
 
-  .delete(async(req, res) => { //id통해서 Article 삭제하기
+  .delete(async(req, res) => { // Id을 통해 article를 찾아내 삭제하기
      const articleId = Number(req.params.id);
 
     try {
@@ -106,7 +107,7 @@ articleRouter.route('/:id')
     }
 })
 
-  .get(async(req, res) => { //id를 통해서  Article 조회하기
+  .get(async(req, res) => { //id를 통해  article 조회하기
     const articleId = Number(req.params.id);
 
     try {

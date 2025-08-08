@@ -17,6 +17,18 @@ const main = async () => {
         content: 'Article 테스트 글입니다.',
     },
   });
+  await prisma.comment.create({
+    data: {
+      content: 'Article comment 테스트',
+      articleId: 1
+    }
+  });
+    await prisma.comment.create({
+    data: {
+      content: 'Product comment 테스트',
+      productId: 1
+    }
+  });
 };
 
 
