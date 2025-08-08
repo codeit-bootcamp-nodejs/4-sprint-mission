@@ -117,6 +117,6 @@ productRouter
     }
   });
 
-productRouter.use("/", commentProductRouter);
+productRouter.use("/:productId/comments", commentProductRouter);
 
 export default productRouter;

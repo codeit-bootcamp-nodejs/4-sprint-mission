@@ -1,6 +1,6 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
-import commentarticleRouter from "./articleComments.js";
+import commentArticleRouter from "./articleComments.js";
 import { validateArtCreate, validateId, validateArtQuery } from "../middlewares/validate.js";
 
 const articleRouter = express.Router();
@@ -122,6 +122,6 @@ articleRouter
     }
   });
 
-articleRouter.use("/", commentarticleRouter);
+articleRouter.use("/:articleId/comments", commentArticleRouter);
 
 export default articleRouter;

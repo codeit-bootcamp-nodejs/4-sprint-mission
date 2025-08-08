@@ -14,6 +14,7 @@ app.use("/photos", imageRouter);
 app.use("/profile", express.static("/uploads"));
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });
