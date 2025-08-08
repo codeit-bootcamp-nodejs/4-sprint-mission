@@ -36,6 +36,7 @@ commentRouter.route('/:id')
 
     try {
       const updated = await prisma.comment.update({
+        where: { id: commentId },
         data: {
           content,
         },

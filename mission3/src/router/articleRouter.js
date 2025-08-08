@@ -1,37 +1,36 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import z from 'zod';
+import  { z } from 'zod';
 
 const articleRouter = express.Router();
 
 const prisma = new PrismaClient();
 
-const createArticleSchema = z.object({
+const Schema = z.object({
   title: z.string().min(1, { message: "제목을 입력해주세요" }),
-  content: z.string().min(30, { message: "내용은 최소 30자 이상이어야 합니다." }).max(200, { message: "내용은 최대 200자까지 가능합니다." }),
+  content: z.string().min(10, { message: "내용은 최소 10자 이상이어야 합니다." }).max(200, { message: "내용은 최대 200자까지 가능합니다." }),
 });
 
 articleRouter.route('/') //Article 등록하기
   .post(async(req, res) => {
     try {
-     const validatedData = createArticleSchema.parse(req.body);    
-    } catch (err) {
-      res.status(404).json({ error: msg.error });
-    };
-   const { title, content } = validatedData;
+     const validatedData = Schema.parse(req.body);
+      const article = await prisma.article.create({
+               data: {
+               title: validatedData.title,
+               content: validatedData.content,
+          },
+      });
 
-    try {
-        const article = await prisma.article.create({
-            data: {
-                title,
-                content,
-            },
-        });
-        res.json({ message: 'Complete to post your article!' });
+      return res.status(201).json(article);
     } catch (err) {
-        res.status(500).json({ error: 'Article is not posted' });
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ error: err.errors });
+      }
+
+      return res.status(500).json({ error: 'Article is not posted'});
     }
-})
+  })
 
   .get(async(req, res) => { //검색어로 Article 조회 및 전체 Article 조회
     try {

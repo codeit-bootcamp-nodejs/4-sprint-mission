@@ -6,7 +6,7 @@ const productRouter = express.Router();
 
 const prisma = new PrismaClient();
 
-const createPorductSchema = z.object({
+const schema = z.object({
   name: z.string().min(1, { message: "이름을 입력해주세요" }),
   description: z.string().min(10, { message: "설명은 최소 10자 이상이어야 합니다." }).max(100, { message: "설명은 최대 100자까지 가능합니다." }),
   price: z.number().int().positive({ message: "가격은 양의 정수여야 합니다." }),
@@ -16,27 +16,25 @@ const createPorductSchema = z.object({
 productRouter.route('/')
   .post(async(req, res) => { //Product 등록하기
     try {
-      const validatedData = createPorductSchema.parse(req.body);    
-    } catch (err) {
-      res.status(404).json({ error: msg.error });
-    };
-    const { name, description, price, tags } = validatedData;
-
-    try {
+      const validatedData = schema.parse(req.body);   
       const product = await prisma.product.create ({
         data: {
-          name,
-          description,
-          price,
-          tags
-        },
+          name: validatedData.name,
+          description: validatedData.description,
+          price: validatedData.price,
+          tags: validatedData.tags,
+        },        
       });
-      res.json({ message: 'Complete to post your product!' });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Failed to post product' });
+      
+      return res.status(201).json(product);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ error: err. errors });
     }
-  })
+
+    return res.status(500).json({ error: 'Product is not posted' });
+  }
+})
 
   .get(async(req, res) => { //검색어로 Product 조회하기 및 전체 Product 조회하기
     try {
