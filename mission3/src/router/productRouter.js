@@ -29,11 +29,9 @@ productRouter.route('/')
       return res.status(201).json(product);
     } catch (err) {
       if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
-        console.error(err);
-        res.status(400).json({ error: err. errors });
+        return res.status(400).json({ error: err. errors });
     }
-    console.error(err);
-    res.status(500).json({ error: 'Product is not posted' }); //그외는 500에러로 출력
+    return res.status(500).json({ error: 'Product is not posted' }); //그외는 500에러로 출력
   }
 })
 
@@ -61,7 +59,7 @@ productRouter.route('/')
       const products = await prisma.product.findMany({
         skip: (page - 1) * 5,
         take: 5,
-         orderBy: {  // 아스키 코드가 느린 순새대로 정렬하기(최신순)
+         orderBy: {  // 최신 순서대로 정렬하기(최신순)
           createdAt: 'desc',
         },
         select: {

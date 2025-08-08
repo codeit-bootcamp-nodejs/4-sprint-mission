@@ -76,7 +76,7 @@ commentRouter.route('/:id')
       },
      take: 5, //첫 불러내는 comment가 총 5개 이고 lastId가 지정이 안되면 skip 의 값은 0이 되고 있다면 1로 설정
      skip: lastId ? 1: 0,
-     ...(lastId && { cursor: { id: lastId } }), //lastId의 값이 주어졌을때 괄호가 풀어지며 내부의 'cursor: { id: lastId }가 작동함
+     ...(lastId && { cursor: { id: lastId } }), //lastId의 값이 있을때 괄호가 풀어지며 내부의 'cursor: { id: lastId }가 작동함
       select: {
           id: true,
           content: true,

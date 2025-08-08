@@ -30,7 +30,7 @@ app.post('/photos', upload.single('image'), (req, res) => {  // ./photo라는 �
 
 app.use('/downlaod', express.static('uploads'));
 
-const corsOptions = { //CORS 설정
+const corsOptions = { //CORS 설정 및 whitelist로 'http://localhost:3000'을 설정
   origin: 'http://localhost:3000',
   optionSuccessStatus: 200
 }
