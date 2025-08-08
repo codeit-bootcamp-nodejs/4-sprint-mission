@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-node_modules
-# Keep environment variables out of version control
-.env
-
-/generated/prisma
-=======
 # 의존성 관리 폴더 (Node.js)
 node_modules/
 # npm에서 생성하는 디버그 로그 파일
@@ -55,4 +48,9 @@ Thumbs.db
 *.log
 *.tmp
 temp/
->>>>>>> upstream/심하원
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
