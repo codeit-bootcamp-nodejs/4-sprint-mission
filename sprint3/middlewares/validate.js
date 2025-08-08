@@ -91,12 +91,39 @@ export function validateNewComment(req, res, next) {
   next();
 }
 
-export function validateId(req, res, next) {
-  const id = Number(req.params.id);
+export function validateCommentUpdate(req, res, next) {
+  const commentId = req.params.commentId ? Number(req.params.commentId) : null;
+  const articleId = req.params.articleId ? Number(req.params.articleId) : null;
+  const productId = req.params.productId ? Number(req.params.productId) : null;
+  const { content } = req.body;
 
-  if (isNaN(id)) {
-    return res.status(400).json({ error: "잘못된 ID 입니다. 숫자여야 합니다." });
+  if (isNaN(commentId) || !content) {
+    return res.status(400).json({ error: "commentId와 content를 확인하세요." });
   }
 
+  if (articleId !== null && isNaN(articleId)) {
+    return res.status(400).json({ error: "잘못된 articleId 입니다." });
+  }
+
+  if (productId !== null && isNaN(productId)) {
+    return res.status(400).json({ error: "잘못된 productId 입니다." });
+  }
+  next();
+}
+
+export function validateId(req, res, next) {
+  const id = req.params.id ? Number(req.params.id) : null;
+  const commentId = req.params.commentId ? Number(req.params.commentId) : null;
+  const articleId = req.params.articleId ? Number(req.params.articleId) : null;
+  const productId = req.params.productId ? Number(req.params.productId) : null;
+
+  if (
+    (id !== null && isNaN(id)) ||
+    (commentId !== null && isNaN(commentId)) ||
+    (articleId !== null && isNaN(articleId)) ||
+    (productId !== null && isNaN(productId))
+  ) {
+    return res.status(400).json({ error: "잘못된 ID 입니다. 숫자여야 합니다." });
+  }
   next();
 }
