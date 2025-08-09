@@ -25,10 +25,10 @@ export const articleService = {
 
         const whereClause = search
             ? {
-                  OR: [
-                      { title: { contains: search, mode: "insensitive" } },
-                      { content: { contains: search, mode: "insensitive" } },
-                  ],
+                OR: [
+                    { title: { contains: search, mode: "insensitive" } },
+                    { content: { contains: search, mode: "insensitive" } },
+                ],
               }
             : {};
 

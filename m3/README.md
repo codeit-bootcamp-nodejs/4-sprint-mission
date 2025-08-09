@@ -185,7 +185,7 @@ GET https://node-4th-sprint-m3.onrender.com/files/461c1284e50e7b009a40a324c9e41e
 ./M3
 ├── docs/                      # 프로젝트 문서 (.ignore)
 ├── http/                      # REST Client 테스트 파일 (.ignore)
-├── node_modules/
+├── node_modules/                (.ignore)
 ├── prisma/                    # Prisma ORM 관련 파일
 │   ├── migrations/            # DB 마이그레이션 파일
 │   ├── schema.prisma          # 데이터베이스 스키마 정의
@@ -197,7 +197,7 @@ GET https://node-4th-sprint-m3.onrender.com/files/461c1284e50e7b009a40a324c9e41e
 │   │   ├── articleService.js
 │   │   ├── productService.js
 │   │   ├── commentService.js
-│   │   └── uploadService.js
+│   │   └── fileService.js
 │   │
 │   ├── middlewares/           # Express.js 미들웨어
 │   │   ├── always.js          # 전역 미들웨어 (요청 로깅)

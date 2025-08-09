@@ -1,4 +1,3 @@
-// src/routes/articles.js
 import express from "express";
 import { assert } from "superstruct";
 import asyncHandler from "../middlewares/asyncHandler.js";
