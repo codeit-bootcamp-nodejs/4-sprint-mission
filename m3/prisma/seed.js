@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { PRODUCTS, ARTICLES, COMMENTS } from './mock-data.js'; 
+import { PRODUCTS, ARTICLES, COMMENTS } from './mock-data.js';
 
 const prisma = new PrismaClient();
 
@@ -25,13 +25,12 @@ async function main() {
       data: ARTICLES,
     });
     console.log('ARTICLES data inserted.');
-    
+
     // COMMENTS 데이터를 createMany로 한 번에 삽입합니다.
     await prisma.comment.createMany({
-        data: COMMENTS,
+      data: COMMENTS,
     });
     console.log('COMMENTS data inserted.');
-
 
     // --- 수동 시퀀스 카운터 재설정 ---
     // createMany는 시퀀스를 업데이트하지 않으므로, 다음 ID가 겹치지 않도록 수동으로 재설정합니다.
@@ -50,26 +49,26 @@ async function main() {
 
     // 2. Product 테이블 시퀀스 재설정
     const maxProductId = await prisma.product.findMany({
-        select: { id: true },
-        orderBy: { id: 'desc' },
-        take: 1,
+      select: { id: true },
+      orderBy: { id: 'desc' },
+      take: 1,
     });
     if (maxProductId.length > 0) {
-        const nextId = maxProductId[0].id + 1;
-        await prisma.$executeRaw`SELECT setval('"Product_id_seq"', ${nextId}, false);`;
-        console.log(`Product sequence counter reset to: ${nextId}`);
+      const nextId = maxProductId[0].id + 1;
+      await prisma.$executeRaw`SELECT setval('"Product_id_seq"', ${nextId}, false);`;
+      console.log(`Product sequence counter reset to: ${nextId}`);
     }
 
     // 3. Comment 테이블 시퀀스 재설정
     const maxCommentId = await prisma.comment.findMany({
-        select: { id: true },
-        orderBy: { id: 'desc' },
-        take: 1,
+      select: { id: true },
+      orderBy: { id: 'desc' },
+      take: 1,
     });
     if (maxCommentId.length > 0) {
-        const nextId = maxCommentId[0].id + 1;
-        await prisma.$executeRaw`SELECT setval('"Comment_id_seq"', ${nextId}, false);`;
-        console.log(`Comment sequence counter reset to: ${nextId}`);
+      const nextId = maxCommentId[0].id + 1;
+      await prisma.$executeRaw`SELECT setval('"Comment_id_seq"', ${nextId}, false);`;
+      console.log(`Comment sequence counter reset to: ${nextId}`);
     }
     // ------------------------------------
 

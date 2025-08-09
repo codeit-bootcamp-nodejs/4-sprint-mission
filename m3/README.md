@@ -183,43 +183,46 @@ GET https://node-4th-sprint-m3.onrender.com/files/461c1284e50e7b009a40a324c9e41e
 
 ```
 ./M3
-├── docs/                      # 프로젝트 문서 (.ignore)
-├── http/                      # REST Client 테스트 파일 (.ignore)
-├── node_modules/                (.ignore)
-├── prisma/                    # Prisma ORM 관련 파일
-│   ├── migrations/            # DB 마이그레이션 파일
-│   ├── schema.prisma          # 데이터베이스 스키마 정의
-│   ├── seed.js                # 초기 데이터 시딩 스크립트
-│   └── mock-data.js           # 초기 Mock 데이터
-│   
-├── src/
-│   ├── services/              # 비즈니스 로직 레이어
-│   │   ├── articleService.js
-│   │   ├── productService.js
-│   │   ├── commentService.js
-│   │   └── fileService.js
-│   │
-│   ├── middlewares/           # Express.js 미들웨어
-│   │   ├── always.js          # 전역 미들웨어 (요청 로깅)
-│   │   ├── asyncHandler.js    # 비동기 에러 핸들러
-│   │   ├── multer.js          # 파일 업로드 설정 (multer)
-│   │   └── validateId.js      # ID 유효성 검증 미들웨어
-│   │
-│   ├── routes/                # 라우터 모듈 (Express.Router)
-│   │   ├── articles.js        # 자유게시판 라우트
-│   │   ├── comments.js        # 댓글 라우트
-│   │   ├── uploads.js         # 파일 업로드 라우트
-│   │   └── products.js        # 중고마켓 라우트
-│   │
-│   ├── validators/            # 유효성 검증 스키마
-│   │   └── structs.js         # Superstruct 스키마
-│   │
-│   └── app.js                 # 메인 서버 파일 (애플리케이션 진입점)
+├── docs/                        # 프로젝트 문서 (.ignore)
+├── http/                        # REST Client 테스트 파일 (.ignore)
+├── node_modules/                  (.ignore) 
+├── prisma/                      # Prisma ORM 관련 파일
+│   ├── migrations/              # DB 마이그레이션 파일
+│   ├── schema.prisma            # 데이터베이스 스키마 정의
+│   ├── seed.js                  # 초기 데이터 시딩 스크립트
+│   └── mock-data.js             # 초기 Mock 데이터
 │
-├── uploads/                   # 업로드 파일 저장 디렉토리 (.ignore)
-├── .env                       # 환경 변수 파일 (.ignore)
-├── .gitignore                 # Git 관리 제외 파일
-├── package-lock.json          # 패키지 의존성 파일
-├── package.json
-└── README.md
+├── src/
+│   ├── core/                    # 애플리케이션 핵심 로직 및 공통 기능
+│   │   ├── client/
+│   │   │   └── prismaClient.js  # Prisma 클라이언트 싱글톤 인스턴스
+│   │   └── middlewares/
+│   │       ├── always.js        # 전역 미들웨어 (요청 로깅)
+│   │       ├── asyncHandler.js  # 비동기 에러 핸들러
+│   │       ├── multer.js        # 파일 업로드 설정
+│   │       └── validateId.js    # ID 유효성 검증 미들웨어
+│   │
+│   ├── routes/                  # 라우터 모듈 (Express.Router)
+│   │   ├── articles.js          # 게시글 라우트
+│   │   ├── comments.js          # 댓글 라우트
+│   │   ├── products.js          # 상품 라우트
+│   │   └── uploads.js           # 파일 업로드 라우트
+│   │
+│   ├── services/                # 비즈니스 로직 레이어
+│   │   ├── articleService.js
+│   │   ├── commentService.js
+│   │   ├── fileService.js
+│   │   └── productService.js
+│   │
+│   ├── validators/              # 데이터 유효성 검증
+│   │   └── structs.js           # Superstruct 스키마
+│   │
+│   └── app.js                   # 메인 서버 파일 (애플리케이션 진입점)
+│
+├── uploads/                     # 업로드 파일 저장 디렉토리 (.ignore)
+├── .env                         # 환경 변수 파일 (.ignore)
+├── .gitignore                   # Git 관리 제외 파일
+├── .prettierrc                  # Prettier 설정 파일
+├── package-lock.json            # 패키지 의존성 파일
+└── package.json
 ```
