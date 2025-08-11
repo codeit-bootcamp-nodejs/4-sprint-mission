@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js",
+    "start": "node app.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
