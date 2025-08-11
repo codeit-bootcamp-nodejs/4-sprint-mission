@@ -31,7 +31,7 @@ productRouter.route('/')
       if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
         return res.status(400).json({ error: err.errors });
     }
-    return res.status(500).json({ error: 'Product is not posted' }); //그외는 500에러로 출력
+    return res.status(500).json({ error: 'Internal Server Error' }); //그외는 500에러로 출력
   }
 })
 
@@ -74,31 +74,31 @@ productRouter.route('/')
         },
         where,
       });
-      res.status(201).json(products);
+      res.status(200).json(products);
     } catch (error) {
       console.error(error);
-      res.status(404).json({ error: `Can't find products`})
+      res.status(404).json({ error: 'Failed to find product' })
     }
   });
 
 productRouter.route('/:id') 
   .patch(async(req, res) => { // Id를 통해서 product를 찾아내 수정하기
     const productId = Number(req.params.id);
-    const { name, description, price, tags } = req.body;
+    const validatedData = schema.parse(req.body);  
 
     try{
         const updated = await prisma.product.update({
             where: { id: productId },
             data: {
-                name,
-                description,
-                price,
-                tags,
+                name: validatedData.name,
+                description: validatedData.description,
+                price: validatedData.price,
+                tags: validatedData.tags,
             },
         });
         res.status(201).json(updated);
     } catch (err) {
-        res.status(500).json({ error: `Product is not modified` });
+        res.status(404).json({ error: 'Failed to modify product data' });
     }
 })
 
@@ -109,13 +109,13 @@ productRouter.route('/:id')
         await prisma.product.delete({
             where: { id: productId },
         });
-        res.json({ message: 'Product is deleted' });
+        res.status(204);
     } catch (err) {
-        res.status(404).json({ error: `Can't delete product` });
+        res.status(404).json({ error: 'Failed to delete data' });
     }
 })
 
-  .get(async(req, res) => { //id를 통해  article 조회하기
+  .get(async(req, res) => { //id를 통해  product 조회하기
     const productId = Number(req.params.id);
 
     try {
@@ -130,9 +130,9 @@ productRouter.route('/:id')
           createdAt: true,
         },
       });
-      res.status(201).json(product);
+      res.status(200).json(product);
     } catch (err) {
-      res.status(404).json({ error: `Can't find products`})
+      res.status(404).json({ error: 'Failed to find product' })
     }
   });
 

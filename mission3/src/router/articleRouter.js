@@ -27,7 +27,7 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
       if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
         return res.status(400).json({ error: err.errors });
     }
-    return res.status(500).json({ error: 'Article is not posted' }); //그외는 500에러로 출력
+    return res.status(500).json({ error: 'Internal Server Error' }); //그외는 500에러로 출력
   }
 })
 
@@ -68,29 +68,29 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
         },
         where,
       });
-      res.status(201).json(articles);
+      res.status(200).json(articles);
     } catch (error) {
       console.error(error);
-      res.status(404).json({ error: `Can't find articles`})
+      res.status(404).json({ error: 'Failed to find article' })
     }
   });
 
 articleRouter.route('/:id')
   .patch(async(req, res) => { // Id를 통해서 article를 찾아내 수정하기
     const articleId = Number(req.params.id);
-    const { title, content } = req.body;
+    const validatedData = schema.parse(req.body);
 
     try {
         const updated = await prisma.article.update({
             where: { id: articleId },
             data: {
-                title,
-                content,
+                title: validatedData.title,
+                content: validatedData.content,
             },
         });
-        res.status(201).json(updated);
+        res.status(200).json(updated);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(404).json({ error: 'Failed to delete data' });
     }
 })
 
@@ -99,11 +99,11 @@ articleRouter.route('/:id')
 
     try {
         await prisma.article.delete({
-            wehre: { id: articleId },
+            where: { id: articleId },
         });
-        res.json({ message: 'Article is deleted' });
+        res.status(204);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 })
 
@@ -111,7 +111,7 @@ articleRouter.route('/:id')
     const articleId = Number(req.params.id);
 
     try {
-      const article = await prisma.product.findUnique({
+      const article = await prisma.article.findUnique({
         where: { id: articleId },
         select: {
           id: true,
@@ -120,9 +120,9 @@ articleRouter.route('/:id')
           createdAt: true,
         },
       });
-      res.status(201).json(article);
+      res.status(200).json(article);
     } catch (err) {
-      res.status(404).json({ error: `Can't find article`})
+      res.status(404).json({ error: 'Failed to find article' })
     }
   });
 

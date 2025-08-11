@@ -24,7 +24,7 @@ commentRouter.route('/')
       });
       res.status(201).json(comment);
     } catch (error) {
-      res.status(500).json({ eror: "Failed to create comment" });
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   });
 
@@ -42,7 +42,7 @@ commentRouter.route('/:id')
       });
       res.status(201).json(updated);
     } catch (err) {
-      res.status(500).json({ error: `Failed to modify comment` });
+      res.status(404).json({ error: 'Failed to modify comment' });
     }
   })
 
@@ -53,9 +53,9 @@ commentRouter.route('/:id')
       await prisma.comment.delete({
         where: { id: commentId },
       });
-      res.json({ message: 'Comment deleted' });
+      res.tatus(204).json({ message: 'Comment is deleted' });
     } catch (err) {
-      res.status(500).json({ error: `Can't deleted your comment` });
+      res.status(404).json({ error: 'Failed to delete data' });
     }
   });
 
@@ -83,10 +83,10 @@ commentRouter.route('/:id')
           createdAt: true,
       },
     });
-    res.status(201).json(comments);
+    res.status(200).json(comments);
   } catch (err) {
     console.error(err);
-    res.status(404).json({ error: `Can't find comments`});
+    res.status(404).json({ error: 'Failed to find comment' })
   }
  });
 
@@ -117,7 +117,7 @@ commentRouter.route('/:id')
     res.status(201).json(comments);
   } catch (err) {
     console.error(err);
-    res.status(404).json({ error: `Can't find comments`});
+    res.status(404).json({ error: 'Failed to find comment' })
   }
  });
 
@@ -128,7 +128,7 @@ commentRouter.route('/:id')
 // commentRouter.route('/')
 //  .get(async(req, res ) => { 
 //   const target = req.query.target;
-//   const targetId = parseInt(req.query.targetId);
+//   const targetId = parseInt(req.query.targetId) || 1;
 //   let purpose = {};
 //   if (target === 'articleId') {
 //     purpose = {articleId: targetId}
@@ -151,7 +151,7 @@ commentRouter.route('/:id')
 //     res.status(201).json(comments);
 //   } catch (err) {
 //     console.error(err);
-//     res.status(404).json({ error: `Can't find comments`});
+//     res.status(404).json({ error: 'Failed to find comment' })
 //   }
 //  });
 
