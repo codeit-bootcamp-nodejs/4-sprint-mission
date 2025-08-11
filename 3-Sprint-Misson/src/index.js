@@ -2,6 +2,9 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import productRouter from './routes/product.js';
 import commentRouter from './routes/comment.js';
+import multer from 'multer'; 
+import cors from 'cors';
+
 
 
 const app = express();
@@ -10,6 +13,7 @@ const prisma = new PrismaClient();
 app.use(express.json());
 app.use('/products', productRouter);
 app.use('/comments', commentRouter);
+app.use(cors());  
 
 
 // 이미지 업로드 API
@@ -42,4 +46,5 @@ app.use((err, req, res, next) => {
 app.listen(3000, () => {
   console.log(`Server running on http://localhost:3000`);
 });
+
 
