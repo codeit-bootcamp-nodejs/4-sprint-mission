@@ -126,7 +126,7 @@ router.get("/", async (req, res) => {
         }
       : {};
 
-      const orderOption = sort === "recent" ? { createAt: "desc" } : {};
+      const orderOption = sort === "recent" ? { createdAt: "desc" } : {};
 
       const [products, totalCount] = await Promise.all([
       prisma.product.findMany({

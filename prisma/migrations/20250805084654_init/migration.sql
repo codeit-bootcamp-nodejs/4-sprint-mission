@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE "publicc"."Product" (
+CREATE TABLE "public"."Product" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,

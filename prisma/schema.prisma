@@ -23,3 +23,11 @@ model Product {
   updatedAt   DateTime  @updatedAt
   status      String    @default("판매중") // 추가 필드
 }
+
+model Article {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
