@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
-import productsRouter from './sprintMission3/routes/products.routes.js';
-import uploadsRouter from './sprintMission3/routes/uploads.routes.js';
+import productsRouter from './sprintMission3/routes/ProductRoute.js';
+import articlesRouter from './sprintMission3/routes/ArticleRoute.js';
+import uploadsRouter from './sprintMission3/routes/ImageRoute.js';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 app.use('/products', productsRouter);
+app.use('/articles', articlesRouter);
 app.use('/uploads', uploadsRouter);
 
 app.listen(PORT, () => {
