@@ -25,7 +25,7 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
       return res.status(201).json(article);
     } catch (err) {
       if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
-        return res.status(400).json({ error: err. errors });
+        return res.status(400).json({ error: err.errors });
     }
     return res.status(500).json({ error: 'Article is not posted' }); //그외는 500에러로 출력
   }

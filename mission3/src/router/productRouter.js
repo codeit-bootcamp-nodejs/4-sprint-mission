@@ -29,7 +29,7 @@ productRouter.route('/')
       return res.status(201).json(product);
     } catch (err) {
       if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
-        return res.status(400).json({ error: err. errors });
+        return res.status(400).json({ error: err.errors });
     }
     return res.status(500).json({ error: 'Product is not posted' }); //그외는 500에러로 출력
   }
