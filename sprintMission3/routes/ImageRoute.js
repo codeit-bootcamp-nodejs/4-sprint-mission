@@ -1,6 +1,6 @@
 import express from 'express';
-import uploads from '../middleware/ImageMiddleware';
-import { resizeImage } from '../middleware/ImageResizeMiddleware';
+import uploads from '../middleware/ImageMiddleware.js';
+import { resizeImage } from '../middleware/ImageResizeMiddleware.js';
 
 const router = express.Router();
 
