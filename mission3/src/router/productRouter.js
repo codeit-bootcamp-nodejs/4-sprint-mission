@@ -37,24 +37,26 @@ productRouter.route('/')
 
   .get(async(req, res) => { //page와 keyword query를 통해서 원하는 product 찾기
     try {
-      const page = parseInt(req.query.page);
-      const keyword = req.query.keyword;
+      const page = parseInt(req.query.page) || 1; //값이 없을 경우도 수식하기 위함
+      const keyword = req.query.keyword || '';
       const where = keyword //name과 description에서 원하는 keyword가 들어간 데이터를 찾도록 만든 변수
       ? {
           OR: [
             {
               name: {
                 contains: keyword,
+                mode: 'insensitive', //대소문자 구분 없이 검색하기 위해
               },
             },
             {
               description: {
                 contains: keyword,
+                mode: 'insensitive',
               },
             },
           ],
         }
-      : undefined;
+      : {}; //기본값 {}으로 빈 객체를 수식하기 위함
 
       const products = await prisma.product.findMany({
         skip: (page - 1) * 5,
@@ -70,7 +72,7 @@ productRouter.route('/')
           tags: true,
           createdAt: true,
         },
-        where
+        where,
       });
       res.status(201).json(products);
     } catch (error) {

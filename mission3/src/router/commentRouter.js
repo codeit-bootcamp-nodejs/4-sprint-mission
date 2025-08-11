@@ -61,7 +61,7 @@ commentRouter.route('/:id')
 
   commentRouter.route('/product')
     .get(async(req, res) => { //targetId를 통해 지정된 product의 comment를 불러오기
-      const targetId = parseInt(req.query.targetId);
+      const targetId = parseInt(req.query.targetId) || 1;
       const lastId = req.query.lastId ? parseInt(req.query.lastId) : null; //cursor 방식의 pagination을 하기 위한 lastId 상수 지정
        try {
     const comments = await prisma.comment.findMany({
@@ -92,7 +92,7 @@ commentRouter.route('/:id')
 
    commentRouter.route('/article')
     .get(async(req, res) => { //targetId를 통해 지정된 article의 comment를 불러오기
-      const targetId = parseInt(req.query.targetId);
+      const targetId = parseInt(req.query.targetId) || 1;
       const lastId = req.query.lastId ? parseInt(req.query.lastId) : null;
        try {
     const comments = await prisma.comment.findMany({

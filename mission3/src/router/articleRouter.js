@@ -33,24 +33,26 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
 
   .get(async(req, res) => { //page와 keyword query를 통해서 원하는 article 찾기
     try {
-      const page = parseInt(req.query.page);
-      const keyword = req.query.keyword;
+      const page = parseInt(req.query.page) || 1;
+      const keyword = req.query.keyword || '';
       const where = keyword //title과 content 에서 원하는 keyword가 있는 데이터를 찾도록 만든 변수
       ? {
           OR: [
             {
               title: {
                 contains: keyword,
+                mode: 'insensitive', //대소문자 구분 없이 검색하기 위해
               },
             },
             {
               content: {
                 contains: keyword,
+                mode: 'insensitive',
               },
             },
           ],
         }
-      : undefined;
+      : {}; //기본값 {}으로 빈 객체를 수식하기 위함
 
       const articles = await prisma.article.findMany({
         skip: (page - 1) * 5, //offset pagination
@@ -64,7 +66,7 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
           content: true,
           createdAt: true,
         },
-        where
+        where,
       });
       res.status(201).json(articles);
     } catch (error) {
