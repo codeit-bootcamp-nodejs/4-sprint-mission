@@ -12,14 +12,14 @@ commnetRouter
   .route("/")
   .get(async (req, res, next) => {
     const productId = Number(req.params.productId);
-    const { cursor = 1, limit = 10 } = req.query;
+    const { cursor, limit = 10 } = req.query;
 
     try {
       const productComments = await prisma.comment.findMany({
         where: { productId },
         take: parseInt(limit, 10),
-        skip: 1,
-        cursor: { id: parseInt(cursor, 10) },
+        skip: cursor ? 1 : 0,
+        cursor: cursor ? { id: parseInt(cursor, 10) } : undefined,
         orderBy: { id: "asc" },
         select: {
           id: true,
@@ -27,6 +27,10 @@ commnetRouter
           createdAt: true,
         },
       });
+
+      if (productComments.length === 0) {
+        return res.status(400).json({ message: "선택한 범위 내 댓글을 찾을 수 없습니다." });
+      }
 
       res.status(200).json(productComments);
     } catch (err) {
