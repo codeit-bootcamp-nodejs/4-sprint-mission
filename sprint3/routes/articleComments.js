@@ -15,7 +15,7 @@ commentRouter
     const { cursor = 1, limit = 10 } = req.query;
 
     try {
-      const productComments = await prisma.comment.findMany({
+      const aritcleComments = await prisma.comment.findMany({
         where: { articleId },
         take: parseInt(limit, 10),
         skip: 1,
@@ -28,7 +28,7 @@ commentRouter
         },
       });
 
-      res.status(200).json(productComments);
+      res.status(200).json(aritcleComments);
     } catch (err) {
       next(err);
     }
