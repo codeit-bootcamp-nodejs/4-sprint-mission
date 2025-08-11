@@ -4,6 +4,7 @@ import productsRouter from './routes/ProductRoute.js';
 import articlesRouter from './routes/ArticleRoute.js';
 import uploadsRouter from './routes/ImageRoute.js';
 import commentsRouter from './routes/CommentRoute.js';
+import { errorHandler } from './middleware/ErrorHandlerMiddleware.js';
 
 dotenv.config();
 
@@ -17,9 +18,7 @@ app.use('/articles', articlesRouter);
 app.use('/comments', commentsRouter);
 app.use('/uploads', uploadsRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
