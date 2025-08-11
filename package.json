@@ -11,6 +11,9 @@
     "prisma": "^6.13.0"
   },
   "type": "module",
+  "prisma":{
+    "seed": "node prisma/seed.js"
+  },
   "scripts": {
     "start": "node sprintMission3/app.js"
   }
