@@ -1,5 +1,4 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import prisma from '../prisma-client.js';
 
 // 댓글 생성 (상품 또는 게시글)
 export const createComment = async (req, res, next) => {

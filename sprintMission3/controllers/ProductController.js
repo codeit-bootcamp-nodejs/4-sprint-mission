@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client/extension';
-
-const prisma = new PrismaClient();
+import prisma from '../prisma-client.js';
 
 // 상품 등록
 export const createProduct = async (req, res, next) => {

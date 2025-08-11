@@ -1,6 +1,4 @@
-import { PrismaClient } from '@prisma/client/extension';
-
-const prisma = new PrismaClient();
+import prisma from '../prisma-client.js';
 
 export const createArticle = async (req, res, next) => {
   try {

@@ -17,7 +17,7 @@
     "seed": "node prisma/seed.js"
   },
   "scripts": {
-    "start": "node start.js",
+    "start": "node sprintMission3/app.js",
     "postinstall": "prisma generate"
   }
 }
