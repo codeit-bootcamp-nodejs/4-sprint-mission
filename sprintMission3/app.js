@@ -1,5 +1,7 @@
 import * as dotenv from 'dotenv';
 import express from 'express';
+import cors from 'cors';
+
 import productsRouter from './routes/ProductRoute.js';
 import articlesRouter from './routes/ArticleRoute.js';
 import uploadsRouter from './routes/ImageRoute.js';
@@ -10,6 +12,8 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(cors());
 
 app.use(express.json());
 
