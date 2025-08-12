@@ -14,10 +14,8 @@ const router = express.Router();
 router
   .route('/')
   .get(async (req, res) => {
-    const { articles, pagination } = await articleService.getAllArticles(
-      req.query
-    );
-    res.send({ articles, pagination });
+    const { data, pagination } = await articleService.getAllArticles(req.query);
+    res.send({ data, pagination });
   })
   // 게시글 작성 API
   .post(validateArticleData, async (req, res) => {

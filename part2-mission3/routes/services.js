@@ -12,7 +12,7 @@ class ArticleService {
 
     let orderBy;
     switch (sort) {
-      case 'resect':
+      case 'recect':
         orderBy = { createdAt: 'desc' };
         break;
       case 'old':
@@ -104,7 +104,7 @@ class ProductService {
 
     let orderBy;
     switch (sort) {
-      case 'resect':
+      case 'recect':
         orderBy = { createdAt: 'desc' };
         break;
       case 'old':

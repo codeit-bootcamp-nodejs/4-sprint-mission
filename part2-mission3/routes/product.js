@@ -14,10 +14,8 @@ const router = express.Router();
 router
   .route('/')
   .get(async (req, res) => {
-    const { products, pagination } = await productService.getAllProducts(
-      req.query
-    );
-    res.send({ products, pagination });
+    const { data, pagination } = await productService.getAllProducts(req.query);
+    res.send({ data, pagination });
   })
   .post(validateProductData, async (req, res) => {
     const { name, description, price, tags } = req.body;

@@ -56,8 +56,8 @@ export const validateArticleUpdateData = (req, res, next) => {
 };
 
 export const validateProductUpdateData = (req, res, next) => {
-  const { title, content, author } = req.body;
-  if (!title && !content && !author) {
+  const { name, description, price, tags } = req.body;
+  if (!name && !description && !price && !tags) {
     return res.status(400).json({
       message:
         '수정할 데이터가 없습니다. (name, description, price, tags 중 최소 하나 필요)',

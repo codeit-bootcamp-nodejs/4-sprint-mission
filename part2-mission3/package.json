@@ -9,7 +9,9 @@
   "scripts": {
     "seed": "node prisma/seed.js",
     "postinstall": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
