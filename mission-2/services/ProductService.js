@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const BASE_URL = 'https://panda-market-api-crud.vercel.app/products';
+import { PRODUCT_BASE_URL as BASE_URL } from '../constants/api.js'; // 변경
 
 // 상품 리스트 조회 (async/await)
 export async function getProductList(page = 1, pageSize = 10, keyword = '') {
@@ -22,6 +21,7 @@ export async function getProduct(id) {
     return res.data;
   } catch (err) {
     console.error('getProduct 오류:', err.message);
+    return null; // 오류 발생 시 null 반환
   }
 }
 

@@ -3,7 +3,11 @@ export class Article {
     this._title = title;
     this._content = content;
     this._writer = writer;
-    this._likeCount = likeCount;
+    if (typeof likeCount === 'number' && likeCount >= 0) {
+      this._likeCount = likeCount;
+    } else {
+      throw new Error('좋아요 수는 0 이상의 숫자여야 합니다.');
+    }
     this._createdAt = new Date();
   }
 

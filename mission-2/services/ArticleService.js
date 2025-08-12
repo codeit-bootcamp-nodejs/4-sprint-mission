@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const BASE_URL = 'https://panda-market-api-crud.vercel.app/articles';
+import { ARTICLE_BASE_URL as BASE_URL } from '../constants/api.js'; // 변경
 
 // 게시글 리스트 조회 (.then 사용)
 export function getArticleList(page = 1, pageSize = 10, keyword = '') {

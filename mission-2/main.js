@@ -7,11 +7,9 @@ import { getArticleList, createArticle } from './services/ArticleService.js';
 async function createProductInstances() {
   try {
     const productData = await getProductList();
-    const products = [];
-
-    productData.list.forEach((product) => {
+    const products = productData.list.map((product) => {
       if (product.tags.includes('전자제품')) {
-        const electronicProduct = new ElectronicProduct(
+        return new ElectronicProduct(
           product.name,
           product.description,
           product.price,
@@ -20,9 +18,8 @@ async function createProductInstances() {
           product.favoriteCount,
           product.manufacturer, // 일부 데이터엔 없을 수 있음
         );
-        products.push(electronicProduct);
       } else {
-        const normalProduct = new Product(
+        return new Product(
           product.name,
           product.description,
           product.price,
@@ -30,7 +27,6 @@ async function createProductInstances() {
           product.images,
           product.favoriteCount,
         );
-        products.push(normalProduct);
       }
     });
 
@@ -45,16 +41,13 @@ async function createProductInstances() {
 async function createArticleInstances() {
   try {
     const articleData = await getArticleList();
-    const articles = [];
-
-    articleData.list.forEach((article) => {
-      const articleInstance = new Article(
+    const articles = articleData.list.map((article) => {
+      return new Article(
         article.title,
         article.content,
         article.writer,
         article.likeCount,
       );
-      articles.push(articleInstance);
     });
 
     console.log('생성된 Article 인스턴스 목록:', articles);
@@ -96,7 +89,13 @@ async function testProductService() {
       ['tag1'],
       ['image1.jpg'],
     );
-    console.log('상품명:', testProduct.name);
+    console.table({
+      '상품명': testProduct.name,
+      '설명': testProduct.description,
+      '가격': testProduct.price,
+      '태그': testProduct.tags.join(', '),
+      '이미지': testProduct.images.join(', ')
+    });
 
     // favorite 메서드 테스트
     console.log('찜하기 전:', testProduct.favoriteCount);
@@ -140,9 +139,12 @@ function testArticleService() {
   // Article 클래스 getter/setter 테스트
   console.log('3. Article 클래스 getter/setter 테스트:');
   const testArticle = new Article('테스트 제목', '테스트 내용', '작성자');
-  console.log('제목:', testArticle.title);
-  console.log('작성자:', testArticle.writer);
-  console.log('생성일:', testArticle.createdAt);
+  console.table({
+    '제목': testArticle.title,
+    '내용': testArticle.content,
+    '작성자': testArticle.writer,
+    '생성일': testArticle.createdAt.toISOString() // Date 객체는 ISO 문자열로 변환하여 표시
+  });
 
   // like 메서드 테스트
   console.log('좋아요 전:', testArticle.likeCount);

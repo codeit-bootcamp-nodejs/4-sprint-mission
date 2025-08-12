@@ -21,9 +21,7 @@ codeit-mission/
 │   ├── ArticleService.js  # Article 관련 API 함수
 │   └── ProductService.js  # Product 관련 API 함수
 ├── main.js                # 메인 실행 파일 (기능 테스트 및 인스턴스 생성)
-├── package.json           # 프로젝트 정보 및 의존성 관리
-├── .eslintrc.cjs          # ESLint 설정 파일
-└── .prettierrc            # Prettier 설정 파일
+└── package.json           # 프로젝트 정보 및 의존성 관리  
 ```
 
 ## 🏁 시작하기
