@@ -1,13 +1,13 @@
 export class Article {
   #title;
-  #content;
+  #article;
   #writer;
   #likeCount;
   #createdAt;
 
-  constructor(title, content, writer) {
+  constructor(title, article, writer) {
     this.#title = title;
-    this.#content = content;
+    this.#article = article;
     this.#writer = writer;
     this.#likeCount = 0;
     this.#createdAt = new Date();
@@ -24,11 +24,11 @@ export class Article {
     this.#title = val;
   }
 
-  get content() {
-    return this.#content;
+  get article() {
+    return this.#article;
   }
-  set content(val) {
-    this.#content = val;
+  set article(val) {
+    this.#article = val;
   }
 
   get writer() {

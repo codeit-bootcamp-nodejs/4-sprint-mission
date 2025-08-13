@@ -13,7 +13,7 @@
   - [x] `constructor` 정의 및 `super` 호출  
 
 - [x] `Article` 클래스 구현  
-  - [x] `title`, `content`, `writer`, `likeCount` 속성  
+  - [x] `title`, `article`, `writer`, `likeCount` 속성  
   - [x] `constructor` 정의  
   - [x] `like()` 메서드  
 
@@ -39,8 +39,8 @@
 
 - [x] `getArticleList(page, pageSize, keyword)` – GET `/articles`  
 - [x] `getArticle(articleId)` – GET `/articles/:articleId`  
-- [x] `createArticle(title, content, image)` – POST `/articles`  
-- [x] `patchArticle(articleId, title, content, image)` – PATCH `/articles/:articleId`  
+- [x] `createArticle(title, article, image)` – POST `/articles`  
+- [x] `patchArticle(articleId, title, article, image)` – PATCH `/articles/:articleId`  
 - [x] `deleteArticle(articleId)` – DELETE `/articles/:articleId`  
 
 ---

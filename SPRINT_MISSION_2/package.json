@@ -1,0 +1,35 @@
+{
+  "name": "4-sprint-mission",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/main.js",
+    "dev": "node SPRINT_MISSION_3/app.js",
+    "seed": "node SPRINT_MISSION_3/prisma/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeeBongJun/4-sprint-mission.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LeeBongJun/4-sprint-mission/issues"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "homepage": "https://github.com/LeeBongJun/4-sprint-mission#readme",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "chalk": "^5.4.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
+  }
+}

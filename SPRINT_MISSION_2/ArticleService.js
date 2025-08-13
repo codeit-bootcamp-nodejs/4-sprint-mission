@@ -12,21 +12,21 @@ export function getArticle(articleId) {
     .catch(err => console.error('Error fetching article:', err));
 }
 
-export function createArticle(title, content, image) {
+export function createArticle(title, article, image) {
   return fetch(`${BASE_URL}/articles`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, content, image })
+    headers: { 'article-Type': 'application/json' },
+    body: JSON.stringify({ title, article, image })
   })
     .then(res => res.ok ? res.json() : Promise.reject(res))
     .catch(err => console.error('Error creating article:', err));
 }
 
-export function patchArticle(articleId, title, content, image) {
+export function patchArticle(articleId, title, article, image) {
   return fetch(`${BASE_URL}/articles/${articleId}`, {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ title, content, image })
+    headers: { 'article-Type': 'application/json' },
+    body: JSON.stringify({ title, article, image })
   })
     .then(res => res.ok ? res.json() : Promise.reject(res))
     .catch(err => console.error('Error patching article:', err));

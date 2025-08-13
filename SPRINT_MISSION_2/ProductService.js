@@ -24,7 +24,7 @@ export async function createProduct(name, description, price, tags, images) {
   try {
     const res = await fetch(`${BASE_URL_PRODUCT}/products`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'article-Type': 'application/json' },
       body: JSON.stringify({ name, description, price, tags, images })
     });
     if (!res.ok) throw res;
@@ -38,7 +38,7 @@ export async function patchProduct(productId, name, description, price, tags, im
   try {
     const res = await fetch(`${BASE_URL_PRODUCT}/products/${productId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'article-Type': 'application/json' },
       body: JSON.stringify({ name, description, price, tags, images })
     });
     if (!res.ok) throw res;
