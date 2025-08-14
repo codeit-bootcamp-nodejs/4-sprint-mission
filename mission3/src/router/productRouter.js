@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import express from 'express';
-import z from 'zod';
+import { z } from 'zod';
 
 const productRouter = express.Router();
 
@@ -14,7 +14,7 @@ const schema = z.object({ //유효성 검사 설정하기
 });
 
 productRouter.route('/')
-  .post(async(req, res) => { // Zod로 유효성 검사에서 통과한 데이터를 product table에 post하기
+  .post(async(req, res, next) => { // Zod로 유효성 검사에서 통과한 데이터를 product table에 post하기
     try {
       const validatedData = schema.parse(req.body);   
       const product = await prisma.product.create ({
@@ -28,14 +28,11 @@ productRouter.route('/')
       
       return res.status(201).json(product);
     } catch (err) {
-      if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
-        return res.status(400).json({ error: err.errors });
+        next(err);
     }
-    return res.status(500).json({ error: 'Internal Server Error' }); //그외는 500에러로 출력
-  }
 })
 
-  .get(async(req, res) => { //page와 keyword query를 통해서 원하는 product 찾기
+  .get(async(req, res, next) => { //page와 keyword query를 통해서 원하는 product 찾기
     try {
       const page = parseInt(req.query.page) || 1; //값이 없을 경우도 수식하기 위함
       const keyword = req.query.keyword || '';
@@ -74,15 +71,15 @@ productRouter.route('/')
         },
         where,
       });
+
       res.status(200).json(products);
     } catch (error) {
-      console.error(error);
-      res.status(404).json({ error: 'Failed to find product' })
+        next(err);
     }
   });
 
 productRouter.route('/:id') 
-  .patch(async(req, res) => { // Id를 통해서 product를 찾아내 수정하기
+  .patch(async(req, res, next) => { // Id를 통해서 product를 찾아내 수정하기
     const productId = Number(req.params.id);
     const validatedData = schema.parse(req.body);  
 
@@ -98,20 +95,20 @@ productRouter.route('/:id')
         });
         res.status(201).json(updated);
     } catch (err) {
-        res.status(404).json({ error: 'Failed to modify product data' });
+        next(err);
     }
 })
 
-  .delete(async(req, res) => { // Id을 통해 product를 찾아내 삭제하기
+  .delete(async(req, res, next) => { // Id을 통해 product를 찾아내 삭제하기
      const productId = Number(req.params.id);
 
     try {
         await prisma.product.delete({
             where: { id: productId },
         });
-        res.status(204);
+        res.status(204).end();
     } catch (err) {
-        res.status(404).json({ error: 'Failed to delete data' });
+        next(err);
     }
 })
 
@@ -130,10 +127,27 @@ productRouter.route('/:id')
           createdAt: true,
         },
       });
+    if (!product) {
+        return res.status(404).json({ error: 'Product not found'});
+      }
       res.status(200).json(product);
     } catch (err) {
-      res.status(404).json({ error: 'Failed to find product' })
+        next(err);
     }
   });
+
+    productRouter.use((err, req, res, next) => { //에러 미드웨어 설정
+      if (err instanceof z.ZodError) {
+          return res.status(400).json({ error: err.errors });
+      }
+  
+      if (err.code === 'P2025') {
+          return res.status(404).json({ error: 'Record not found' });
+      }
+  
+      console.error('unhandled Error:', err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    });
+  
 
 export default productRouter;

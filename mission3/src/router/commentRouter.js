@@ -6,7 +6,7 @@ const commentRouter = express.Router();
 const prisma = new PrismaClient();
 
 commentRouter.route('/')
-  .post(async(req, res) => { //target query를 통해서 'articleId'와 'productId' 중 하나의 정보를 받고, targetId query를 통해서 세부 Id 정보를 받음
+  .post(async(req, res, next) => { //target query를 통해서 'articleId'와 'productId' 중 하나의 정보를 받고, targetId query를 통해서 세부 Id 정보를 받음
     const target = req.query.target;
     const targetId = parseInt(req.query.targetId);
     const { content } = req.body;
@@ -22,14 +22,15 @@ commentRouter.route('/')
       const comment = await prisma.comment.create({
         data
       });
+
       res.status(201).json(comment);
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+        next(err);
     }
   });
 
 commentRouter.route('/:id') 
-  .patch(async(req, res) => { //Id 정보를 받고서 대조 후 알맞는 comment를 찾아 수정하기
+  .patch(async(req, res, next) => { //Id 정보를 받고서 대조 후 알맞는 comment를 찾아 수정하기
     const commentId = Number(req.params.id);
     const { content } = req.body;
 
@@ -42,25 +43,26 @@ commentRouter.route('/:id')
       });
       res.status(201).json(updated);
     } catch (err) {
-      res.status(404).json({ error: 'Failed to modify comment' });
+        next(err);
     }
   })
 
-  .delete(async(req, res) => { //id를 통해서 comment 찾기 후 삭제하기
+  .delete(async(req, res, next) => { //id를 통해서 comment 찾기 후 삭제하기
     const commentId = Number(req.params.id);
 
     try {
       await prisma.comment.delete({
         where: { id: commentId },
       });
-      res.tatus(204).json({ message: 'Comment is deleted' });
+
+      res.status(204).end();
     } catch (err) {
-      res.status(404).json({ error: 'Failed to delete data' });
+        next(err);
     }
   });
 
   commentRouter.route('/product')
-    .get(async(req, res) => { //targetId를 통해 지정된 product의 comment를 불러오기
+    .get(async(req, res, next) => { //targetId를 통해 지정된 product의 comment를 불러오기
       const targetId = parseInt(req.query.targetId) || 1;
       const lastId = req.query.lastId ? parseInt(req.query.lastId) : null; //cursor 방식의 pagination을 하기 위한 lastId 상수 지정
        try {
@@ -83,15 +85,15 @@ commentRouter.route('/:id')
           createdAt: true,
       },
     });
+
     res.status(200).json(comments);
   } catch (err) {
-    console.error(err);
-    res.status(404).json({ error: 'Failed to find comment' })
+    next(err);
   }
  });
 
    commentRouter.route('/article')
-    .get(async(req, res) => { //targetId를 통해 지정된 article의 comment를 불러오기
+    .get(async(req, res, next) => { //targetId를 통해 지정된 article의 comment를 불러오기
       const targetId = parseInt(req.query.targetId) || 1;
       const lastId = req.query.lastId ? parseInt(req.query.lastId) : null;
        try {
@@ -116,43 +118,17 @@ commentRouter.route('/:id')
     });
     res.status(201).json(comments);
   } catch (err) {
-    console.error(err);
-    res.status(404).json({ error: 'Failed to find comment' })
+    next(err);
   }
  });
 
-// 코드의 줄이 짧으면 짧으수록 좋다는 멘토님의 말씀이 떠올라서 1차적으로 target query 를 통해서 articleId, productId를 구별하도록 만들고
-// targetId query를 통해서 세부 Id를 비교해서 comment를 찾아내면서 targetId가 없을 경우 target의 유형의 comment를 전부
-// 불러오는 방법에서 막혔습니다..
+  commentRouter.use((err, req, res, next) => { //에러 미드웨어 설정
+    if (err.code === 'P2025') {
+        return res.status(404).json({ error: 'Record not found' });
+    }
 
-// commentRouter.route('/')
-//  .get(async(req, res ) => { 
-//   const target = req.query.target;
-//   const targetId = parseInt(req.query.targetId) || 1;
-//   let purpose = {};
-//   if (target === 'articleId') {
-//     purpose = {articleId: targetId}
-//   } else if (target === 'productId') {
-//     purpose = {productId: targetId}
-//   } else {
-//     return res.status(400).json({ error: "Wrong target" });
-//   };
-//     try {
-//     const comments = await prisma.comment.findMany({
-//       where: {
-//         ...purpose
-//       },
-//       select: {
-//           id: true,
-//           content: true,
-//           createdAt: true,
-//       },
-//     });
-//     res.status(201).json(comments);
-//   } catch (err) {
-//     console.error(err);
-//     res.status(404).json({ error: 'Failed to find comment' })
-//   }
-//  });
+    console.error('unhandled Error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  });
 
 export default commentRouter;

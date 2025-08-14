@@ -12,26 +12,23 @@ const schema = z.object({ //유효성 검사 설정하기
 });
 
 articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를 article table에 post하기
-  .post(async(req, res) => {
+  .post(async(req, res, next) => {
     try {
       const validatedData = schema.parse(req.body);
       const article = await prisma.article.create({
-               data: {
-               title: validatedData.title,
-               content: validatedData.content,
-          },
+            data: {
+                title: validatedData.title,
+                content: validatedData.content,
+            },
       });
 
       return res.status(201).json(article);
     } catch (err) {
-      if (err instanceof z.ZodError) { //유효성 검사에 통과하지 못하면 400에러창이 출력
-        return res.status(400).json({ error: err.errors });
+        next(err);
     }
-    return res.status(500).json({ error: 'Internal Server Error' }); //그외는 500에러로 출력
-  }
 })
 
-  .get(async(req, res) => { //page와 keyword query를 통해서 원하는 article 찾기
+  .get(async(req, res, next) => { //page와 keyword query를 통해서 원하는 article 찾기
     try {
       const page = parseInt(req.query.page) || 1;
       const keyword = req.query.keyword || '';
@@ -68,15 +65,15 @@ articleRouter.route('/') // Zod로 유효성 검사에서 통과한 데이터를
         },
         where,
       });
+
       res.status(200).json(articles);
     } catch (error) {
-      console.error(error);
-      res.status(404).json({ error: 'Failed to find article' })
+        next(err);
     }
   });
 
 articleRouter.route('/:id')
-  .patch(async(req, res) => { // Id를 통해서 article를 찾아내 수정하기
+  .patch(async(req, res, next) => { // Id를 통해서 article를 찾아내 수정하기
     const articleId = Number(req.params.id);
     const validatedData = schema.parse(req.body);
 
@@ -90,24 +87,24 @@ articleRouter.route('/:id')
         });
         res.status(200).json(updated);
     } catch (err) {
-        res.status(404).json({ error: 'Failed to delete data' });
+        next(err);
     }
 })
 
-  .delete(async(req, res) => { // Id을 통해 article를 찾아내 삭제하기
+  .delete(async(req, res, next) => { // Id을 통해 article를 찾아내 삭제하기
      const articleId = Number(req.params.id);
 
     try {
         await prisma.article.delete({
             where: { id: articleId },
         });
-        res.status(204);
+        res.status(204).end();
     } catch (err) {
-        res.status(500).json({ error: 'Internal Server Error' });
+        next(err);
     }
 })
 
-  .get(async(req, res) => { //id를 통해  article 조회하기
+  .get(async(req, res, next) => { //id를 통해  article 조회하기
     const articleId = Number(req.params.id);
 
     try {
@@ -120,10 +117,28 @@ articleRouter.route('/:id')
           createdAt: true,
         },
       });
+      if (!article) {
+        return res.status(404).json({ error: 'Article not found'});
+      }
       res.status(200).json(article);
     } catch (err) {
-      res.status(404).json({ error: 'Failed to find article' })
+        next(err);
     }
   });
+
+
+  articleRouter.use((err, req, res, next) => { //에러 미드웨어 설정
+    if (err instanceof z.ZodError) {
+        return res.status(400).json({ error: err.errors });
+    }
+
+    if (err.code === 'P2025') {
+        return res.status(404).json({ error: 'Record not found' });
+    }
+
+    console.error('unhandled Error:', err);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  });
+
 
 export default articleRouter;
