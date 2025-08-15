@@ -1,0 +1,13 @@
+### 상품 등록
+POST http://localhost:3000/product
+Content-Type: application/json
+
+{
+  "name": "아이폰 15",
+  "description": "거의 새제품",
+  "price": 1200000,
+  "tags": ["전자기기", "휴대폰"]
+}
+
+###
+GET http://localhost:3000/product

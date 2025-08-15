@@ -1,24 +1,32 @@
 {
-  "name": "myfolder",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
+  },
+  "name": "3",
   "version": "1.0.0",
-  "main": "Product.js",
+  "main": "article.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "format": "prettier --write ."
+    "seed": "node prisma/seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ammgree/4-sprint-mission.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
-  "type": "module",
-  "dependencies": {
-    "axois": "^0.0.1-security"
+  "bugs": {
+    "url": "https://github.com/ammgree/4-sprint-mission/issues"
   },
-  "devDependencies": {
-    "@eslint/js": "^9.31.0",
-    "eslint": "^9.31.0",
-    "globals": "^16.3.0",
-    "prettier": "^3.6.2"
-  }
+  "homepage": "https://github.com/ammgree/4-sprint-mission#readme",
+  "description": ""
 }
