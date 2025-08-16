@@ -21,7 +21,7 @@ app.use("/files", express.static("uploads"));
 
 
 app.get('/', (req,res)=>{
-    res.send("미션 3 홈페이지입니다.");
+    res.send("미션 3 홈페이지입니다."); 
 });
 
 app.use('/products',productRouter);//1번 경로, 2번 인자는 핸들러

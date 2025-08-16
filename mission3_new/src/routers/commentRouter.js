@@ -1,5 +1,8 @@
 import express from 'express';
 import prisma from '../client/prismaClient.js'
+import { assert } from 'superstruct';
+import { PatchComment } from '../validators/structor.js';
+import asyncHandler from '../middlewares/asyncHandler.js';
 
 
 const router = express.Router();
@@ -7,7 +10,8 @@ const router = express.Router();
 ///////////////////////////////////////////////////////////////댓글수정
 
 
-router.patch('/:cid', async (req, res) => {
+router.patch('/:cid', asyncHandler(async (req, res) => {
+  assert(req.body, PatchComment);
   const { cid } = req.params;
     const ccid = parseInt(cid);
     const { content } = req.body;
@@ -16,23 +20,18 @@ router.patch('/:cid', async (req, res) => {
      data: {content},
     });
   res.status(201).json(comment);
-  });
+}));
 
 ////////////////////////////////////////////////////////////////댓글삭제
 
-router.delete('/:cid', async (req, res) => {
-  try{
+router.delete('/:cid', asyncHandler(async (req, res) => {
   const { cid } = req.params;
     const ccid = parseInt(cid);
     await prisma.comment.delete({
      where: { id: ccid },
     });
    res.sendStatus(204);
-   } 
-   catch (error) {
-    res.json({ message: "없는거 몰라?????;;;;" });
-  }
-});
+}));
 
 
 

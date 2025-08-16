@@ -1,7 +1,7 @@
 import express from 'express';
 import prisma from '../client/prismaClient.js';
 import { assert } from 'superstruct';
-import { CreateProduct, PatchProduct } from '../validators/structor.js';
+import { CreateProduct, PatchProduct, CreateComment } from '../validators/structor.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 
 const router = express.Router();
@@ -19,11 +19,8 @@ router.post('/', asyncHandler(async (req, res) => {
 // - 최신순(`recent`)으로 정렬할 수 있습니다.
 //  - `name`, `description`에 포함된 단어로 검색할 수 있습니다.
 
-router.get(
-  '/',
-  asyncHandler(async (req, res) => {
-    const { order = 'asc', page = 0, pageSize = 5, keyword = '' } = req.query;
-    console.log(req.query.order);
+router.get('/', asyncHandler(async (req, res) => {
+    const { order = 'asc', page = 1, pageSize = 3, keyword = '' } = req.query;
 
     let orderBy;
     if (order === 'recent') {
@@ -107,8 +104,7 @@ router.delete(
       where: { id: ppid },
     });
     res.sendStatus(204);
-    res.json({ message: '이미 지워졌다고 몊번이나 얘기햇냐!' });
-  }),
+  })
 );
 
 // - 댓글 등록 API를 만들어 주세요.
@@ -118,6 +114,7 @@ router.delete(
 router.post(
   '/:pid/comments',
   asyncHandler(async (req, res) => {
+    assert(req.body, CreateComment);
     const { pid } = req.params;
     const ppid = parseInt(pid);
     const { content } = req.body;
