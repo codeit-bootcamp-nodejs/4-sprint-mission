@@ -45,18 +45,18 @@ router.get('/', asyncHandler(async (req,res)=> {
 
 
 
-router.post('/', asyncHandler(async (req,res)=> { //첫번쨰 인자는 경로, 가운데 미들웨어 기능넣기 가능, 두번째 핸들러 
-    assert(req.body, CreateProduct); //여기서 유효성 검사를 진행 -> structor가 에러 객체를 만들어서 던짐 근데. async핸들러가 그걸 잡아냄. 
+router.post('/', asyncHandler(async (req,res)=> {  
+    assert(req.body, CreateProduct); 
     const product = await prisma.product.create({
-        data: req.body //어쩔 수 업슨 문법
-    }); //db에 넣을 것
-    res.status(201).json(product); //받아온 결과 넣는 것
-})); //프리즈마 자체가 비동기  
+        data: req.body 
+    }); 
+    res.status(201).json(product); 
+}));  
 
 
 router.get('/:prouductId', asyncHandler(async (req,res)=> {
-    const {prouductId} = req.params; //얘는 지금 스트링으로 받음
-    const parseId = parseInt(prouductId);//문자를 숫자로 파싱해줌
+    const {prouductId} = req.params; 
+    const parseId = parseInt(prouductId);
     const product = await prisma.product.findUnique({
         where: {id: parseId},
         select: {
@@ -80,7 +80,7 @@ router.patch('/:prouductId', asyncHandler(async (req,res)=> {
         where: {id: parseId},
         data: updateData,
     }); 
-    res.status(200).json(product); //상태코드 겸 데이터 ? 
+    res.status(200).json(product);
 }));
 
 router.delete('/:prouductId', asyncHandler(async (req,res)=> {
@@ -93,7 +93,7 @@ router.delete('/:prouductId', asyncHandler(async (req,res)=> {
         res.json({ message: error.message });
 }));
 
-// 중고마켓, 자유게시판 댓글 등록 API를 따로 만들어 주세요.
+
 router.post('/:productId/comments', asyncHandler(async(req,res)=> {
     assert(req.body, CreateComment);
     const { productId } = req.params;
@@ -106,7 +106,6 @@ router.post('/:productId/comments', asyncHandler(async(req,res)=> {
         }
     });
     res.status(201).json(comment);
-    // res.json(content);
 }));
 
 router.get('/:productId/comments', asyncHandler(async (req,res)=> {
@@ -125,4 +124,4 @@ router.get('/:productId/comments', asyncHandler(async (req,res)=> {
 
 
 
-export default router; //객체에 커스텀했고 밖에서 쓸 수 있게 내보내겟다. 
+export default router;

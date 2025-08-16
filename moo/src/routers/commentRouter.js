@@ -6,8 +6,6 @@ import { assert } from 'superstruct';
 
 const router = express.Router();
 
-// content를 입력하여 댓글을 등록합니다.
-// 중고마켓, 자유게시판 댓글 등록 API를 따로 만들어 주세요.
 
 router.patch('/:commentId', asyncHandler(async (req,res)=> {
     assert(req.body, PatchComment);
@@ -22,7 +20,6 @@ router.patch('/:commentId', asyncHandler(async (req,res)=> {
 }));
 
 
-//삭제
 router.delete('/:commentId', asyncHandler(async (req,res) => {
     const { commentsId } =  req.params;
     const parseId = parseInt(commentsId);

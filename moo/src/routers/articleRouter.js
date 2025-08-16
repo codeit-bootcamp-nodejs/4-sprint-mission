@@ -38,7 +38,7 @@ router.get('/', asyncHandler(async (req, res) => {
         orderBy,
         skip: parseInt((page - 1) * pageSize),
         take: parseInt(pageSize),
-    }); //최소 1부터 여러개 => 복수로 변수명 적는게 좋다 - ! 혹은 list로
+    }); 
     res.status(200).json(articles);
 }));
 
@@ -94,7 +94,6 @@ router.delete('/:articlesId', asyncHandler(async (req, res) => {
 
 
 
-//자유게시판에 댓글 등록 comment로 
 router.post('/:articleId/comments', asyncHandler(async (req, res) => {
     assert(req.body, PatchComment);
     const { articleId } = req.params;
@@ -111,7 +110,7 @@ router.post('/:articleId/comments', asyncHandler(async (req, res) => {
 
 
 
-//댓글 목록 조회
+
 router.get('/:articleId/comments', asyncHandler(async (req, res) => {
     const { articleId } = req.params;
     const parseId = parseInt(articleId);
@@ -119,7 +118,7 @@ router.get('/:articleId/comments', asyncHandler(async (req, res) => {
     const comments = await prisma.comment.findMany({
         where: { articleId: parseId },
         orderBy: {
-            createdAt: 'desc' //페이징 정렬 기본
+            createdAt: 'desc'
         },
         select: {
             id: true,
