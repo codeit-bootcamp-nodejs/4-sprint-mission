@@ -3,6 +3,7 @@ import prisma from '../client/prismaClient.js';
 import { assert } from 'superstruct';
 import { CreateProduct, PatchProduct, CreateComment } from '../validators/structor.js';
 import asyncHandler from "../middlewares/asyncHandler.js";
+import { parse } from 'dotenv';
 
 
 const router = express.Router();
@@ -40,9 +41,8 @@ router.get('/', asyncHandler(async (req,res)=> {
         skip: parseInt((page - 1) * pageSize),
         take: parseInt(pageSize),
     }); 
-    res.status(200).json(products); //상품들 가지고 옴 
+    res.status(200).json(products); 
 }));
-
 
 
 router.post('/', asyncHandler(async (req,res)=> {  
@@ -111,17 +111,24 @@ router.post('/:productId/comments', asyncHandler(async(req,res)=> {
 router.get('/:productId/comments', asyncHandler(async (req,res)=> {
     const { productId } = req.params;
     const parseId = parseInt(productId);
+    const { cursor, limit = 5 } = req.body;
     const comments = await prisma.comment.findMany({
         where: { productId: parseId },
+        orderBy: {
+            createdAt: 'desc'
+        },
         select: {
             id: true,
             content: true,
             createdAt: true,
         },
+        take: parseId(limit),
+        ...(cursor && { cursor: { id: parseInt(cursor)}, skip: 1 }),
     });
-    res.status(200).json(comments);
+
+    const nextCursor = 
+    comments.length === parseInt(limit) ? comments[comments.length -1].id : null;
+    res.status(200).json({comments, nextCursor});
 }));
-
-
 
 export default router;

@@ -3,7 +3,6 @@ import path from "path";
 import fs from "fs";
 import { v4 as uuidv4 } from "uuid";
 
-// uploads 폴더가 없으면 생성
 try {
   fs.readdirSync("uploads");
 } catch (error) {
@@ -30,6 +29,3 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export default upload;
-
-//파일을 어떻게 받아서 어떻게 하겠다. 
-//multer 설정
