@@ -10,7 +10,6 @@ async function getProductList(page, pageSize, keyword) {
             keyword
         });
 
-        // console.log(res.data);
         return res.data;
     } catch (e) {
         console.error(e);
@@ -21,7 +20,6 @@ async function getProduct(productId) {
     try {
         const res = await axios.get(apiUrl+`/products/${productId}`)
 
-        // console.log(res.data);
         return res.data;
     } catch (e) {
         console.error(e);
@@ -38,7 +36,6 @@ async function createProduct(name, description, price, tags, images) {
             images
         });
 
-        // console.log(res.data);
         return res.data;
     } catch (e) {
         console.error(e);
@@ -55,7 +52,6 @@ async function patchProduct(name, description, price, tags, images) {
             images
         });
 
-        // console.log(res.data);
         return res.data;
     } catch (e) {
         console.error(e);
@@ -66,7 +62,6 @@ async function deleteProduct(productId) {
     try {
         const res = await axios.get(apiUrl+`/products/${productId}`)
 
-        // console.log(res.data);
         return res.data;
     } catch (e) {
         console.error(e);
