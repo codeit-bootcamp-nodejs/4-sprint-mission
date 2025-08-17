@@ -4,18 +4,35 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kimaeong/4-sprint-mission.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "bugs": {
     "url": "https://github.com/kimaeong/4-sprint-mission/issues"
   },
   "homepage": "https://github.com/kimaeong/4-sprint-mission#readme",
-  "description": ""
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "is-email": "^1.0.2",
+    "is-uuid": "^1.0.2",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.13.0",
+    "superstruct": "^2.0.2",
+    "zod": "^4.0.15"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.1"
+  }
 }
