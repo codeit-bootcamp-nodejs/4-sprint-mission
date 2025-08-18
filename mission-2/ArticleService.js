@@ -9,6 +9,7 @@ export async function getArticle(id) {
     return await axiosInstance.get(`/articles/${id}`)
         .then(response => response.data)
         .catch(e => {
+            console.error(e);
             if (e.response) {
                 console.log(e.response.status);
                 console.log(e.response.data);
@@ -26,6 +27,7 @@ export async function getArticleList(page = 1, pageSize = 10, keyword) {
     return await axiosInstance.get(`/articles`, { params })
         .then(response => response.data)
         .catch(e => {
+            console.error(e);
             if (e.response) {
                 console.log(e.response.status);
                 console.log(e.response.data);
@@ -43,6 +45,7 @@ export async function createArticle({ title = 'default', content = 'content', im
     return await axiosInstance.post(`/articles`, params)
         .then(response => response.data)
         .catch(e => {
+            console.error(e);
             if (e.response) {
                 console.log(e.response.status);
                 console.log(e.response.data);
@@ -61,6 +64,7 @@ export async function patchArticle(id, { title = 'default', content = 'default',
     return await axiosInstance.patch(`/articles/${id}`, params)
         .then(response => response.data)
         .catch(e => {
+            console.error(e);
             if (e.response) {
                 console.log(e.response.status);
                 console.log(e.response.data);
@@ -74,6 +78,7 @@ export async function deleteArticle(id) {
     return await axiosInstance.delete(`/articles/${id}`)
         .then(response => response.data)
         .catch(e => {
+            console.error(e);
             if (e.response) {
                 console.log(e.response.status);
                 console.log(e.response.data);
