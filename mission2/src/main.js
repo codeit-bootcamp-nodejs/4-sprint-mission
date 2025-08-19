@@ -40,24 +40,27 @@ console.log(article);
 //deleteArticle
 await deleteArticle(article.id);
 
-// 비동기 처리, 오류 처리
-fetch(`https://panda-market-api-crud.vercel.app/docs/articles`)
-  .then((response) => response.json())
-  .then((data) => console.log(data))
-  .catch((error) => console.log('Error!'))
-  .finally(() => console.log('Finished'));
+// // 비동기 처리, 오류 처리
+// fetch(`https://panda-market-api-crud.vercel.app/docs/articles`)
+//   .then((response) => response.json())
+//   .then((data) => console.log(data))
+//   .catch((error) => console.log('Error!'))
+//   .finally(() => console.log('Finished'));
 
 // async function getArticle() {
 //     const response = await fetch(`https://panda-market-api-crud.vercel.app/articles`);
 //     const data = await response.json();
 //     console.log(nodpe data);
 // };
+//     console.log(data);
+// };
 
-fetch(`https://panda-market-api-crud.vercel.app/articles`)
-  .then((response) => response.json())
-  .then((data) => console.log(data));
+// fetch(`https://panda-market-api-crud.vercel.app/articles`)
+//   .then((response) => response.json())
+//   .then((data) => console.log(data));
 
-console.log('게시물을 불러내고 있습니다...');
+// console.log('게시물을 불러내고 있습니다...');
+
 
 
 // //Product---
@@ -95,15 +98,15 @@ console.log('게시물을 불러내고 있습니다...');
 
 // console.log(products);
 
-// const product = await patchProduct(id, {
-//     name: '디지털 몬스터',
-//     description: '어린 시절 모두가 했었던 다마고치',
-//     price: 40000,
-//     tags: '전자제품',
-//     images: "https://example.com/...",
-// });
+const product = await patchProduct(id, {
+    name: '디지털 몬스터',
+    description: '어린 시절 모두가 했었던 다마고치',
+    price: 40000,
+    tags: '전자제품',
+    images: "https://example.com/...",
+});
 
-// console.log(product);
+console.log(product);
 
 // //deleteProduct
 // await deleteProduct(1258);
