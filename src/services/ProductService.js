@@ -1,104 +1,66 @@
-import axios from 'axios';
-import { ElectronicProduct, Product } from '../models/Product.js';
+import prisma from '../prismaClient.js';
 
-const baseUrl = 'https://panda-market-api-crud.vercel.app/products';
+const productService = {
+  async createProduct(data) {
+    const newProduct = await prisma.product.create({
+      data,
+    });
+    return newProduct;
+  },
 
-export async function getProductList({page= 1, pageSize= 10, keyword= ''}={}) {
-  try {
-  const res = await axios.get(baseUrl, {
-	params: { page, pageSize, keyword }	
-  });
-  const data = res.data;
-  return data.list.map(item=> {
-    if (item.tags.includes('전자제품')) {
-      return new ElectronicProduct(
-        item.name, 
-        item.description, 
-        item.price, 
-        item.tags, 
-        item.images, 
-        item.favoriteCount,
-        item.manufacturer
-      );
-    } else {
-      return new Product(
-        item.name, 
-        item.description, 
-        item.price, 
-        item.tags, 
-        item.images, 
-        item.favoriteCount
-      );
-      }
-  })  
-  } catch(e) {
-    console.error(`getProductList failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return [];
-  }
-}
+  async getProductById(id) {
+    const product = await prisma.product.findFirst({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        createdAt: true,
+      },
+    });
+    return product;
+  },
 
-export async function getProduct(id) {
-  try {
-  const res = await axios.get(`${baseUrl}/${id}`);
-  const data = res.data;
-    if (data.tags.includes('전자제품')) {
-      return new ElectronicProduct(
-        data.name, 
-        data.description, 
-        data.price, 
-        data.tags, 
-        data.images, 
-        data.favoriteCount,
-        data.manufacturer
-      );
-    } else {
-      return new Product(
-        data.name, 
-        data.description, 
-        data.price, 
-        data.tags, 
-        data.images, 
-        data.favoriteCount
-      );
-      }
-  } catch(e) {
-   console.error(`getProduct failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-   return null;
-    }
-}
+  async updateProduct(id, data) {
+    const productPatched = await prisma.product.update({
+      where: { id },
+      data,
+    });
+    return productPatched;
+  },
 
-export async function createProduct(name, description, price, tags, images) {
-  try {
-  const res = await axios.post(baseUrl, {name, description, price, tags, images});
-  const data = res.data;
-  console.log(data);
-  return data;
-  } catch(e) {
-   console.error(`createProduct failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-   return null;
-  }
-}
+  async deleteProduct(id) {
+    const product = await prisma.product.delete({
+      where: { id },
+    });
+    return product;
+  },
 
-export async function patchProduct(id, updateValue) {
-  try {
-  const res = await axios.patch(`${baseUrl}/${id}`, updateValue);
-  const data = res.data;
-  console.log(data);
-  return data;
-  } catch(e) {
-   console.error(`patchProduct failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-   return null;
-  }
-}
+  async listProduct({ page, pageSize, keyword }) {
+    const where = keyword
+      ? {
+          OR: [
+            { name: { contains: keyword, mode: 'insensitive' } },
+            { description: { contains: keyword, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+    const products = await prisma.product.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true,
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: { createdAt: 'desc' },
+    });
+    return products;
+  },
+};
 
-export async function deleteProduct(id) {
-  try {
-  const res = await axios.delete(`${baseUrl}/${id}`);
-  const data = res.data;
-  console.log(data);
-  return data;
-  } catch(e) {
-   console.error(`deleteProduct failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-   return null;
-  }
-}
+export default productService;

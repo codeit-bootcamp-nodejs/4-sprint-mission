@@ -1,71 +1,77 @@
-import axios from 'axios';
-const baseUrl = 'https://panda-market-api-crud.vercel.app/articles';
+import prisma from '../prismaClient.js';
 
-// 페이지 목록을 불러오는 함수
-export async function getArticleList({ page= 1, pageSize= 10, keyword= ''}={}) {
-  
-  return axios.get(baseUrl, {
-	params: { page, pageSize, keyword }	
-  })
-  .then(res => { 
-    console.log(res.data);
-    return res.data;
-  })
-  .catch(e => {
-    console.error(`getArticleList failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return [];
-  })
-}
+const articleService = {
+  async createArticle(data) {
+    const newArticle = await prisma.article.create({
+      data,
+    });
+    return newArticle;
+  },
 
-export async function getArticle(id) {
-  
-  return axios.get(`${baseUrl}/${id}`)
-  .then(res => { 
-    console.log(res.data);
-    return res.data;
-  })
-  .catch(e => {
-    console.error(`getArticle failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return null;
-  })
-}
+  async getArticleById(id) {
+    const article = await prisma.article.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAT: true,
+      },
+    });
+    return article;
+  },
 
-export async function createArticle(title, content, image) {
-  
-  return axios.post(baseUrl, { title, content, image })
-  .then(res => { 
-    console.log(res.data);
-    return res.data;
-  })
-  .catch(e => {
-    console.error(`createArticle failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return [];
-  })
-}
+  async updateArticle(id, data) {
+    const articlePatched = await prisma.article.update({
+      where: { id },
+      data,
+    });
+    return articlePatched;
+  },
 
-export async function patchArticle(id, updatevalue) {
-  
-  return axios.patch(`${baseUrl}/${id}`, updatevalue
-  )
-  .then(res => { 
-    console.log(res.data);
-    return res.data;
-  })
-  .catch(e => {
-    console.error(`patchArticle failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return [];
-  })
-}
+  async deleteArticle(id) {
+    const article = await prisma.article.delete({
+      where: { id },
+    });
+    return article;
+  },
 
-export async function deleteArticle(id) {
-  
-  return axios.delete(`${baseUrl}/${id}`)
-  .then(res => { 
-    console.log(res.data);
-    return res.data;
-  })
-  .catch(e => {
-    console.error(`deleteArticle failed: ${e.response?.status || 'No status'} ${e.response?.statusText || e.message}`);
-    return [];
-  })
-}
+  async listArticle({ page, pageSize, keyword }) {
+    const where = keyword
+      ? {
+          OR: [
+            {
+              title: {
+                contains: keyword,
+                mode: 'insensitive',
+              },
+            },
+            {
+              content: {
+                contains: keyword,
+                mode: 'insensitive',
+              },
+            },
+          ],
+        }
+      : {};
+
+    const articles = await prisma.article.findMany({
+      where,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+      },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    return articles;
+  },
+};
+
+export default articleService;
