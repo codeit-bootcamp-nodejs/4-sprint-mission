@@ -1,0 +1,32 @@
+
+# 상품 등록 (POST)
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+    "name": "에어팟 프로 3세대",
+    "description": "업그레이드된 노이즈 캔슬링과 공간 음향",
+    "price": 359000,
+    "tags": ["#애플", "#이어폰", "#노이즈캔슬링"]
+}
+
+###
+PATCH http://localhost:3000/products/8
+Content-Type: application/json
+
+{
+    "name": "에어팟 프로 5세대",
+    "description": "업그레이드된 노이즈 캔슬링과 공간 음향",
+    "price": 400000,
+    "tags": ["#애플", "#이어폰", "#노이즈캔슬링"]
+}
+
+###
+GET http://localhost:3000/products/2
+
+###
+GET http://localhost:3000/products
+
+###
+DELETE http://localhost:3000/products/10
+

@@ -1,0 +1,24 @@
+
+# 상품 등록 (POST)
+POST http://localhost:3000/articles
+Content-Type: application/json
+
+{
+    "title": "에어팟 프로 3세대",
+    "content": "업그레이드된 노이즈 캔슬링과 공간 음향"
+}
+
+###
+PATCH http://localhost:3000/articles/5
+Content-Type: application/json
+
+{
+    "title": "에어팟 프로 5세대",
+    "content": "더 업그레이드된 노이즈 캔슬링과 공간 음향"
+}
+
+###
+GET http://localhost:3000/articles
+
+###
+DELETE http://localhost:3000/articles/3
