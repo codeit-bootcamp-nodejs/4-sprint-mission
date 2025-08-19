@@ -1,5 +1,5 @@
-import * as article from './src/ArticleService.js';
-import * as product from './src/ProductService.js';
+import * as article from './sprintmission/src/ArticleService.js';
+import * as product from './sprintmission/src/ProductService.js';
 
 article.getArticleList();
 article.getArticle();
