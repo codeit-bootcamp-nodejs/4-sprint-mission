@@ -1,0 +1,19 @@
+services:
+  - type: web                   # 서비스 종류 (웹 서버)
+    name: sprint3-market-board  # Render 대시보드에서 보이는 이름
+    env: node                   # Node.js 환경
+    plan: free                  # Render 플랜 (free, starter, etc.)
+    buildCommand: |             # 빌드할 때 실행할 명령어
+      npm ci
+      npm run prisma:generate
+    startCommand: npm start      # 서버 실행 시 실행할 명령어
+    envVars:                     # Render에 등록할 환경변수들
+      - key: DATABASE_URL
+        sync: false              # .env 파일 대신 Render 대시보드에서 직접 입력해야 함
+      - key: PORT
+        value: 3000
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: UPLOAD_DIR
+        value: "uploads"
+    autoDeploy: true             # GitHub push 시 자동 배포 여부

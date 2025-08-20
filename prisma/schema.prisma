@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id          Int                 @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal             @db.Decimal(12,2)
+  tags        String[]            @db.Text
+  imageUrl    String?             // 업로드 이미지 경로(옵션)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  comments    ProductComment[]
+
+  @@index([name])
+  @@index([createdAt])
+}
+
+model Article {
+  id        Int                @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  comments  ArticleComment[]
+}
+
+model ProductComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+
+  @@index([productId, createdAt])
+}
+
+model ArticleComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int
+
+  @@index([articleId, createdAt])
+}

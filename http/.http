@@ -1,0 +1,19 @@
+
+GET http://localhost:3000/
+
+###
+GET http://localhost:3000/health 
+
+###
+
+GET http://localhost:3000/products
+
+// 상품 목록 
+
+###
+
+GET http://localhost:3000/articles
+
+###
+
+POST http://localhost:3000/products
