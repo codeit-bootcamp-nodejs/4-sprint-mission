@@ -2,17 +2,15 @@ import axios from "axios";
 
 const BASE_URL = "https://panda-market-api-crud.vercel.app/articles";
 
-// Article 상품 목록을 검색하는 함수
+/**  Article 상품 목록을 검색하는 함수 */
 export function getArticleList(page = 1, pageSize = 10, keyword = "") {
   const url = new URL(BASE_URL);
   url.searchParams.append("page", page);
   url.searchParams.append("pageSize", pageSize);
 
-  if (typeof keyword === "string" && keyword.trim()) {
+  if (typeof keyword === "string") {
     url.searchParams.append("keyword", keyword.trim());
   }
-
-  console.log(url.toString());
 
   return axios
     .get(url.toString())
@@ -21,11 +19,11 @@ export function getArticleList(page = 1, pageSize = 10, keyword = "") {
       return res.data;
     })
     .catch((error) => {
-      console.log(error.message);
+      console.error(error.message);
     });
 }
 
-// Article ID의 상세정보를 조회하는 함수
+/**  Article ID의 상세정보를 조회하는 함수 */
 export function getArticle(id) {
   return axios
     .get(`${BASE_URL}/${id}`)
@@ -38,7 +36,7 @@ export function getArticle(id) {
     });
 }
 
-// Article 새로운 상품을 추가하는 함수
+/**  Article 새로운 상품을 추가하는 함수 */
 export function createArticle({ title, content, image }) {
   const requestBody = {
     title,
@@ -57,7 +55,7 @@ export function createArticle({ title, content, image }) {
     });
 }
 
-// Article ID의 정보를 변경하는 함수
+/**  Article ID의 정보를 변경하는 함수 */
 export function patchArticle(id, update) {
   return axios
     .patch(`${BASE_URL}/${id}`, update)
@@ -70,7 +68,7 @@ export function patchArticle(id, update) {
     });
 }
 
-//Article ID를 삭제하는 함수
+/** Article ID를 삭제하는 함수 */
 export function deleteArticle(id) {
   console.log("삭제할 ID :", id);
   return axios

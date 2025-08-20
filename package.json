@@ -1,0 +1,33 @@
+{
+  "name": "4-sprint-mission",
+  "version": "1.0.0",
+  "description": "- [x] 클래스 구현 - [x] Article 요청 함수 구현 - [x] Product 요청 함수 구현 - [x] Git 사용",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed": "node prisma/seed.js",
+    "start": "node sprint3/app.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codeit-bootcamp-nodejs/4-sprint-mission.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/codeit-bootcamp-nodejs/4-sprint-mission/issues"
+  },
+  "homepage": "https://github.com/codeit-bootcamp-nodejs/4-sprint-mission#readme",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2"
+  }
+}
