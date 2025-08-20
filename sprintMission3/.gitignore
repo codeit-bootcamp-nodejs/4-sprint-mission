@@ -1,0 +1,23 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.DS_Store
+build/
+dist/
+*.log
+
+# Prisma
+/prisma/migrations/
+*.sqlite
+*.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Other common files
+temp/
+tmp/

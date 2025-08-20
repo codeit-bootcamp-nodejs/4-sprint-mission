@@ -1,10 +1,7 @@
-import axios from 'axios';
 import * as Productfile from './ProductService.js'
-import * as Articlefile from './ArticleService.js' 
 
-
-function checkData() {
-    const products = [];
+function getProductList(){
+    products = [];
     const responseData = Productfile.getProductlist();
     const objs= responseData.list;
     objs.forEach((data)=>{

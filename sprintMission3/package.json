@@ -1,0 +1,32 @@
+{
+  "name": "sprintmission3",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "npx prisma generate --schema ./src/prisma/schema.prisma",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "curl": "^0.1.4",
+    "dotenv": "^17.2.1",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "prisma": "^6.13.0",
+    "superstruct": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "prisma": {
+    "seed": "node src/prisma/seed.js"
+  },
+  "type": "module"
+}
