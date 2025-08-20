@@ -1,30 +1,29 @@
-# Panda Market Client
+# 중고 마켓 & 게시판 API 서버
 
-이 프로젝트는 Panda Market API와 통신하여 상품 및 게시글을 관리하는 웹 클라이언트입니다.
+중고 마켓과 커뮤니티 게시판 애플리케이션을 위한 API 서버입니다.
 
 ## 주요 기능
 
-- 상품(Product) 및 전자제품(ElectronicProduct) 데이터 모델링
-- 게시글(Article) 데이터 모델링
-- API 서비스를 통한 데이터 연동 (조회, 생성, 수정, 삭제)
+- **중고 마켓:**
+  - 상품 CRUD (생성, 조회, 수정, 삭제)
+  - 페이지네이션, 검색, 정렬 기능이 포함된 상품 목록 조회
+  - 상품 이미지 업로드
+- **커뮤니티 게시판:**
+  - 게시글 CRUD
+  - 페이지네이션, 검색, 정렬 기능이 포함된 게시글 목록 조회
+- **댓글:**
+  - 상품과 게시글에 댓글 추가 기능
+  - 댓글 CRUD
+  - 커서 기반 페이지네이션을 사용한 댓글 목록 조회
 
-## 실행 방법
 
-```bash
-# 필요한 경우 Node.js 환경에서 실행합니다.
-node src/main.js
-```
+## 배포
 
-## 프로젝트 구조
+이 프로젝트는 [Render](https://splint-mission-3.onrender.com/)에 배포할 수 있도록 설정되어 있습니다.
 
-```
-/
-├── src/
-│   ├── Article.js           # 게시글 클래스
-│   ├── ArticleService.js    # 게시글 API 연동 서비스
-│   ├── ElectronicProduct.js # 전자제품 클래스 (상품 상속)
-│   ├── main.js              # 메인 실행 파일
-│   ├── Product.js           # 상품 클래스
-│   └── ProductService.js    # 상품 API 연동 서비스
-└── package.json
-```
+`render-build.sh` 스크립트가 빌드 및 배포 과정을 처리합니다:
+1.  의존성 설치 (`npm install`).
+2.  데이터베이스 마이그레이션 적용 (`npm run prisma:deploy`).
+3.  데이터베이스 시딩 (`npm run prisma:seed`).
+
+Render 대시보드에서 시작 명령어는 `npm start`로 설정해야 합니다.
