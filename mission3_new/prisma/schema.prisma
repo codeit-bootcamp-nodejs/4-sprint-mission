@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 중고마켓 상품 모델
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Product 모델에 대한 댓글들을 저장하는 필드
+  comments    Comment[] @relation("ProductComments")
+}
+
+// 자유게시판 게시글 모델
+model Article {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Article 모델에 대한 댓글들을 저장하는 필드
+  comments    Comment[] @relation("ArticleComments")
+}
+
+// 댓글 모델
+model Comment {
+  id          Int      @id @default(autoincrement())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+ // 댓글이 달린 상품의 ID.
+  productId Int?
+  // Product 모델과 관계 설정. Optional(?)로 설정하여 게시글 댓글도 가능하게 함 onDelete: Cascade를 명시하여 상품 삭제 시 댓글도 함께 삭제합니다.
+  product   Product? @relation("ProductComments", fields: [productId], references: [id], onDelete: Cascade)
+  // 댓글이 달린 게시글의 ID.
+  articleId Int?
+  // Article 모델과 관계 설정. Optional(?)로 설정하여 게시글 댓글도 가능하게 함 onDelete: Cascade를 명시하여 게시글 삭제 시 댓글도 함께 삭제합니다.
+  article   Article? @relation("ArticleComments", fields: [articleId], references: [id], onDelete: Cascade)
+}
