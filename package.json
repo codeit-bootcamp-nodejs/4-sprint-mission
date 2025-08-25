@@ -1,22 +1,23 @@
 {
-  "name": "sprintmisson2",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "format": "prettier --write ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "eslint": "^9.31.0",
-    "prettier": "^3.6.2"
-  },
   "dependencies": {
-    "eslint-config-prettier": "^10.1.8"
+    "@prisma/client": "^6.13.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.32.0",
+    "prettier": "3.6.2",
+    "prisma": "^6.13.0"
+  },
+  "type": "module",
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "start": "node sprintMission3/app.js",
+    "postinstall": "prisma generate"
   }
 }
