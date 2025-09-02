@@ -1,4 +1,3 @@
-// multer.config.js (별도의 파일로 관리)
 import multer from "multer";
 
 const storage = multer.diskStorage({
