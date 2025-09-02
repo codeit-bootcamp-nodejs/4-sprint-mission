@@ -16,9 +16,33 @@ const AuthController = {
 
   async login(req, res, next) {
     try {
-      const { user, token } = await AuthService.login(req.body);
-      res.status(200).json({ user, accessToken: token });
-      next();
+      const { user, accessToken, refreshToken } = await AuthService.login(
+        req.body
+      );
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json({ user, accessToken, refreshToken });
+    } catch (err) {
+      next(err);
+    }
+  },
+
+  async refreshToken(req, res, next) {
+    try {
+      const oldRefreshToken = req.cookies.refreshToken;
+      const { accessToken, refreshToken: newRefreshToken } =
+        await AuthService.refreshAccessToken(oldRefreshToken);
+
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json({ accessToken });
     } catch (err) {
       next(err);
     }

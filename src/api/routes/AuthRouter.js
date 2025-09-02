@@ -6,5 +6,5 @@ const router = express.Router();
 
 router.post("/register", hassingPassword(), AuthController.signup);
 router.post("/login", AuthController.login); // 나중에 user 유효성 검사 추가
-
+router.post("/refresh-token", AuthController.refreshToken);
 export default router;

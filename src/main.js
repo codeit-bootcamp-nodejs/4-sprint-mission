@@ -5,6 +5,7 @@ import CommentRouter from "./api/routes/CommentRouter.js";
 import errorHandler from "./api/middlewares/errorHandler.js";
 import imageRouter from "./api/routes/ImageRouter.js";
 import AuthRouter from "./api/routes/AuthRouter.js";
+import cookieParser from "cookie-parser";
 // import { testAllArticleService } from "./external/tests/testArticleService.js";
 // import { testAllProductService } from "./external/tests/testProductService.js";
 
@@ -15,6 +16,7 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/products", ProductRouter);
 app.use("/articles", ArticleRouter);
