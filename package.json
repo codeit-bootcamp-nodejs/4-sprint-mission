@@ -1,0 +1,26 @@
+{
+  "name": "4",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ammgree/4-sprint-mission.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ammgree/4-sprint-mission/issues"
+  },
+  "homepage": "https://github.com/ammgree/4-sprint-mission#readme",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0"
+  }
+}
