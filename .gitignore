@@ -11,3 +11,5 @@ sprintMission2/
 /generated/prisma
 
 .env
+
+/prisma/migrations
