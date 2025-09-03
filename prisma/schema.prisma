@@ -25,6 +25,7 @@ model User {
   products     Product[]
   articles     Article[]
   Comment      Comment[]
+  Like         Like[]
 }
 
 model Product {
@@ -38,7 +39,8 @@ model Product {
   Comment     Comment[]
 
   userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like   Like[]
 
   @@map("products")
 }
@@ -52,7 +54,8 @@ model Article {
   Comment   Comment[]
 
   userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Like   Like[]
 
   @@map("articles")
 }
@@ -72,4 +75,22 @@ model Comment {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  articleId Int?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, articleId])
+  @@unique([userId, productId])
+  @@map("likes")
 }

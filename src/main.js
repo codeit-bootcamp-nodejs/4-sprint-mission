@@ -6,7 +6,9 @@ import errorHandler from "./api/middlewares/errorHandler.js";
 import imageRouter from "./api/routes/ImageRouter.js";
 import AuthRouter from "./api/routes/AuthRouter.js";
 import MypageRouter from "./api/routes/MypageRouter.js";
+import LikeRouter from "./api/routes/LikeRouter.js";
 import cookieParser from "cookie-parser";
+
 // import { testAllArticleService } from "./external/tests/testArticleService.js";
 // import { testAllProductService } from "./external/tests/testProductService.js";
 
@@ -23,6 +25,7 @@ app.use("/products", ProductRouter);
 app.use("/articles", ArticleRouter);
 app.use("/comments", CommentRouter);
 app.use("/mypage", MypageRouter);
+app.use("/likes", LikeRouter);
 
 app.use("/uploads", express.static("uploads"));
 app.use("/images", imageRouter);
