@@ -1,5 +1,6 @@
 import articleRouter from "./router/article-router.js";
 import productRouter from "./router/product-router.js";
+import userRouter from "./router/user-router.js";
 import fileRouter from "./file.js";
 
 import cors from 'cors';
@@ -12,6 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/user', userRouter);
 app.use('/article', articleRouter);
 app.use('/product', productRouter);
 app.use('/upload',fileRouter);
