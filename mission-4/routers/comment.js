@@ -1,15 +1,18 @@
-import express from 'express';
-import { deleteComment, patchComment, getCommentList, createComment } from '../services/commentService.js';
+import express from "express";
+import commnetValidator from "../middlewares/commentValidator.js";
+import CommentController from "../controllers/commentController.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const commentRouter = express.Router();
 
+// prettier-ignore
 commentRouter.route('/')
-    .get(getCommentList())
-    .post(createComment())
-    
-    
+    .get(commnetValidator(), asyncHandler(CommentController.getCommentList))
+    .post(commnetValidator(), asyncHandler(CommentController.postComment))
+
+// prettier-ignore
 commentRouter.route('/:id')
-    .patch(patchComment())
-    .delete(deleteComment())
+    .patch(commnetValidator(), asyncHandler(CommentController.patchComment))
+    .delete(commnetValidator(), asyncHandler(CommentController.deleteComment))
 
 export default commentRouter;
