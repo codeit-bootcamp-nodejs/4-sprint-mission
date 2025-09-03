@@ -1,5 +1,5 @@
 import { isValid } from "zod/v3";
-import prisma from "../prismaClient.js";
+import prisma from "../libs/prismaClient.js";
 
 const ArticleService = {
   async createArticle(articleData, userId) {

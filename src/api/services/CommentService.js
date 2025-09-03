@@ -1,4 +1,4 @@
-import prisma from "../prismaClient.js";
+import prisma from "../libs/prismaClient.js";
 
 const CommentService = {
   async createComment({ content, productId, articleId, userId }) {
