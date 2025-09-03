@@ -36,7 +36,7 @@ const ArticleController = {
           const decoded = jwt.verify(token, JWT_SECRET);
           userId = decoded.userId;
         } catch (err) {
-          console.log("로그인되지 않은 사용자입니다(유효하지 않은 토큰)");
+          console.error("토큰 검증 오류:", err);
         }
       }
       const article = await ArticleService.findUniqueArticle(articleId, userId);
