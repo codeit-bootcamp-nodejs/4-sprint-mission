@@ -1,12 +1,6 @@
 import express from 'express';
-import { productController } from '../controllers/productController.js';
-import {
-  validateId,
-  validateCommentId,
-  validateProductData,
-  validateCommentData,
-  validateProductUpdateData,
-} from '../middlewares/validation.js';
+import { productController } from '../controllers/product-controller.js';
+import { validation } from '../middlewares/validation.js';
 
 const router = express.Router();
 
@@ -14,28 +8,40 @@ const router = express.Router();
 router
   .route('/')
   .get(productController.getAllProducts)
-  .post(validateProductData, productController.createProduct);
+  .post(validation.validateProductData, productController.createProduct);
 
 router
   .route('/:id')
-  .get(validateId, productController.getProductById)
-  .patch(validateId, validateProductUpdateData, productController.updateProduct)
-  .delete(validateId, productController.deleteProduct);
+  .get(validation.validateId, productController.getProductById)
+  .patch(
+    validation.validateId,
+    validation.validateProductUpdateData,
+    productController.updateProduct
+  )
+  .delete(validation.validateId, productController.deleteProduct);
 
 // 댓글
 router
   .route('/:id/comments')
-  .get(validateId, productController.getComments)
-  .post(validateId, validateCommentData, productController.createComment);
+  .get(validation.validateId, productController.getComments)
+  .post(
+    validation.validateId,
+    validation.validateCommentData,
+    productController.createComment
+  );
 
 router
   .route('/:id/comments/:commentId')
-  .get(validateId, validateCommentId, productController.getCommentById)
+  .get(
+    validation.validateId,
+    validation.validateCommentId,
+    productController.getCommentById
+  )
   .patch(
-    validateCommentId,
-    validateCommentData,
+    validation.validateCommentId,
+    validation.validateCommentData,
     productController.updateComment
   )
-  .delete(validateCommentId, productController.deleteComment);
+  .delete(validation.validateCommentId, productController.deleteComment);
 
 export default router;

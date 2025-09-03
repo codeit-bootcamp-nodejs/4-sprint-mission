@@ -1,0 +1,40 @@
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import prisma from '../lib/prismaClient.js';
+import {
+  JWT_ACCESS_TOKEN_SECRET,
+  // JWT_REFRESH_TOKEN_SECRET,
+} from '../constants.js';
+
+const accessTokenOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: JWT_ACCESS_TOKEN_SECRET,
+};
+
+// const refreshTokenOptions = {
+//   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//   secretOrKey: JWT_REFRESH_TOKEN_SECRET,
+// };
+
+async function jwtVerify(payload, done) {
+  console.log('JWT payload received:', payload); // 🔥 여기
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+    console.log('User found:', user); // 🔥 여기
+    done(null, user);
+  } catch (error) {
+    console.error('Error in jwtVerify:', error); // 🔥 여기
+    done(error, false);
+  }
+}
+
+export const accessTokenStrategy = new JwtStrategy(
+  accessTokenOptions,
+  jwtVerify
+);
+
+// export const refreshTokenStrategy = new JwtStrategy(
+//   refreshTokenOptions,
+//   jwtVerify
+// );

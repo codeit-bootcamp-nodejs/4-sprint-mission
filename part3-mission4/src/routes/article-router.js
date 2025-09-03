@@ -1,13 +1,13 @@
 import express from 'express';
-import { articleController } from '../controllers/articleController.js';
-import { validateArticleData } from '../middlewares/validation.js';
+import { articleController } from '../controllers/article-controller.js';
+import { validation } from '../middlewares/validation.js';
 
 const router = express.Router();
 
 router
   .route('/')
   .get(articleController.getAllArticles)
-  .post(validateArticleData, articleController.createArticle);
+  .post(validation.validateArticleData, articleController.createArticle);
 
 router
   .route('/:id')
