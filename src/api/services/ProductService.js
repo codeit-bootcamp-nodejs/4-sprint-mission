@@ -1,9 +1,9 @@
 import prisma from "../prismaClient.js";
 
 const ProductService = {
-  async createProduct(productData) {
+  async createProduct(productData, userId) {
     const newProduct = await prisma.product.create({
-      data: productData,
+      data: { ...productData, userId },
     });
     return newProduct;
   },
@@ -15,16 +15,29 @@ const ProductService = {
     return product;
   },
 
-  async patchProduct(id, updateData) {
-    const product = await prisma.product.update({
+  async patchProduct(id, updateData, userId) {
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (product.userId != userId) {
+      const error = new Error("상품을 수정할 권한이 없습니다.");
+      error.statusCode = 403;
+      throw error;
+    }
+    return await prisma.product.update({
       where: { id },
       data: updateData,
     });
-    return product;
   },
 
-  async deleteProduct(id) {
-    await prisma.product.delete({
+  async deleteProduct(id, userId) {
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (product.userId !== userId) {
+      const error = new Error("상품을 삭제할 권한이 없습니다.");
+      error.statusCode = 403;
+      throw error;
+    }
+    return await prisma.product.delete({
       where: { id },
     });
   },

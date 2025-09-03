@@ -3,9 +3,13 @@ import ProductService from "../services/ProductService.js";
 const ProductController = {
   async createProduct(req, res, next) {
     try {
+      const { id: userId } = req.user;
       const { name, description, price, tags } = req.body;
       const productData = { name, description, price, tags };
-      const newProduct = await ProductService.createProduct(productData);
+      const newProduct = await ProductService.createProduct(
+        productData,
+        userId
+      );
 
       res.status(201).json(newProduct);
     } catch (err) {
@@ -32,9 +36,14 @@ const ProductController = {
   async patchProduct(req, res, next) {
     try {
       const { id } = req.params;
+      const { id: userId } = req.user;
       const updateData = req.body;
 
-      const product = await ProductService.patchProduct(Number(id), updateData);
+      const product = await ProductService.patchProduct(
+        Number(id),
+        updateData,
+        userId
+      );
       if (!product) {
         return res.status(404).json({ error: "수정할 상품이 없음" });
       }
@@ -47,7 +56,8 @@ const ProductController = {
   async deleteProduct(req, res, next) {
     try {
       const { id } = req.params;
-      await ProductService.deleteProduct(Number(id));
+      const { id: userId } = req.user;
+      await ProductService.deleteProduct(Number(id), userId);
 
       res.status(201).json({ success: "상품 삭제 성공" });
     } catch (err) {

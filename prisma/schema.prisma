@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
   nickname     String
   image        String?
   password     String
   refreshToken String?
-  createAt     DateTime @default(now())
-  updateAt     DateTime @updatedAt
+  createAt     DateTime  @default(now())
+  updateAt     DateTime  @updatedAt
+  products     Product[]
 }
 
 model Product {
@@ -33,6 +34,9 @@ model Product {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   Comment     Comment[]
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
