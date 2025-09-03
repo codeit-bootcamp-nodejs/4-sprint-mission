@@ -1,4 +1,7 @@
 import ProductService from "../services/ProductService.js";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const ProductController = {
   async createProduct(req, res, next) {
@@ -21,12 +24,21 @@ const ProductController = {
     try {
       //throw new Error("🔥에러 핸들러 테스트");
       const { id } = req.params;
-      const product = await ProductService.findUniqueProduct(Number(id));
+      const productId = Number(id);
 
-      if (!product) {
-        return res.status(404).json({ error: "해당 상품을 찾을 수 없음" });
+      let userId = null;
+      const token = req.cookies.accessToken;
+
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET);
+          userId = decoded.userId;
+        } catch (err) {
+          console.error("토큰 검증 오류:", err);
+        }
       }
 
+      const product = await ProductService.findUniqueProduct(productId, userId);
       res.status(200).json(product);
     } catch (err) {
       next(err);

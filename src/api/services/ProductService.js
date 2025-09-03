@@ -8,11 +8,19 @@ const ProductService = {
     return newProduct;
   },
 
-  async findUniqueProduct(id) {
+  async findUniqueProduct(productId, userId) {
     const product = await prisma.product.findUnique({
-      where: { id },
+      where: { id: productId },
     });
-    return product;
+
+    if (!userId) {
+      return { ...product, isLiked: false };
+    }
+
+    const like = await prisma.like.findFirst({
+      where: { userId, productId },
+    });
+    return { ...product, isLiked: !!like };
   },
 
   async patchProduct(id, updateData, userId) {
