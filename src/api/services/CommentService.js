@@ -1,27 +1,43 @@
 import prisma from "../prismaClient.js";
 
 const CommentService = {
-  async createComment({ content, productId, articleId }) {
+  async createComment({ content, productId, articleId, userId }) {
     const newComment = await prisma.comment.create({
       data: {
         content,
         productId: productId || null,
         articleId: articleId || null,
+        userId,
       },
     });
     return newComment;
   },
 
-  async updateComment(id, updateData) {
-    const comment = await prisma.comment.update({
+  async updateComment(id, updateData, userId) {
+    const comment = await prisma.comment.findUnique({ where: { id } });
+
+    if (comment.userId != userId) {
+      const error = new Error("댓글을 수정할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
+    return await prisma.comment.update({
       where: { id },
       data: updateData,
     });
-    return comment;
   },
 
-  async deleteComment(id) {
-    await prisma.comment.delete({
+  async deleteComment(id, userId) {
+    const comment = await prisma.comment.findUnique({ where: { id } });
+
+    if (comment.userId != userId) {
+      const error = new Error("댓글을 삭제할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
+    return await prisma.comment.delete({
       where: { id },
     });
   },

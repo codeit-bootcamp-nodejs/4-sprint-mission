@@ -3,6 +3,7 @@ import CommentService from "../services/CommentService.js";
 const CommentController = {
   async createComment(req, res, next) {
     try {
+      const { id: userId } = req.user;
       const { content, productId, articleId } = req.body;
 
       if (!content || (!productId && !articleId)) {
@@ -19,6 +20,7 @@ const CommentController = {
         content,
         productId,
         articleId,
+        userId,
       });
       res.status(201).json(newComment);
     } catch (err) {
@@ -32,12 +34,14 @@ const CommentController = {
 
   async updateComment(req, res, next) {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
       const updateData = req.body;
 
       const comment = await CommentService.updateComment(
         Number(id),
-        updateData
+        updateData,
+        userId
       );
       res.status(201).json(comment, next);
     } catch (err) {
@@ -50,8 +54,9 @@ const CommentController = {
 
   async deleteComment(req, res, next) {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
-      await CommentService.deleteComment(Number(id));
+      await CommentService.deleteComment(Number(id), userId);
       res.status(201).json({ success: "댓글 삭제" });
     } catch (err) {
       if (err.code === "P2025") {
