@@ -1,24 +1,22 @@
-import express from 'express';
-import productRouter from './routers/product.js';
-import articleRouter from './routers/article.js';
-import jsonErrorHandler from './middlewares/jsonErrorHandler.js';
-import fileRouter from './routers/file.js';
-import cors from 'cors';
+import express from "express";
+import router from "./routers/index.js";
+import errorHandler from "./middlewares/errorHandler.js";
+import cors from "cors";
+import morgan from "morgan";
 
 const app = express();
 const PORT = 3000;
 
-app.use(cors())
+app.use(cors());
 app.use(express.json());
-app.use(express.static('uploads'));
-app.use(express.urlencoded({ extended: true }))
+app.use(morgan("dev"));
+app.use("/uploads", express.static("uploads"));
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/product', productRouter);
-app.use('/article', articleRouter);
-app.use('/uploads', fileRouter);
+app.use(router);
 
-app.use(jsonErrorHandler);
+app.use(errorHandler);
 
-app.listen(PORT, ()=>{
-    console.log(`서버가 ${PORT}에서 실행중입니다.`)
+app.listen(PORT, () => {
+  console.log(`서버가 ${PORT}에서 실행중입니다.`);
 });

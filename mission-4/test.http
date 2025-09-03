@@ -1,10 +1,10 @@
 // Product tests
 
 ### 상품 목록 조회
-GET http://localhost:3000/product?page=0&keyword=&nums=
+GET http://localhost:3000/product?page=1&keyword=&pageSize=
 
 ### 상품 단건 조회
-GET http://localhost:3000/product/7
+GET http://localhost:3000/product/4
 
 ### 상품 생성
 POST http://localhost:3000/product
@@ -18,7 +18,7 @@ Content-Type: application/json
 }
 
 ### 상품 수정
-PATCH http://localhost:3000/product/13
+PATCH http://localhost:3000/product/4
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### 상품 삭제
-DELETE http://localhost:3000/product/13
+DELETE http://localhost:3000/product/4
 
 // Article tests
 
@@ -35,31 +35,31 @@ DELETE http://localhost:3000/product/13
 GET http://localhost:3000/article?page=0&keyword=
 
 ### 게시글 단건 조회
-GET http://localhost:3000/article/3
+GET http://localhost:3000/article/4
 
 ### 게시글 생성
 POST http://localhost:3000/article
 Content-Type: application/json
 
 {
-  "title": "Express와 Prisma를 활용하여 api 만들기",
+  "title": "mission3 리팩토링3",
   "content": "이 게시글은 테스트용입니다."
 }
 
 ### 게시글 수정
-PATCH http://localhost:3000/article/9
+PATCH http://localhost:3000/article/4
 Content-Type: application/json
 
 {
-  "title": "게시글 수정하기",
+  "title": "mission3 리팩토링",
   "content": "내용을 수정 했습니다."
 }
 
 ### 게시글 삭제
-DELETE http://localhost:3000/article/10
+DELETE http://localhost:3000/article/4
 
 ### 게시글 댓글 작성
-POST http://localhost:3000/article/3/comment
+POST http://localhost:3000/article/5/comment
 Content-Type: application/json
 
 {
@@ -67,10 +67,10 @@ Content-Type: application/json
 }
 
 ### 게시글 댓글 목록 조회
-GET http://localhost:3000/article/3/comment?page=0&cursorId=3
+GET http://localhost:3000/article/5/comment?page=0&cursorId=
 
 ### 게시글 댓글 수정
-PATCH http://localhost:3000/article/3/comment/3
+PATCH http://localhost:3000/article/5/comment/3
 Content-Type: application/json
 
 {
@@ -78,10 +78,10 @@ Content-Type: application/json
 }
 
 ### 게시글 댓글 삭제
-DELETE http://localhost:3000/article/3/comment/10
+DELETE http://localhost:3000/article/5/comment/3
 
 ### 상품 댓글 작성
-POST http://localhost:3000/product/3/comment
+POST http://localhost:3000/product/5/comment
 Content-Type: application/json
 
 {
@@ -89,10 +89,10 @@ Content-Type: application/json
 }
 
 ### 상품 댓글 목록 조회
-GET http://localhost:3000/product/3/comment?cursorId=3
+GET http://localhost:3000/product/5/comment?cursorId=
 
 ### 상품 댓글 수정
-PATCH http://localhost:3000/product/3/comment/6
+PATCH http://localhost:3000/product/5/comment/4
 Content-Type: application/json
 
 {
@@ -100,9 +100,9 @@ Content-Type: application/json
 }
 
 ### 상품 댓글 삭제
-DELETE http://localhost:3000/product/3/comment/11
+DELETE http://localhost:3000/product/5/comment/4
 
-### 파일 업로드 테스트
+### 파일 업로드 테스트 -> 현재 이미지 업로드만 가능하게 유효성 추가해놔서 오류 발생
 POST http://localhost:3000/uploads
 Content-Type: multipart/form-data; boundary=Boundary01234567890123456789
 
@@ -124,12 +124,5 @@ Content-Type: image/png
 < ./testdog.png
 --Boundary01234567890123456789--
 
-### 불러와보기
-GET http://localhost:3000/uploads/c7b65d682ca05341cee88976b333a2c3
-
-
-
-
-
-
-
+### 이미지 삭제 테스트
+DELETE http://localhost:3000/uploads/1
