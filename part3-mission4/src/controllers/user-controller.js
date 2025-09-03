@@ -30,13 +30,24 @@ class UserController {
   }
 
   async updateUserProfile(req, res) {
-    const { username, password, email, images } = req.body; // 수정할 필드만 뽑음
-    const updateData = { username, password, email, images };
+    const { username, email, images } = req.body; // 수정할 필드만 뽑음
+    const updateData = { username, email, images };
     const updated = await userService.updateUserProfile(
       req.user.id,
       updateData
     );
     res.status(200).json({ updated, message: '프로필 수정 완료!' });
+  }
+
+  async updatePassword(req, res) {
+    const { currentPassword, newPassword, newPasswordConfirm } = req.body;
+    if (newPassword !== newPasswordConfirm) {
+      return res
+        .status(400)
+        .json({ message: '새 비밀번호가 일치하지 않습니다.' });
+    }
+    await userService.updatePassword(req.user.id, currentPassword, newPassword);
+    res.status(200).json({ message: '비밀번호가 변경되었습니다.' });
   }
 }
 

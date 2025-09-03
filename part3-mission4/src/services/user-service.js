@@ -45,9 +45,6 @@ class UserService {
   }
 
   async updateUserProfile(userId, updateData) {
-    if (updateData.password) {
-      updateData.password = await bcrypt.hash(updateData.password, 10);
-    }
     const updateUserProfile = await prisma.user.update({
       where: { id: userId },
       data: updateData,
@@ -58,6 +55,40 @@ class UserService {
       },
     });
     return updateUserProfile;
+  }
+
+  // async updatePassword(userId, currentPassword, newPassword) {
+  //   const user = await prisma.user.findUnique({ where: { id: userId } });
+  //   const isValid = await bcrypt.compare(currentPassword, user.password);
+  //   if (!isValid) throw new Error('현재 비밀번호가 일치하지 않습니다.');
+
+  //   const hashed = await bcrypt.hash(newPassword, 10);
+  //   return prisma.user.update({
+  //     where: { id: userId },
+  //     data: { password: hashed },
+  //   });
+  // }
+
+  async updatePassword(userId, currentPassword, newPassword) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    console.log('입력한 currentPassword:', currentPassword);
+    console.log('DB에 저장된 user.password (해시):', user.password);
+
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    console.log('bcrypt.compare 결과:', isValid);
+
+    if (!isValid) throw new Error('현재 비밀번호가 일치하지 않습니다.');
+
+    const isSameAsOld = await bcrypt.compare(newPassword, user.password);
+    if (isSameAsOld) throw new Error('기존 비밀번호로는 변경할 수 없습니다.');
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    console.log('새 비밀번호 해시:', hashed);
+
+    return prisma.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
   }
 
   setTokenCookies(res, accessToken, refreshToken) {
