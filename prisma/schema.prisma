@@ -24,6 +24,7 @@ model User {
   updateAt     DateTime  @updatedAt
   products     Product[]
   articles     Article[]
+  Comment      Comment[]
 }
 
 model Product {
@@ -66,6 +67,9 @@ model Comment {
 
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int?
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }
