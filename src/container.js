@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { ProductController } from './controller/index.js';
-import { ProductService } from './service/index.js';
-import { ProductRepository } from './repository/index.js';
+import { ProductController, ArticleController } from './controller/index.js';
+import { ProductService, ArticleService } from './service/index.js';
+import { ProductRepository, ArticleRepository } from './repository/index.js';
 
 const prisma = new PrismaClient();
 
@@ -9,13 +9,17 @@ const prisma = new PrismaClient();
 
 // Repository
 const productRepository = new ProductRepository(prisma);
+const articleRepository = new ArticleRepository(prisma);
 
 // Service
 const productService = new ProductService(productRepository, prisma);
+const articleService = new ArticleService(articleRepository, prisma);
 
 // controller
 const productController = new ProductController(productService);
+const articleController = new ArticleController(articleService);
 
 export default {
   productController,
+  articleController,
 };
