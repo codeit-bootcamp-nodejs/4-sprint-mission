@@ -1,5 +1,5 @@
-import ArticleRouter  from "./ArticleApi.js";
-import ProductRouter from "./ProductApi.js";
+import articleRouter from "./router/article-router.js";
+import productRouter from "./router/product-router.js";
 import fileRouter from "./file.js";
 
 import cors from 'cors';
@@ -9,19 +9,18 @@ import 'dotenv/config';
 
 const app = express();
 
-
 app.use(cors());
 app.use(express.json());
-app.use('/article', ArticleRouter);
-app.use('/product', ProductRouter);
+
+app.use('/article', articleRouter);
+app.use('/product', productRouter);
 app.use('/upload',fileRouter);
+
 app.use( (err,req,res,next) =>{
     if (err){
         res.json( err.message|| "Server Error Occured");
     }
 })
-
-// console.log(process.env.DATABASE_URL)
 
 app.listen(3000, () =>{
     console.log("server is running at http://localhost:3000")
