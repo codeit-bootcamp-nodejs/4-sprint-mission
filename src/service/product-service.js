@@ -30,19 +30,21 @@ export class ProductService {
 
     const offset = (page - 1) * limit;
 
-    const [products, totalCount] = await prisma.$transaction(async (tx) => {
-      const products = await this.productRepository.findManyProducts(
-        whereCondition,
-        offset,
-        limit,
-        tx,
-      );
-      const totalCount = await this.productRepository.countProducts(
-        whereCondition,
-        tx,
-      );
-      return [products, totalCount];
-    });
+    const [products, totalCount] = await this.prisma.$transaction(
+      async (tx) => {
+        const products = await this.productRepository.findManyProducts(
+          whereCondition,
+          offset,
+          limit,
+          tx,
+        );
+        const totalCount = await this.productRepository.countProducts(
+          whereCondition,
+          tx,
+        );
+        return [products, totalCount];
+      },
+    );
 
     const totalPages = Math.ceil(totalCount / limit);
 
