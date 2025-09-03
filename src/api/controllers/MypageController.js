@@ -45,6 +45,17 @@ const MypageController = {
       next(err);
     }
   },
+
+  async getLikeProducts(req, res, next) {
+    try {
+      const { id: userId } = req.user;
+
+      const products = await MypageService.getLikeProducts(userId);
+      res.status(200).json(products);
+    } catch (err) {
+      next(err);
+    }
+  },
 };
 
 export default MypageController;
