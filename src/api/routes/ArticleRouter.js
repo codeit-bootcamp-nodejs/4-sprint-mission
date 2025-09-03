@@ -1,6 +1,6 @@
 import express from "express";
 import ArticleController from "../controllers/ArticleController.js";
-import validateArticle from "../middlewares/validateArticle.js";
+import validateArticle from "../middlewares/validators/validateArticle.js";
 import authenticate from "../middlewares/authenticate.js";
 
 const router = express.Router();
