@@ -25,6 +25,10 @@ const AuthController = {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
+      res.cookie("accessToken", accessToken, {
+        maxAge: 1 * 60 * 60 * 1000,
+      });
+
       res.status(200).json({ user, accessToken, refreshToken });
     } catch (err) {
       next(err);
@@ -37,9 +41,14 @@ const AuthController = {
       const { accessToken, refreshToken: newRefreshToken } =
         await AuthService.refreshAccessToken(oldRefreshToken);
 
+      // 쿠키에 토큰 저장
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.cookie("accessToken", accessToken, {
+        maxAge: 1 * 60 * 60 * 1000,
       });
 
       res.status(200).json({ accessToken });
