@@ -2,7 +2,7 @@ export class ProductService {
   // 생성자에서 ProductRepository와 prisma 클라이언트를 주입받습니다.
   constructor(productRepository, prisma) {
     this.productRepository = productRepository;
-    this.prisma;
+    this.prisma = prisma;
   }
 
   // 상품 생성
