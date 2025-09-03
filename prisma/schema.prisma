@@ -23,6 +23,7 @@ model User {
   createAt     DateTime  @default(now())
   updateAt     DateTime  @updatedAt
   products     Product[]
+  articles     Article[]
 }
 
 model Product {
@@ -48,6 +49,9 @@ model Article {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Comment   Comment[]
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("articles")
 }

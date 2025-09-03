@@ -1,9 +1,9 @@
 import prisma from "../prismaClient.js";
 
 const ArticleService = {
-  async createArticle(articleData) {
+  async createArticle(articleData, userId) {
     const newArticle = await prisma.article.create({
-      data: articleData,
+      data: { ...articleData, userId },
     });
     return newArticle;
   },
@@ -15,15 +15,30 @@ const ArticleService = {
     return article;
   },
 
-  async updateArticle(id, updateData) {
-    const article = await prisma.article.update({
+  async updateArticle(id, updateData, userId) {
+    const article = await prisma.article.findUnique({ where: { id } });
+
+    if (article.userId != userId) {
+      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    return await prisma.article.update({
       where: { id },
       data: updateData,
     });
-    return article;
   },
 
-  async deleteArticle(id) {
+  async deleteArticle(id, userId) {
+    const article = await prisma.article.findUnique({ where: { id } });
+
+    if (article.userId != userId) {
+      const error = new Error("게시글을 삭제할 권한이 없습니다.");
+      error.statusCode = 403;
+      throw error;
+    }
+
     await prisma.article.delete({
       where: { id },
     });
