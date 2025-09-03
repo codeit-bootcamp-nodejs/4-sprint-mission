@@ -1,6 +1,7 @@
 import prisma from "../prismaClient.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -24,6 +25,11 @@ const AuthService = {
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
+  },
+
+  // 토큰 해싱 메서드 정의
+  hashToken(token) {
+    return crypto.createHash("sha256").update(token).digest("hex");
   },
 
   async login(loginData) {
@@ -57,9 +63,11 @@ const AuthService = {
       expiresIn: "7d",
     });
 
+    const hashedRefreshToken = this.hashToken(refreshToken);
+
     await prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken },
+      data: { refreshToken: hashedRefreshToken },
     });
 
     const { password: _, ...userWithoutPassword } = user;
@@ -67,12 +75,15 @@ const AuthService = {
     return { userWithoutPassword, accessToken, refreshToken };
   },
 
+  // AcessToken & RefreshToken을 재발급 받는 코드
   async refreshAccessToken(oldRefreshToken) {
     if (!oldRefreshToken) {
       const error = new Error("Refresh Token이 제공되지 않았습니다.");
       error.statusCode = 401;
       throw error;
     }
+
+    const hashedOldRefreshToken = this.hashToken(oldRefreshToken);
 
     try {
       const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET);
@@ -82,7 +93,7 @@ const AuthService = {
         where: { id: userId },
       });
 
-      if (!user || user.refreshToken !== oldRefreshToken) {
+      if (!user || user.refreshToken !== hashedOldRefreshToken) {
         const error = new Error("유효하지 않은 Refresh Token입니다.");
         error.statusCode = 403;
         throw error;
@@ -98,9 +109,11 @@ const AuthService = {
         expiresIn: "7d",
       })
 
+      const hashedNewRefreshToken = this.hashToken(newRefreshToken);
+
       await prisma.user.update({
         where: { id: user.id },
-        data: { refreshToken: newRefreshToken },
+        data: { refreshToken: hashedNewRefreshToken },
       });
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
