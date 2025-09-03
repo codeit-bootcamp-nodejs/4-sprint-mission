@@ -75,6 +75,20 @@ const MypageService = {
 
     return products;
   },
+
+  async getLikeProducts(userId) {
+    const likedProducts = await prisma.like.findMany({
+      where: { userId, productId: { not: null } },
+      include: {
+        product: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return likedProducts.map((like) => like.product);
+  },
 };
 
 export default MypageService;
