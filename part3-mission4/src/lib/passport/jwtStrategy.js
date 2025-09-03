@@ -1,5 +1,5 @@
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import prisma from '../lib/prismaClient.js';
+import prisma from '../prismaClient.js';
 import {
   JWT_ACCESS_TOKEN_SECRET,
   // JWT_REFRESH_TOKEN_SECRET,

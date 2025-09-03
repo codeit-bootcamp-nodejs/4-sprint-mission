@@ -1,5 +1,5 @@
 import passport from 'passport';
-import prisma from '../lib/prismaClient.js';
+import prisma from '../prismaClient.js';
 import { localStrategy } from './localStrategy.js';
 import {
   accessTokenStrategy,

@@ -1,4 +1,4 @@
-import { userService } from '../services/user-service';
+import { userService } from '../services/user-service.js';
 
 class UserController {
   async register(req, res) {
@@ -8,6 +8,17 @@ class UserController {
       data: user,
       message: '회원 가입 성공!',
     });
+  }
+
+  async login(req, res) {
+    const { accessToken, refreshToken } = await userService.login(req.user.id);
+    userService.setTokenCookies(res, accessToken, refreshToken);
+    res.status(200).json({ token: accessToken, message: '로그인 되었습니다.' });
+  }
+
+  logout(req, res) {
+    userService.clearTokenCookies(res);
+    res.status(200).send({ message: '로그아웃 되었습니다.' });
   }
 }
 

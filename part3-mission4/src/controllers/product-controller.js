@@ -1,5 +1,5 @@
-import { productService } from '../services/productService';
-import { commentService } from '../services/commentService';
+import { productService } from '../services/product-service.js';
+import { commentService } from '../services/comment-service.js';
 
 class ProductController {
   // 제품

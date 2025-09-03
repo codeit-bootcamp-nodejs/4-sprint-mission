@@ -1,21 +1,23 @@
+import prisma from '../lib/prismaClient.js';
+
 class Validation {
-  validateId = (req, res, next) => {
+  validateId(req, res, next) {
     const paramValue = req.params.id;
     if (!paramValue || isNaN(parseInt(paramValue))) {
       return res.status(400).json({ message: '잘못된 ID 형식입니다.' });
     }
     next();
-  };
+  }
 
-  validateCommentId = (req, res, next) => {
+  validateCommentId(req, res, next) {
     const paramValue = req.params.commentId;
     if (!paramValue || isNaN(parseInt(paramValue))) {
       return res.status(400).json({ message: '잘못된 댓글 ID 형식입니다.' });
     }
     next();
-  };
+  }
 
-  validateProductData = (req, res, next) => {
+  validateProductData(req, res, next) {
     const { name, description, price } = req.body;
     if (!name || !description || !price) {
       return res.status(400).json({
@@ -23,9 +25,9 @@ class Validation {
       });
     }
     next();
-  };
+  }
 
-  validateArticleData = (req, res, next) => {
+  validateArticleData(req, res, next) {
     const { title, content } = req.body;
     if (!title || !content) {
       return res.status(400).json({
@@ -33,9 +35,9 @@ class Validation {
       });
     }
     next();
-  };
+  }
 
-  validateCommentData = (req, res, next) => {
+  validateCommentData(req, res, next) {
     const { content } = req.body;
     if (!content) {
       return res.status(400).json({
@@ -43,9 +45,9 @@ class Validation {
       });
     }
     next();
-  };
+  }
 
-  validateArticleUpdateData = (req, res, next) => {
+  validateArticleUpdateData(req, res, next) {
     const { title, content, author } = req.body;
     if (!title && !content && !author) {
       return res.status(400).json({
@@ -54,9 +56,9 @@ class Validation {
       });
     }
     next();
-  };
+  }
 
-  validateProductUpdateData = (req, res, next) => {
+  validateProductUpdateData(req, res, next) {
     const { name, description, price, tags } = req.body;
     if (!name && !description && !price && !tags) {
       return res.status(400).json({
@@ -65,7 +67,18 @@ class Validation {
       });
     }
     next();
-  };
+  }
+
+  async validateUsername(req, res, next) {
+    const { username } = req.body;
+    const userCheck = await prisma.user.findUnique({
+      where: { username },
+    });
+    if (userCheck) {
+      return res.status(409).json({ message: '이미 사용 중인 닉네임입니다.' });
+    }
+    next();
+  }
 }
 
 export const validation = new Validation();

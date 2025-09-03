@@ -2,14 +2,15 @@ import multer from 'multer';
 import express from 'express';
 
 const router = express.Router();
+const app = express();
 
 // 404
-app.use((req, res) => {
+app.use((req, res, next) => {
   res.status(404).json({ message: '데이터를 찾을 수 없습니다.' });
 });
 
 // 500
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   console.error(err.stack);
   let statusCode = err.status || 500;
   let message = err.message || '서버 오류';
