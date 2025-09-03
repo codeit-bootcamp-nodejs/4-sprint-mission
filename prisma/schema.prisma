@@ -22,8 +22,8 @@ model User{
   password            String
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
-  products            Product[]
-  articles            Article[]
+  product             Product[]
+  article             Article[]
 }
 
  
