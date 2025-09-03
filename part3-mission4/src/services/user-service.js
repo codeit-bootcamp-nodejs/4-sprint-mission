@@ -24,6 +24,7 @@ class UserService {
     const { password: _, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
+
   async login(userId) {
     const { accessToken, refreshToken } = generateTokens(userId);
     console.log('Generated accessToken:', accessToken);
