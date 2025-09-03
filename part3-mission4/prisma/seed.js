@@ -1,57 +1,131 @@
 import 'dotenv/config';
-import { PrismaClient } from '../generated/prisma/index.js';
-
-const prisma = new PrismaClient();
+import prisma from '../src/lib/prismaClient.js';
 
 const main = async () => {
-  const newProduct = await prisma.product.create({
+  // 1️⃣ 유저 시드
+  const user1 = await prisma.user.create({
+    data: {
+      username: 'testuser1',
+      email: 'test1@example.com',
+      password: 'hashedpassword1',
+      images: [],
+    },
+  });
+
+  const user2 = await prisma.user.create({
+    data: {
+      username: 'testuser2',
+      email: 'test2@example.com',
+      password: 'hashedpassword2',
+      images: [],
+    },
+  });
+
+  // 2️⃣ 상품 시드 (총 3개)
+  const product1 = await prisma.product.create({
     data: {
       name: 'Nintendo Switch2',
       description: '아 스위치2 갖고 싶다',
       price: 650000,
       tags: ['전자제품'],
+      images: [],
+      user: { connect: { id: user1.id } },
     },
   });
-  const newArticle = await prisma.article.create({
+
+  const product2 = await prisma.product.create({
+    data: {
+      name: 'PlayStation 5',
+      description: '게임 끝판왕',
+      price: 750000,
+      tags: ['게임기'],
+      images: [],
+      user: { connect: { id: user2.id } },
+    },
+  });
+
+  const product3 = await prisma.product.create({
+    data: {
+      name: 'Xbox Series X',
+      description: 'MS 게임기',
+      price: 700000,
+      tags: ['게임기'],
+      images: [],
+      user: { connect: { id: user1.id } },
+    },
+  });
+
+  // 3️⃣ 게시글 시드 (총 3개)
+  const article1 = await prisma.article.create({
     data: {
       title: '스위치2 솔직히 너무 비싼듯 ㅇㅇ',
       content: 'ㅈㄱㄴ',
-    },
-  });
-  await prisma.comment.create({
-    data: {
-      content: '와 가격',
-      product: {
-        connect: { id: newProduct.id },
-      },
+      tags: ['리뷰'],
+      user: { connect: { id: user2.id } },
     },
   });
 
-  await prisma.comment.create({
+  const article2 = await prisma.article.create({
     data: {
-      content: '스위치2 존버 대성공 ㅋㅋ',
-      product: {
-        connect: { id: newProduct.id },
-      },
+      title: '플스5 성능 리뷰',
+      content: '가격만 빼면 마음에 드네',
+      tags: ['리뷰', '게임'],
+      user: { connect: { id: user1.id } },
     },
   });
 
-  await prisma.comment.create({
+  const article3 = await prisma.article.create({
     data: {
-      content: 'ㄹㅇ 쉽지않음 거의 플스5급 아님?',
-      article: {
-        connect: { id: newArticle.id },
-      },
+      title: '엑스박스 시리즈 X 후기',
+      content: '엑스박스 쳤다...',
+      tags: ['리뷰', '게임'],
+      user: { connect: { id: user2.id } },
     },
   });
 
-  await prisma.comment.create({
-    data: {
-      content: '플스5 프로 생각하면 또 선녀 같네',
-      article: {
-        connect: { id: newArticle.id },
+  // 4️⃣ 댓글 시드
+  await prisma.comment.createMany({
+    data: [
+      // Product1 댓글
+      { content: '와 가격', userId: user2.id, productId: product1.id },
+      {
+        content: '스위치2 존버 대성공 ㅋㅋ',
+        userId: user1.id,
+        productId: product1.id,
       },
-    },
+
+      // Product2 댓글
+      {
+        content: '플스5 진짜 사고 싶다',
+        userId: user1.id,
+        productId: product2.id,
+      },
+
+      // Product3 댓글
+      { content: '엑박도 좋음', userId: user2.id, productId: product3.id },
+
+      // Article1 댓글
+      {
+        content: 'ㄹㅇ 쉽지않음 거의 플스5급 아님?',
+        userId: user1.id,
+        articleId: article1.id,
+      },
+      {
+        content: '플스5 프로 생각하면 또 선녀 같네',
+        userId: user2.id,
+        articleId: article1.id,
+      },
+
+      // Article2 댓글
+      {
+        content: '성능 리뷰 잘 봤습니다',
+        userId: user2.id,
+        articleId: article2.id,
+      },
+
+      // Article3 댓글
+      { content: '엑박 후기 ㄳ', userId: user1.id, articleId: article3.id },
+    ],
   });
 };
 
