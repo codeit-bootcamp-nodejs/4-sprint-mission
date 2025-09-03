@@ -5,6 +5,7 @@ import CommentRouter from "./api/routes/CommentRouter.js";
 import errorHandler from "./api/middlewares/errorHandler.js";
 import imageRouter from "./api/routes/ImageRouter.js";
 import AuthRouter from "./api/routes/AuthRouter.js";
+import MypageRouter from "./api/routes/MypageRouter.js";
 import cookieParser from "cookie-parser";
 // import { testAllArticleService } from "./external/tests/testArticleService.js";
 // import { testAllProductService } from "./external/tests/testProductService.js";
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use("/products", ProductRouter);
 app.use("/articles", ArticleRouter);
 app.use("/comments", CommentRouter);
+app.use("/mypage", MypageRouter);
 
 app.use("/uploads", express.static("uploads"));
 app.use("/images", imageRouter);
