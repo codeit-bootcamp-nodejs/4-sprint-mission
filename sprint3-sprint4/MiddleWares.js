@@ -17,18 +17,4 @@ export function ProductValid(req,res,next){
 }
 
 
-export function ArticleValid(req,res,next){
-    // console.log('articlevalid first')
-    const {title, articleContent} = req.body;
-    if (!title ||!articleContent){
-        res.send("no title or articleContent");
-    }
-
-    if (title.length>50 ||articleContent.length>800 ){
-        res.send("too long or too short");
-    }
-
-    next();
-
-}
 
