@@ -82,6 +82,11 @@ class ArticleService {
     return prisma.article.update({
       where: { id: parseInt(id) },
       data: updateData,
+      select: {
+        title: true,
+        content: true,
+        tags: true,
+      },
     });
   }
 

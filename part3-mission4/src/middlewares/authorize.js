@@ -22,9 +22,18 @@ export const isCommentOwner = isOwner((req) =>
   prisma.comment.findUnique({ where: { id: +req.params.id } })
 );
 
-export const isUserSelf = isOwner((req) =>
-  prisma.user.findUnique({ where: { id: req.user.id } })
-);
+export const isUserSelf = async (req, res, next) => {
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+  if (!user)
+    return res.status(404).json({ message: '대상을 찾을 수 없습니다.' });
+
+  if (user.id !== req.user.id) {
+    return res.status(403).json({ message: '권한이 없습니다.' });
+  }
+
+  next();
+};
 
 export const verifyPassword = async (req, res, next) => {
   const { currentPassword } = req.body;

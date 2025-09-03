@@ -27,7 +27,8 @@ class ProductController {
 
   async updateProduct(req, res) {
     const { id } = req.params;
-    const { updateData } = req.body;
+    const { name, description, price, tags, images } = req.body;
+    const updateData = { name, description, price, tags, images };
     const updated = await productService.updateProduct(id, updateData);
     res.json(updated);
   }

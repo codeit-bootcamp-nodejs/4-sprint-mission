@@ -31,6 +31,35 @@ class UserService {
     return { accessToken, refreshToken };
   }
 
+  async getUserProfile(userId) {
+    const getUserProfile = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        images: true,
+      },
+    });
+    return getUserProfile;
+  }
+
+  async updateUserProfile(userId, updateData) {
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+    const updateUserProfile = await prisma.user.update({
+      where: { id: userId },
+      data: updateData,
+      select: {
+        username: true,
+        email: true,
+        images: true,
+      },
+    });
+    return updateUserProfile;
+  }
+
   setTokenCookies(res, accessToken, refreshToken) {
     res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,

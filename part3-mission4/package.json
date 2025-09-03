@@ -11,7 +11,8 @@
     "postinstall": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/app.js",
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "db:reset": "npx prisma migrate reset --skip-seed && npx prisma migrate dev && npx prisma db seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

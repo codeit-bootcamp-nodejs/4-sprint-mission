@@ -83,6 +83,13 @@ class ProductService {
     return prisma.product.update({
       where: { id: parseInt(id) },
       data: updateData,
+      select: {
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        images: true,
+      },
     });
   }
 

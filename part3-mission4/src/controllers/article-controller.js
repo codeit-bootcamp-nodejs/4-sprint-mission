@@ -23,7 +23,8 @@ class ArticleController {
 
   async updateArticle(req, res) {
     const { id } = req.params;
-    const { updateData } = req.body;
+    const { title, content, tags } = req.body;
+    const updateData = { title, content, tags };
     const updated = await articleService.updateArticle(id, updateData);
     res.json(updated);
   }

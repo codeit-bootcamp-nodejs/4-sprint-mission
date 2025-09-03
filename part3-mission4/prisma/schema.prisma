@@ -15,13 +15,16 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  image     String[]
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  email     String    @unique
+  images    String[]
   password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  products  Product[]
+  articles  Article[]
+  comments  Comment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Product {
@@ -30,7 +33,10 @@ model Product {
   description String
   price       Int
   tags        String[]
+  images      String[]
   comments    Comment[]
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -39,7 +45,9 @@ model Article {
   id        Int       @id @default(autoincrement())
   title     String
   content   String
-  author    String    @default("ㅇㅇ")
+  tags      String[]
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  Comment[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -48,9 +56,10 @@ model Article {
 model Comment {
   id        Int      @id @default(autoincrement())
   content   String
-  author    String   @default("ㅇㅇ")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   articleId Int?
   article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   productId Int?
