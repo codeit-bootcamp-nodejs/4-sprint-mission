@@ -1,8 +1,5 @@
-import jwt from "jsonwebtoken";
 import prisma from "../prismaClient.js";
 import bcrypt from "bcrypt";
-
-const JWT_SECRET = process.env.JWT_SECRET;
 
 const MypageService = {
   async getUser(userId) {
