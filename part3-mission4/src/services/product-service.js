@@ -98,6 +98,21 @@ class ProductService {
       where: { id: parseInt(id) },
     });
   }
+
+  async getUserProducts(userId) {
+    console.log(userId);
+    return prisma.product.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        images: true,
+      },
+    });
+  }
 }
 
 export const productService = new ProductService();

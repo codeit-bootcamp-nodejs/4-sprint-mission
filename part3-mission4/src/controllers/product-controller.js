@@ -71,6 +71,17 @@ class ProductController {
     await commentService.deleteComment(commentId);
     res.status(204).send();
   }
+
+  // 유저 제품 목록 조회
+  async getUserProducts(req, res) {
+    console.log('req.params.id:', req.params.id); // <- 여기 확인
+    const userId = +req.params.id; // 문자열 -> 숫자
+    if (userId !== req.user.id) {
+      return res.status(403).json({ message: '권한이 없습니다.' });
+    }
+    const products = await productService.getUserProducts(userId);
+    res.status(200).json({ products });
+  }
 }
 
 export const productController = new ProductController();
