@@ -1,4 +1,4 @@
-import prisma from "../prismaClient.js";
+import prisma from "../libs/prismaClient.js";
 
 const ProductService = {
   async createProduct(productData, userId) {

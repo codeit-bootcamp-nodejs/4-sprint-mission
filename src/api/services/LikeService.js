@@ -1,4 +1,4 @@
-import prisma from "../prismaClient.js";
+import prisma from "../libs/prismaClient.js";
 
 const LikeService = {
   async toggleLike(userId, type, contentId) {

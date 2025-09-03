@@ -1,4 +1,4 @@
-import prisma from "../prismaClient.js";
+import prisma from "../libs/prismaClient.js";
 import bcrypt from "bcrypt";
 
 const MypageService = {
