@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 
+import container from './src/container.js';
 import productsRouter from './routes/ProductRoute.js';
 import articlesRouter from './routes/ArticleRoute.js';
 import uploadsRouter from './routes/ImageRoute.js';
@@ -17,7 +18,9 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use('/products', productsRouter);
+const { productController } = container;
+
+app.use('/products', productsRouter(productController));
 app.use('/articles', articlesRouter);
 app.use('/comments', commentsRouter);
 app.use('/uploads', uploadsRouter);
