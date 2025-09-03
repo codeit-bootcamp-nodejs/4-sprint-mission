@@ -1,3 +1,4 @@
+import { isValid } from "zod/v3";
 import prisma from "../prismaClient.js";
 
 const ArticleService = {
@@ -8,11 +9,19 @@ const ArticleService = {
     return newArticle;
   },
 
-  async findUniqueArticle(id) {
+  async findUniqueArticle(articleId, userId) {
     const article = await prisma.article.findUnique({
-      where: { id },
+      where: { id: articleId },
     });
-    return article;
+
+    if (!userId) {
+      return { ...article, isLiked: false };
+    }
+
+    const like = await prisma.like.findFirst({
+      where: { userId, articleId },
+    });
+    return { ...article, isLiked: !!like };
   },
 
   async updateArticle(id, updateData, userId) {

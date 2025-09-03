@@ -1,4 +1,7 @@
 import ArticleService from "../services/ArticleService.js";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const ArticleController = {
   async createArticle(req, res, next) {
@@ -23,7 +26,20 @@ const ArticleController = {
   async findUniqueArticle(req, res, next) {
     try {
       const { id } = req.params;
-      const article = await ArticleService.findUniqueArticle(Number(id));
+      const articleId = Number(id);
+
+      let userId = null;
+      const token = req.cookies.accessToken;
+
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, JWT_SECRET);
+          userId = decoded.userId;
+        } catch (err) {
+          console.log("로그인되지 않은 사용자입니다(유효하지 않은 토큰)");
+        }
+      }
+      const article = await ArticleService.findUniqueArticle(articleId, userId);
       res.status(200).json(article);
     } catch (err) {
       next(err);
