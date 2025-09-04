@@ -16,7 +16,13 @@ class UserController {
   async login(req, res) {
     const { accessToken, refreshToken } = await userService.login(req.user.id);
     userService.setTokenCookies(res, accessToken, refreshToken);
-    res.status(200).json({ token: accessToken, message: '로그인 되었습니다.' });
+    res
+      .status(200)
+      .json({
+        accesstoken: accessToken,
+        refreshToken: refreshToken,
+        message: '로그인 되었습니다.',
+      });
   }
 
   logout(req, res) {

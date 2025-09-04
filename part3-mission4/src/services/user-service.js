@@ -1,12 +1,11 @@
 import prisma from '../lib/prismaClient.js';
 import bcrypt from 'bcrypt';
-import { generateTokens } from '../lib/token.js';
+import { verifyRefreshToken, generateTokens } from '../lib/token.js';
 import {
   NODE_ENV,
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
 } from '../lib/constants.js';
-
 import AppError from '../lib/appError.js';
 
 class UserService {
@@ -30,6 +29,7 @@ class UserService {
   async login(userId) {
     const { accessToken, refreshToken } = generateTokens(userId);
     console.log('생성된 엑세스 토큰:', accessToken);
+    console.log('생성된 리프레시 토큰:', refreshToken);
     return { accessToken, refreshToken };
   }
 
@@ -104,13 +104,21 @@ class UserService {
       httpOnly: true,
       secure: NODE_ENV === 'production',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      path: '/refresh',
+      path: '/auth/refresh',
     });
   }
 
   clearTokenCookies(res) {
     res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+  }
+
+  async refreshTokens(refreshToken, res) {
+    const { userId } = verifyRefreshToken(refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } =
+      generateTokens(userId);
+    this.setTokenCookies(res, accessToken, newRefreshToken);
+    return accessToken;
   }
 }
 

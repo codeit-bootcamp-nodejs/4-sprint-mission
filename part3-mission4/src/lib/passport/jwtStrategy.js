@@ -2,7 +2,7 @@ import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import prisma from '../prismaClient.js';
 import {
   JWT_ACCESS_TOKEN_SECRET,
-  // JWT_REFRESH_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_SECRET,
 } from '../constants.js';
 
 const accessTokenOptions = {
@@ -10,10 +10,10 @@ const accessTokenOptions = {
   secretOrKey: JWT_ACCESS_TOKEN_SECRET,
 };
 
-// const refreshTokenOptions = {
-//   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-//   secretOrKey: JWT_REFRESH_TOKEN_SECRET,
-// };
+const refreshTokenOptions = {
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: JWT_REFRESH_TOKEN_SECRET,
+};
 
 async function jwtVerify(payload, done) {
   console.log('JWT payload received:', payload); // 🔥 여기
@@ -34,7 +34,7 @@ export const accessTokenStrategy = new JwtStrategy(
   jwtVerify
 );
 
-// export const refreshTokenStrategy = new JwtStrategy(
-//   refreshTokenOptions,
-//   jwtVerify
-// );
+export const refreshTokenStrategy = new JwtStrategy(
+  refreshTokenOptions,
+  jwtVerify
+);
