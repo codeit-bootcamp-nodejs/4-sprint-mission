@@ -10,4 +10,8 @@ async function hashing(hashword) {
   }
 }
 
-export { hashing };
+async function compareWords(word, hashedWord) {
+  return await bcrypt.compare(word, hashedWord);
+}
+
+export { hashing, compareWords };

@@ -12,9 +12,7 @@ const AuthController = {
 
   async login(req, res, next) {
     try {
-      const { user, accessToken, refreshToken } = await AuthService.login(
-        req.body
-      );
+      const { user, accessToken, refreshToken } = await AuthService.login(req.body);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -33,9 +31,9 @@ const AuthController = {
 
   async refreshToken(req, res, next) {
     try {
-      const oldRefreshToken = req.cookies.refreshToken;
-      const { accessToken, refreshToken: newRefreshToken } =
-        await AuthService.refreshAccessToken(oldRefreshToken);
+      const { accessToken, refreshToken: newRefreshToken } = await AuthService.refreshAccessToken(
+        req.cookies.refreshToken
+      );
 
       // 쿠키에 토큰 저장
       res.cookie("refreshToken", newRefreshToken, {

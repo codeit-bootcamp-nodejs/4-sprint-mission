@@ -1,7 +1,6 @@
 import prisma from "../libs/prismaClient.js";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { hashing } from "../libs/hashing.js";
+import { hashing, compareWords } from "../libs/hashing.js";
 import { generateTokens } from "../libs/token.js";
 
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
@@ -33,19 +32,19 @@ const AuthService = {
   },
 
   async login(loginData) {
+    // 이메일로 존재하는 사용자인지 확인
     const user = await prisma.user.findUnique({
       where: { email: loginData.email },
     });
+
     if (!user) {
       const error = new Error("가입되지 않은 사용자입니다");
       error.statusCode = 401;
       throw error;
     }
 
-    const isPasswordVaild = await bcrypt.compare(
-      loginData.password,
-      user.password
-    );
+    // 비밀번호 일치 여부 확인
+    const isPasswordVaild = await compareWords(loginData.password, user.password);
 
     if (!isPasswordVaild) {
       const error = new Error("비밀번호가 일치하지 않습니다.");
@@ -56,8 +55,8 @@ const AuthService = {
     // 액세스 토큰 및 리프레시 토큰 생성
     const { accessToken, refreshToken } = generateTokens(user.id);
 
+    // DB에 리프레시 토큰 저장
     const hashedRefreshToken = await hashing(refreshToken);
-
     await prisma.user.update({
       where: { id: user.id },
       data: { refreshToken: hashedRefreshToken },
@@ -68,7 +67,7 @@ const AuthService = {
     return { userWithoutPassword, accessToken, refreshToken };
   },
 
-  // AcessToken & RefreshToken을 재발급 받는 코드
+  // AcessToken & RefreshToken을 재발급 받는 메서드
   async refreshAccessToken(oldRefreshToken) {
     if (!oldRefreshToken) {
       const error = new Error("Refresh Token이 제공되지 않았습니다.");
@@ -76,38 +75,44 @@ const AuthService = {
       throw error;
     }
 
-    const hashedOldRefreshToken = await hashing(oldRefreshToken);
-
     try {
+      // 토큰 디코딩해서 토큰의 User 확인 및 변조 여부 확인
       const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET);
-      const userId = decoded.userId;
+      const userId = decoded.id;
 
       const user = await prisma.user.findUnique({
         where: { id: userId },
       });
 
-      if (!user || user.refreshToken !== hashedOldRefreshToken) {
+      if (!user) {
+        const error = new Error("해당하는 user가 없습니다. (Refresh Token 에러)");
+        error.statusCode = 403;
+        throw error;
+      }
+
+      // DB에 저장된 refreshToken 일치 여부 확인
+      const isTokenValid = await compareWords(oldRefreshToken, user.refreshToken);
+
+      if (!isTokenValid) {
         const error = new Error("유효하지 않은 Refresh Token입니다.");
         error.statusCode = 403;
         throw error;
       }
 
       // 새로운 Access Token, Refresh Token 생성
-      const { newAccessToken, newRefreshToken } = generateTokens(user.id);
-
-      const hashedNewRefreshToken = await hashing(newRefreshToken);
+      const { accessToken, refreshToken } = generateTokens(user.id);
+      const hashedNewRefreshToken = await hashing(refreshToken);
 
       await prisma.user.update({
         where: { id: user.id },
         data: { refreshToken: hashedNewRefreshToken },
       });
 
-      return { accessToken: newAccessToken, refreshToken: newRefreshToken };
+      return { accessToken, refreshToken };
     } catch (err) {
+      console.error("Refresh Token 실제 오류:", err);
       if (err.name === "TokenExpiredError") {
-        const error = new Error(
-          "Refresh Token이 만료되었습니다. 다시 로그인해주세요."
-        );
+        const error = new Error("Refresh Token이 만료되었습니다. 다시 로그인해주세요.");
         error.statusCode = 401;
         throw error;
       }
