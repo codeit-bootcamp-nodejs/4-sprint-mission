@@ -1,4 +1,4 @@
-import { idSchema } from "../validations/common.js";
+import { idSchema } from "../validations/commonSchema.js";
 
 export default function parentIdParser(req, res, next) {
   const url = req.baseUrl;
