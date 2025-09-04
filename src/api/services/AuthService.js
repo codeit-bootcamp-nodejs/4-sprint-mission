@@ -2,8 +2,8 @@ import prisma from "../libs/prismaClient.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { generateTokens } from "../libs/token.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 const AuthService = {
@@ -53,15 +53,8 @@ const AuthService = {
       throw error;
     }
 
-    // 토큰 생성
-    const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    // 로그인 시 RefreshToken 생성
-    const refreshToken = jwt.sign({ userId: user.id }, REFRESH_TOKEN_SECRET, {
-      expiresIn: "7d",
-    });
+    // 액세스 토큰 및 리프레시 토큰 생성
+    const { accessToken, refreshToken } = generateTokens(user.id);
 
     const hashedRefreshToken = this.hashToken(refreshToken);
 
@@ -99,15 +92,8 @@ const AuthService = {
         throw error;
       }
 
-      // 새로운 Access Token 생성
-      const newAccessToken = jwt.sign({ userId: user.id }, JWT_SECRET, {
-        expiresIn: "1h",
-      });
-
-      // prettier-ignore
-      const newRefreshToken = jwt.sign({ userId: user.id }, REFRESH_TOKEN_SECRET, {
-        expiresIn: "7d",
-      })
+      // 새로운 Access Token, Refresh Token 생성
+      const { newAccessToken, newRefreshToken } = generateTokens(user.id);
 
       const hashedNewRefreshToken = this.hashToken(newRefreshToken);
 
