@@ -155,6 +155,10 @@ router.put('/users/me', authMiddleware, async (req, res, next) => {
     }
 });
 
+/** 비밀번호 변경 */
+/**Q. 현재 비밀번호 변경 후에 전에 사용하던 비밀번호의 Token이 여전히 유효한데 
+ * 전에 사용하던 토큰을 삭제하고 새로 발급된 Token만 유효하게 하려면 어떻게 개발을 하면될까요???
+ */
 router.put('/users/me/password', authMiddleware, async (req, res, next) => {
     try{
         const {id: userId } = req.user;
@@ -191,6 +195,23 @@ router.put('/users/me/password', authMiddleware, async (req, res, next) => {
 
         return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다."});
     } catch(err){
+        next(err);
+    }
+});
+
+/** 특정 유저가 등록한 상품 목록 조회 */
+router.get('/users/me/products', authMiddleware, async(req, res, next) => {
+    try{
+        const { id: userId } = req.user;
+
+        const products = await prisma.product.findMany({
+            where: { authorId: userId },
+            orderBy: {
+                createdAt: 'desc', // 최신순
+            },
+        });
+        return res.status(200).json({ data: products });
+    } catch(err) {
         next(err);
     }
 });
