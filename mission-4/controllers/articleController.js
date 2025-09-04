@@ -16,7 +16,11 @@ class ArticleController {
     return res.status(200).json(result);
   }
   async postArticle(req, res) {
-    const result = await postArticleService(req.body);
+    const args = {
+      userId: req.user.id,
+      ...req.body,
+    };
+    const result = await postArticleService(args);
     return res.status(201).json(result);
   }
   async patchArticle(req, res) {

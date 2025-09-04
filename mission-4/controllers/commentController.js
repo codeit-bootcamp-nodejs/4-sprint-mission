@@ -19,6 +19,7 @@ class CommentController {
     const args = {
         parentId: req.parentId,
         parentType: req.parentType,
+        userId: req.user.id,
         content,
     }
     const result = await postCommentService(args);

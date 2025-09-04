@@ -2,7 +2,11 @@ import { deleteFileService, postFileService } from "../services/fileService.js";
 
 class FileController {
   async postFile(req, res) {
-    const result = await postFileService(req.file);
+    const args = {
+      path: req.file.path,
+      userId: req.user.id,
+    };
+    const result = await postFileService(args);
     return res.status(201).json(result);
   }
   async deleteFile(req, res) {

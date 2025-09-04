@@ -16,7 +16,11 @@ class ProductController {
     return res.status(200).json(result);
   }
   async postProduct(req, res) {
-    const result = await postProductService(req.body);
+    const args = {
+      userId: req.user.id,
+      ...req.body,
+    };
+    const result = await postProductService(args);
     return res.status(201).json(result);
   }
   async patchProduct(req, res) {
