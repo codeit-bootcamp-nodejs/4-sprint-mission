@@ -1,6 +1,6 @@
-import { postSchema } from "../validations/commentSchema.js";
-import { idSchema } from "../validations/common.js";
-import { getCommentListSchema } from "../validations/commentSchema.js";
+import { postSchema } from "../../validations/commentSchema.js";
+import { idSchema } from "../../validations/commonSchema.js";
+import { getCommentListSchema } from "../../validations/commentSchema.js";
 
 export default function commentValidator() {
   return (req, res, next) => {

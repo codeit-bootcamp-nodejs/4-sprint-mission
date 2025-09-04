@@ -1,5 +1,5 @@
-import { postSchema } from "../validations/productSchema.js";
-import { getListSchema, idSchema } from "../validations/common.js";
+import { postSchema } from "../../validations/productSchema.js";
+import { getListSchema, idSchema } from "../../validations/commonSchema.js";
 
 export default function productValidator() {
   return (req, res, next) => {
