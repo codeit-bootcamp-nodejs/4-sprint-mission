@@ -3,11 +3,7 @@ import AuthService from "../services/AuthService.js";
 const AuthController = {
   async signup(req, res, next) {
     try {
-      const { email, nickname, password } = req.body;
-
-      const signupData = { email, nickname, password };
-      const newUser = await AuthService.signup(signupData);
-
+      const newUser = await AuthService.signup(req.body);
       res.status(201).json(newUser);
     } catch (err) {
       next(err);
