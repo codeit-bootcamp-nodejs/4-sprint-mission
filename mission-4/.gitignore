@@ -2,8 +2,9 @@ node_modules
 # Keep environment variables out of version control
 .env
 
+# 미션관련 추가
 /uploads
-
+.prettierrc
 /generated/prisma
 
 # Node.js 기본
