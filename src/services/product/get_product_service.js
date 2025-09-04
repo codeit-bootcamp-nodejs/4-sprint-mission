@@ -21,6 +21,7 @@ export async function getProductService(offset, limit, search) {
       name: true,
       price: true,
       createdAt: true,
+      comment: true,
     },
   });
   return products;

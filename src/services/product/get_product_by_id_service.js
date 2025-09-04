@@ -12,6 +12,7 @@ export async function getProductByIdService(id) {
       price: true,
       tags: true,
       createdAt: true,
+      comment: true,
     },
   });
   return product;

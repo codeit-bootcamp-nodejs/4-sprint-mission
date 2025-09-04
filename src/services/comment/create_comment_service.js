@@ -11,6 +11,7 @@ export async function createArticleCommentService({ id, content }) {
   });
   return comment;
 }
+
 export async function createProductCommentService({ id, content }) {
   const comment = await prisma.comment.create({
     data: {

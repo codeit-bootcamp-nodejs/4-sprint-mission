@@ -8,8 +8,8 @@ import { createProductController } from "../controllers/product/create_product_c
 import { updateProductController } from "../controllers/product/update_product_controller.js";
 import { deleteProductController } from "../controllers/product/delete_product_controller.js";
 
-import { getCommentController } from "../controllers/comment/get_comment_controller.js";
-import { createCommentController } from "../controllers/comment/create_comment_controller.js";
+import { getProductCommentController } from "../controllers/comment/get_comment_controller.js";
+import { createProductCommentController } from "../controllers/comment/create_comment_controller.js";
 import { updateCommentController } from "../controllers/comment/update_comment_controller.js";
 import { deleteCommentController } from "../controllers/comment/delete_comment_controller.js";
 
@@ -22,13 +22,13 @@ router
 router
   .route("/:id")
   .get(getProductByIdController)
-  .patch(Validate.validateProduct, updateProductController)
+  .patch(updateProductController)
   .delete(deleteProductController);
 
 router
-  .route("/comment")
-  .get(getCommentController)
-  .post(Validate.validateContent, createCommentController);
+  .route("/:id/comment")
+  .get(getProductCommentController)
+  .post(Validate.validateContent, createProductCommentController);
 router
   .route("/:id/comment/:commentId")
   .patch(updateCommentController)
