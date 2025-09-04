@@ -1,12 +1,14 @@
 import express from 'express';
 import usersRouter from "./src/routes/users.router.js";
 import productsRouter from './src/routes/products.router.js';
+import articlesRouter from './src/routes/articles.router.js';
+import commentsRouter from './src/routes/comments.router.js'; 
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json()); //body-parser middleware
-app.use('/api', [usersRouter, productsRouter]); //users, products 라우터 연결
+app.use('/api', [usersRouter, productsRouter, articlesRouter, commentsRouter]);
 
 app.use((err, req, res, next) => {
     console.error(err);
