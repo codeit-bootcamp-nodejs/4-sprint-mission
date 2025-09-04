@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../prisma.js";
 
 export async function getArticleCommentService({ id, take, cursor }) {
   const comment = await prisma.comment.findMany({

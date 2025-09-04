@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../prisma.js";
 
 export async function updateArticleService({ id, updateData }) {
   const article = await prisma.article.update({

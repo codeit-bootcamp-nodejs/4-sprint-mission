@@ -1,7 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-import { skip } from "node:test";
-
-const prisma = new PrismaClient();
+import prisma from "../prisma.js";
 
 export async function getProductService(offset, limit, search) {
   const products = await prisma.product.findMany({
