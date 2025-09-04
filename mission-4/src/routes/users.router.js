@@ -54,40 +54,47 @@ router.post('/signup', async(req, res, next) => {
     }
 });
 
-// 로그인
+// 로그인 (Refresh Token 발급 추가)
 router.post('/login', async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-        // 유효성 검사
-        if(!email|| !password) {
-            return res.status(400).json({ message: "이메일과 비밀번호를 모두 입력하세요."});
-        }
-        
-        // 사용자 조회 (이메일)
-        const user = await prisma.user.findFirst({ where: { email }});
-        if (!user) {
-            return res.status(401).json( { message: "인증 정보가 유효하지 않습니다."});
-        }
-
-        // 비밀번호 해싱
-        const isPasswordMatched = await bcrypt.compare(password, user.password);
-        if (!isPasswordMatched) {
-            return res.status(401).json( { message: "인증 정보가 유효하지 않습니다."});
-        }
-
-        // JWT 생성
-        const accessToken = jwt.sign(
-            { userId: user.id }, //payload: JWT에 담을 정보(사용자 ID)
-            'custom-secret-key', // secretKey: JWT를 서명할 비밀키
-            { expiresIn: '12h'} // 토큰의 유효시간 12시간으로 설정
-        );
-
-        // 클라이언트에게 Access Token 응답
-        return res.status(200).json( { accessToken });
-    } catch (err){
-        next(err);
+    if (!email || !password) {
+      return res.status(400).json({ message: "이메일과 비밀번호를 모두 입력해주세요." });
     }
+
+    const user = await prisma.user.findFirst({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });
+    }
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched) {
+      return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });
+    }
+
+    // --- 토큰 생성 로직 변경 ---
+
+    // 1. Access Token 생성 (유효기간: 12시간)
+    const accessToken = jwt.sign({ userId: user.id }, 'custom-secret-key', { expiresIn: '12h' });
+
+    // 2. Refresh Token 생성 (유효기간: 7일)
+    const refreshToken = jwt.sign({ userId: user.id }, 'custom-refresh-secret-key', { expiresIn: '7d' });
+
+    // 3. Refresh Token을 데이터베이스에 저장
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: refreshToken },
+    });
+
+    // 4. 클라이언트에게 두 토큰 모두 전달
+    return res.status(200).json({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.get('/users/me', authMiddleware, async (req, res, next) => {
@@ -156,9 +163,6 @@ router.put('/users/me', authMiddleware, async (req, res, next) => {
 });
 
 /** 비밀번호 변경 */
-/**Q. 현재 비밀번호 변경 후에 전에 사용하던 비밀번호의 Token이 여전히 유효한데 
- * 전에 사용하던 토큰을 삭제하고 새로 발급된 Token만 유효하게 하려면 어떻게 개발을 하면될까요???
- */
 router.put('/users/me/password', authMiddleware, async (req, res, next) => {
     try{
         const {id: userId } = req.user;
@@ -248,6 +252,44 @@ router.get('/users/me/liked-products', authMiddleware, async (req, res, next) =>
 
     return res.status(200).json({ data: likedProducts });
   } catch (err) {
+    next(err);
+  }
+});
+
+/** Access Token 재발급 **/
+router.post('/token/refresh', async (req, res, next) => {
+  try {
+    const { authorization } = req.headers;
+    if (!authorization) {
+      return res.status(401).json({ message: 'Refresh Token이 필요합니다.' });
+    }
+
+    const [tokenType, refreshToken] = authorization.split(' ');
+    if (tokenType !== 'Bearer') {
+      return res.status(401).json({ message: '지원하지 않는 토큰 형식입니다.' });
+    }
+
+    // 1. Refresh Token 검증 (시그니처, 만료 여부)
+    const decodedToken = jwt.verify(refreshToken, 'custom-refresh-secret-key');
+    const userId = decodedToken.userId;
+
+    // 2. 데이터베이스에서 사용자의 Refresh Token 조회
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user || user.refreshToken !== refreshToken) {
+      // 사용자가 없거나, DB의 토큰과 일치하지 않는 경우
+      return res.status(401).json({ message: '유효하지 않은 Refresh Token입니다.' });
+    }
+
+    // 3. 새로운 Access Token 생성
+    const newAccessToken = jwt.sign({ userId: user.id }, 'custom-secret-key', { expiresIn: '12h' });
+
+    // 4. 새로운 Access Token 발급
+    return res.status(200).json({ accessToken: newAccessToken });
+  } catch (err) {
+    // Refresh Token이 만료되었거나, 형식이 잘못된 경우 등
+    if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ message: 'Refresh Token이 유효하지 않습니다.' });
+    }
     next(err);
   }
 });
