@@ -23,6 +23,8 @@ model Product {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   comments    Comment[]
+  User        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int 
 }
 
 model Article {
@@ -32,6 +34,8 @@ model Article {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt()
   comments  Comment[]
+  User      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
 }
 
 model Comment {
@@ -43,6 +47,8 @@ model Comment {
   articleId Int?
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int?
+  User      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
 }
 
 model Image {
@@ -51,4 +57,21 @@ model Image {
   url       String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int?      @unique
 }
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  nickname      String
+  password      String
+  refreshToken  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Product       Product[]
+  Article       Article[]
+  Comment       Comment[]
+  Image         Image?
+}
+

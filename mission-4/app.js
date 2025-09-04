@@ -7,7 +7,11 @@ import morgan from "morgan";
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+app.use(
+  cors({
+    allowedHeaders: ["Content-Type", "Authorization", "x-refresh-token"],
+  })
+);
 app.use(express.json());
 app.use(morgan("dev"));
 app.use("/uploads", express.static("uploads"));
