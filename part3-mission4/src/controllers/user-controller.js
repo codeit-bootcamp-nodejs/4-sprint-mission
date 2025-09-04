@@ -1,5 +1,7 @@
 import { commentService } from '../services/comment-service.js';
 import { userService } from '../services/user-service.js';
+import { productService } from '../services/product-service.js';
+import { articleService } from '../services/article-service.js';
 
 class UserController {
   async register(req, res) {
@@ -55,6 +57,24 @@ class UserController {
     const userId = req.user.id;
     const comments = await commentService.getUserComments(userId);
     res.status(200).json({ comments });
+  }
+
+  async getUserLikedProducts(req, res) {
+    const userId = req.user?.id;
+    const likedProducts = await productService.getUserLikedProducts(userId);
+    res.json({ data: likedProducts });
+  }
+
+  async getUserLikedArticles(req, res) {
+    const userId = req.user?.id;
+    const likedArticles = await articleService.getUserLikedArticles(userId);
+    res.json({ data: likedArticles });
+  }
+
+  async getUserLikedComments(req, res) {
+    const userId = req.user?.id;
+    const likedComments = await commentService.getUserLikedComments(userId);
+    res.json({ data: likedComments });
   }
 }
 

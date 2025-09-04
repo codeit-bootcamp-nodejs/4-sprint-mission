@@ -2,7 +2,7 @@ import prisma from '../lib/prismaClient.js';
 import AppError from '../lib/appError.js';
 
 class ArticleService {
-  async getAllArticles(query) {
+  async getAllArticles(query, userId) {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || 10;
     const sort = query.sort || 'recent';
@@ -30,64 +30,91 @@ class ArticleService {
         }
       : {};
 
+    const include = {
+      user: { select: { username: true } },
+      ...(userId && {
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
+        },
+      }),
+    };
+
     const articles = await prisma.article.findMany({
       skip,
       take: limit,
       where,
       orderBy,
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-        user: {
-          select: {
-            username: true,
-          },
-        },
-      },
+      include,
     });
 
     if (!articles || articles.length === 0) {
       throw new AppError('해당하는 게시글을 찾을 수 없습니다.', 404);
     }
 
+    const articlesWithLike = articles.map((a) => ({
+      ...a,
+      isLiked: a.likedBy?.length > 0 || false,
+      likeCount: a.likeCount,
+    }));
+
     const totalArticles = await prisma.article.count({ where });
     const totalPages = Math.ceil(totalArticles / limit);
 
     return {
-      data: articles,
+      data: articlesWithLike,
       pagination: { totalArticles, totalPages, currentPage: page, limit },
     };
   }
 
-  async getArticleById(id) {
-    const article = await prisma.article.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        user: {
-          select: { username: true },
-        },
-        comments: {
-          // 게시글 댓글
-          select: {
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-              // 댓글 작성자
-              select: {
-                username: true,
-              },
+  async getArticleById(articleId, userId) {
+    const include = {
+      user: { select: { username: true } },
+      comments: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          user: { select: { username: true } },
+          likeCount: true,
+          ...(userId && {
+            likedBy: {
+              where: { id: userId },
+              select: { id: true, username: true },
             },
-          },
+          }),
         },
       },
+      ...(userId && {
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
+        },
+      }),
+    };
+
+    const article = await prisma.article.findUnique({
+      where: { id: parseInt(articleId) },
+      include,
     });
+
     if (!article) {
       throw new AppError('존재하지 않는 게시글입니다.', 404);
     }
-    return article;
+
+    const articleWithLike = {
+      ...article,
+      isLiked: article.likedBy?.length > 0 || false,
+      likeCount: article.likeCount,
+      comments: article.comments.map((c) => ({
+        ...c,
+        isLiked: c.likedBy?.length > 0 || false,
+        likeCount: c.likeCount,
+      })),
+    };
+
+    return articleWithLike;
   }
 
   async createArticle(title, content, userId) {
@@ -143,9 +170,39 @@ class ArticleService {
         content: true,
         tags: true,
         images: true,
+        likeCount: true,
       },
     });
     return articles;
+  }
+
+  async getUserLikedArticles(userId) {
+    const likedArticles = await prisma.product.findMany({
+      where: { likedBy: { some: { id: parseInt(userId) } } },
+    });
+    return likedArticles;
+  }
+
+  async articleLike(userId, articleId) {
+    const articleLiked = await prisma.product.update({
+      where: { id: parseInt(articleId) },
+      data: {
+        likedBy: { connect: { id: parseInt(userId) } },
+        likeCount: { increment: 1 },
+      },
+    });
+    return articleLiked;
+  }
+
+  async articleUnlike(userId, articleId) {
+    const articleUnliked = await prisma.product.update({
+      where: { id: parseInt(articleId) },
+      data: {
+        likedBy: { disconnect: { id: parseInt(userId) } },
+        likeCount: { decrement: 1 },
+      },
+    });
+    return articleUnliked;
   }
 }
 

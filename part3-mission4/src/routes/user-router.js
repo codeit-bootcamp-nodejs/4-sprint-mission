@@ -60,4 +60,25 @@ router.get(
   userController.getUserComments
 );
 
+router.get(
+  '/:userId/likes/products',
+  authenticate,
+  isUserSelf,
+  userController.getUserLikedProducts
+);
+
+router.get(
+  '/:userId/likes/articles',
+  authenticate,
+  isUserSelf,
+  userController.getUserLikedArticles
+);
+
+router.get(
+  '/:userId/likes/comments',
+  authenticate,
+  isUserSelf,
+  userController.getUserLikedComments
+);
+
 export default router;

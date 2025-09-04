@@ -1,95 +1,104 @@
+import { parse } from 'dotenv';
 import AppError from '../lib/appError.js';
 import prisma from '../lib/prismaClient.js';
 
 class CommentService {
   // 게시글 댓글 조회
-  async getCommentsByArticleId(articleId) {
+  async getCommentsByArticleId(articleId, userId) {
     const comments = await prisma.comment.findMany({
-      where: { articleId: parseInt(articleId) },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            username: true,
-          },
+      where: { articleId: parseInt(articleId), productId: null },
+      include: {
+        user: { select: { username: true } },
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
         },
       },
     });
-    if (!comments || comments.length === 0) {
+
+    if (!comments || comments.length === 0)
       throw new AppError('해당 게시글의 댓글을 찾을 수 없습니다.', 404);
-    }
-    return comments;
+
+    return comments.map((c) => ({
+      ...c,
+      isLiked: c.likedBy.length > 0,
+      likeCount: c.likeCount,
+    }));
   }
 
   // 상품 댓글 조회
-  async getCommentsByProductId(productId) {
+  async getCommentsByProductId(productId, userId) {
     const comments = await prisma.comment.findMany({
-      where: { productId: parseInt(productId) },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            username: true,
-          },
+      where: { productId: parseInt(productId), articleId: null },
+      include: {
+        user: { select: { username: true } },
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
         },
       },
     });
-    if (!comments || comments.length === 0) {
+
+    if (!comments || comments.length === 0)
       throw new AppError('해당 상품의 댓글을 찾을 수 없습니다.', 404);
-    }
-    return comments;
+
+    return comments.map((c) => ({
+      ...c,
+      isLiked: c.likedBy.length > 0,
+      likeCount: c.likeCount,
+    }));
   }
 
   // 게시글 단일 댓글 조회
-  async getCommentByIdAndArticleId(articleId, commentId) {
-    const comment = await prisma.comment.findUnique({
-      where: { id: parseInt(commentId) },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            username: true,
-          },
+  async getCommentByIdAndArticleId(articleId, commentId, userId) {
+    const comment = await prisma.comment.findFirst({
+      where: { id: parseInt(commentId), articleId: parseInt(articleId) },
+      include: {
+        user: { select: { username: true } },
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
         },
       },
     });
 
-    if (!comment) {
-      throw new AppError('해당 댓글을 찾을 수 없습니다.', 404);
-    }
-    return comment;
+    if (!comment) throw new AppError('해당 댓글을 찾을 수 없습니다.', 404);
+
+    return {
+      ...comment,
+      isLiked: comment.likedBy.length > 0,
+      likeCount: comment.likeCount,
+    };
   }
 
   // 상품 단일 댓글 조회
-  async getCommentByIdAndProductId(productId, commentId) {
-    const comment = await prisma.comment.findUnique({
-      where: { id: parseInt(commentId) },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-        updatedAt: true,
-        user: {
-          select: {
-            username: true,
-          },
+  async getCommentByIdAndProductId(productId, commentId, userId) {
+    console.log(
+      'SERVICE - productId:',
+      productId,
+      'commentId:',
+      commentId,
+      'userId:',
+      userId
+    );
+    const comment = await prisma.comment.findFirst({
+      where: { id: parseInt(commentId), productId: parseInt(productId) },
+      include: {
+        user: { select: { username: true } },
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
         },
       },
     });
+    console.log('SERVICE - comment from DB:', comment);
+    if (!comment) throw new AppError('해당 댓글을 찾을 수 없습니다.', 404);
 
-    if (!comment) {
-      throw new AppError('해당 댓글을 찾을 수 없습니다.', 404);
-    }
-    return comment;
+    return {
+      ...comment,
+      isLiked: comment.likedBy.length > 0,
+      likeCount: comment.likeCount,
+    };
   }
 
   // 게시글 댓글 생성
@@ -106,13 +115,13 @@ class CommentService {
   }
 
   // 상품 댓글 생성
-  async createProductComment(productId, content, userId) {
-    if (!productId) throw new AppError('존재하지 않는 상품입니다', 404);
+  async createProductComment(commentId, content, userId) {
+    if (!commentId) throw new AppError('존재하지 않는 상품입니다', 404);
     const newComment = await prisma.comment.create({
       data: {
         content,
         user: { connect: { id: userId } },
-        product: { connect: { id: parseInt(productId) } },
+        product: { connect: { id: parseInt(commentId) } },
       },
     });
 
@@ -165,9 +174,39 @@ class CommentService {
             name: true,
           },
         },
+        likeCount: true,
       },
     });
     return comments;
+  }
+
+  async getUserLikedComments(userId) {
+    const likedComments = await prisma.comment.findMany({
+      where: { likedBy: { some: { id: userId } } },
+    });
+    return likedComments;
+  }
+
+  async commentLike(userId, commentId) {
+    const commentLiked = await prisma.comment.update({
+      where: { id: parseInt(commentId) },
+      data: {
+        likedBy: { connect: { id: userId } },
+        likeCount: { increment: 1 },
+      },
+    });
+    return commentLiked;
+  }
+
+  async commentUnlike(userId, commentId) {
+    const commentUnliked = await prisma.comment.update({
+      where: { id: parseInt(commentId) },
+      data: {
+        likedBy: { disconnect: { id: userId } },
+        likeCount: { decrement: 1 },
+      },
+    });
+    return commentUnliked;
   }
 }
 

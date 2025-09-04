@@ -2,10 +2,12 @@ import express from 'express';
 import { articleController } from '../controllers/article-controller.js';
 import { validation } from '../middlewares/validation.js';
 import authenticate from '../middlewares/authenticate.js';
-import { isArticleOwner } from '../middlewares/authorize.js';
+import { isArticleOwner, isCommentOwner } from '../middlewares/authorize.js';
 
 const router = express.Router();
-
+/**
+ * 게시글 전체 조회 / 생성
+ */
 router
   .route('/')
   .get(articleController.getAllArticles)
@@ -15,6 +17,9 @@ router
     articleController.createArticle
   );
 
+/**
+ * 단일 게시글 조회 / 수정 / 삭제
+ */
 router
   .route('/:id')
   .get(articleController.getArticleById)
@@ -26,30 +31,46 @@ router
   )
   .delete(authenticate, isArticleOwner, articleController.deleteArticle);
 
-// 댓글 조회, 생성
+/**
+ * 게시글 좋아요 / 취소
+ */
+router
+  .route('/:id/like')
+  .post(authenticate, articleController.likeArticle)
+  .delete(authenticate, articleController.unlikeArticle);
+
+/**
+ * 게시글 댓글 조회 / 생성
+ */
 router
   .route('/:id/comments')
-  .get(articleController.getComments) // articleId 기준 댓글 목록
+  .get(articleController.getComments) // 게시글 ID 기준 댓글 목록
   .post(
     authenticate,
     validation.validate(validation.commentSchema),
     articleController.createComment
   );
 
-// 특정 댓글 조회, 수정, 삭제
+/**
+ * 단일 댓글 조회 / 수정 / 삭제
+ */
 router
   .route('/:id/comments/:commentId')
   .get(articleController.getCommentById)
   .patch(
     authenticate,
-    isArticleOwner, // 필요에 따라 comment 소유자 확인 미들웨어로 바꿀 수 있음
+    isCommentOwner, // comment 소유자 확인
     validation.validate(validation.commentSchema),
     articleController.updateComment
   )
-  .delete(
-    authenticate,
-    isArticleOwner, // 필요에 따라 comment 소유자 확인 미들웨어로 바꿀 수 있음
-    articleController.deleteComment
-  );
+  .delete(authenticate, isCommentOwner, articleController.deleteComment);
+
+/**
+ * 댓글 좋아요 / 취소
+ */
+router
+  .route('/:id/comments/:commentId/like')
+  .post(authenticate, articleController.likeComment)
+  .delete(authenticate, articleController.unlikeComment);
 
 export default router;

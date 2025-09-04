@@ -3,7 +3,7 @@ import AppError from '../lib/appError.js';
 
 class ProductService {
   // 전체 상품 조회 (검색/페이징/정렬)
-  async getAllProducts(query) {
+  async getAllProducts(query, userId) {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || 10;
     const sort = query.sort || 'recent';
@@ -32,65 +32,93 @@ class ProductService {
         }
       : {};
 
+    const include = {
+      user: { select: { username: true } },
+    };
+
+    if (userId) {
+      include.likedBy = {
+        where: { id: userId },
+        select: { id: true, username: true },
+      };
+    }
+
     const products = await prisma.product.findMany({
       skip,
       take: limit,
       where,
       orderBy,
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        createdAt: true,
-        user: {
-          select: {
-            username: true,
-          },
-        },
-      },
+      include,
     });
 
     if (!products) {
       throw new AppError('해당하는 제품을 찾을 수 없습니다.', 404);
     }
 
+    const productsWithLike = products.map((p) => ({
+      ...p,
+      isLiked: userId ? p.likedBy?.length > 0 : false,
+      likeCount: p.likeCount, // likeCount 필드 사용
+    }));
+
     const totalProducts = await prisma.product.count({ where });
     const totalPages = Math.ceil(totalProducts / limit);
 
     return {
-      data: products,
+      data: productsWithLike,
       pagination: { totalProducts, totalPages, currentPage: page, limit },
     };
   }
 
   // 단일 상품 조회
-  async getProductById(productId) {
-    const product = await prisma.product.findUnique({
-      where: { id: parseInt(productId) },
-      include: {
-        user: {
-          select: { username: true },
-        },
-        comments: {
-          // 게시글 댓글
-          select: {
-            content: true,
-            createdAt: true,
-            updatedAt: true,
-            user: {
-              // 댓글 작성자
-              select: {
-                username: true,
-              },
+  async getProductById(productId, userId) {
+    const include = {
+      user: { select: { username: true } },
+      comments: {
+        select: {
+          id: true,
+          content: true,
+          createdAt: true,
+          updatedAt: true,
+          user: { select: { username: true } },
+          likeCount: true,
+          ...(userId && {
+            likedBy: {
+              where: { id: userId },
+              select: { id: true, username: true },
             },
-          },
+          }),
         },
       },
+      ...(userId && {
+        likedBy: {
+          where: { id: userId },
+          select: { id: true, username: true },
+        },
+      }),
+    };
+
+    const product = await prisma.product.findUnique({
+      where: { id: parseInt(productId) },
+      include,
     });
+
     if (!product) {
       throw new AppError('존재하지 않는 상품입니다.', 404);
     }
-    return product;
+
+    const productWithLike = {
+      ...product,
+      isLiked: product.likedBy?.length > 0 || false,
+      likeCount: product.likeCount,
+      comments: product.comments.map((c) => ({
+        ...c,
+        isLiked: c.likedBy?.length > 0 || false,
+        likeCount: c.likeCount,
+      })),
+    };
+
+    return productWithLike;
   }
 
   // 상품 등록
@@ -159,9 +187,40 @@ class ProductService {
         price: true,
         tags: true,
         images: true,
+        likeCount: true,
       },
     });
     return products;
+  }
+
+  async getUserLikedProducts(userId) {
+    const likedProducts = await prisma.product.findMany({
+      where: { likedBy: { some: { id: parseInt(userId) } } },
+    });
+    return likedProducts;
+  }
+
+  async productLike(userId, productId) {
+    console.log('productId:', productId, 'userId:', userId);
+    const productLiked = await prisma.product.update({
+      where: { id: parseInt(productId) },
+      data: {
+        likedBy: { connect: { id: parseInt(userId) } },
+        likeCount: { increment: 1 },
+      },
+    });
+    return productLiked;
+  }
+
+  async productUnlike(userId, productId) {
+    const productUnliked = await prisma.product.update({
+      where: { id: parseInt(productId) },
+      data: {
+        likedBy: { disconnect: { id: parseInt(userId) } },
+        likeCount: { decrement: 1 },
+      },
+    });
+    return productUnliked;
   }
 }
 

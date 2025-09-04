@@ -4,7 +4,8 @@ import { commentService } from '../services/comment-service.js';
 class ArticleController {
   // 게시글
   async getAllArticles(req, res) {
-    const result = await articleService.getAllArticles(req.query);
+    const userId = req.user?.id || null;
+    const result = await articleService.getAllArticles(req.query, userId);
     res.json(result);
   }
 
@@ -38,6 +39,20 @@ class ArticleController {
     const userId = req.user.id;
     const result = await articleService.deleteArticle(id, userId);
     res.status(200).json(result);
+  }
+
+  async likeArticle(req, res) {
+    const userId = req.user?.id;
+    const articleId = req.params.id;
+    const article = await articleService.articleLike(userId, articleId);
+    res.json({ data: article });
+  }
+
+  async unlikeArticle(req, res) {
+    const userId = req.user?.id;
+    const articleId = req.params.id;
+    const article = await articleService.articleUnlike(userId, articleId);
+    res.json({ data: article });
   }
 
   // 댓글
@@ -85,6 +100,20 @@ class ArticleController {
     const userId = req.user.id;
     await commentService.deleteComment(commentId, userId);
     res.status(204).send();
+  }
+
+  async likeComment(req, res) {
+    const userId = req.user?.id;
+    const { commentId } = req.params;
+    const comment = await commentService.commentLike(userId, commentId);
+    res.json({ data: comment });
+  }
+
+  async unlikeComment(req, res) {
+    const userId = req.user?.id;
+    const { commentId } = req.params;
+    const comment = await commentService.commentUnlike(userId, commentId);
+    res.json({ data: comment });
   }
 
   // 유저 게시글 목록 조회

@@ -36,6 +36,11 @@ router
     productController.deleteProduct
   );
 
+router
+  .route('/:id/like')
+  .post(authenticate, productController.likeProduct)
+  .delete(authenticate, productController.unlikeProduct);
+
 // 댓글
 router
   .route('/:id/comments')
@@ -55,6 +60,10 @@ router
   .get(
     validation.validateParam('id', validation.idSchema),
     validation.validateParam('commentId', validation.idSchema),
+    (req, res, next) => {
+      console.log('ROUTER - req.params:', req.params);
+      next();
+    },
     productController.getCommentById
   )
   .patch(
@@ -70,5 +79,10 @@ router
     validation.validateParam('commentId', validation.idSchema),
     productController.deleteComment
   );
+
+router
+  .route('/:id/comments/:commentId/like')
+  .post(authenticate, productController.likeComment)
+  .delete(authenticate, productController.unlikeComment);
 
 export default router;
