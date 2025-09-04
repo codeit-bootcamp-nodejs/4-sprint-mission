@@ -4,7 +4,7 @@ const ImageController = {
       return res.status(400).json({ error: "이미지 파일 없음" });
     }
 
-    const imageUrl = `/uploads/${req.file.filename}`;
+    const imageUrl = req.file.path;
     res.status(200).json({ imageUrl });
   },
 };
