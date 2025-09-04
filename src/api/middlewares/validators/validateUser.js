@@ -10,7 +10,6 @@ export const signupSchema = z.object({
   nickname: z
     .string()
     .min(2, { message: "닉네임은 최소 2자 이상이어야 합니다." }),
-  image: z.string().url({ message: "유효한 URL 형식이 아닙니다." }).nullable(),
 });
 
 export const loginSchema = z.object({
