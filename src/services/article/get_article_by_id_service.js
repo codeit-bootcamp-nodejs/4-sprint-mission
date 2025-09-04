@@ -10,6 +10,7 @@ export async function getArticleByIdService(id) {
       title: true,
       content: true,
       createdAt: true,
+      comment: true,
     },
   });
   return article;

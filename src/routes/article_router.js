@@ -9,7 +9,7 @@ import * as Validate from "../middleware/validate.js";
 
 import { getCommentController } from "../controllers/comment/get_comment_controller.js";
 import { updateCommentController } from "../controllers/comment/update_comment_controller.js";
-import { createArticleCommentController } from "../controllers/comment/create_comment_controller.js";
+import { createCommentController } from "../controllers/comment/create_comment_controller.js";
 import { deleteCommentController } from "../controllers/comment/delete_comment_controller.js";
 
 const router = express.Router();
@@ -18,18 +18,18 @@ router
   .route("/")
   .get(getArticleController)
   .post(Validate.validateArticle, createArticleController);
-
 router
   .route("/:id")
   .get(getArticleByIdController)
   .patch(updateArticleController)
   .delete(deleteArticleController);
+
 router
   .route("/:id/comment")
   .get(getCommentController)
-  .post(Validate.validateContent, createArticleCommentController);
+  .post(Validate.validateContent, createCommentController);
 router
-  .route("/:id/comment/:id")
+  .route("/:id/comment/:commentId")
   .patch(updateCommentController)
   .delete(deleteCommentController);
 

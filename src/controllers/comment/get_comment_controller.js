@@ -6,7 +6,7 @@ export async function getCommentController(req, res) {
     const take = parseInt(req.query.take) || 10;
     const cursor = req.query.cursor ? parseInt(req.query.cursor) : null;
 
-    const result = getCommentService({ id, take, cursor });
+    const result = await getCommentService({ id, take, cursor });
     res.json(result);
   } catch (e) {
     res.json({ message: "댓글 조회에 실패했습니다." });

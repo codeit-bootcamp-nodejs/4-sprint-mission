@@ -2,12 +2,12 @@ import { updateCommentService } from "../../services/comment/update_comment_serv
 
 export async function updateCommentController(req, res) {
   try {
-    const id = parseInt(req.params.id);
+    const commentId = parseInt(req.params.commentId);
     const { content } = req.body;
     const updateData = {};
 
     if (content) updateData.content = content;
-    const result = await updateCommentService({ id, updateData });
+    const result = await updateCommentService({ commentId, updateData });
     res.send(result);
   } catch (e) {
     res.json({ message: e.message });
