@@ -1,10 +1,11 @@
 import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
+import optionalAuthMiddleware from '../middlewares/optional-auth.middleware.js';
 
 const router = express.Router();
 
-/** 상품 등록 API **/
+/** 상품 등록 **/
 // 인증 미들웨어를 통과해야만 상품을 등록할 수 있습니다.
 router.post('/products', authMiddleware, async (req, res, next) => {
   try {
@@ -29,7 +30,7 @@ router.post('/products', authMiddleware, async (req, res, next) => {
   }
 });
 
-/** 상품 목록 조회 API **/
+/** 상품 목록 조회 **/
 router.get('/products', async (req, res, next) => {
   try {
     const products = await prisma.product.findMany({
@@ -56,13 +57,14 @@ router.get('/products', async (req, res, next) => {
   }
 });
 
-/** 상품 상세 조회 API **/
-router.get('/products/:productId', async (req, res, next) => {
+/** 상품 상세 조회 **/
+router.get('/products/:productId', optionalAuthMiddleware, async (req, res, next) => {
   try {
     const { productId } = req.params;
+    const user = req.user; // optionalAuthMiddleware 덕분에 사용자가 있을 수도, 없을 수도 있습니다.
 
     const product = await prisma.product.findUnique({
-      where: { id: +productId }, //정수로 변환 (parseInt, Number)
+      where: { id: +productId },
       select: {
         id: true,
         name: true,
@@ -81,7 +83,26 @@ router.get('/products/:productId', async (req, res, next) => {
       return res.status(404).json({ message: '상품을 찾을 수 없습니다.' });
     }
 
-    return res.status(200).json({ data: product });
+    let isLiked = false;
+    if (user) {
+      // 로그인한 사용자의 경우, '좋아요' 여부를 확인합니다.
+      const like = await prisma.productLike.findUnique({
+        where: {
+          userId_productId: {
+            userId: user.id,
+            productId: +productId,
+          },
+        },
+      });
+      if (like) {
+        isLiked = true;
+      }
+    }
+
+    // 조회된 상품 정보에 isLiked 필드를 추가하여 응답합니다.
+    const responseProduct = { ...product, isLiked };
+
+    return res.status(200).json({ data: responseProduct });
   } catch (err) {
     next(err);
   }
@@ -126,7 +147,7 @@ router.put('/products/:productId', authMiddleware, async( req, res, next) => {
   }
 });
 
-/** 상품 삭제 API **/
+/** 상품 삭제 **/
 
 router.delete('/products/:productId', authMiddleware, async (req, res, next) => {
   try {
@@ -151,6 +172,54 @@ router.delete('/products/:productId', authMiddleware, async (req, res, next) => 
     });
     return res.status(200).json({ message: "상품이 성공적으로 삭제 완료"});
   } catch(err) {
+    next(err);
+  }
+});
+
+/** 상품 좋아요/ 좋아요 취소 **/
+
+router.post('/products/:productId/like', authMiddleware, async(req, res, next) => {
+  try{
+    const { productId } = req.params;
+    const { id: userId } = req.user;
+
+    // 상품이 있는지 확인
+    const product = await prisma.product.findUnique({ where: { id: +productId }});
+    if (!product) {
+      return res.status(404).json({ message: "상품을 찾을 수 없습니다."});
+    }
+    // 사용자가 해당 상품에 이미 좋아요를 눌렀는지 확인
+    const existingLike = await prisma.productLike.findUnique({
+      where: {
+        // prisma 스키마에서 @id([userId, productId])로 조회
+        userId_productId: {
+          userId,
+          productId: +productId,
+        },
+      },
+    });
+
+    // 좋아요가 이미 있다면 좋아요 취소, 없다면 좋아요
+    if(existingLike) {
+      await prisma.productLike.delete({
+        where: {
+          userId_productId: {
+            userId,
+            productId: +productId,
+          },
+        },
+      });
+      return res.status(200).json({ message: "좋아요 취소했습니다."});
+    } else {
+      await prisma.productLike.create({
+        data: {
+          userId,
+          productId: +productId,
+        },
+      });
+      return res.status(200).json({ message: "좋아요를 눌렀습니다."});
+    }
+  } catch(err){
     next(err);
   }
 });

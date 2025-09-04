@@ -199,7 +199,7 @@ router.put('/users/me/password', authMiddleware, async (req, res, next) => {
     }
 });
 
-/** 특정 유저가 등록한 상품 목록 조회 */
+/** 특정 유저가 등록한 상품 목록 조회 **/
 router.get('/users/me/products', authMiddleware, async(req, res, next) => {
     try{
         const { id: userId } = req.user;
@@ -215,4 +215,41 @@ router.get('/users/me/products', authMiddleware, async(req, res, next) => {
         next(err);
     }
 });
+
+/** 내가 '좋아요' 누른 상품 목록 조회 **/
+router.get('/users/me/liked-products', authMiddleware, async (req, res, next) => {
+  try {
+    const { id: userId } = req.user;
+
+    const likedProducts = await prisma.product.findMany({
+      where: {
+        likes: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            nickname: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return res.status(200).json({ data: likedProducts });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

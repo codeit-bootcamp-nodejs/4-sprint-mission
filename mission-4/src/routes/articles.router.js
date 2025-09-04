@@ -1,6 +1,7 @@
 import express from 'express';
 import { prisma } from '../utils/prisma.util.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
+import optionalAuthMiddleware from '../middlewares/optional-auth.middleware.js';
 
 const router = express.Router();
 
@@ -54,10 +55,12 @@ router.get('/articles', async (req, res, next) => {
   }
 });
 
-// 게시글 상세 조회 API
-router.get('/articles/:articleId', async (req, res, next) => {
+// 게시글 상세 조회
+router.get('/articles/:articleId', optionalAuthMiddleware, async (req, res, next) => {
   try {
     const { articleId } = req.params;
+    const user = req.user;
+
     const article = await prisma.article.findUnique({
       where: { id: +articleId },
       select: {
@@ -78,7 +81,24 @@ router.get('/articles/:articleId', async (req, res, next) => {
       return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
     }
 
-    return res.status(200).json({ data: article });
+    let isLiked = false;
+    if (user) {
+      const like = await prisma.articleLike.findUnique({
+        where: {
+          userId_articleId: {
+            userId: user.id,
+            articleId: +articleId,
+          },
+        },
+      });
+      if (like) {
+        isLiked = true;
+      }
+    }
+
+    const responseArticle = { ...article, isLiked };
+
+    return res.status(200).json({ data: responseArticle });
   } catch (err) {
     next(err);
   }
@@ -134,6 +154,53 @@ router.delete('/articles/:articleId', authMiddleware, async (req, res, next) => 
     await prisma.article.delete({ where: { id: +articleId } });
 
     return res.status(200).json({ message: '게시글이 성공적으로 삭제되었습니다.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** 게시글 좋아요/좋아요 취소 **/
+router.post('/articles/:articleId/like', authMiddleware, async (req, res, next) => {
+  try {
+    const { articleId } = req.params;
+    const { id: userId } = req.user;
+
+    // 게시글이 존재하는지 확인
+    const article = await prisma.article.findUnique({ where: { id: +articleId } });
+    if (!article) {
+      return res.status(404).json({ message: '게시글을 찾을 수 없습니다.' });
+    }
+
+    // 사용자가 이미 좋아요를 눌렀는지 확인
+    const existingLike = await prisma.articleLike.findUnique({
+      where: {
+        userId_articleId: {
+          userId,
+          articleId: +articleId,
+        },
+      },
+    });
+
+    // 좋아요가 이미 있다면 삭제(좋아요 취소), 없다면 생성(좋아요)
+    if (existingLike) {
+      await prisma.articleLike.delete({
+        where: {
+          userId_articleId: {
+            userId,
+            articleId: +articleId,
+          },
+        },
+      });
+      return res.status(200).json({ message: '게시글 좋아요를 취소했습니다.' });
+    } else {
+      await prisma.articleLike.create({
+        data: {
+          userId,
+          articleId: +articleId,
+        },
+      });
+      return res.status(200).json({ message: '게시글에 좋아요를 눌렀습니다.' });
+    }
   } catch (err) {
     next(err);
   }
