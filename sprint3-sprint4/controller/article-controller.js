@@ -227,6 +227,7 @@ export class ArticleController{
             
         }
     }
+    
 }
 
 export default new ArticleController();

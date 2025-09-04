@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import REFRESH_SECRET_KEY  from './constants'
 import ACCESS_SECRET_KEY from  './constants'
 
-class jsonWebToken{
+export class jsonWebToken{
     /*
     payload = { 
       userId: Int
@@ -30,3 +30,5 @@ class jsonWebToken{
         return decoded
     }
 }
+
+export default new jsonWebToken();

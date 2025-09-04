@@ -1,14 +1,13 @@
 import bcrypt from 'bcrypt'
 import prisma from 'lib/prisma.js'
-
+import jsonWebToken from '../lib/json-web-token.js';
 
 class UserController{
     register = async(req,res,next) => {
         const {email, nickname, password} = req.body;
 
-        const plainPassword = password;
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(plainPassword,hash);
+        const hashedPassword = await bcrypt.hash(password,hash);
 
         const newUser = prisma.user.create({
             data:{
@@ -21,12 +20,15 @@ class UserController{
 
     login = async(req,res,next) => {
         const {email, password} = req.body;
-        const user = prisma.user.findUnique({}) 
+        const user = prisma.user.findUnique({
+            where:{email}
+        }) 
         const isMatch = await bcrypt.compare(password, user.password);
+        let accessToken
         if (isMatch){
-
+            accessToken = jsonWebToken.generateAccess(user.id)
         }
-        return 
+        return accessToken
     }
 
     getUser = async(req,res,next) => {
