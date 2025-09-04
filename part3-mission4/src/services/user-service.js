@@ -7,6 +7,8 @@ import {
   REFRESH_TOKEN_COOKIE_NAME,
 } from '../lib/constants.js';
 
+import AppError from '../lib/appError.js';
+
 class UserService {
   async register(username, email, password) {
     const salt = await bcrypt.genSalt(10);
@@ -27,7 +29,7 @@ class UserService {
 
   async login(userId) {
     const { accessToken, refreshToken } = generateTokens(userId);
-    console.log('Generated accessToken:', accessToken);
+    console.log('생성된 엑세스 토큰:', accessToken);
     return { accessToken, refreshToken };
   }
 
@@ -77,10 +79,11 @@ class UserService {
     const isValid = await bcrypt.compare(currentPassword, user.password);
     console.log('bcrypt.compare 결과:', isValid);
 
-    if (!isValid) throw new Error('현재 비밀번호가 일치하지 않습니다.');
+    if (!isValid) throw new AppError('현재 비밀번호가 일치하지 않습니다.');
 
     const isSameAsOld = await bcrypt.compare(newPassword, user.password);
-    if (isSameAsOld) throw new Error('기존 비밀번호로는 변경할 수 없습니다.');
+    if (isSameAsOld)
+      throw new AppError('기존 비밀번호로는 변경할 수 없습니다.');
 
     const hashed = await bcrypt.hash(newPassword, 10);
     console.log('새 비밀번호 해시:', hashed);

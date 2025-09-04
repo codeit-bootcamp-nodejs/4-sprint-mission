@@ -1,16 +1,17 @@
 import prisma from '../lib/prismaClient.js';
+import AppError from '../lib/appError.js';
 
 class ArticleService {
   async getAllArticles(query) {
-    const page = parseInt(query.page) || 1; // 페이지
-    const limit = parseInt(query.limit) || 10; // 노출 항목
-    const sort = query.sort || 'recent'; // 정렬 설정
-    const keyword = query.keyword || ''; // 키워드 설정
-    const skip = (page - 1) * limit; // 넘길 항목수
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 10;
+    const sort = query.sort || 'recent';
+    const keyword = query.keyword || '';
+    const skip = (page - 1) * limit;
 
     let orderBy;
     switch (sort) {
-      case 'recect':
+      case 'recent':
         orderBy = { createdAt: 'desc' };
         break;
       case 'old':
@@ -18,82 +19,133 @@ class ArticleService {
         break;
       default:
         orderBy = { createdAt: 'desc' };
-        break;
     }
 
-    let where;
+    const where = keyword
+      ? {
+          OR: [
+            { title: { contains: keyword, mode: 'insensitive' } },
+            { content: { contains: keyword, mode: 'insensitive' } },
+          ],
+        }
+      : {};
 
-    if (keyword) {
-      where = {
-        OR: [
-          { title: { contains: keyword, mode: 'insensitive' } },
-          { content: { contains: keyword, mode: 'insensitive' } },
-        ],
-      };
-    }
     const articles = await prisma.article.findMany({
       skip,
       take: limit,
-      where, // 검색 조건 적용
-      orderBy, // 정렬 조건 적용
+      where,
+      orderBy,
       select: {
         id: true,
         title: true,
         content: true,
-        author: true,
         createdAt: true,
+        user: {
+          select: {
+            username: true,
+          },
+        },
       },
     });
 
-    const totalArticles = await prisma.article.count({ where }); // 검색 조건에 맞는 총 게시글 수
+    if (!articles || articles.length === 0) {
+      throw new AppError('해당하는 게시글을 찾을 수 없습니다.', 404);
+    }
+
+    const totalArticles = await prisma.article.count({ where });
     const totalPages = Math.ceil(totalArticles / limit);
 
     return {
       data: articles,
-      pagination: {
-        totalArticles,
-        totalPages,
-        currentPage: page,
-        limit,
-      },
+      pagination: { totalArticles, totalPages, currentPage: page, limit },
     };
   }
+
   async getArticleById(id) {
     const article = await prisma.article.findUnique({
       where: { id: parseInt(id) },
+      include: {
+        user: {
+          select: { username: true },
+        },
+        comments: {
+          // 게시글 댓글
+          select: {
+            content: true,
+            createdAt: true,
+            updatedAt: true,
+            user: {
+              // 댓글 작성자
+              select: {
+                username: true,
+              },
+            },
+          },
+        },
+      },
     });
     if (!article) {
-      throw new Error('존재하지 않는 게시글입니다.');
+      throw new AppError('존재하지 않는 게시글입니다.', 404);
     }
     return article;
   }
 
-  async createArticle(title, content, author) {
-    return prisma.article.create({
+  async createArticle(title, content, userId) {
+    if (!userId) throw new AppError('작성자를 확인할 수 없습니다.', 400);
+
+    const newArticle = await prisma.article.create({
       data: {
         title,
         content,
-        author,
+        user: { connect: { id: parseInt(userId) } },
       },
     });
+
+    if (!newArticle) {
+      throw new AppError('게시글 등록에 실패했습니다.', 400);
+    }
+    return newArticle;
   }
 
-  async updateArticle(id, updateData) {
-    return prisma.article.update({
-      where: { id: parseInt(id) },
+  async updateArticle(id, updateData, userId) {
+    const updated = await prisma.article.updateMany({
+      where: { id: parseInt(id), userId },
       data: updateData,
+    });
+
+    if (updated.count === 0) {
+      throw new AppError('권한이 없거나 게시글이 존재하지 않습니다.', 403);
+    }
+
+    return { message: '게시글이 수정되었습니다.' };
+  }
+
+  async deleteArticle(id, userId) {
+    const deleted = await prisma.article.deleteMany({
+      where: { id: parseInt(id), userId },
+    });
+
+    if (deleted.count === 0) {
+      throw new AppError('권한이 없거나 게시글이 존재하지 않습니다.', 403);
+    }
+
+    return { message: '게시글이 삭제되었습니다.' };
+  }
+
+  // 특정 유저의 게시글 조회
+  async getUserArticles(userId) {
+    const articles = await prisma.article.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
       select: {
+        id: true,
         title: true,
         content: true,
         tags: true,
+        images: true,
       },
     });
-  }
-
-  async deleteArticle(id) {
-    return prisma.article.delete({
-      where: { id: parseInt(id) },
-    });
+    return articles;
   }
 }
 

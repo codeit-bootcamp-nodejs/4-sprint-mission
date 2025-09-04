@@ -1,21 +1,15 @@
+// errorHandler.js
 import multer from 'multer';
-import express from 'express';
+import AppError from '../lib/appError.js';
 
-const router = express.Router();
-const app = express();
-
-// 404
-app.use((req, res, next) => {
-  res.status(404).json({ message: '데이터를 찾을 수 없습니다.' });
-});
-
-// 500
-app.use((err, req, res, next) => {
+function errorHandler(err, req, res, next) {
   console.error(err.stack);
-  let statusCode = err.status || 500;
+
+  // 기본값
+  let statusCode = err.statusCode || 500;
   let message = err.message || '서버 오류';
 
-  // 멀터 처리
+  // 멀터 에러 처리
   if (err instanceof multer.MulterError) {
     statusCode = 400;
     switch (err.code) {
@@ -27,12 +21,21 @@ app.use((err, req, res, next) => {
         break;
       case 'LIMIT_FILE_COUNT':
         message = '최대 5개의 파일만 업로드할 수 있습니다.';
+        break;
       default:
         message = err.message;
-        break;
     }
   }
-  res.status(statusCode).json({ message: message });
-});
 
-export default router;
+  // 운영/개발 모드 분리 가능
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(statusCode).json({ message });
+  } else {
+    return res.status(statusCode).json({
+      message,
+      stack: err.stack,
+    });
+  }
+}
+
+export default errorHandler;

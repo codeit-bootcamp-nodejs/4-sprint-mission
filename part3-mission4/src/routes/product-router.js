@@ -12,55 +12,63 @@ router
   .get(productController.getAllProducts)
   .post(
     authenticate,
-    validation.validateProductData,
+    validation.validate(validation.productSchema),
     productController.createProduct
   );
 
 router
   .route('/:id')
-  .get(validation.validateId, productController.getProductById)
+  .get(
+    validation.validateParam('id', validation.idSchema),
+    productController.getProductById
+  )
   .patch(
+    authenticate,
     isProductOwner,
-    validation.validateId,
-    validation.validateProductUpdateData,
+    validation.validateParam('id', validation.idSchema),
+    validation.validate(validation.productUpdateSchema),
     productController.updateProduct
   )
   .delete(
+    authenticate,
     isProductOwner,
-    validation.validateId,
+    validation.validateParam('id', validation.idSchema),
     productController.deleteProduct
   );
 
 // 댓글
 router
   .route('/:id/comments')
-  .get(validation.validateId, productController.getComments)
+  .get(
+    validation.validateParam('id', validation.idSchema),
+    productController.getComments
+  )
   .post(
     authenticate,
-    validation.validateId,
-    validation.validateCommentData,
+    validation.validateParam('id', validation.idSchema),
+    validation.validate(validation.commentSchema),
     productController.createComment
   );
 
 router
   .route('/:id/comments/:commentId')
   .get(
-    validation.validateId,
-    validation.validateCommentId,
+    validation.validateParam('id', validation.idSchema),
+    validation.validateParam('commentId', validation.idSchema),
     productController.getCommentById
   )
   .patch(
+    authenticate,
     isCommentOwner,
-    validation.validateCommentId,
-    validation.validateCommentData,
+    validation.validateParam('commentId', validation.idSchema),
+    validation.validate(validation.commentSchema),
     productController.updateComment
   )
   .delete(
+    authenticate,
     isCommentOwner,
-    validation.validateCommentId,
+    validation.validateParam('commentId', validation.idSchema),
     productController.deleteComment
   );
-
-router.get('/:id/myProducts', authenticate, productController.getUserProducts);
 
 export default router;

@@ -11,6 +11,7 @@ class ProductController {
   async createProduct(req, res) {
     const { name, description, price, tags } = req.body;
     const newProduct = await productService.createProduct(
+      req.user.id,
       name,
       description,
       price,
@@ -29,13 +30,17 @@ class ProductController {
     const { id } = req.params;
     const { name, description, price, tags, images } = req.body;
     const updateData = { name, description, price, tags, images };
-    const updated = await productService.updateProduct(id, updateData);
+    const updated = await productService.updateProduct(
+      id,
+      req.user.id,
+      updateData
+    );
     res.json(updated);
   }
 
   async deleteProduct(req, res) {
     const { id } = req.params;
-    await productService.deleteProduct(id);
+    await productService.deleteProduct(id, req.user.id);
     res.status(204).send();
   }
 
@@ -49,36 +54,46 @@ class ProductController {
   async createComment(req, res) {
     const { id } = req.params;
     const { content } = req.body;
-    const newComment = await commentService.createProductComment(id, content);
+    const userId = req.user.id; // authenticate 미들웨어에서 가져옴
+    const newComment = await commentService.createProductComment(
+      id,
+      content,
+      userId
+    );
     res.status(201).json(newComment);
   }
 
   async getCommentById(req, res) {
     const { id, commentId } = req.params;
-    const comment = await commentService.getCommentByIdProductId(id, commentId);
+    const comment = await commentService.getCommentByIdAndProductId(
+      id,
+      commentId
+    );
     res.json(comment);
   }
 
   async updateComment(req, res) {
     const { commentId } = req.params;
     const { content } = req.body;
-    const updated = await commentService.updateComment(commentId, content);
+    const userId = req.user.id;
+    const updated = await commentService.updateComment(
+      commentId,
+      userId,
+      content
+    );
     res.json(updated);
   }
 
   async deleteComment(req, res) {
     const { commentId } = req.params;
-    await commentService.deleteComment(commentId);
+    const userId = req.user.id;
+    await commentService.deleteComment(commentId, userId);
     res.status(204).send();
   }
 
   // 유저 제품 목록 조회
   async getUserProducts(req, res) {
-    console.log('req.params.id:', req.params.id); // <- 여기 확인
-    const userId = +req.params.id; // 문자열 -> 숫자
-    if (userId !== req.user.id) {
-      return res.status(403).json({ message: '권한이 없습니다.' });
-    }
+    const userId = req.user.id;
     const products = await productService.getUserProducts(userId);
     res.status(200).json({ products });
   }

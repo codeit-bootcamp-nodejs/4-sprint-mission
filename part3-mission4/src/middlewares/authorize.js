@@ -11,24 +11,30 @@ export const isOwner = (modelGetter) => async (req, res, next) => {
 };
 
 export const isProductOwner = isOwner((req) =>
-  prisma.product.findUnique({ where: { id: +req.params.id } })
+  prisma.product.findUnique({
+    where: { id: parseInt(req.params.id) },
+    select: { userId: true },
+  })
 );
 
 export const isArticleOwner = isOwner((req) =>
-  prisma.article.findUnique({ where: { id: +req.params.id } })
+  prisma.article.findUnique({
+    where: { id: parseInt(req.params.id) },
+    select: { userId: true }, // 반드시 userId 포함
+  })
 );
 
 export const isCommentOwner = isOwner((req) =>
-  prisma.comment.findUnique({ where: { id: +req.params.id } })
+  prisma.comment.findUnique({
+    where: { id: parseInt(req.params.id) },
+    select: { userId: true },
+  })
 );
 
 export const isUserSelf = async (req, res, next) => {
-  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+  const userId = parseInt(req.params.userId);
 
-  if (!user)
-    return res.status(404).json({ message: '대상을 찾을 수 없습니다.' });
-
-  if (user.id !== req.user.id) {
+  if (userId !== req.user.id) {
     return res.status(403).json({ message: '권한이 없습니다.' });
   }
 

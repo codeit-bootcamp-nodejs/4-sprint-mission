@@ -1,3 +1,4 @@
+import { commentService } from '../services/comment-service.js';
 import { userService } from '../services/user-service.js';
 
 class UserController {
@@ -48,6 +49,12 @@ class UserController {
     }
     await userService.updatePassword(req.user.id, currentPassword, newPassword);
     res.status(200).json({ message: '비밀번호가 변경되었습니다.' });
+  }
+
+  async getUserComments(req, res) {
+    const userId = req.user.id;
+    const comments = await commentService.getUserComments(userId);
+    res.status(200).json({ comments });
   }
 }
 

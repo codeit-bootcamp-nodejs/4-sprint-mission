@@ -46,6 +46,7 @@ model Article {
   title     String
   content   String
   tags      String[]
+  images    String[]
   userId    Int
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  Comment[]
