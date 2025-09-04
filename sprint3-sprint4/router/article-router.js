@@ -1,7 +1,12 @@
 import express from 'express'
+
+import LikeController from '../controller/like-controller.js';
+
 import articleController from '../controller/article-controller.js';
-import articleMiddleware from '../Middleware/article-middleware.js';
-import checkArticleAuthorize from '../Middleware/auth-middleware.js';
+import articleMiddleware from '../middleware/article-middleware.js';
+
+import checkAuthenticated from '../middleware/auth-middleware.js';
+import checkArticleAuthorize from '../middleware/auth-middleware.js';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +22,8 @@ ArticleRouter.get('/detail/:id',
 ArticleRouter.post('/', 
     articleMiddleware.ArticleValid, 
     articleMiddleware.ValidateForm,
-     articleController.postArticle)
+    checkAuthenticated,
+    articleController.postArticle)
 
 ArticleRouter.patch('detail/:id', 
     articleMiddleware.ValidateId, 
@@ -29,6 +35,19 @@ ArticleRouter.delete('/detail/:id',
     articleMiddleware.ValidateId,
     checkArticleAuthorize,
     articleController.deleteArticle )
+
+
+//like feature
+ArticleRouter.post('detail/:id',
+    checkAuthenticated,
+    likeController.ArticleLike
+)
+
+ArticleRouter.delete('detail/:id',
+    checkAuthenticated,
+    likeController.ArticleDislike
+)
+
 
 //article comments API routing
 ArticleRouter.get('/comments', 

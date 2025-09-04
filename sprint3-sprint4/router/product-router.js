@@ -1,13 +1,12 @@
-
-
-
 import express from 'express'
-import { PrismaClient } from '@prisma/client'
-import { ProductValid } from './MiddleWares.js';
+
+import likeController from '../controller/like-controller.js';
+
 import productController from '../controller/product-controller.js';
-import productMiddleware from '../Middleware/product-middleware.js';
-import checkAuthenticated from '../Middleware/auth-middleware.js';
-import checkProductAuthorize from '../Middleware/auth-middleware.js';
+import productMiddleware from '../middleware/product-middleware.js';
+
+import checkAuthenticated from '../middleware/auth-middleware.js';
+import checkProductAuthorize from '../middleware/auth-middleware.js';
 
 const prisma = new PrismaClient();
 
@@ -23,7 +22,7 @@ ProductRouter.get('/detail/:id',
     productController.getOneProduct)
 
 ProductRouter.post('/', 
-    ProductValid, 
+    // ProductValid, 
     productMiddleware.validateId, 
     productMiddleware.validateForm,
     checkAuthenticated,
@@ -38,6 +37,23 @@ ProductRouter.delete('/detail/:id',
     productMiddleware.validateId ,
     checkProductAuthorize,
     productController.deleteProduct)
+
+
+
+//like feature
+ProductRouter.post('detail/:id',
+    productMiddleware.validateId,
+    checkAuthenticated,
+    likeController.ProductLike
+)
+
+ProductRouter.delete('detail/:id',
+    productMiddleware.validateId,
+    checkAuthenticated,
+    likeController.ProductDislike
+)
+
+
 
 //Product Comment API 라우팅
 ProductRouter.get('/comments', 
