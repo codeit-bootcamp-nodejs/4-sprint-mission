@@ -1,18 +1,20 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../lib/prisma.js";
 
 async function getCommentListService({ cursorId, pageSize, parentType }) {
-  const where =
-    parentType === "product"
-      ? { productId: { not: null } }
-      : { articleId: { not: null } };
+  const where = parentType === "product" ? { productId: { not: null } } : { articleId: { not: null } };
   const query = {
     where,
     select: {
       id: true,
       content: true,
       createdAt: true,
+      User: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+        },
+      },
     },
     take: pageSize,
   };
@@ -24,15 +26,12 @@ async function getCommentListService({ cursorId, pageSize, parentType }) {
   return comment;
 }
 
-async function postCommentService({ parentId, parentType, content }) {
+async function postCommentService({ userId, parentId, parentType, content }) {
   const comment = await prisma.comment.create({
     data: {
       content,
-      [parentType]: {
-        connect: {
-          id: parentId,
-        },
-      },
+      [`${parentType}Id`]: parentId,
+      userId,
     },
     include: {
       [parentType]: true,
@@ -58,9 +57,4 @@ async function deleteCommentService({ id }) {
   return comment;
 }
 
-export {
-  getCommentListService,
-  postCommentService,
-  patchCommentService,
-  deleteCommentService,
-};
+export { getCommentListService, postCommentService, patchCommentService, deleteCommentService };

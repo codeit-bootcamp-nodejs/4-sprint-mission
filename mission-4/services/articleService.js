@@ -1,20 +1,22 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../lib/prisma.js";
 
 async function getArticleListService({ keyword, page, pageSize }) {
   const article = await prisma.article.findMany({
     where: {
-      OR: [
-        { title: { contains: keyword } },
-        { content: { contains: keyword } },
-      ],
+      OR: [{ title: { contains: keyword } }, { content: { contains: keyword } }],
     },
     select: {
       id: true,
       title: true,
       content: true,
       createdAt: true,
+      User: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -25,11 +27,12 @@ async function getArticleListService({ keyword, page, pageSize }) {
   return article;
 }
 
-async function postArticleService({ title, content }) {
+async function postArticleService({ userId, title, content }) {
   const article = await prisma.article.create({
     data: {
       title,
       content,
+      userId,
     },
   });
   return article;
@@ -43,6 +46,13 @@ async function getArticleService({ id }) {
       title: true,
       content: true,
       createdAt: true,
+      User: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+        },
+      },
     },
   });
   return article;
@@ -63,10 +73,4 @@ async function deleteArticleService({ id }) {
   return article;
 }
 
-export {
-  getArticleListService,
-  postArticleService,
-  getArticleService,
-  patchArticleService,
-  deleteArticleService,
-};
+export { getArticleListService, postArticleService, getArticleService, patchArticleService, deleteArticleService };

@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from "../lib/prisma.js";
 
-const prisma = new PrismaClient();
-
+// prettier-ignore
 async function getProductListService({ keyword, page, pageSize }) {
   const productList = await prisma.product.findMany({
     where: {
@@ -15,6 +14,13 @@ async function getProductListService({ keyword, page, pageSize }) {
       name: true,
       price: true,
       createdAt: true,
+      User: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+        },
+      },
     },
     skip: (page - 1) * pageSize,
     take: pageSize,
@@ -25,13 +31,14 @@ async function getProductListService({ keyword, page, pageSize }) {
   return productList;
 }
 
-async function postProductService({ name, description, price, tags }) {
+async function postProductService({ userId, name, description, price, tags }) {
   const product = await prisma.product.create({
     data: {
       name,
       description,
       price,
       tags,
+      userId,
     },
   });
   return product;
@@ -47,6 +54,13 @@ async function getProductService({ id }) {
       price: true,
       tags: true,
       createdAt: true,
+      User: {
+        select: {
+          id: true,
+          email: true,
+          nickname: true,
+        },
+      },
     },
   });
   return product;
@@ -67,10 +81,4 @@ async function deleteProductService({ id }) {
   return product;
 }
 
-export {
-  getProductListService,
-  postProductService,
-  getProductService,
-  patchProductService,
-  deleteProductService,
-};
+export { getProductListService, postProductService, getProductService, patchProductService, deleteProductService };
