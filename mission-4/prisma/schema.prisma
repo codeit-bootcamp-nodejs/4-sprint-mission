@@ -17,6 +17,7 @@ model User {
   nickname  String   @unique
   image     String?
   password  String
+  refreshToken String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -25,7 +26,6 @@ model User {
   comments      Comment[]
   productLikes  ProductLike[]
   articleLikes  ArticleLike[]
-
   @@map("users")
 }
 
