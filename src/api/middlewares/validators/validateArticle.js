@@ -1,13 +1,6 @@
-export default function validateArticle(req, res, next) {
-  const { title, content } = req.body;
+import { z } from "zod";
 
-  if (!title || typeof title !== "string") {
-    return res.status(400).json({ error: "제목을 입력하세요 (문자열)" });
-  }
-
-  if (!content || typeof content !== "string") {
-    return res.status(400).json({ error: "내용을 입력하세요 (문자열)" });
-  }
-
-  next();
-}
+export const ArticleSchema = z.object({
+  title: z.string().min(1, { message: "제목을 입력하세요" }),
+  content: z.string().min(1, { message: "내용을 입력하세요." }),
+});

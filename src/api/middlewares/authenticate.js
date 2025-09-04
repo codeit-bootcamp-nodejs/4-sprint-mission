@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import prisma from "../libs/prismaClient.js";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 
 export default async function authenticate(req, res, next) {
   const { accessToken } = req.cookies;
@@ -13,8 +12,8 @@ export default async function authenticate(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(accessToken, JWT_SECRET);
-    const userId = decoded.userId;
+    const decoded = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
+    const userId = decoded.id;
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
