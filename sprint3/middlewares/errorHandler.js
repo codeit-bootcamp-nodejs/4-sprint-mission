@@ -1,7 +1,7 @@
 export function errorHandler(err, req, res, next) {
   const status = err.status;
-  console.log("Error:", err);
-  console.log("Status:", status);
+  console.error("Error:", err);
+  console.error("Status:", status);
 
   if (status === 400) {
     return res.status(status).json({ error: "잘못된 요청입니다." });

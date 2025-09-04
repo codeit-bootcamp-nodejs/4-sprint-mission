@@ -1,9 +1,9 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import productRouter from "./routes/products.js";
-import articleRouter from "./routes/articles.js";
-import imageRouter from "./routes/image.js";
+import productRouter from "./routers/productsRouter.js";
+import articleRouter from "./routers/articlesRouter.js";
+import imageRouter from "./routers/imageRouter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 dotenv.config();
