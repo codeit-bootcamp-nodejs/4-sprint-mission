@@ -1,18 +1,20 @@
 import express from "express";
-import commnetValidator from "../middlewares/commentValidator.js";
+import commentValidator from "../middlewares/validation.middleware/commentValidator.js";
 import CommentController from "../controllers/commentController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import authentication from "../middlewares/authentication.js";
+import authorization from "../middlewares/authorizaion.js";
 
 const commentRouter = express.Router();
 
 // prettier-ignore
 commentRouter.route('/')
-    .get(commnetValidator(), asyncHandler(CommentController.getCommentList))
-    .post(commnetValidator(), asyncHandler(CommentController.postComment))
+    .get(commentValidator(), asyncHandler(CommentController.getCommentList))
+    .post(authentication(), commentValidator(), asyncHandler(CommentController.postComment))
 
 // prettier-ignore
 commentRouter.route('/:id')
-    .patch(commnetValidator(), asyncHandler(CommentController.patchComment))
-    .delete(commnetValidator(), asyncHandler(CommentController.deleteComment))
+    .patch(authentication(), commentValidator(), authorization('comment'), asyncHandler(CommentController.patchComment))
+    .delete(authentication(), commentValidator(), authorization('comment'), asyncHandler(CommentController.deleteComment))
 
 export default commentRouter;
