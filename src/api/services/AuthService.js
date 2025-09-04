@@ -1,13 +1,14 @@
 import prisma from "../libs/prismaClient.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
+import { hashing } from "../libs/hashing.js";
 import { generateTokens } from "../libs/token.js";
 
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
 const AuthService = {
   async signup(signupData) {
+    // 이메일로 이미 존재하는 사용자인지 확인
     const existingUser = await prisma.user.findUnique({
       where: { email: signupData.email },
     });
@@ -18,18 +19,17 @@ const AuthService = {
       throw error;
     }
 
+    // 사용자 생성 전 비밀번호 해싱
+    const { email, nickname, password } = signupData;
+    const hashedPassword = await hashing(password);
+
     // 사용자 생성
     const newUser = await prisma.user.create({
-      data: signupData,
+      data: { email, nickname, password: hashedPassword },
     });
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
-  },
-
-  // 토큰 해싱 메서드 정의
-  hashToken(token) {
-    return crypto.createHash("sha256").update(token).digest("hex");
   },
 
   async login(loginData) {
@@ -56,7 +56,7 @@ const AuthService = {
     // 액세스 토큰 및 리프레시 토큰 생성
     const { accessToken, refreshToken } = generateTokens(user.id);
 
-    const hashedRefreshToken = this.hashToken(refreshToken);
+    const hashedRefreshToken = await hashing(refreshToken);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -76,7 +76,7 @@ const AuthService = {
       throw error;
     }
 
-    const hashedOldRefreshToken = this.hashToken(oldRefreshToken);
+    const hashedOldRefreshToken = await hashing(oldRefreshToken);
 
     try {
       const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET);
@@ -95,7 +95,7 @@ const AuthService = {
       // 새로운 Access Token, Refresh Token 생성
       const { newAccessToken, newRefreshToken } = generateTokens(user.id);
 
-      const hashedNewRefreshToken = this.hashToken(newRefreshToken);
+      const hashedNewRefreshToken = await hashing(newRefreshToken);
 
       await prisma.user.update({
         where: { id: user.id },
