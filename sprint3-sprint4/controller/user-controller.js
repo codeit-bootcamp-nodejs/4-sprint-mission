@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt'
 import prisma from 'lib/prisma.js'
-import 
+
 
 class UserController{
     register = async(req,res,next) => {
@@ -68,7 +68,6 @@ class UserController{
 
         return userProduct
     }
-
 }
 
 export default new UserController();

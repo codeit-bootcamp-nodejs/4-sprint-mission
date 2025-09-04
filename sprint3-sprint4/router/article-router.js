@@ -1,7 +1,7 @@
 import express from 'express'
-import { PrismaClient } from '@prisma/client';
 import articleController from '../controller/article-controller.js';
 import articleMiddleware from '../Middleware/article-middleware.js';
+import checkArticleAuthorize from '../Middleware/auth-middleware.js';
 
 const prisma = new PrismaClient();
 
@@ -22,10 +22,12 @@ ArticleRouter.post('/',
 ArticleRouter.patch('detail/:id', 
     articleMiddleware.ValidateId, 
     articleMiddleware.ValidateForm,
+    checkArticleAuthorize,
     articleController.patchArticle)
 
 ArticleRouter.delete('/detail/:id', 
     articleMiddleware.ValidateId,
+    checkArticleAuthorize,
     articleController.deleteArticle )
 
 //article comments API routing

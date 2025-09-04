@@ -2,6 +2,7 @@ import express from 'express';
 import userController from '../controller/user-controller';
 import passport from 'passport';
 
+
 userRouter = express.router();
 
 
@@ -12,7 +13,7 @@ userRouter.get('/:userId', userController.getUser)
 userRouter.patch('/:userId', userController.patchUser)
 userRouter.patch('/:userId', userController.patchPassword)
 
-userRouter.get(':userID/products', userController.getUserProduct)
+userRouter.get(':id/products', userController.getUserProduct)
 
 
 // passport.authenticate('local'),

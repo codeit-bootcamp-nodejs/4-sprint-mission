@@ -6,6 +6,8 @@ import { PrismaClient } from '@prisma/client'
 import { ProductValid } from './MiddleWares.js';
 import productController from '../controller/product-controller.js';
 import productMiddleware from '../Middleware/product-middleware.js';
+import checkAuthenticated from '../Middleware/auth-middleware.js';
+import checkProductAuthorize from '../Middleware/auth-middleware.js';
 
 const prisma = new PrismaClient();
 
@@ -20,19 +22,21 @@ ProductRouter.get('/detail/:id',
     productMiddleware.validateId,
     productController.getOneProduct)
 
-ProductRouter.post('/postProduct', 
+ProductRouter.post('/', 
     ProductValid, 
     productMiddleware.validateId, 
     productMiddleware.validateForm,
+    checkAuthenticated,
     productController.postProduct )
 
-ProductRouter.patch('/detail/:id', 
+ProductRouter.patch('/detail/:id',
     productMiddleware.validateId,
-
+    checkProductAuthorize,
     productController.patchProduct )
 
-ProductRouter.delete('/detail/:id', 
+ProductRouter.delete('/detail/:id',
     productMiddleware.validateId ,
+    checkProductAuthorize,
     productController.deleteProduct)
 
 //Product Comment API 라우팅
