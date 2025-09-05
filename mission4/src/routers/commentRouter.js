@@ -14,16 +14,12 @@ const commentSchema = z.object({
     .max(100, { message: "덧글은 최대 100자까지 가능합니다." }),
 });
 
-const commentQuerySchema = z.object({
-  id: z
-    .string()
-    .regex(/^\d+$/, { message: "id는 숫자여야 합니다." })
-    .transform(Number),
-  lastId: z
-    .string()
-    .regex(/^\d+$/, { message: "lastId는 숫자여야 합니다." })
-    .transform(Number)
-    .optional(),
+const commentListSchema = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive({ message: "id는 양의 정수여야 합니다." }),
+  lastId: z.coerce.number().int().positive().optional(),
 });
 
 router.post(
@@ -47,12 +43,12 @@ router.delete(
   deleteComment
 );
 router.get(
-  "/comments/products",
+  "/comments/products/:id",
   passport.authenticate("access-token", { session: false }),
   productCommentList
 );
 router.get(
-  "/comments/articles",
+  "/comments/articles/:id",
   passport.authenticate("access-token", { session: false }),
   articleCommentList
 );
@@ -130,7 +126,7 @@ async function modifyComment(req, res, next) {
   }
 }
 
-async function deleteComment(req, res) {
+async function deleteComment(req, res, next) {
   const commentId = Number(req.params.id);
   const user = req.user;
 
@@ -158,10 +154,13 @@ async function deleteComment(req, res) {
 }
 
 async function productCommentList(req, res, next) {
-  const parsed = querySchema.parse(req.query); // 유효성 검사 + 변환
-  const { id: productId, lastId } = parsed;
-
   try {
+    const parsed = commentListSchema.parse({
+      id: req.params.id,
+      lastId: req.query.lastId,
+    });
+    const { id: productId, lastId } = parsed;
+
     const comments = await prisma.comment.findMany({
       where: {
         AND: [
@@ -173,9 +172,9 @@ async function productCommentList(req, res, next) {
           },
         ],
       },
-      take: 5, //첫 불러내는 comment가 총 5개 이고 lastId가 지정이 안되면 skip 의 값은 0이 되고 있다면 1로 설정
+      take: 5,
       skip: lastId ? 1 : 0,
-      ...(lastId && { cursor: { id: lastId } }), //lastId의 값이 있을때 괄호가 풀어지며 내부의 'cursor: { id: lastId }가 작동함
+      ...(lastId && { cursor: { id: lastId } }),
       select: {
         id: true,
         content: true,
@@ -190,10 +189,13 @@ async function productCommentList(req, res, next) {
 }
 
 async function articleCommentList(req, res, next) {
-  const parsed = querySchema.parse(req.query);
-  const { id: articleId, lastId } = parsed;
-
   try {
+    const parsed = commentListSchema.parse({
+      id: req.params.id,
+      lastId: req.query.lastId,
+    });
+    const { id: articleId, lastId } = parsed;
+    
     const comments = await prisma.comment.findMany({
       where: {
         AND: [
