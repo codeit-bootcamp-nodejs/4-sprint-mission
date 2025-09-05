@@ -1,6 +1,7 @@
 
 import bcrypt from 'bcrypt'
 import prisma from '../lib/prisma.js'
+import jsonWebToken from '../lib/json-web-token.js';
 
 class userService{
     createUser = async({password,email,nickname}) => {
