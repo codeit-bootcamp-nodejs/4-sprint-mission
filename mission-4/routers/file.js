@@ -1,5 +1,5 @@
 import express from "express";
-import { upload } from "../lib/multer.js";
+import upload from "../lib/multer.js";
 import fileController from "../controllers/fileController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import fileValidator from "../middlewares/validation.middleware/fileValidator.js";

@@ -3,6 +3,7 @@ import {
   patchUserService,
   deleteUserService,
   getUserContentListService,
+  getUserContentLikeListService,
 } from "../services/userService.js";
 
 class UserController {
@@ -27,12 +28,19 @@ class UserController {
     return res.status(200).json(result);
   }
   async getUserContentList(req, res) {
-    const { content } = req.params;
     const args = {
       id: req.user.id,
-      content: content.charAt(0).toUpperCase() + content.slice(1),
+      content: req.content,
     };
     const result = await getUserContentListService(args);
+    return res.status(200).json(result);
+  }
+  async getUserContentLikeList(req, res) {
+    const args = {
+      id: req.user.id,
+      content: req.content,
+    };
+    const result = await getUserContentLikeListService(args);
     return res.status(200).json(result);
   }
 }

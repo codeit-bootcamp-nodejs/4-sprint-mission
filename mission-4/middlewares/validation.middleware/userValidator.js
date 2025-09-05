@@ -6,8 +6,9 @@ export default function userValidator() {
       // 추후 확장 고려
       switch (req.method) {
         case "GET":
-          if (req.params) {
-            contentSchema.parse(req.params);
+          if (req.params.content) {
+            const { content } = contentSchema.parse(req.params);
+            req.content = content;
           }
           break;
         case "PATCH":

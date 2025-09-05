@@ -4,15 +4,26 @@ import {
   postArticleService,
   patchArticleService,
   deleteArticleService,
+  postArticleLikeService,
+  deleteArticleLikeService,
 } from "../services/articleService.js";
 
 class ArticleController {
   async getArticle(req, res) {
-    const result = await getArticleService({ id: req.parsedId });
+    const { id } = req.parsedId;
+    const args = {
+      userId: req.user?.id,
+      articleId: id,
+    };
+    const result = await getArticleService(args);
     return res.status(200).json(result);
   }
   async getArticleList(req, res) {
-    const result = await getArticleListService(req.parsedQuery);
+    const args = {
+      userId: req.user?.id,
+      ...req.parsedQuery,
+    };
+    const result = await getArticleListService(args);
     return res.status(200).json(result);
   }
   async postArticle(req, res) {
@@ -33,6 +44,24 @@ class ArticleController {
   }
   async deleteArticle(req, res) {
     const result = await deleteArticleService({ id: req.parsedId });
+    return res.status(200).json(result);
+  }
+  async postArticleLike(req, res) {
+    const { id } = req.parsedId;
+    const args = {
+      userId: req.user.id,
+      articleId: id,
+    };
+    const result = await postArticleLikeService(args);
+    return res.status(201).json(result);
+  }
+  async deleteArticleLike(req, res) {
+    const { id } = req.parsedId;
+    const args = {
+      userId: req.user.id,
+      articleId: id,
+    };
+    const result = await deleteArticleLikeService(args);
     return res.status(200).json(result);
   }
 }

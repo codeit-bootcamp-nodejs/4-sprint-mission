@@ -17,4 +17,7 @@ userRouter.route("/")
 userRouter.route("/:content")
   .get(authentication(), userValidator(), asyncHandler(UserController.getUserContentList))
 
+// prettier-ignore
+userRouter.route("/:content/likes")
+  .get(authentication(), userValidator(), asyncHandler(UserController.getUserContentLikeList))
 export default userRouter;

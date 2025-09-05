@@ -1,3 +1,4 @@
+import { email, includes } from "zod";
 import prisma from "../lib/prisma.js";
 
 async function getUserService({ id }) {
@@ -9,7 +10,7 @@ async function getUserService({ id }) {
       id: true,
       email: true,
       nickname: true,
-      Image: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -25,7 +26,7 @@ async function patchUserService({ id, data }) {
       id: true,
       email: true,
       nickname: true,
-      Image: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -42,7 +43,7 @@ async function deleteUserService({ id }) {
       id: true,
       email: true,
       nickname: true,
-      Image: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -50,15 +51,67 @@ async function deleteUserService({ id }) {
   return result;
 }
 async function getUserContentListService({ id, content }) {
+  content += "s";
+  let options = {};
+  if (content === "comments") {
+    options = {
+      select: {
+        [content]: true,
+      },
+    };
+  } else {
+    options = {
+      select: {
+        [content]: {
+          include: {
+            _count: { select: { likes: true } },
+            likes: { where: { userId: id } },
+          },
+        },
+      },
+    };
+  }
+  const userContent = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    ...options,
+  });
+  let result = userContent;
+  if (content === "products" || content === "articles") {
+    const contentList = userContent[content];
+    const filteredContentList = contentList.map((content) => {
+      const { likes, _count, ...filteredContent } = content;
+      return {
+        likeCount: content._count.likes,
+        isLike: id ? content.likes.length === 1 : false,
+        ...filteredContent,
+      };
+    });
+    result = filteredContentList;
+  }
+  return result;
+}
+async function getUserContentLikeListService({ id, content }) {
   const result = await prisma.user.findUniqueOrThrow({
     where: {
       id,
     },
     select: {
-      [content]: true,
+      [`${content}Likes`]: {
+        include: {
+          [content]: true,
+        },
+      },
     },
   });
   return result;
 }
 
-export { getUserService, patchUserService, deleteUserService, getUserContentListService };
+export {
+  getUserService,
+  patchUserService,
+  deleteUserService,
+  getUserContentListService,
+  getUserContentLikeListService,
+};

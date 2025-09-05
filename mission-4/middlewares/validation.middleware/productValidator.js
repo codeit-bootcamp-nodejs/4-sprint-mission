@@ -13,7 +13,11 @@ export default function productValidator() {
           }
           break;
         case "POST":
-          postSchema.parse(req.body);
+          if (req.params.id) {
+            req.parsedId = idSchema.parse(req.params);
+          } else {
+            postSchema.parse(req.body);
+          }
           break;
         case "PATCH":
           req.parsedId = idSchema.parse(req.params);

@@ -1,8 +1,8 @@
 import prisma from "../lib/prisma.js";
 
 // prettier-ignore
-async function getProductListService({ keyword, page, pageSize }) {
-  const productList = await prisma.product.findMany({
+async function getProductListService({ keyword, page, pageSize, userId }) {
+  const products = await prisma.product.findMany({
     where: {
       OR: [
         { name: { contains: keyword } },
@@ -14,6 +14,16 @@ async function getProductListService({ keyword, page, pageSize }) {
       name: true,
       price: true,
       createdAt: true,
+      likes: {
+        where: {
+          userId,
+        },
+      },
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
       User: {
         select: {
           id: true,
@@ -28,7 +38,15 @@ async function getProductListService({ keyword, page, pageSize }) {
       createdAt: "desc",
     },
   });
-  return productList;
+  const results = products.map((product) => {
+    const { likes, _count, ...filteredProduct } = product;
+    return {
+      likeCount: product._count.likes,
+      isLike: userId ? product.likes.length === 1 : false,
+      ...filteredProduct,
+    };
+  });
+  return results;
 }
 
 async function postProductService({ userId, name, description, price, tags }) {
@@ -44,9 +62,11 @@ async function postProductService({ userId, name, description, price, tags }) {
   return product;
 }
 
-async function getProductService({ id }) {
+async function getProductService({ productId, userId }) {
   const product = await prisma.product.findUniqueOrThrow({
-    where: id,
+    where: {
+      id: productId,
+    },
     select: {
       id: true,
       name: true,
@@ -54,6 +74,16 @@ async function getProductService({ id }) {
       price: true,
       tags: true,
       createdAt: true,
+      likes: {
+        where: {
+          userId,
+        },
+      },
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
       User: {
         select: {
           id: true,
@@ -63,7 +93,13 @@ async function getProductService({ id }) {
       },
     },
   });
-  return product;
+  const { likes, _count, ...filteredProduct } = product;
+  const result = {
+    likeCount: product._count.likes,
+    isLike: userId ? product.likes.length === 1 : false,
+    ...filteredProduct,
+  };
+  return result;
 }
 
 async function patchProductService({ id, data }) {
@@ -81,4 +117,34 @@ async function deleteProductService({ id }) {
   return product;
 }
 
-export { getProductListService, postProductService, getProductService, patchProductService, deleteProductService };
+async function postProductLikeService({ userId, productId }) {
+  const product = await prisma.productLike.create({
+    data: {
+      userId,
+      productId,
+    },
+  });
+  return product;
+}
+
+async function deleteProductLikeService({ userId, productId }) {
+  const product = await prisma.productLike.delete({
+    where: {
+      userId_productId: {
+        userId,
+        productId,
+      },
+    },
+  });
+  return product;
+}
+
+export {
+  getProductListService,
+  postProductService,
+  getProductService,
+  patchProductService,
+  deleteProductService,
+  postProductLikeService,
+  deleteProductLikeService,
+};
