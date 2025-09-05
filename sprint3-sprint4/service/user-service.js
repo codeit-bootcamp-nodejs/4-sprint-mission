@@ -51,7 +51,17 @@ class userService{
         return likedProducList;
     }
     
+    formatUser = async(user) => {
+        let formattedUser = {};
+        formattedUser.email = user.email;
+        formattedUser.nickname = user.nickname;
+        formattedUser.image = user.image;
+        formattedUser.createdAt = user.createdAt;
+        formattedUser.updatedAt = user.updatedAt;
 
+        return formattedUser
+    }
+        
 
 }
 

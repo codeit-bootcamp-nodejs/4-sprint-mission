@@ -11,7 +11,7 @@ class UserController{
         const newUser = userService.createUser({
             email,nickname,password})
 
-        return newUser
+        return userService.formatUser(newUser)
     }
 
     login = async(req,res,next) => {
@@ -31,7 +31,7 @@ class UserController{
 
         //비밀번호 빼기
 
-        return user
+        return userService.formatUser(user)
     }
 
     patchUser = async(req,res,next) => {
@@ -41,7 +41,7 @@ class UserController{
             where:{id:userId},
             data:{nickname,image}
         })
-        return patchUser
+        return userService.formatUser(patchUser)
     }
 
     patchPassword = async(req,res,next) => {
@@ -51,7 +51,7 @@ class UserController{
             where:{id:userId},
             data:{password}
         })
-        return patchUser
+        return userService.formatUser(patchUser)
     }
 
     getUserProduct = async(req,res, next) => {
