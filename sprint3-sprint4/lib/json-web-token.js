@@ -10,7 +10,7 @@ export class jsonWebToken{
     */
     generateAccess = (payload) => {
         const SecretKey = ACCESS_SECRET_KEY;
-        const accesToken = jwt.sign(payload, secretKey,
+        const accesToken = jwt.sign(payload.userId, secretKey,
            {expiresIn: '1h'} )
 
         return accesToken
@@ -18,7 +18,7 @@ export class jsonWebToken{
 
     generateRefresh = (payload) => {
         const SecretKey = REFRESH_SECRET_KEY;
-        const refreshToken = jwt.sign(payload, secretKey,
+        const refreshToken = jwt.sign(payload.userId, secretKey,
             {expiresIn: '1d'})
 
         return refreshToken
