@@ -1,6 +1,7 @@
 import express from "express";
 import { prisma } from "../utils/prisma.util.js";
-import authMiddleware from '../middlewares/auth.middleware.js'
+import authMiddleware from '../middlewares/auth.middleware.js';
+import upload from '../middlewares/upload.middleware.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -292,6 +293,38 @@ router.post('/token/refresh', async (req, res, next) => {
     }
     next(err);
   }
+});
+
+/** 프로필 이미지 업로드 **/
+router.put('/users/me/image', authMiddleware, upload.single('image'),async(req, res, next) =>{
+    try{
+        const { id: userId } = req.user;
+        const file = req.file;
+        if(!file) {
+            return res.status(400).json({ message: "이미지 파일 업로드해주세요"});
+        }
+
+        const imageUrl = file.path;
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: { image: imageUrl },
+            select: {
+                id: true,
+                email: true,
+                nickname: true,
+                image: true,
+                createdAt: true,
+                updatedAt: true,
+            }
+        });
+        return res.status(200).json({
+            message: "프로필 이미지가 성공적으로 변경되었습니다.",
+            data: updatedUser
+        });
+    } catch(err){
+        next(err);
+    }
 });
 
 export default router;
