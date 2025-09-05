@@ -7,6 +7,7 @@ import articleMiddleware from '../middleware/article-middleware.js';
 
 import checkAuthenticated from '../middleware/auth-middleware.js';
 import checkArticleAuthorize from '../middleware/auth-middleware.js';
+import passport from 'passport';
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,7 @@ ArticleRouter.get('/detail/:id',
 ArticleRouter.post('/', 
     articleMiddleware.ArticleValid, 
     articleMiddleware.ValidateForm,
+    passport.authenticate('AccessToken', {session:false}) ,
     checkAuthenticated,
     articleController.postArticle)
 
@@ -39,12 +41,12 @@ ArticleRouter.delete('/detail/:id',
 
 //like feature
 ArticleRouter.post('detail/:id',
-    checkAuthenticated,
+    passport.authenticate('AccessToken', {session:false}) ,
     likeController.ArticleLike
 )
 
 ArticleRouter.delete('detail/:id',
-    checkAuthenticated,
+    passport.authenticate('AccessToken', {session:false}) ,
     likeController.ArticleDislike
 )
 
@@ -55,6 +57,7 @@ ArticleRouter.get('/comments',
 
 ArticleRouter.post('/detail/:id/comments', 
     articleMiddleware.ValidateId,
+    passport.authenticate('AccessToken', {session:false}) ,
     articleController.postComment)
 
 ArticleRouter.patch('/detail/:id/comments', 

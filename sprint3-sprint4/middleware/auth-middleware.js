@@ -11,35 +11,53 @@ export function checkAuthenticated(req,res,next){
     }
 }
 
+export function checkAccessToken(req,res,next){
+
+}
 
 export async function checkProductAuthorize(req,res,next){
-        const sessionUser = req.user;
-        const sessionUserId = sessionUser.id;
-        const productId = req.params.id;
-        const product =  await prisma.product.findUnique({
-            where:{id:productId}
-        })
-
-        if (sessionUserId == product.userId){
-            return next()
-        }else{
-            return res.status(401).send("권한이 없습니다")
-        }
+    const productId = Number(req.params.id);
+    const user = req.user;
+    const product = await prisma.product.findUnique({
+        where:{id:productId}
+    })
+    if (product.userId==user.id){
+        return next()
+    }else{
+        const error = new Error("401 unathorized")
+        error.status = 401
+        throw error
     }
+}
 
 export async function checkArticleAuthorize(req,res,next){
-        const sessionUser = req.user;
-        const sessionUserId = sessionUser.id;
-        const articleId = req.params.id;
-        const article = await prisma.article.findUnique({
-            where:{id:articleId}
-        })
-
-        if (sessionUserId == article.userId){
-            return next()
-        }else{
-            return res.status(401).send("권한이 없습니다")
-        }
+    const articleId = Number(req.params.id);
+    const user = req.user;
+    const article = await prisma.article.findUnique({
+        where:{id:articleId}
+    })
+    if (article.userId==user.id){
+        return next()
+    }else{
+        const error = new Error("401 unathorized")
+        error.status = 401
+        throw error
     }
+}
 
+
+export async function checkProductCommentAuthorize(req,res,next){
+    const productId = Number(req.params.id);
+    const user = req.user;
+    const product = await prisma.product.findUnique({
+        where:{id:productId}
+    })
+    if (product.userId==user.id){
+        return next()
+    }else{
+        const error = new Error("401 unathorized")
+        error.status = 401
+        throw error
+    }
+}
 
