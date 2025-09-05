@@ -41,7 +41,7 @@ model Product{
   comment           ProductComment[]
   user              User             @relation(fields:[userId], references:[id], onDelete: Cascade )
   userId            Int
-  productLike       ProductLike[]
+  like              ProductLike[]
 }
 
 model Article{
