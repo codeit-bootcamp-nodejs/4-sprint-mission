@@ -16,15 +16,12 @@ const refreshTokenOptions = {
 };
 
 async function jwtVerify(payload, done) {
-  console.log('JWT payload received:', payload); // 🔥 여기
   try {
     const user = await prisma.user.findUnique({
       where: { id: payload.id },
     });
-    console.log('User found:', user); // 🔥 여기
     done(null, user);
   } catch (error) {
-    console.error('Error in jwtVerify:', error); // 🔥 여기
     done(error, false);
   }
 }

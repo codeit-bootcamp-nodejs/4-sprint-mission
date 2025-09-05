@@ -28,8 +28,6 @@ class UserService {
 
   async login(userId) {
     const { accessToken, refreshToken } = generateTokens(userId);
-    console.log('생성된 엑세스 토큰:', accessToken);
-    console.log('생성된 리프레시 토큰:', refreshToken);
     return { accessToken, refreshToken };
   }
 
@@ -61,11 +59,8 @@ class UserService {
 
   async updatePassword(userId, currentPassword, newPassword) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    console.log('입력한 currentPassword:', currentPassword);
-    console.log('DB에 저장된 user.password (해시):', user.password);
 
     const isValid = await bcrypt.compare(currentPassword, user.password);
-    console.log('bcrypt.compare 결과:', isValid);
 
     if (!isValid) throw new AppError('현재 비밀번호가 일치하지 않습니다.');
 
@@ -74,7 +69,6 @@ class UserService {
       throw new AppError('기존 비밀번호로는 변경할 수 없습니다.');
 
     const hashed = await bcrypt.hash(newPassword, 10);
-    console.log('새 비밀번호 해시:', hashed);
 
     return prisma.user.update({
       where: { id: userId },
