@@ -3,6 +3,7 @@ import router from "./routers/index.js";
 import errorHandler from "./middlewares/errorHandler.js";
 import cors from "cors";
 import morgan from "morgan";
+import "./lib/redis.js";
 
 const app = express();
 const PORT = 3000;

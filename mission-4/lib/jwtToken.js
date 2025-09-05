@@ -12,11 +12,9 @@ function generateToken(userid) {
 }
 
 function verifyAccessToken(token) {
-  const result = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
-  return { id: result.id };
+  return jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
 }
 function verifyRefreshToken(token) {
-  const result = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
-  return { id: result.id };
+  return jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
 }
 export { generateToken, verifyAccessToken, verifyRefreshToken };

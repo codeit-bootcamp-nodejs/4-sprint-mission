@@ -3,11 +3,11 @@ import prisma from "../lib/prisma.js";
 import { redisClient } from "../lib/redis.js";
 import { REDIS_KEY } from "../lib/constants.js";
 
-export default function authentication() {
+export default function optionalAuthentication() {
   return async (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({ error: "인증이 유효하지 않습니다." });
+      return next();
     }
     const token = authHeader.split(" ")[1];
     try {
@@ -15,7 +15,7 @@ export default function authentication() {
       const isBlacklisted = await redisClient.get(`${REDIS_KEY}:${token}`);
 
       if (isBlacklisted) {
-        return res.status(401).json({ error: "만료된 토큰입니다. 다시 로그인해주세요." });
+        return res.status(401).json({ error: "로그아웃된 토큰입니다. 다시 로그인해주세요." });
       }
       const result = verifyAccessToken(token);
       const user = await prisma.user.findUniqueOrThrow({
