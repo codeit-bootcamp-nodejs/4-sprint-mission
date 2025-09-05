@@ -12,19 +12,32 @@ import {
   validateArticleQuery,
 } from "../middlewares/validate.js";
 import articleCommentRouter from "./articleCommentsRouter.js";
+import passport from "../lib/passport/index.js";
 
 const articleRouter = express.Router();
 
 articleRouter
   .route("/")
   .get(validateArticleQuery, getArticleList)
-  .post(validateArticleCreate, postArticle);
+  .post(
+    validateArticleCreate,
+    passport.authenticate("access-token", { session: false }),
+    postArticle
+  );
 
 articleRouter
   .route("/:id")
   .get(validateId, getArticleById)
-  .patch(validateId, patchArticle)
-  .delete(validateId, deleteArticle);
+  .patch(
+    validateId,
+    passport.authenticate("access-token", { session: false }),
+    patchArticle
+  )
+  .delete(
+    validateId,
+    passport.authenticate("access-token", { session: false }),
+    deleteArticle
+  );
 
 articleRouter.use("/:articleId/comments", articleCommentRouter);
 

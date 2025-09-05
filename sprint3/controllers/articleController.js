@@ -25,8 +25,9 @@ export const getArticleList = async (req, res, next) => {
 export const postArticle = async (req, res, next) => {
   try {
     const { title, content } = req.body;
+    const userId = req.user.id;
 
-    const article = await createArticle(title, content);
+    const article = await createArticle(title, content, userId);
 
     res.status(201).json(article);
   } catch (err) {
@@ -53,10 +54,11 @@ export const getArticleById = async (req, res, next) => {
 export const patchArticle = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const userId = req.user.id;
 
     const { title, content } = req.body;
 
-    const article = await updateArticle(id, title, content);
+    const article = await updateArticle(id, title, content, userId);
 
     res.status(200).json(article);
   } catch (err) {
@@ -67,8 +69,9 @@ export const patchArticle = async (req, res, next) => {
 export const deleteArticle = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const userId = req.user.id;
 
-    await removeArticle(id);
+    await removeArticle(id, userId);
 
     res.status(200).json({ message: `${id} 삭제 완료` });
   } catch (err) {

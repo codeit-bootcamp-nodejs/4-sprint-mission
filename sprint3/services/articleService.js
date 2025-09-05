@@ -33,12 +33,13 @@ export const getArticles = async (offset, limit, title, content) => {
   }
 };
 
-export const createArticle = async (title, content) => {
+export const createArticle = async (title, content, userId) => {
   try {
     const article = await prisma.article.create({
       data: {
         title,
         content,
+        userId,
       },
     });
 
@@ -66,7 +67,7 @@ export const findArticleById = async (id) => {
   }
 };
 
-export const updateArticle = async (id, title, content) => {
+export const updateArticle = async (id, title, content, userId) => {
   try {
     const articleData = {};
 
@@ -76,20 +77,41 @@ export const updateArticle = async (id, title, content) => {
     if (content !== undefined) {
       articleData.content = content;
     }
+    const article = await prisma.article.findUnique({ where: { id } });
 
-    const article = await prisma.article.update({
+    if (article.userId != userId) {
+      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
+    const updatedArticle = await prisma.article.update({
       where: { id },
       data: articleData,
     });
 
-    return article;
+    return updatedArticle;
   } catch (err) {
     throw err;
   }
 };
 
-export const removeArticle = async (id) => {
+export const removeArticle = async (id, userId) => {
   try {
+    const article = await prisma.article.findUnique({ where: { id } });
+
+    if (!article) {
+      const error = new Error("게시글을 찾을 수 없습니다.");
+      error.status = 404;
+      throw error;
+    }
+
+    if (article.userId != userId) {
+      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
     await prisma.article.delete({ where: { id } });
   } catch (err) {
     throw err;

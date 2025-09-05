@@ -10,16 +10,6 @@ import {
 const accessTokenOptions = {
   jwtFromRequest: (req) => req.cookies[ACCESS_TOKEN_COOKIE_NAME],
   secretOrKey: JWT_ACCESS_TOKEN_SECRET,
-  /*
-  jwtFromRequest: (req) => {
-    const token = req.headers["authorization"]; // Bearer <token>
-    if (!token || token.split(" ")[0] !== "Bearer") {
-      throw new Error("Unauthorized");
-    }
-    return token && token.split(" ")[1]; // 'Bearer <token>'에서 <token>만 추출
-  },
-  */
-  secretOrKey: JWT_ACCESS_TOKEN_SECRET,
 };
 
 const refreshTokenOptions = {
