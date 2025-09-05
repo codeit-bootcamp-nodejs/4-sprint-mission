@@ -5,6 +5,7 @@ import likeController from '../controller/like-controller.js';
 import productController from '../controller/product-controller.js';
 import productMiddleware from '../middleware/product-middleware.js';
 
+import checkProductCommentAuth from '../middleware/auth-middleware.js'
 import checkProductAuthorize from '../middleware/auth-middleware.js';
 
 const prisma = new PrismaClient();
@@ -69,12 +70,14 @@ ProductRouter.patch('/detail/:id/comment/:commentId',
     productMiddleware.validateId, 
     productMiddleware.validateCommentId,
     passport.authenticate('AccessToken', {session:false}) ,
+    checkProductCommentAuth,
     productController.patchComment )
 
 ProductRouter.delete('/detail/:id/comment/:commentId', 
     productMiddleware.validateId,
     productMiddleware.validateCommentId,
     passport.authenticate('AccessToken', {session:false}) ,
+    checkProductCommentAuth,
     productController.deleteComment)
 
 

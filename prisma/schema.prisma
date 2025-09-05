@@ -26,6 +26,8 @@ model User{
   article             Article[]
   articleLike         ArticleLike[]
   productLike         ProductLike[]
+  ArticleComment      ArticleComment[]
+  ProductComment      ProductComment[]
 }
 
  
@@ -63,7 +65,8 @@ model ProductComment{
   updatedAt           DateTime           @updatedAt
   product             Product            @relation(fields:[productId], references:[id], onDelete:Cascade)
   productId           Int         
-  
+  user                User               @relation(fields:[userId], references:[id], onDelete:Cascade)
+  userId              Int 
 }
 
 model ArticleComment{
@@ -72,7 +75,9 @@ model ArticleComment{
   createdAt           DateTime           @default(now())
   updatedAt           DateTime           @updatedAt
   article             Article            @relation(fields:[articleId], references:[id], onDelete:Cascade)
-  articleId           Int       
+  articleId           Int   
+  user                User               @relation(fields:[userId], references:[id], onDelete:Cascade)
+  userId              Int    
 }
 
 model ArticleLike{

@@ -46,13 +46,14 @@ export async function checkArticleAuthorize(req,res,next){
 }
 
 
-export async function checkProductCommentAuthorize(req,res,next){
-    const productId = Number(req.params.id);
-    const user = req.user;
-    const product = await prisma.product.findUnique({
-        where:{id:productId}
+export async function checkArticleCommentAuth(req,res,next){
+    const commentId = Number(req.params.commentId);
+    const comment = await prisma.article.findUnique({
+        where:{id:commentId}
     })
-    if (product.userId==user.id){
+    const userId = Number(req.user.id);
+
+    if (Number(comment.userId)===userId){
         return next()
     }else{
         const error = new Error("401 unathorized")
@@ -61,3 +62,18 @@ export async function checkProductCommentAuthorize(req,res,next){
     }
 }
 
+export async function checkProductCommentAuth(req,res,next){
+    const commentId = Number(req.params.commentId);
+    const comment = await prisma.product.findUnique({
+        where:{id:commentId}
+    })
+    const userId = Number(req.user.id);
+
+    if (Number(comment.userId)===userId){
+        return next()
+    }else{
+        const error = new Error("401 unathorized")
+        error.status = 401
+        throw error
+    }
+}
