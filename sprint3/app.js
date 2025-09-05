@@ -1,12 +1,11 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import productRouter from "./routers/productsRouter.js";
 import articleRouter from "./routers/articlesRouter.js";
 import imageRouter from "./routers/imageRouter.js";
+import authRouter from "./routers/authRouter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
-dotenv.config();
+import { PORT } from "./lib/constants.js";
 
 const app = express();
 
@@ -18,9 +17,9 @@ app.use("/products", productRouter);
 app.use("/articles", articleRouter);
 app.use("/photos", imageRouter);
 app.use("/profile", express.static("/uploads"));
+app.use("/auth", authRouter);
 app.use(errorHandler);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
