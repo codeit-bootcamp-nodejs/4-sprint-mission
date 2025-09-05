@@ -69,7 +69,6 @@ router.get(
 );
 
 // 좋아요한 상품, 게시글, 댓글 조회
-
 router.get(
   '/:userId/likes/products',
   authenticate,

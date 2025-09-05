@@ -22,15 +22,15 @@ router
   .get(articleController.getArticleById)
   .patch(
     authenticate,
-    isArticleOwner,
     validation.validateParam('id', validation.idSchema),
+    isArticleOwner,
     validation.validate(validation.articleUpdateSchema),
     articleController.updateArticle
   )
   .delete(
     authenticate,
-    isArticleOwner,
     validation.validateParam('id', validation.idSchema),
+    isArticleOwner,
     articleController.deleteArticle
   );
 

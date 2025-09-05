@@ -24,21 +24,29 @@ router
   )
   .patch(
     authenticate,
-    isProductOwner,
     validation.validateParam('id', validation.idSchema),
+    isProductOwner,
     validation.validate(validation.productUpdateSchema),
     productController.updateProduct
   )
   .delete(
     authenticate,
-    isProductOwner,
     validation.validateParam('id', validation.idSchema),
+    isProductOwner,
     productController.deleteProduct
   );
 
 router
   .route('/:id/like')
-  .post(authenticate, productController.likeProduct)
-  .delete(authenticate, productController.unlikeProduct);
+  .post(
+    authenticate,
+    validation.validateParam('id', validation.idSchema),
+    productController.likeProduct
+  )
+  .delete(
+    authenticate,
+    validation.validateParam('id', validation.idSchema),
+    productController.unlikeProduct
+  );
 
 export default router;

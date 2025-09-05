@@ -9,14 +9,20 @@ const router = express.Router();
 router
   .route('/:articleId/comments')
   .get(articleCommentController.getComments)
-  .post(authenticate, articleCommentController.createComment);
+  .post(
+    authenticate,
+    validation.validate(validation.commentSchema),
+    articleCommentController.createComment
+  );
 
+// 댓글 수정, 삭제
 router
   .route('/comments/:commentId')
   .patch(
     authenticate,
     isCommentOwner,
     validation.validateParam('commentId', validation.idSchema),
+    validation.validate(validation.commentSchema),
     articleCommentController.updateComment
   )
   .delete(
@@ -26,6 +32,7 @@ router
     articleCommentController.deleteComment
   );
 
+// 게시글 댓글 좋아요
 router
   .route('/comments/:commentId/like')
   .post(

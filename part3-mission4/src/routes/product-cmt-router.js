@@ -9,20 +9,25 @@ const router = express.Router();
 router
   .route('/:productId/comments')
   .get(productCommentController.getComments)
-  .post(authenticate, productCommentController.createComment);
+  .post(
+    authenticate,
+    validation.validate(validation.commentSchema),
+    productCommentController.createComment
+  );
 
 router
   .route('/comments/:commentId')
   .patch(
     authenticate,
-    isCommentOwner,
     validation.validateParam('commentId', validation.idSchema),
+    isCommentOwner,
+    validation.validate(validation.commentSchema),
     productCommentController.updateComment
   )
   .delete(
     authenticate,
-    isCommentOwner,
     validation.validateParam('commentId', validation.idSchema),
+    isCommentOwner,
     productCommentController.deleteComment
   );
 

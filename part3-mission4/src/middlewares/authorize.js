@@ -2,7 +2,9 @@ import prisma from '../lib/prismaClient.js';
 import bcrypt from 'bcrypt';
 
 export const isOwner = (modelGetter) => async (req, res, next) => {
+  console.log('📌 req.params:', req.params);
   const resource = await modelGetter(req);
+  console.log('📌 조회된 리소스:', resource);
   if (!resource)
     return res.status(404).json({ message: '대상을 찾을 수 없습니다.' });
   if (resource.userId !== req.user.id)
@@ -26,14 +28,13 @@ export const isArticleOwner = isOwner((req) =>
 
 export const isCommentOwner = isOwner((req) =>
   prisma.comment.findUnique({
-    where: { id: parseInt(req.params.id) },
+    where: { id: parseInt(req.params.commentId) },
     select: { userId: true },
   })
 );
 
 export const isUserSelf = async (req, res, next) => {
   const userId = parseInt(req.params.userId);
-
   if (userId !== req.user.id) {
     return res.status(403).json({ message: '권한이 없습니다.' });
   }
