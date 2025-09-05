@@ -21,7 +21,7 @@ app.use('/article', articleRouter);
 app.use('/product', productRouter);
 app.use('/upload',fileRouter);
 
-app.use( (err,req,res,next) =>{
+app.use((err, req, res, next) =>{
     if (err){
         res.json( err.message|| "Server Error Occured");
     }

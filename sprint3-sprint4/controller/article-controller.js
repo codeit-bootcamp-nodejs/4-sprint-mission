@@ -1,13 +1,8 @@
 import express from 'express'
-import { PrismaClient } from '@prisma/client'
-import { ArticleValid } from './MiddleWares.js';
+import prisma from '../lib/prisma.js'
 import ArticleService from '../service/article-service.js';
 
-const prisma = new PrismaClient();
-
 const ArticleRouter = express.Router();
-
-
 
 //모든 게시글 불러오기, 댓글 미포함
 
@@ -111,17 +106,9 @@ export class ArticleController{
     getComments = async(req,res,next) =>{
         try{
             let {take = '10',skip= '1',commentId = '1'} = req.query;
-            take = parseInt(take);
-            skip = parseInt(skip);
-            commentId = parseInt(commentId);
-
             
-            const articleComment =await prisma.ArticleComment.findMany({
-                take,
-                skip,
-                cursor: {id: commentId},
-                orderBy:{id: 'asc'}
-            });
+            data = {take, skip, commentId}
+            const articleComment =await articleService.getComment(data);
 
             return res.status(200).send(articleComment);
 
@@ -136,10 +123,6 @@ export class ArticleController{
     postComment = async (req,res,next) =>{
 
         const id = Number(req.params.id) ;
-
-        const article = prisma.article.findUnique({
-            where: {id}
-        });
 
         const commentContent = req.body.commentContent;
         if (!commentContent|| commentContent.length>500){
@@ -168,19 +151,10 @@ export class ArticleController{
     patchComment = async (req,res,next) =>{
 
         const id = Number(req.params.id) ;
-        const article = prisma.article.findUnique({
-            where: {id}
-        });
-
-
         try{
             const CommentId = Number(req.body.id);
             const commentContent = req.body.commentContent;
-            if(!CommentId){
-                const err = new Error("invalid parameter")
-                err.status = 400;
-                return next(err);
-            }
+
             if(!commentContent){
                 const err = new Error("invalid body data");
                 err.status = 400;
@@ -203,16 +177,6 @@ export class ArticleController{
     }
 
     deleteComment = async (req,res,next) =>{
-
-        const id = Number(req.params.id) ;
-        const CommentId= Number(req.params.commentId);
-
-        if(!CommentId || !id){
-            const err = new Error("invalid parameter")
-            err.status = 400;
-            return next(err);
-        }
-        
         try{
             await prisma.ArticleComment.delete({
                 where:{id:CommentId}

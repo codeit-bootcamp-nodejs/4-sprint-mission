@@ -8,6 +8,7 @@ import articleMiddleware from '../middleware/article-middleware.js';
 import checkAuthenticated from '../middleware/auth-middleware.js';
 import checkArticleAuthorize from '../middleware/auth-middleware.js';
 import passport from 'passport';
+import ValidCommentForm from '../middleware/comment-middleware.js';
 
 const prisma = new PrismaClient();
 

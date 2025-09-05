@@ -1,21 +1,20 @@
-import { skip } from "@prisma/client/runtime/library"
-
+import prisma from '../lib/prisma.js'
 
 
 export class ArticleService{
     getArticles = async(skip,take,sort,searchtitle, searchcontent) =>{
     
-    let orderBy ;
-    skip = parseInt(skip);
-    take = parseInt(take);
+        let orderBy ;
+        skip = parseInt(skip);
+        take = parseInt(take);
 
-    if (sort == 'oldest'){        
-        orderBy = {createdAt : 'desc'};
-    }else if (sort == 'recent'){
-        orderBy = {createdAt : 'asc'};
-    }else{
-        orderBy = {createdAt : 'desc'};
-    }
+        if (sort == 'oldest'){        
+            orderBy = {createdAt : 'desc'};
+        }else if (sort == 'recent'){
+            orderBy = {createdAt : 'asc'};
+        }else{
+            orderBy = {createdAt : 'desc'};
+        }
 
         const Articles = await prisma.Article.findMany({
             skip,
@@ -26,11 +25,26 @@ export class ArticleService{
                         {contains : searchtitle ,
                         mode : 'insensitive'}},
                     {articleContent:{contains : searchcontent}}]}
-         })
+        })
          return Articles
     }
 
+    getComment = async({take,skip,commentId}) => {
+        take = parseInt(take);
+        skip = parseInt(skip);
+        commentId = parseInt(commentId);
 
+        
+        const articleComment =await prisma.ArticleComment.findMany({
+            take,
+            skip,
+            cursor: {id: commentId},
+            orderBy:{id: 'asc'}
+        });
+        return articleComment;
+    }
+
+    
 }
 
 export default new ArticleService();

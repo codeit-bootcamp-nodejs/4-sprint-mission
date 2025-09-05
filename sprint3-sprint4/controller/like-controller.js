@@ -3,8 +3,8 @@ import prisma from '../lib/prisma.js'
 
 class LikeController{
     ArticleLike = async(req,res,next) => {
-        const userId = req.user.id;
-        const articleId = req.params.id;
+        const userId = Number(req.user.id);
+        const articleId = Number(req.params.id);
         const like = await prisma.ArticleLike.create({
             data:{userId,articleId}
         })
@@ -12,8 +12,8 @@ class LikeController{
     }
 
     ArticleDislike = async(req,res,next) => {
-        const userId = req.user.id;
-        const articleId = req.params.id;
+        const userId = Number(req.user.id);
+        const articleId = Number(req.params.id);
         const findLike = await prisma.ArticleLike.findFirst({
             data:{userId,articleId}
         })
@@ -24,8 +24,8 @@ class LikeController{
     }
 
     ProductLike = async(req,res,next) => {
-        const userId = req.user.id;
-        const productId = req.params.id;
+        const userId = Number(req.user.id);
+        const productId = Number(req.params.id);
         const like = await prisma.ProductLike.create({
             data:{userId,productId}
         })
@@ -33,8 +33,8 @@ class LikeController{
     }
 
     ArticleDislike = async(req,res,next) => {
-        const userId = req.user.id;
-        const productId = req.params.id;
+        const userId = Number(req.user.id);
+        const productId = Number(req.params.id);
         const findLike = await prisma.ProductLike.findFirst({
             data:{userId,articleId}
         })

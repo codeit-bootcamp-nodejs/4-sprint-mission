@@ -1,10 +1,6 @@
 
-import express from 'express'
-import { PrismaClient } from '@prisma/client'
-import { ProductValid } from './MiddleWares.js';
 import productService from '../service/product-service.js';
-
-const prisma = new PrismaClient();
+import prisma from '../lib/prisma.js'
 
 
 export class ProductController{
