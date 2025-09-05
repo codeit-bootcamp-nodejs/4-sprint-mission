@@ -5,15 +5,21 @@ import passport from 'passport';
 
 userRouter = express.router();
 
-
+// register, login, get user information
 userRouter.post('/login', userController.login)
 userRouter.post('/register', userController.register)
+userRouter.get('/:id', userController.getUser)
 
-userRouter.get('/:userId', userController.getUser)
-userRouter.patch('/:userId', userController.patchUser)
-userRouter.patch('/:userId', userController.patchPassword)
+//modify user information
+userRouter.patch('/:id', userController.patchUser)
+userRouter.patch('/:id', userController.patchPassword)
 
+//get products of login user
 userRouter.get(':id/products', userController.getUserProduct)
+
+//get liked products of login user
+userRouter.get(':id/like', )
+
 
 
 // passport.authenticate('local'),
