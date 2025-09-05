@@ -34,7 +34,7 @@ export const getProducts = async (offset, limit, name, description) => {
   }
 };
 
-export const createProduct = async (name, description, price, tags) => {
+export const createProduct = async (name, description, price, tags, userId) => {
   try {
     const product = await prisma.product.create({
       data: {
@@ -42,6 +42,7 @@ export const createProduct = async (name, description, price, tags) => {
         description,
         price,
         tags,
+        userId,
       },
     });
 
@@ -71,9 +72,24 @@ export const findProductById = async (id) => {
   }
 };
 
-export const updateProduct = async (id, name, description, price, tags) => {
+export const updateProduct = async (
+  id,
+  name,
+  description,
+  price,
+  tags,
+  userId
+) => {
   try {
-    const product = await prisma.product.update({
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (product.userId != userId) {
+      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
+    const updatedProduct = await prisma.product.update({
       where: { id },
       data: {
         ...(name !== undefined && { name }),
@@ -83,14 +99,28 @@ export const updateProduct = async (id, name, description, price, tags) => {
       },
     });
 
-    return product;
+    return updatedProduct;
   } catch (err) {
     throw err;
   }
 };
 
-export const removeProduct = async (id) => {
+export const removeProduct = async (id, userId) => {
   try {
+    const product = await prisma.product.findUnique({ where: { id } });
+
+    if (!product) {
+      const error = new Error("게시글을 찾을 수 없습니다.");
+      error.status = 404;
+      throw error;
+    }
+
+    if (product.userId != userId) {
+      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      error.status = 403;
+      throw error;
+    }
+
     await prisma.product.delete({ where: { id } });
   } catch (err) {
     throw err;

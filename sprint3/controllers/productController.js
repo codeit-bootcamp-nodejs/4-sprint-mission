@@ -25,8 +25,9 @@ export const getProductList = async (req, res, next) => {
 export const postProduct = async (req, res, next) => {
   try {
     const { name, description, price, tags } = req.body;
+    const userId = req.user.id;
 
-    const product = await createProduct(name, description, price, tags);
+    const product = await createProduct(name, description, price, tags, userId);
 
     res.status(201).json(product);
   } catch (err) {
@@ -53,10 +54,18 @@ export const getProductById = async (req, res, next) => {
 export const patchProduct = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const userId = req.user.id;
 
     const { name, description, price, tags } = req.body;
 
-    const product = await updateProduct(id, name, description, price, tags);
+    const product = await updateProduct(
+      id,
+      name,
+      description,
+      price,
+      tags,
+      userId
+    );
 
     res.status(200).json(product);
   } catch (err) {
@@ -67,8 +76,9 @@ export const patchProduct = async (req, res, next) => {
 export const deletProduct = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const userId = req.user.id;
 
-    await removeProduct(id);
+    await removeProduct(id, userId);
 
     res.status(200).json({ message: `${id} 삭제 완료` });
   } catch (err) {
