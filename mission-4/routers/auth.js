@@ -12,6 +12,9 @@ authRouter.route('/signup')
 authRouter.route('/login')
     .post(authValidator(), asyncHandler(AuthController.login))
 // prettier-ignore
+authRouter.route('/logout')
+    .post(asyncHandler(AuthController.logout))
+// prettier-ignore
 authRouter.route('/refresh')
     .post(asyncHandler(AuthController.refresh))
 

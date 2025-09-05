@@ -1,6 +1,8 @@
 import { passwordHashing, validatePassword } from "../lib/bcrypt.js";
-import { generateToken, verifyRefreshToken } from "../lib/jwtToken.js";
+import { generateToken, verifyAccessToken, verifyRefreshToken } from "../lib/jwtToken.js";
 import prisma from "../lib/prisma.js";
+import { redisClient } from "../lib/redis.js";
+import { REDIS_KEY } from "../lib/constants.js";
 
 async function signupService({ email, nickname, password }) {
   const hashedPassword = await passwordHashing(password);
@@ -35,7 +37,24 @@ async function loginService({ email, password }) {
   return { accessToken, refreshToken };
 }
 
+async function logoutService(accessToken) {
+  // 토큰 추출해서 남은 유효시간 계산
+  const payload = verifyAccessToken(accessToken);
+  const remainingTime = payload.exp - Math.floor(Date.now() / 1000);
+
+  await redisClient.set(`${REDIS_KEY}:${accessToken}`, "blacklisted", {
+    EX: remainingTime,
+  });
+  return { message: "로그아웃 되었습니다." };
+}
+
 async function refreshService({ refreshToken }) {
+  const isBlacklisted = await redisClient.get(`${REDIS_KEY}:${refreshToken}`);
+  if (isBlacklisted) {
+    const err = new Error("만료된 리프레시 토큰입니다.");
+    err.statusCode = 401;
+    throw err;
+  }
   return prisma.$transaction(async (tx) => {
     // 토큰 검증, 유효성 확인, 재발급, db 업데이트를 트랜잭션으로 묶기
     const result = verifyRefreshToken(refreshToken);
@@ -62,8 +81,12 @@ async function refreshService({ refreshToken }) {
         refreshToken: newRefreshToken,
       },
     });
+    const remainingTime = result.exp - Math.floor(Date.now() / 1000);
+    await redisClient.set(`${REDIS_KEY}:${refreshToken}`, "blacklisted", {
+      EX: remainingTime,
+    });
     return { accessToken, refreshToken: newRefreshToken };
   });
 }
 
-export { signupService, loginService, refreshService };
+export { signupService, loginService, logoutService, refreshService };

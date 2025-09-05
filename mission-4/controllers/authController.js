@@ -1,4 +1,4 @@
-import { signupService, loginService, refreshService } from "../services/authService.js";
+import { signupService, loginService, logoutService, refreshService } from "../services/authService.js";
 
 class AuthController {
   async signup(req, res) {
@@ -7,6 +7,12 @@ class AuthController {
   }
   async login(req, res) {
     const result = await loginService(req.body);
+    return res.status(200).json(result);
+  }
+  async logout(req, res) {
+    const authHeader = req.headers.authorization;
+    const token = authHeader.split(" ")[1];
+    const result = await logoutService(token);
     return res.status(200).json(result);
   }
   async refresh(req, res) {
