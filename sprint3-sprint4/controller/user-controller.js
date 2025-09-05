@@ -66,12 +66,14 @@ class UserController{
     }
 
     getLikedProduct = async(req, res, next) => {
-        const userId = req.user.id;
-        const user = await prisma.user.findUnique({
-            where:{id:userId},
-            include:{productLike}
-        })
-        const productLike = user.productLike;
+        const user = req.user
+
+        //likeModels는 유저, product의 정보를 가진 좋아요 모델의 list 
+        const likedModels = user.productLike;
+        //like models를 바탕으로 현재 로그인 한 유저가 좋아요 한 product들을 가져옵니다
+        const likedProducList = await userService.likedProdcut(likedModels)
+
+        return likedProducList
     }
 }
 

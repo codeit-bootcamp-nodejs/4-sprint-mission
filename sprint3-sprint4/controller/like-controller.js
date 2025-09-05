@@ -14,11 +14,11 @@ class LikeController{
     ArticleDislike = async(req,res,next) => {
         const userId = Number(req.user.id);
         const articleId = Number(req.params.id);
-        const findLike = await prisma.ArticleLike.findFirst({
+        const findedLike = await prisma.ArticleLike.findFirst({
             data:{userId,articleId}
         })
         await prisma.ArticleLike.delete({
-            where:{id: findLike.id}
+            where:{id: findedLike.id}
         })
         return 'success'
     }
@@ -32,7 +32,7 @@ class LikeController{
         return like
     }
 
-    ArticleDislike = async(req,res,next) => {
+    ProductDislike = async(req,res,next) => {
         const userId = Number(req.user.id);
         const productId = Number(req.params.id);
         const findLike = await prisma.ProductLike.findFirst({

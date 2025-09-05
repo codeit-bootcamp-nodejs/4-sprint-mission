@@ -32,6 +32,24 @@ class userService{
         }
     }
 
+    /*
+     input: 현재 로그인한 유저의 
+            product, user의 좋아요 관계인
+            like 모델들의 모임
+     output: 유저가 좋아요 한 product들을 list 형식으로 가져옵니다. 
+     */
+    likedProduct = async (likeModels) => {
+        let likedProducList = [];
+        for (const likedModel of likeModels){
+            const productId= likedModel.productId;
+            const Product = await prisma.product.findFirst({
+                id:productId
+            })
+            likedProducList.push(product)
+        }
+
+        return likedProducList;
+    }
     
 
 
