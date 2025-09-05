@@ -59,18 +59,6 @@ class UserService {
     return updateUserProfile;
   }
 
-  // async updatePassword(userId, currentPassword, newPassword) {
-  //   const user = await prisma.user.findUnique({ where: { id: userId } });
-  //   const isValid = await bcrypt.compare(currentPassword, user.password);
-  //   if (!isValid) throw new Error('현재 비밀번호가 일치하지 않습니다.');
-
-  //   const hashed = await bcrypt.hash(newPassword, 10);
-  //   return prisma.user.update({
-  //     where: { id: userId },
-  //     data: { password: hashed },
-  //   });
-  // }
-
   async updatePassword(userId, currentPassword, newPassword) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
     console.log('입력한 currentPassword:', currentPassword);
@@ -92,6 +80,37 @@ class UserService {
       where: { id: userId },
       data: { password: hashed },
     });
+  }
+
+  async getUserComments(userId) {
+    const comments = await prisma.comment.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        content: true,
+        article: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+        product: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        likeCount: true,
+      },
+    });
+    return comments;
+  }
+
+  async getUserLikedComments(userId) {
+    const likedComments = await prisma.comment.findMany({
+      where: { likedBy: { some: { id: userId } } },
+    });
+    return likedComments;
   }
 
   setTokenCookies(res, accessToken, refreshToken) {

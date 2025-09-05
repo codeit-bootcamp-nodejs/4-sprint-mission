@@ -1,5 +1,4 @@
 import { articleService } from '../services/article-service.js';
-import { commentService } from '../services/comment-service.js';
 
 class ArticleController {
   // 게시글
@@ -53,67 +52,6 @@ class ArticleController {
     const articleId = req.params.id;
     const article = await articleService.articleUnlike(userId, articleId);
     res.json({ data: article });
-  }
-
-  // 댓글
-  async getComments(req, res) {
-    const { id } = req.params; // articleId
-    const comments = await commentService.getCommentsByArticleId(id);
-    res.json(comments);
-  }
-
-  async createComment(req, res) {
-    const { id } = req.params; // articleId
-    const { content } = req.body;
-    const userId = req.user.id;
-    const newComment = await commentService.createArticleComment(
-      id,
-      content,
-      userId
-    );
-    res.status(201).json(newComment);
-  }
-
-  async getCommentById(req, res) {
-    const { id, commentId } = req.params;
-    const comment = await commentService.getCommentByIdAndArticleId(
-      id,
-      commentId
-    );
-    res.json(comment);
-  }
-
-  async updateComment(req, res) {
-    const { commentId } = req.params;
-    const { content } = req.body;
-    const userId = req.user.id;
-    const updated = await commentService.updateComment(
-      commentId,
-      userId,
-      content
-    );
-    res.json(updated);
-  }
-
-  async deleteComment(req, res) {
-    const { commentId } = req.params;
-    const userId = req.user.id;
-    await commentService.deleteComment(commentId, userId);
-    res.status(204).send();
-  }
-
-  async likeComment(req, res) {
-    const userId = req.user?.id;
-    const { commentId } = req.params;
-    const comment = await commentService.commentLike(userId, commentId);
-    res.json({ data: comment });
-  }
-
-  async unlikeComment(req, res) {
-    const userId = req.user?.id;
-    const { commentId } = req.params;
-    const comment = await commentService.commentUnlike(userId, commentId);
-    res.json({ data: comment });
   }
 
   // 유저 게시글 목록 조회

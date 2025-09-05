@@ -201,7 +201,6 @@ class ProductService {
   }
 
   async productLike(userId, productId) {
-    console.log('productId:', productId, 'userId:', userId);
     const productLiked = await prisma.product.update({
       where: { id: parseInt(productId) },
       data: {

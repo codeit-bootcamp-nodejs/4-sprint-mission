@@ -23,8 +23,18 @@ router.post('/logout', userController.logout);
 // 유저 조회, 정보 수정
 router
   .route('/:userId')
-  .get(authenticate, isUserSelf, userController.getUserProfile)
-  .patch(authenticate, isUserSelf, userController.updateUserProfile);
+  .get(
+    authenticate,
+    isUserSelf,
+    validation.validateParam('id', validation.idSchema),
+    userController.getUserProfile
+  )
+  .patch(
+    authenticate,
+    isUserSelf,
+    validation.validateParam('id', validation.idSchema),
+    userController.updateUserProfile
+  );
 
 // 유저 비밀번호 수정
 router.patch(
@@ -34,36 +44,37 @@ router.patch(
   userController.updatePassword
 );
 
-// 유저 정보 수정
-// router.patch(
-//   authenticate,
-//   isUserSelf,
-//   userController.updateUserProfile
-// );
+// 자신의 상품, 게시글, 댓글 조회
 
 router.get(
   '/:userId/my-products',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   productController.getUserProducts
 );
 router.get(
   '/:userId/my-articles',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   articleController.getUserArticles
 );
 router.get(
   '/:userId/my-comments',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   userController.getUserComments
 );
+
+// 좋아요한 상품, 게시글, 댓글 조회
 
 router.get(
   '/:userId/likes/products',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   userController.getUserLikedProducts
 );
 
@@ -71,6 +82,7 @@ router.get(
   '/:userId/likes/articles',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   userController.getUserLikedArticles
 );
 
@@ -78,6 +90,7 @@ router.get(
   '/:userId/likes/comments',
   authenticate,
   isUserSelf,
+  validation.validateParam('id', validation.idSchema),
   userController.getUserLikedComments
 );
 

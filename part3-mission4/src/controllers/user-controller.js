@@ -1,4 +1,3 @@
-import { commentService } from '../services/comment-service.js';
 import { userService } from '../services/user-service.js';
 import { productService } from '../services/product-service.js';
 import { articleService } from '../services/article-service.js';
@@ -16,13 +15,11 @@ class UserController {
   async login(req, res) {
     const { accessToken, refreshToken } = await userService.login(req.user.id);
     userService.setTokenCookies(res, accessToken, refreshToken);
-    res
-      .status(200)
-      .json({
-        accesstoken: accessToken,
-        refreshToken: refreshToken,
-        message: '로그인 되었습니다.',
-      });
+    res.status(200).json({
+      accesstoken: accessToken,
+      refreshToken: refreshToken,
+      message: '로그인 되었습니다.',
+    });
   }
 
   logout(req, res) {
@@ -61,7 +58,7 @@ class UserController {
 
   async getUserComments(req, res) {
     const userId = req.user.id;
-    const comments = await commentService.getUserComments(userId);
+    const comments = await userService.getUserComments(userId);
     res.status(200).json({ comments });
   }
 
@@ -79,7 +76,7 @@ class UserController {
 
   async getUserLikedComments(req, res) {
     const userId = req.user?.id;
-    const likedComments = await commentService.getUserLikedComments(userId);
+    const likedComments = await userService.getUserLikedComments(userId);
     res.json({ data: likedComments });
   }
 }
