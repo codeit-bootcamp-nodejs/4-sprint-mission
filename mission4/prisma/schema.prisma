@@ -69,7 +69,7 @@ model Like {
   articleId Int?
   article   Article?  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 
-  // 유저-상품, 유저-게시글 각각 중복 방지
+  // 유저-상품, 유저-게시글 각각 중복 방지, 좋아요 중첩 방지
   @@unique([userId, productId])
   @@unique([userId, articleId])
 }
