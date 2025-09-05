@@ -1,6 +1,6 @@
 import express from 'express'
 import prisma from '../lib/prisma.js'
-import ArticleService from '../service/article-service.js';
+import articleService from '../service/article-service.js';
 
 const ArticleRouter = express.Router();
 
@@ -16,9 +16,13 @@ export class ArticleController{
         take = parseInt(take);
         const data = {sort, skip, take, searchtitle,searchcontent, skip, take}
         
+
         try{
-            const Articles = ArticleService.getArticles(data)
-            res.status(200).send(Articles);
+            let articles = ArticleService.getArticles(data)
+            for (let article of articles){
+                articleService.addIsLiked(article)
+            }
+            res.status(200).send(articles);
         } catch(error){
             console.error(error);
             const err = new Error("Server Error");
@@ -32,12 +36,14 @@ export class ArticleController{
             let id = req.params.id;
             id = parseInt(id);
             
-            const Article = await prisma.Article.findUnique({
+            let article = await prisma.Article.findUnique({
                 where: {id},
                 include : {comment: true}
             });
 
-            return res.status(200).send(Article);
+            article = articleService.addIsLiked(article);
+
+            return res.status(200).send(article);
             
         } catch(error){
             console.error(error);
@@ -51,7 +57,7 @@ export class ArticleController{
         const {title, articleContent} = req.body;
 
         try{
-            const Article =  await prisma.Article.create({
+            let Article =  await prisma.Article.create({
                 data: {title,articleContent}
             });
             console.log("post Article success");

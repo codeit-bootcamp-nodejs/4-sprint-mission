@@ -5,8 +5,11 @@ export class productService{
 
     getProducts = async(data) => {
 
-        const {sort, skip, take, searchName, searchDescription} = data;
+        let {sort, skip, take, searchName, searchDescription} = data;
         let orderBy ;
+        
+        skip = Number(skip);
+        take = Number(skip);
 
         if (sort === 'oldest'){        
             orderBy = {createdAt : 'desc'};
@@ -30,6 +33,22 @@ export class productService{
         return product
     }
 
+    addIsLiked = async(user, product) => {
+        const productLikeList = user.productLike;
+        const likedProductIds = [];
+        for (const productLike of productLikeList){
+            let productId = productLike.productId;
+            likedProductIds.push(productId)
+        }
+
+        const productId = Number(product.id)
+        if (likedProductIds.includes(productId)){
+            product.isLiked = true;
+        }else {
+            product.isLiked = false;
+        }
+        return product
+    }
     
 }
 

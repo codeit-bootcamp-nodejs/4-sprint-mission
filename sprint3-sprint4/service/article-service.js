@@ -44,7 +44,22 @@ export class ArticleService{
         return articleComment;
     }
 
+    addIsLiked = async(user,article) => {
+        const articleLikeList = user.articleLike;
+        const likedArticleIds = [];
+        for (const articleLike of articleLikeList){
+            let articleId = articleLike.articleId;
+            likedArticles.push(article)
+        }
 
+        const articleId = Number(article.id)
+        if (likedArticleIds.includes(articleId)){
+            article.isLiked = true;
+        }else {
+            article.isLiked = false;
+        }
+        return article
+    }
 }
 
 export default new ArticleService();

@@ -5,14 +5,17 @@ import prisma from '../lib/prisma.js'
 
 export class ProductController{
     getProducts = async (req,res,next) =>{
-        let {sort = 'recent', skip = '10', take= '10', searchName, searchDescription} = req.query;
-        skip = parseInt(skip);
-        take = parseInt(take);
+        let {sort = 'recent', skip = 10, take= 10, searchName, searchDescription} = req.query;
         
         const data = {sort, skip, take, searchName, searchDescription};
         try{
-            const Product = productService.getProducts(data);
-            return res.status(200).send(Product);
+            let products = productService.getProducts(data);
+            
+            for (let product of products){
+                product = productService.addIsLiked(product);
+            }
+
+            return res.status(200).send(products);
             
         }catch(error){
             console.error(error);
@@ -27,13 +30,12 @@ export class ProductController{
         const id = Number(req.params.id);
     
         try{
-            const Product = await prisma.product.findUnique({
+            let product = await prisma.product.findUnique({
                 where:{id},
                 include: {comment:true}
             });
-    
-            console.log(`get product : ${Product}`);
-            return res.status(200).send(Product);
+            product = productService.addIsLiked(product);
+            return res.status(200).send(product);
             
         }catch(error){
             console.error(error);
