@@ -1,6 +1,7 @@
 import express from "express";
 
 import * as Validate from "../middleware/validate.js";
+import authenticate from "../middleware/authenticate.js";
 
 import { getProductController } from "../controllers/product/get_product_controller.js";
 import { getProductByIdController } from "../controllers/product/get_product_by_id_controller.js";
@@ -18,20 +19,20 @@ const router = express.Router();
 router
   .route("/")
   .get(getProductController)
-  .post(Validate.validateProduct, createProductController);
+  .post(authenticate, Validate.validateProduct, createProductController);
 router
   .route("/:id")
   .get(getProductByIdController)
-  .patch(updateProductController)
-  .delete(deleteProductController);
+  .patch(authenticate, updateProductController)
+  .delete(authenticate, deleteProductController);
 
 router
   .route("/:id/comment")
   .get(getProductCommentController)
-  .post(Validate.validateContent, createProductCommentController);
+  .post(authenticate, Validate.validateContent, createProductCommentController);
 router
   .route("/:id/comment/:commentId")
-  .patch(updateCommentController)
-  .delete(deleteCommentController);
+  .patch(authenticate, updateCommentController)
+  .delete(authenticate, deleteCommentController);
 
 export default router;

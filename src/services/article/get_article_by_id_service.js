@@ -9,6 +9,7 @@ export async function getArticleByIdService(id) {
       content: true,
       createdAt: true,
       comment: true,
+      userId: true,
     },
   });
   return article;

@@ -1,9 +1,9 @@
 import prisma from "../prisma.js";
 
-export async function createArticleService({ title, content }) {
+export async function createArticleService({ title, content, user }) {
   try {
     const article = await prisma.article.create({
-      data: { title, content },
+      data: { title, content, userId: user.id },
     });
     return article;
   } catch (e) {

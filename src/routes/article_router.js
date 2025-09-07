@@ -6,6 +6,7 @@ import { updateArticleController } from "../controllers/article/update_article_c
 import { deleteArticleController } from "../controllers/article/delete_article_controller.js";
 
 import * as Validate from "../middleware/validate.js";
+import authenticate from "../middleware/authenticate.js";
 
 import { getArticleCommentController } from "../controllers/comment/get_comment_controller.js";
 import { updateCommentController } from "../controllers/comment/update_comment_controller.js";
@@ -17,20 +18,20 @@ const router = express.Router();
 router
   .route("/")
   .get(getArticleController)
-  .post(Validate.validateArticle, createArticleController);
+  .post(authenticate, Validate.validateArticle, createArticleController);
 router
   .route("/:id")
   .get(getArticleByIdController)
-  .patch(updateArticleController)
-  .delete(deleteArticleController);
+  .patch(authenticate, updateArticleController)
+  .delete(authenticate, deleteArticleController);
 
 router
   .route("/:id/comment")
   .get(getArticleCommentController)
-  .post(Validate.validateContent, createArticleCommentController);
+  .post(authenticate, Validate.validateContent, createArticleCommentController);
 router
   .route("/:id/comment/:commentId")
-  .patch(updateCommentController)
-  .delete(deleteCommentController);
+  .patch(authenticate, updateCommentController)
+  .delete(authenticate, deleteCommentController);
 
 export default router;

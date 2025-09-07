@@ -18,6 +18,7 @@ export async function getArticleService(offset, limit, search) {
         content: true,
         createdAt: true,
         comment: true,
+        userId: true,
       },
     });
     return article;

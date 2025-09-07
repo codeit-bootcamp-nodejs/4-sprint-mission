@@ -19,6 +19,7 @@ export async function getProductService(offset, limit, search) {
       price: true,
       createdAt: true,
       comment: true,
+      userId: true,
     },
   });
   return products;

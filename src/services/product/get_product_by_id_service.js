@@ -11,6 +11,7 @@ export async function getProductByIdService(id) {
       tags: true,
       createdAt: true,
       comment: true,
+      userId: true,
     },
   });
   return product;
