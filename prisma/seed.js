@@ -1,26 +1,84 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient(); // Prisma 인스턴스 생성
+import prisma from "../src/lib/prisma.js";
+import bcrypt from "bcrypt";
 
 async function main() {
-  await prisma.Product.createMany({
+  // 1. 기본 유저 생성
+  const hashedPassword = await bcrypt.hash("password123", 10);
+
+  const user = await prisma.user.upsert({
+    where: { email: "seed@example.com" },
+    update: {},
+    create: {
+      email: "seed@example.com",
+      nickname: "seedUser",
+      password: hashedPassword,
+      provider: "local",
+    },
+  });
+
+  // 2. 게시글 시드 데이터
+  await prisma.article.createMany({
     data: [
       {
-        name: '맥북에어 m3 15인치',
-        description:
-          '2024년 구매, 16GB RAM / 256GB SSD / 사이클 10회, 실사용 7개월, 잔기스 없음, 풀박스 구성품.',
-        price: 1300000,
-        tags: '전자기기',
+        title: "첫 번째 시드 게시글",
+        content: "테스트용 게시글입니다.",
+        userId: user.id,
+      },
+      {
+        title: "두 번째 시드 게시글",
+        content: "또 다른 게시글입니다.",
+        userId: user.id,
       },
     ],
   });
 
-  await prisma.Article.createMany({
-    data: [{ title: '반갑습니다', content: '안녕하세요 처음 뵙겠습니다.' }],
+  // 3. 상품 + 이미지 시드 데이터
+  const productA = await prisma.product.create({
+    data: {
+      name: "시드 상품 A",
+      description: "테스트용 상품 A",
+      price: 10000,
+      tags: ["tag1", "tag2"],
+      userId: user.id,
+    },
   });
+
+  const productB = await prisma.product.create({
+    data: {
+      name: "시드 상품 B",
+      description: "테스트용 상품 B",
+      price: 20000,
+      tags: ["tag3"],
+      userId: user.id,
+    },
+  });
+
+  // 4. 이미지 시드
+  const image1 = await prisma.image.create({
+    data: { url: "https://via.placeholder.com/300x200?text=Product+A" },
+  });
+
+  const image2 = await prisma.image.create({
+    data: { url: "https://via.placeholder.com/300x200?text=Product+B" },
+  });
+
+  // 5. ProductImage 연결
+  await prisma.productImage.createMany({
+    data: [
+      { productId: productA.id, imageId: image1.id },
+      { productId: productB.id, imageId: image2.id },
+    ],
+  });
+
+  console.log("✅ Seed 데이터 생성 완료");
 }
 
 main()
-  .then()
-  .catch((error) => console.error(error))
-  .finally(() => prisma.$disconnect());
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });

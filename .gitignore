@@ -1,5 +1,38 @@
-node_modules/
-.env
+# macOS
 .DS_Store
-.env.local
 
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 환경 변수 및 빌드 결과
+.env*
+dist/
+build/
+coverage/
+logs/
+*.log
+tmp/
+.nyc_output/
+
+# Prisma
+*.db
+*.sqlite
+*.sqlite-journal
+
+# PostgreSQL
+*.dump
+*.sql
+
+# 캐시
+.cache/
+.parcel-cache/
+
+# Docker (사용한다면)
+.docker/
+docker-compose.override.yml
+
+# VSCode (선택 사항)
+.vscode/

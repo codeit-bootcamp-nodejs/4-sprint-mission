@@ -1,15 +1,10 @@
-import { z } from 'zod';
+import { makeValidator } from "../lib/validator.js";
+import articleSchemas from "../schemas/articleSchemas.js";
 
-const articleSchema = z.object({
-  title: z.string().min(1, '제목을 입력해주세요.'),
-  content: z.string().min(1, '내용을 입력해주세요.'),
+export const validateArticleBody = makeValidator({ body: articleSchemas.body });
+export const validateArticleParams = makeValidator({
+  params: articleSchemas.params,
 });
-
-function articleValidation(req, res, next) {
-  const result = articleSchema.safeParse(req.body);
-  if (!result.success) {
-    return res.status(400).json({ error: result.error.errors });
-  }
-  next();
-}
-export default articleValidation;
+export const validateArticleQuery = makeValidator({
+  query: articleSchemas.query,
+});

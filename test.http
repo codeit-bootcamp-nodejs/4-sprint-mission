@@ -1,0 +1,139 @@
+### 회원가입
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "nickname": "testuser",
+  "password": "Password123!"
+}
+
+### 로그인 (쿠키에 JWT 저장됨)
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "nickname": "testuser",
+  "password": "Password123!"
+}
+
+### 프로필 조회
+GET http://localhost:3000/users/profile
+
+### 프로필 수정
+PUT http://localhost:3000/users/profile
+Content-Type: application/json
+
+{
+  "nickname": "updatedUser"
+}
+
+### 비밀번호 변경
+PUT http://localhost:3000/users/password
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123!",
+  "newPassword": "NewPassword456@"
+}
+
+### 재로그인 (쿠키에 JWT 저장됨)
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "nickname": "updatedUser",
+  "password": "NewPassword456@"
+}
+
+###
+
+### 게시글 목록 조회
+GET http://localhost:3000/articles
+
+### 게시글 등록
+POST http://localhost:3000/articles
+Content-Type: application/json
+
+{
+  "title": "첫 번째 게시글",
+  "content": "테스트 게시글입니다."
+}
+
+### 게시글 상세 조회
+GET http://localhost:3000/articles/1
+
+### 게시글 수정
+PATCH http://localhost:3000/articles/3
+Content-Type: application/json
+
+{
+  "title": "수정된 게시글",
+  "content": "수정된 내용입니다."
+}
+
+### 게시글 좋아요 (토글)
+POST http://localhost:3000/articles/1/like
+
+### 게시글 상세 조회 (isLiked, likeCount 확인)
+GET http://localhost:3000/articles/1
+
+### 내가 좋아요한 게시글 목록
+GET http://localhost:3000/users/likes/articles
+
+### 게시글 삭제
+DELETE http://localhost:3000/articles/5
+
+---
+
+### 상품 목록 조회
+GET http://localhost:3000/products
+
+### 상품 등록
+POST http://localhost:3000/products
+Content-Type: application/json
+
+{
+  "name": "테스트 상품",
+  "description": "이것은 테스트 상품입니다.",
+  "price": 19900
+}
+
+### 내가 등록한 상품 조회
+GET http://localhost:3000/users/products
+
+### 상품 상세 조회
+GET http://localhost:3000/products/1
+
+### 상품 수정
+PATCH http://localhost:3000/products/3
+Content-Type: application/json
+
+{
+  "name": "수정된 상품명",
+  "description": "설명을 수정했습니다.",
+  "price": 29900
+}
+
+### 상품 좋아요 (토글)
+POST http://localhost:3000/products/1/like
+
+### 상품 상세 조회 (isLiked, likeCount 확인)
+GET http://localhost:3000/products/1
+
+### 내가 좋아요한 상품 목록
+GET http://localhost:3000/users/likes/products
+
+### 상품 삭제
+DELETE http://localhost:3000/products/3
+
+---
+
+### 로그아웃
+POST http://localhost:3000/auth/logout
+
+### 토큰 재발급
+POST http://localhost:3000/auth/refresh
+
+### 회원 탈퇴
+DELETE http://localhost:3000/users/delete

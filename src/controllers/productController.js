@@ -1,86 +1,178 @@
-import productService from '../services/productService';
+import {
+  createProduct,
+  getProductById,
+  updateProduct,
+  deleteProduct,
+  listProduct,
+  toggleProductLike,
+} from "../services/productService.js";
+import { DEFAULT_PAGE, MIN_PAGESIZE, MAX_PAGESIZE } from "../lib/constants.js";
+import { makeAbsoluteUrl } from "../lib/utils.js";
 
-const productController = {
-  async createProduct(req, res, next) {
-    try {
-      const { name, description, price, tags } = req.body;
-      const productData = { name, description, price, tags };
-      const newProduct = await productService.createProduct(productData);
-      res.status(201).json(newProduct);
-    } catch (error) {
-      next(error);
+export async function createProductController(req, res, next) {
+  try {
+    const { name, description, price, tags } = req.body;
+    const productData = {
+      name,
+      description,
+      price,
+      tags,
+      userId: req.user.id,
+    };
+
+    // 업로드된 파일들 (uploadMiddleware.array("images", 5) 로 받은 것)
+    const files = req.files || [];
+
+    const newProduct = await createProduct(productData, files);
+
+    // ✅ 응답 변환
+    const response = {
+      ...newProduct,
+      images: newProduct.productImages.map((pi) =>
+        makeAbsoluteUrl(req, pi.image.url)
+      ),
+    };
+
+    res.status(201).json(response);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getProductByIdController(req, res, next) {
+  try {
+    const id = req.params.id;
+
+    const product = await getProductById(id);
+    if (!product) {
+      return res
+        .status(404)
+        .json({ error: `${id}에 해당하는 상품을 찾을 수 없습니다` });
     }
-  },
 
-  async getProductById(req, res, next) {
-    try {
-      const id = Number(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: '유효하지 않은 ID입니다.' });
-      }
-      const product = await productService.getProductById(id);
-      if (!product) {
-        return res
-          .status(404)
-          .json({ error: `${id}에 해당하는 상품을 찾을 수 없습니다` });
-      }
+    // ✅ 로그인 사용자 ID (passport로 인증된 경우만)
+    const userId = req.user?.id;
 
-      res.status(200).json(product);
-    } catch (error) {
-      next(error);
+    // ✅ 응답 변환
+    const response = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      tags: product.tags,
+      user: product.User,
+      images: product.productImages.map((pi) =>
+        pi.image?.url ? makeAbsoluteUrl(req, pi.image.url) : null
+      ),
+      createdAt: product.createdAt,
+      likeCount: product._count.productLikes,
+      isLiked: userId
+        ? product.productLikes.some((like) => like.userId === userId)
+        : false,
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updateProductController(req, res, next) {
+  try {
+    const id = req.params.id;
+
+    // 기존 상품 조회
+    const product = await getProductById(id);
+    if (!product) {
+      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
     }
-  },
 
-  async updateProduct(req, res, next) {
-    try {
-      const id = Number(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: '유효하지 않은 ID입니다.' });
-      }
-      const { name, description, price, tags } = req.body;
-      const productData = { name, description, price, tags };
-
-      const productPatched = await productService.updateProduct(
-        id,
-        productData
-      );
-
-      res.status(200).json(productPatched);
-    } catch (error) {
-      next(error);
+    // 작성자 확인
+    if (product.userId !== req.user.id) {
+      return res.status(403).json({ error: "수정 권한이 없습니다." });
     }
-  },
 
-  async deleteProduct(req, res, next) {
-    try {
-      const id = Number(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: '유효하지 않은 ID입니다.' });
-      }
+    const { name, description, price, tags } = req.body;
+    const productData = { name, description, price, tags };
 
-      const product = await productService.deleteProduct(id);
-      res.status(200).json({ message: '상품을 삭제했습니다' });
-    } catch (error) {
-      next(error);
+    const productPatched = await updateProduct(id, productData);
+
+    res.status(200).json(productPatched);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteProductController(req, res, next) {
+  try {
+    const id = req.params.id;
+
+    // 기존 상품 조회
+    const product = await getProductById(id);
+    if (!product) {
+      return res.status(404).json({ error: "상품을 찾을 수 없습니다." });
     }
-  },
 
-  async listProduct(req, res, next) {
-    try {
-      const page = Number(req.query.page) || 1;
-      const pageSize = Number(req.query.pageSize) || 10;
-      const keyword = req.query.keyword;
-      const products = await productService.listProduct({
-        page,
-        pageSize,
-        keyword,
-      });
-
-      res.status(200).json(products);
-    } catch (error) {
-      next(error);
+    // 작성자 확인
+    if (product.userId !== req.user.id) {
+      return res.status(403).json({ error: "삭제 권한이 없습니다." });
     }
-  },
-};
 
-export default productController;
+    await deleteProduct(id);
+    res.status(200).json({ message: "상품을 삭제했습니다" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function listProductController(req, res, next) {
+  try {
+    const page = Math.max(req.query.page, DEFAULT_PAGE);
+    const pageSize = Math.min(
+      Math.max(req.query.pageSize, MIN_PAGESIZE),
+      MAX_PAGESIZE
+    );
+    const keyword = req.query.keyword;
+    const result = await listProduct({
+      page,
+      pageSize,
+      keyword,
+    });
+
+    // ✅ 응답 변환 (썸네일 URL 추가)
+    const response = {
+      data: result.data.map((p) => ({
+        ...p,
+        thumbnail: p.productImages[0]
+          ? makeAbsoluteUrl(req, p.productImages[0].image.url)
+          : null,
+      })),
+      meta: {
+        page: result.page,
+        pageSize: result.pageSize,
+        total: result.total,
+        totalPages: Math.ceil(result.total / result.pageSize),
+        hasNextPage: result.page * result.pageSize < result.total,
+      },
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+}
+
+// 상품 좋아요 또는 좋아요 취소 (toggle)
+export async function toggleProductLikeController(req, res, next) {
+  try {
+    const userId = req.user.id; // 로그인한 유저 ID
+    const productId = req.params.id; // 좋아요할 상품 ID
+
+    // 서비스 함수 호출: 이미 좋아요 상태면 삭제, 아니면 생성 및 최신 데이터 다시 가져오기 (좋아요 개수 + 내가 눌렀는지)
+    const result = await toggleProductLike(userId, productId);
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
