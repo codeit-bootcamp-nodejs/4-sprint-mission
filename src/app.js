@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import articleRouter from "./routes/article_router.js";
 import productRouter from "./routes/product_router.js";
 import userRouter from "./routes/user_router.js";
+import uploadRouter from "./routes/upload_router.js";
 
 const app = express();
 app.use(cookieParser());
@@ -12,6 +13,8 @@ app.use(express.json());
 app.use("/article", articleRouter);
 app.use("/product", productRouter);
 app.use("/", userRouter);
+app.use("/uploads", uploadRouter);
+app.use("/uploads", express.static("uploads"));
 
 const port = Number(process.env.PORT) || 3000;
 
