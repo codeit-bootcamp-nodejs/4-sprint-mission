@@ -9,6 +9,7 @@ class ArticleCommentService {
   commentLike = commentRepository.like;
   commentUnlike = commentRepository.unlike;
 
+  // 게시글의 댓글 조회
   async getCommentsByArticleId(articleId, userId) {
     const comments = await prisma.comment.findMany({
       where: { articleId: parseInt(articleId), productId: null },
@@ -28,7 +29,7 @@ class ArticleCommentService {
       likeCount: c.likeCount,
     }));
   }
-
+  // 게시글 댓글 작성
   async createArticleComment(articleId, content, userId) {
     return prisma.comment.create({
       data: {

@@ -6,7 +6,7 @@ import { isArticleOwner, isCommentOwner } from '../middlewares/authorize.js';
 
 const router = express.Router();
 
-// 게시글 전체 조회 / 생성
+// 게시글 조회, 생성
 router
   .route('/')
   .get(articleController.getAllArticles)
@@ -16,7 +16,7 @@ router
     articleController.createArticle
   );
 
-// 단일 게시글 조회 / 수정 / 삭제
+// 게시글  상세 조회, 수정, 삭제
 router
   .route('/:id')
   .get(articleController.getArticleById)
@@ -34,7 +34,7 @@ router
     articleController.deleteArticle
   );
 
-// 게시글 좋아요 / 취소
+// 게시글 좋아요, 좋아요 취소
 router
   .route('/:id/like')
   .post(

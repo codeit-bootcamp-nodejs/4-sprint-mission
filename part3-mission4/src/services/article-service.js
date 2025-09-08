@@ -2,6 +2,7 @@ import prisma from '../lib/prismaClient.js';
 import AppError from '../lib/appError.js';
 
 class ArticleService {
+  // 전체 게시글 조회
   async getAllArticles(query, userId) {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || 10;
@@ -67,6 +68,7 @@ class ArticleService {
     };
   }
 
+  // 단일 게시글 조회
   async getArticleById(articleId, userId) {
     const include = {
       user: { select: { username: true } },
@@ -117,6 +119,7 @@ class ArticleService {
     return articleWithLike;
   }
 
+  // 게시글 작성
   async createArticle(title, content, userId) {
     if (!userId) throw new AppError('작성자를 확인할 수 없습니다.', 400);
 
@@ -134,6 +137,7 @@ class ArticleService {
     return newArticle;
   }
 
+  // 게시글 수정
   async updateArticle(id, updateData, userId) {
     const updated = await prisma.article.updateMany({
       where: { id: parseInt(id), userId },
@@ -147,6 +151,7 @@ class ArticleService {
     return { message: '게시글이 수정되었습니다.' };
   }
 
+  // 게시글 삭제
   async deleteArticle(id, userId) {
     const deleted = await prisma.article.deleteMany({
       where: { id: parseInt(id), userId },
@@ -159,7 +164,7 @@ class ArticleService {
     return { message: '게시글이 삭제되었습니다.' };
   }
 
-  // 특정 유저의 게시글 조회
+  // 본인이 작성한 게시글 조회
   async getUserArticles(userId) {
     const articles = await prisma.article.findMany({
       where: { userId },
@@ -176,6 +181,7 @@ class ArticleService {
     return articles;
   }
 
+  // 좋아요한 게시글 조회
   async getUserLikedArticles(userId) {
     const likedArticles = await prisma.product.findMany({
       where: { likedBy: { some: { id: parseInt(userId) } } },
@@ -183,6 +189,7 @@ class ArticleService {
     return likedArticles;
   }
 
+  // 게시글 좋아요
   async articleLike(userId, articleId) {
     const articleLiked = await prisma.product.update({
       where: { id: parseInt(articleId) },
@@ -194,6 +201,7 @@ class ArticleService {
     return articleLiked;
   }
 
+  // 게시글 좋아요 취소
   async articleUnlike(userId, articleId) {
     const articleUnliked = await prisma.product.update({
       where: { id: parseInt(articleId) },

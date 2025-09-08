@@ -54,7 +54,7 @@ class ArticleController {
     res.json({ data: article });
   }
 
-  // 유저 게시글 목록 조회
+  // 본인이 작성한 게시글 조회
   async getUserArticles(req, res) {
     const userId = req.user.id;
     const articles = await articleService.getUserArticles(userId);

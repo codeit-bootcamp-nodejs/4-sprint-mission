@@ -9,6 +9,7 @@ class ProductCommentService {
   commentLike = commentRepository.like;
   commentUnlike = commentRepository.unlike;
 
+  // 상품의 댓글 조회
   async getCommentsByProductId(productId, userId) {
     const comments = await prisma.comment.findMany({
       where: { productId: parseInt(productId), articleId: null },
@@ -29,6 +30,7 @@ class ProductCommentService {
     }));
   }
 
+  // 상품의 댓글 작성
   async createProductComment(productId, content, userId) {
     return prisma.comment.create({
       data: {

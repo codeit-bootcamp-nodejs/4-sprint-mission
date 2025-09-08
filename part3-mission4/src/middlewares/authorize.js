@@ -1,6 +1,7 @@
 import prisma from '../lib/prismaClient.js';
 import bcrypt from 'bcrypt';
 
+// 공통 로직
 export const isOwner = (modelGetter) => async (req, res, next) => {
   console.log('📌 req.params:', req.params);
   const resource = await modelGetter(req);
@@ -12,6 +13,7 @@ export const isOwner = (modelGetter) => async (req, res, next) => {
   next();
 };
 
+// 제품 권한 체크
 export const isProductOwner = isOwner((req) =>
   prisma.product.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -19,13 +21,15 @@ export const isProductOwner = isOwner((req) =>
   })
 );
 
+// 게시글 권한 체크
 export const isArticleOwner = isOwner((req) =>
   prisma.article.findUnique({
     where: { id: parseInt(req.params.id) },
-    select: { userId: true }, // 반드시 userId 포함
+    select: { userId: true },
   })
 );
 
+// 댓글 권한 체크
 export const isCommentOwner = isOwner((req) =>
   prisma.comment.findUnique({
     where: { id: parseInt(req.params.commentId) },
@@ -33,6 +37,7 @@ export const isCommentOwner = isOwner((req) =>
   })
 );
 
+// 본인인지 체크
 export const isUserSelf = async (req, res, next) => {
   const userId = parseInt(req.params.userId);
   if (userId !== req.user.id) {
@@ -42,6 +47,7 @@ export const isUserSelf = async (req, res, next) => {
   next();
 };
 
+// 비밀번호 체크
 export const verifyPassword = async (req, res, next) => {
   const { currentPassword } = req.body;
 

@@ -6,7 +6,7 @@ import { isProductOwner, isCommentOwner } from '../middlewares/authorize.js';
 
 const router = express.Router();
 
-// 상품
+// 상품 조회, 등록
 router
   .route('/')
   .get(productController.getAllProducts)
@@ -16,6 +16,7 @@ router
     productController.createProduct
   );
 
+// 상품 상세 조회, 수정, 삭제
 router
   .route('/:id')
   .get(
@@ -36,6 +37,7 @@ router
     productController.deleteProduct
   );
 
+// 상품 좋아요, 좋아요 취소
 router
   .route('/:id/like')
   .post(

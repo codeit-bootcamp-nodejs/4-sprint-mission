@@ -9,6 +9,7 @@ import {
 import AppError from '../lib/appError.js';
 
 class UserService {
+  // 유저 등록
   async register(username, email, password) {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -26,11 +27,13 @@ class UserService {
     return userWithoutPassword;
   }
 
+  // 로그인
   async login(userId) {
     const { accessToken, refreshToken } = generateTokens(userId);
     return { accessToken, refreshToken };
   }
 
+  // 유저 정보 조회
   async getUserProfile(userId) {
     const getUserProfile = await prisma.user.findUnique({
       where: { id: userId },
@@ -44,6 +47,7 @@ class UserService {
     return getUserProfile;
   }
 
+  // 유저 정보 수정
   async updateUserProfile(userId, updateData) {
     const updateUserProfile = await prisma.user.update({
       where: { id: userId },
@@ -57,6 +61,7 @@ class UserService {
     return updateUserProfile;
   }
 
+  // 비밀번호 수정
   async updatePassword(userId, currentPassword, newPassword) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -76,6 +81,7 @@ class UserService {
     });
   }
 
+  // 본인 댓글 조회
   async getUserComments(userId) {
     const comments = await prisma.comment.findMany({
       where: { userId },
@@ -100,6 +106,7 @@ class UserService {
     return comments;
   }
 
+  // 자신이 좋아요한 댓글 조회
   async getUserLikedComments(userId) {
     const likedComments = await prisma.comment.findMany({
       where: { likedBy: { some: { id: userId } } },
@@ -107,6 +114,7 @@ class UserService {
     return likedComments;
   }
 
+  // 토큰 세팅
   setTokenCookies(res, accessToken, refreshToken) {
     res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
       httpOnly: true,
@@ -121,11 +129,13 @@ class UserService {
     });
   }
 
+  // 토큰 클리어
   clearTokenCookies(res) {
     res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
   }
 
+  // 리프레시 토큰
   async refreshTokens(refreshToken, res) {
     const { userId } = verifyRefreshToken(refreshToken);
     const { accessToken, refreshToken: newRefreshToken } =

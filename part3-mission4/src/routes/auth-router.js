@@ -5,6 +5,7 @@ import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants.js';
 
 const router = express.Router();
 
+// 리프레시 토큰
 router.post('/refresh', async (req, res) => {
   try {
     const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME];

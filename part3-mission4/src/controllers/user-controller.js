@@ -3,6 +3,7 @@ import { productService } from '../services/product-service.js';
 import { articleService } from '../services/article-service.js';
 
 class UserController {
+  // 회원가입
   async register(req, res) {
     const { username, email, password } = req.body;
     const user = await userService.register(username, email, password);
@@ -12,6 +13,7 @@ class UserController {
     });
   }
 
+  // 로그인
   async login(req, res) {
     const { accessToken, refreshToken } = await userService.login(req.user.id);
     userService.setTokenCookies(res, accessToken, refreshToken);
@@ -22,11 +24,13 @@ class UserController {
     });
   }
 
+  // 로그아웃
   logout(req, res) {
     userService.clearTokenCookies(res);
     res.status(200).send({ message: '로그아웃 되었습니다.' });
   }
 
+  // 유저 정보 조회
   async getUserProfile(req, res) {
     const profile = await userService.getUserProfile(req.user.id);
     if (!profile) {
@@ -35,6 +39,7 @@ class UserController {
     res.status(200).json({ profile, message: '유저 프로필 조회!' });
   }
 
+  // 유저 정보 수정
   async updateUserProfile(req, res) {
     const { username, email, images } = req.body; // 수정할 필드만 뽑음
     const updateData = { username, email, images };
@@ -45,6 +50,7 @@ class UserController {
     res.status(200).json({ updated, message: '프로필 수정 완료!' });
   }
 
+  // 비밀번호 수정
   async updatePassword(req, res) {
     const { currentPassword, newPassword, newPasswordConfirm } = req.body;
     if (newPassword !== newPasswordConfirm) {
@@ -56,24 +62,28 @@ class UserController {
     res.status(200).json({ message: '비밀번호가 변경되었습니다.' });
   }
 
+  // 유저가 단 댓글 조회
   async getUserComments(req, res) {
     const userId = req.user.id;
     const comments = await userService.getUserComments(userId);
     res.status(200).json({ comments });
   }
 
+  // 유저가 좋아요 누른 상품 조회
   async getUserLikedProducts(req, res) {
     const userId = req.user?.id;
     const likedProducts = await productService.getUserLikedProducts(userId);
     res.json({ data: likedProducts });
   }
 
+  // 유저가 좋아요 누른 게시글 조회
   async getUserLikedArticles(req, res) {
     const userId = req.user?.id;
     const likedArticles = await articleService.getUserLikedArticles(userId);
     res.json({ data: likedArticles });
   }
 
+  // 유저가 좋아요 누른 댓글 조회
   async getUserLikedComments(req, res) {
     const userId = req.user?.id;
     const likedComments = await userService.getUserLikedComments(userId);

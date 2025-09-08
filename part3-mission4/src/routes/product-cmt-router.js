@@ -6,6 +6,7 @@ import { isCommentOwner } from '../middlewares/authorize.js';
 
 const router = express.Router();
 
+// 상품 댓글 조회, 작성
 router
   .route('/:productId/comments')
   .get(productCommentController.getComments)
@@ -15,6 +16,7 @@ router
     productCommentController.createComment
   );
 
+// 상품 댓글 수정, 삭제
 router
   .route('/comments/:commentId')
   .patch(
@@ -31,6 +33,7 @@ router
     productCommentController.deleteComment
   );
 
+// 상품 댓글 좋아요, 좋아요 취소
 router
   .route('/comments/:commentId/like')
   .post(

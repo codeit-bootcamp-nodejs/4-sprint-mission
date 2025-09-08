@@ -2,7 +2,7 @@ import prisma from '../lib/prismaClient.js';
 import AppError from '../lib/appError.js';
 
 class ProductService {
-  // 전체 상품 조회 (검색/페이징/정렬)
+  // 전체 상품 조회
   async getAllProducts(query, userId) {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || 10;
@@ -138,7 +138,7 @@ class ProductService {
     return newProduct;
   }
 
-  // 상품 수정 (권한 체크 포함)
+  // 상품 수정
   async updateProduct(productId, userId, updateData) {
     const updated = await prisma.product.updateMany({
       where: { id: parseInt(productId), userId },
@@ -162,7 +162,7 @@ class ProductService {
     });
   }
 
-  // 상품 삭제 (권한 체크 포함)
+  // 상품 삭제
   async deleteProduct(productId, userId) {
     const deleted = await prisma.product.deleteMany({
       where: { id: parseInt(productId), userId },
@@ -175,7 +175,7 @@ class ProductService {
     return { message: '제품이 삭제되었습니다.' };
   }
 
-  // 특정 유저의 상품 조회
+  // 본인이 등록한 상품 조회
   async getUserProducts(userId) {
     const products = await prisma.product.findMany({
       where: { userId },
@@ -193,6 +193,7 @@ class ProductService {
     return products;
   }
 
+  // 좋아요한 상품 조회
   async getUserLikedProducts(userId) {
     const likedProducts = await prisma.product.findMany({
       where: { likedBy: { some: { id: parseInt(userId) } } },
@@ -200,6 +201,7 @@ class ProductService {
     return likedProducts;
   }
 
+  // 상품 좋아요
   async productLike(userId, productId) {
     const productLiked = await prisma.product.update({
       where: { id: parseInt(productId) },
@@ -211,6 +213,7 @@ class ProductService {
     return productLiked;
   }
 
+  // 상품 좋아요 취소
   async productUnlike(userId, productId) {
     const productUnliked = await prisma.product.update({
       where: { id: parseInt(productId) },

@@ -1,7 +1,7 @@
 import { productService } from '../services/product-service.js';
 
 class ProductController {
-  // 제품
+  // 상품
   async getAllProducts(req, res) {
     const userId = req.user?.id || null;
     const { data, pagination } = await productService.getAllProducts(
@@ -61,7 +61,7 @@ class ProductController {
     res.json({ data: product });
   }
 
-  // 유저 제품 목록 조회
+  // 본인이 등록한 상품 조회
   async getUserProducts(req, res) {
     const userId = req.user.id;
     const products = await productService.getUserProducts(userId);

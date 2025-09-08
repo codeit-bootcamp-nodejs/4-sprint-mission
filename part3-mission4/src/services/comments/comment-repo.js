@@ -6,6 +6,7 @@ export const commentRepository = {
     return prisma.comment.findUnique({ where: { id: parseInt(commentId) } });
   },
 
+  // 댓글 수정
   async updateComment(commentId, userId, content) {
     const comment = await this.findById(commentId);
     if (!comment) throw new AppError('댓글을 찾을 수 없습니다.', 404);
@@ -17,6 +18,7 @@ export const commentRepository = {
     });
   },
 
+  // 댓글 삭제
   async deleteComment(commentId, userId) {
     const deleted = await prisma.comment.deleteMany({
       where: { id: parseInt(commentId), userId },
@@ -27,6 +29,7 @@ export const commentRepository = {
     return { message: '댓글이 삭제되었습니다.' };
   },
 
+  // 댓글 좋아요
   async like(userId, commentId) {
     return prisma.comment.update({
       where: { id: parseInt(commentId) },
@@ -37,6 +40,7 @@ export const commentRepository = {
     });
   },
 
+  // 댓글 좋아요 취소
   async unlike(userId, commentId) {
     return prisma.comment.update({
       where: { id: parseInt(commentId) },
