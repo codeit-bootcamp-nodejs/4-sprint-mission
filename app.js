@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 
-app.use("/images", express.static(path.join(process.cwd(), "upload")));
+app.use("/images", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/", router);
 
