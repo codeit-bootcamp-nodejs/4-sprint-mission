@@ -31,9 +31,10 @@ export const getProductsComments = async (req, res, next) => {
 export const postProductComment = async (req, res, next) => {
   try {
     const productId = Number(req.params.productId);
+    const userId = Number(req.user.id);
     const { content } = req.body;
 
-    const comment = await createProductComment(productId, content);
+    const comment = await createProductComment(productId, content, userId);
 
     res.status(201).json(comment);
   } catch (err) {
@@ -45,9 +46,15 @@ export const patchProductComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
     const productId = Number(req.params.productId);
+    const userId = Number(req.user.id);
     const { content } = req.body;
 
-    const comment = await updateProductComment(productId, commentId, content);
+    const comment = await updateProductComment(
+      productId,
+      commentId,
+      content,
+      userId
+    );
 
     res.status(200).json(comment);
   } catch (err) {
@@ -62,8 +69,9 @@ export const deleteProductComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
     const productId = Number(req.params.productId);
+    const userId = Number(req.user.id);
 
-    await removeProductComment(commentId, productId);
+    await removeProductComment(commentId, productId, userId);
 
     res.status(200).json({ message: `ID:${commentId} 삭제 완료` });
   } catch (err) {

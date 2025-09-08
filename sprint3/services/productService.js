@@ -84,7 +84,7 @@ export const updateProduct = async (
     const product = await prisma.product.findUnique({ where: { id } });
 
     if (product.userId != userId) {
-      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      const error = new Error("상품을 수정할 권한이 없습니다.");
       error.status = 403;
       throw error;
     }
@@ -110,13 +110,13 @@ export const removeProduct = async (id, userId) => {
     const product = await prisma.product.findUnique({ where: { id } });
 
     if (!product) {
-      const error = new Error("게시글을 찾을 수 없습니다.");
+      const error = new Error("상품을 찾을 수 없습니다.");
       error.status = 404;
       throw error;
     }
 
     if (product.userId != userId) {
-      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      const error = new Error("상품을 삭제할 권한이 없습니다.");
       error.status = 403;
       throw error;
     }

@@ -27,9 +27,10 @@ export const getArticleComments = async (req, res, next) => {
 export const postArticleComment = async (req, res, next) => {
   try {
     const articleId = Number(req.params.articleId);
+    const userId = Number(req.user.id);
     const { content } = req.body;
 
-    const comment = await createArticleComment(articleId, content);
+    const comment = await createArticleComment(articleId, content, userId);
 
     res.status(201).json(comment);
   } catch (err) {
@@ -41,9 +42,15 @@ export const patchArticleComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
     const articleId = Number(req.params.articleId);
+    const userId = Number(req.user.id);
     const { content } = req.body;
 
-    const comment = await updateArticleComment(articleId, commentId, content);
+    const comment = await updateArticleComment(
+      articleId,
+      commentId,
+      content,
+      userId
+    );
 
     res.status(200).json(comment);
   } catch (err) {
@@ -58,8 +65,9 @@ export const deleteArticleComment = async (req, res, next) => {
   try {
     const commentId = Number(req.params.commentId);
     const articleId = Number(req.params.articleId);
+    const userId = Number(req.user.id);
 
-    await removeArticleComment(commentId, articleId);
+    await removeArticleComment(commentId, articleId, userId);
 
     res.status(200).json({ message: `ID:${commentId} 삭제 완료` });
   } catch (err) {

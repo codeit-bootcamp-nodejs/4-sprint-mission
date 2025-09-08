@@ -25,7 +25,7 @@ export const getArticleList = async (req, res, next) => {
 export const postArticle = async (req, res, next) => {
   try {
     const { title, content } = req.body;
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     const article = await createArticle(title, content, userId);
 
@@ -54,7 +54,7 @@ export const getArticleById = async (req, res, next) => {
 export const patchArticle = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     const { title, content } = req.body;
 
@@ -69,7 +69,7 @@ export const patchArticle = async (req, res, next) => {
 export const deleteArticle = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     await removeArticle(id, userId);
 

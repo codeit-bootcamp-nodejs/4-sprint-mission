@@ -107,7 +107,7 @@ export const removeArticle = async (id, userId) => {
     }
 
     if (article.userId != userId) {
-      const error = new Error("게시글을 수정할 권한이 없습니다.");
+      const error = new Error("게시글을 삭제할 권한이 없습니다.");
       error.status = 403;
       throw error;
     }

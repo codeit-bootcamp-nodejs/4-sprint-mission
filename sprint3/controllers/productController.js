@@ -25,7 +25,7 @@ export const getProductList = async (req, res, next) => {
 export const postProduct = async (req, res, next) => {
   try {
     const { name, description, price, tags } = req.body;
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     const product = await createProduct(name, description, price, tags, userId);
 
@@ -54,7 +54,7 @@ export const getProductById = async (req, res, next) => {
 export const patchProduct = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     const { name, description, price, tags } = req.body;
 
@@ -76,7 +76,7 @@ export const patchProduct = async (req, res, next) => {
 export const deletProduct = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    const userId = req.user.id;
+    const userId = Number(req.user.id);
 
     await removeProduct(id, userId);
 

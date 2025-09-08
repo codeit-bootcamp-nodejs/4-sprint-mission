@@ -21,12 +21,23 @@ export const findArticleComments = async (articleId, cursor, limit) => {
   }
 };
 
-export const createArticleComment = async (articleId, content) => {
+export const createArticleComment = async (articleId, content, userId) => {
   try {
+    const article = await prisma.article.findUnique({
+      where: { id: articleId },
+    });
+
+    if (!article) {
+      const error = new Error("게시글을 찾을 수 없습니다.");
+      error.status = 404;
+      throw error;
+    }
+
     const comment = await prisma.comment.create({
       data: {
         content,
-        article: { connect: { id: articleId } },
+        articleId,
+        userId,
       },
     });
 
@@ -36,7 +47,12 @@ export const createArticleComment = async (articleId, content) => {
   }
 };
 
-export const updateArticleComment = async (articleId, commentId, content) => {
+export const updateArticleComment = async (
+  articleId,
+  commentId,
+  content,
+  userId
+) => {
   try {
     const comment = await prisma.comment.findFirst({
       where: {
@@ -47,6 +63,10 @@ export const updateArticleComment = async (articleId, commentId, content) => {
 
     if (!comment) {
       throw new Error("댓글을 찾을 수 없습니다.");
+    }
+
+    if (comment.userId !== userId) {
+      throw new Error("댓글을 수정할 권한이 없습니다.");
     }
 
     const updatedArticleComment = await prisma.comment.update({
@@ -60,8 +80,23 @@ export const updateArticleComment = async (articleId, commentId, content) => {
   }
 };
 
-export const removeArticleComment = async (commentId, articleId) => {
+export const removeArticleComment = async (commentId, articleId, userId) => {
   try {
+    const comment = await prisma.comment.findFirst({
+      where: {
+        id: commentId,
+        articleId: articleId,
+      },
+    });
+
+    if (!comment) {
+      throw new Error("댓글을 찾을 수 없습니다.");
+    }
+
+    if (comment.userId !== userId) {
+      throw new Error("댓글을 삭제할 권한이 없습니다.");
+    }
+
     await prisma.comment.delete({
       where: {
         id: commentId,
