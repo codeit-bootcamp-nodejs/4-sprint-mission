@@ -18,10 +18,10 @@ model Product {
   name        String
   description String
   price       Int
+  like        Like[]
   tags        String[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  like        Boolean
   comment     Comment[]
   user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int?
@@ -33,7 +33,7 @@ model Article {
   content   String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  like      Boolean
+  like      Like[]
   comment   Comment[]
   User      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int?
@@ -65,4 +65,15 @@ model User {
   product   Product[]
   article   Article[]
   comment   Comment[]
+  Like      Like[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  articleId Int?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
