@@ -3,42 +3,30 @@ import {
   postCommentService,
   patchCommentService,
   deleteCommentService,
-} from "../services/commentService.js";
+} from '../services/commentService.js';
 // prettier-ignore
 class CommentController {
   async getCommentList(req, res) {
-    const args = {
-        ...req.parsedQuery,
-        parentType: req.parentType
-    }
-    const result = await getCommentListService(args);
+    const parentType = req.parentType;
+    const result = await getCommentListService({parentType, ...req.parsedQuery});
     return res.status(200).json(result);
   }
   async postComment(req, res) {
     const {content} = req.body;
-    const args = {
-        parentId: req.parentId,
-        parentType: req.parentType,
-        userId: req.user.id,
-        content,
-    }
-    const result = await postCommentService(args);
+    const parentType = req.parentType;
+    const parentId = req.parentId;
+    const {id: userId} = req.tokenPayload;
+    const result = await postCommentService({parentId, userId, parentType, content});
     return res.status(201).json(result);
   }
   async patchComment(req, res) {
     const {content} = req.body;
-    const args = {
-        id: req.parsedId,
-        content,
-    }
-    const result = await patchCommentService(args);
+    const id = req.parsedId;
+    const result = await patchCommentService({id, content});
     return res.status(200).json(result);
   }
   async deleteComment(req, res) {
-    const args = {
-        id: req.parsedId
-    }
-    const result = await deleteCommentService(args);
+    const result = await deleteCommentService({id: req.parsedId});
     return res.status(200).json(result);
   }
 }

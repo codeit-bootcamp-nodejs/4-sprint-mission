@@ -6,40 +6,29 @@ import {
   deleteProductService,
   postProductLikeService,
   deleteProductLikeService,
-} from "../services/productService.js";
+} from '../services/productService.js';
 
 class ProductController {
   async getProduct(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user?.id,
-      productId: id,
-    };
-    const result = await getProductService(args);
+    const { id: productId } = req.parsedId;
+    const { id: userId } = req.tokenPayload || {};
+    const result = await getProductService({ userId, productId });
     return res.status(200).json(result);
   }
   async getProductList(req, res) {
-    const args = {
-      userId: req.user?.id,
-      ...req.parsedQuery,
-    };
-    const result = await getProductListService(args);
+    const { id: userId } = req.tokenPayload || {};
+    const result = await getProductListService({ userId, ...req.parsedQuery });
     return res.status(200).json(result);
   }
   async postProduct(req, res) {
-    const args = {
-      userId: req.user.id,
-      ...req.body,
-    };
-    const result = await postProductService(args);
+    const { id: userId } = req.tokenPayload;
+    const result = await postProductService({ userId, ...req.body });
     return res.status(201).json(result);
   }
   async patchProduct(req, res) {
-    const args = {
-      id: req.parsedId,
-      data: req.body,
-    };
-    const result = await patchProductService(args);
+    const id = req.parsedId;
+    const data = req.body;
+    const result = await patchProductService({ id, data });
     return res.status(200).json(result);
   }
   async deleteProduct(req, res) {
@@ -47,21 +36,15 @@ class ProductController {
     return res.status(200).json(result);
   }
   async postProductLike(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user.id,
-      productId: id,
-    };
-    const result = await postProductLikeService(args);
+    const { id: productId } = req.parsedId;
+    const { id: userId } = req.tokenPayload;
+    const result = await postProductLikeService({ userId, productId });
     return res.status(201).json(result);
   }
   async deleteProductLike(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user.id,
-      productId: id,
-    };
-    const result = await deleteProductLikeService(args);
+    const { id: productId } = req.parsedId;
+    const { id: userId } = req.tokenPayload;
+    const result = await deleteProductLikeService({ userId, productId });
     return res.status(200).json(result);
   }
 }

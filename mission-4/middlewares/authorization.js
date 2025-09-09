@@ -4,14 +4,14 @@ export default function authorization(domain) {
   return async (req, res, next) => {
     try {
       const id = req.parsedId;
-      const user = req.user;
+      const { id: idFromToken } = req.tokenPayload;
       const data = await prisma[domain].findUniqueOrThrow({
         where: id,
         select: {
           userId: true,
         },
       });
-      if (user.id !== data.userId) {
+      if (idFromToken !== data.userId) {
         const err = new Error('권한이 없습니다.');
         err.statusCode = 403; // 403 Forbidden
         throw err;

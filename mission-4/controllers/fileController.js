@@ -1,12 +1,10 @@
-import { deleteFileService, postFileService } from "../services/fileService.js";
+import { deleteFileService, postFileService } from '../services/fileService.js';
 
 class FileController {
   async postFile(req, res) {
-    const args = {
-      path: req.file.path,
-      userId: req.user.id,
-    };
-    const result = await postFileService(args);
+    const { id: userId } = req.tokenPayload;
+    const { path } = req.file;
+    const result = await postFileService({ path, userId });
     return res.status(201).json(result);
   }
   async deleteFile(req, res) {

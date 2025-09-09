@@ -6,40 +6,29 @@ import {
   deleteArticleService,
   postArticleLikeService,
   deleteArticleLikeService,
-} from "../services/articleService.js";
+} from '../services/articleService.js';
 
 class ArticleController {
   async getArticle(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user?.id,
-      articleId: id,
-    };
-    const result = await getArticleService(args);
+    const { id: articleId } = req.parsedId;
+    const { id: userId } = req.tokenPayload || {};
+    const result = await getArticleService({ userId, articleId });
     return res.status(200).json(result);
   }
   async getArticleList(req, res) {
-    const args = {
-      userId: req.user?.id,
-      ...req.parsedQuery,
-    };
-    const result = await getArticleListService(args);
+    const { id: userId } = req.tokenPayload || {};
+    const result = await getArticleListService({ userId, ...req.parsedQuery });
     return res.status(200).json(result);
   }
   async postArticle(req, res) {
-    const args = {
-      userId: req.user.id,
-      ...req.body,
-    };
-    const result = await postArticleService(args);
+    const { id: userId } = req.tokenPayload;
+    const result = await postArticleService({ userId, ...req.body });
     return res.status(201).json(result);
   }
   async patchArticle(req, res) {
-    const args = {
-      id: req.parsedId,
-      data: req.body,
-    };
-    const result = await patchArticleService(args);
+    const id = req.parsedId;
+    const data = req.body;
+    const result = await patchArticleService({ id, data });
     return res.status(200).json(result);
   }
   async deleteArticle(req, res) {
@@ -47,21 +36,15 @@ class ArticleController {
     return res.status(200).json(result);
   }
   async postArticleLike(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user.id,
-      articleId: id,
-    };
-    const result = await postArticleLikeService(args);
+    const { id: articleId } = req.parsedId;
+    const { id: userId } = req.tokenPayload;
+    const result = await postArticleLikeService({ userId, articleId });
     return res.status(201).json(result);
   }
   async deleteArticleLike(req, res) {
-    const { id } = req.parsedId;
-    const args = {
-      userId: req.user.id,
-      articleId: id,
-    };
-    const result = await deleteArticleLikeService(args);
+    const { id: articleId } = req.parsedId;
+    const { id: userId } = req.tokenPayload;
+    const result = await deleteArticleLikeService({ userId, articleId });
     return res.status(200).json(result);
   }
 }
