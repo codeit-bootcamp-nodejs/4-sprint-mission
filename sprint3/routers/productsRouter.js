@@ -15,12 +15,13 @@ import {
 import productCommentRouter from "./productCommentsRouter.js";
 import likeRouter from "./productLikeRouter.js";
 import passport from "../lib/passport/index.js";
+import { optionalAuth } from "../middlewares/optionalAuth.js";
 
 const productRouter = express.Router();
 
 productRouter
   .route("/")
-  .get(validateProductQuery, getProductList)
+  .get(validateProductQuery, optionalAuth, getProductList)
   .post(
     validateProductCreate,
     passport.authenticate("access-token", { session: false }),
@@ -29,7 +30,7 @@ productRouter
 
 productRouter
   .route("/:id")
-  .get(validateId, getProductById)
+  .get(validateId, optionalAuth, getProductById)
   .patch(
     validateId,
     validateProductUpdate,

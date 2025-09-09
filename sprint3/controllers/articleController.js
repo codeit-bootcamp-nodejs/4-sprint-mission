@@ -9,8 +9,9 @@ import {
 export const getArticleList = async (req, res, next) => {
   try {
     const { offset = 0, limit = 10, title, content } = req.query;
+    const userId = req.user?.id || null;
 
-    const articles = await getArticles(offset, limit, title, content);
+    const articles = await getArticles(offset, limit, title, content, userId);
 
     if (articles.length === 0) {
       return res.status(404).json({ error: "게시글을 찾을 수 없습니다." });
@@ -38,8 +39,9 @@ export const postArticle = async (req, res, next) => {
 export const getArticleById = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
+    const userId = req.user?.id || null;
 
-    const article = await findArticleById(id);
+    const article = await findArticleById(id, userId);
 
     if (!article) {
       return res.status(404).json({ message: "게시글을 찾을 수 없습니다." });

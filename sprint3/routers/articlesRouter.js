@@ -14,12 +14,13 @@ import {
 import articleCommentRouter from "./articleCommentsRouter.js";
 import likeRouter from "./articleLikeRouter.js";
 import passport from "../lib/passport/index.js";
+import { optionalAuth } from "../middlewares/optionalAuth.js";
 
 const articleRouter = express.Router();
 
 articleRouter
   .route("/")
-  .get(validateArticleQuery, getArticleList)
+  .get(validateArticleQuery, optionalAuth, getArticleList)
   .post(
     validateArticleCreate,
     passport.authenticate("access-token", { session: false }),
@@ -28,7 +29,7 @@ articleRouter
 
 articleRouter
   .route("/:id")
-  .get(validateId, getArticleById)
+  .get(validateId, optionalAuth, getArticleById)
   .patch(
     validateId,
     passport.authenticate("access-token", { session: false }),

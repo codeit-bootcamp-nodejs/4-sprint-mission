@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-export const getProducts = async (offset, limit, name, description) => {
+export const getProducts = async (offset, limit, name, description, userId) => {
   const filter = [];
 
   if (name) {
@@ -28,7 +28,29 @@ export const getProducts = async (offset, limit, name, description) => {
       },
     });
 
-    return product;
+    if (!userId) {
+      // 비로그인 유저면 그냥 isLiked는 false로 세팅 후 반환
+      return product.map((product) => ({ ...product, isLiked: false }));
+    }
+
+    const likedProducts = await prisma.like.findMany({
+      where: {
+        userId,
+        productId: { in: product.map((p) => p.id) },
+      },
+      select: {
+        productId: true,
+      },
+    });
+
+    // 3. 좋아요 누른 상품 ID만 모아서 Set으로 만듦 (검색 빠르게 하기 위해)
+    const likedProductIds = new Set(likedProducts.map((lp) => lp.productId));
+
+    // 4. 각 상품에 isLiked 필드 추가
+    return product.map((product) => ({
+      ...product,
+      isLiked: likedProductIds.has(product.id),
+    }));
   } catch (err) {
     throw err;
   }
@@ -52,7 +74,7 @@ export const createProduct = async (name, description, price, tags, userId) => {
   }
 };
 
-export const findProductById = async (id) => {
+export const findProductById = async (id, userId) => {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
@@ -66,7 +88,20 @@ export const findProductById = async (id) => {
       },
     });
 
-    return product;
+    let isLiked = false;
+    if (userId) {
+      const like = await prisma.like.findUnique({
+        where: {
+          userId_productId: {
+            userId,
+            productId: id,
+          },
+        },
+      });
+      isLiked = !!like; // like가 있으면 true, 없으면 false
+    }
+
+    return { ...product, isLiked };
   } catch (err) {
     throw err;
   }

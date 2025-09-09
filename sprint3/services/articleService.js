@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma.js";
 
-export const getArticles = async (offset, limit, title, content) => {
+export const getArticles = async (offset, limit, title, content, userId) => {
   try {
     const filter = [];
 
@@ -27,7 +27,26 @@ export const getArticles = async (offset, limit, title, content) => {
       },
     });
 
-    return articles;
+    if (!userId) {
+      return articles.map((article) => ({ ...article, isLiked: false }));
+    }
+
+    const likedArticles = await prisma.like.findMany({
+      where: {
+        userId,
+        articleId: { in: articles.map((p) => p.id) },
+      },
+      select: {
+        articleId: true,
+      },
+    });
+
+    const likedArticleIds = new Set(likedArticles.map((lp) => lp.articleId));
+
+    return articles.map((article) => ({
+      ...article,
+      isLiked: likedArticleIds.has(article.id),
+    }));
   } catch (err) {
     throw err;
   }
@@ -49,7 +68,7 @@ export const createArticle = async (title, content, userId) => {
   }
 };
 
-export const findArticleById = async (id) => {
+export const findArticleById = async (id, userId) => {
   try {
     const article = await prisma.article.findUnique({
       where: { id },
@@ -61,7 +80,20 @@ export const findArticleById = async (id) => {
       },
     });
 
-    return article;
+    let isLiked = false;
+    if (userId) {
+      const like = await prisma.like.findUnique({
+        where: {
+          userId_articleId: {
+            userId,
+            articleId: id,
+          },
+        },
+      });
+      isLiked = !!like; // like가 있으면 true, 없으면 false
+    }
+
+    return { ...article, isLiked };
   } catch (err) {
     throw err;
   }
