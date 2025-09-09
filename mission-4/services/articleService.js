@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.js";
+import prisma from '../lib/prisma.js';
 
 async function getArticleListService({ keyword, page, pageSize, userId }) {
   const articles = await prisma.article.findMany({
@@ -20,7 +20,7 @@ async function getArticleListService({ keyword, page, pageSize, userId }) {
           likes: true,
         },
       },
-      User: {
+      user: {
         select: {
           id: true,
           email: true,
@@ -29,7 +29,7 @@ async function getArticleListService({ keyword, page, pageSize, userId }) {
       },
     },
     orderBy: {
-      createdAt: "desc",
+      createdAt: 'desc',
     },
     skip: (page - 1) * pageSize,
     take: pageSize,
@@ -76,7 +76,7 @@ async function getArticleService({ articleId, userId }) {
           likes: true,
         },
       },
-      User: {
+      user: {
         select: {
           id: true,
           email: true,
@@ -114,6 +114,9 @@ async function postArticleLikeService({ userId, articleId }) {
       userId,
       articleId,
     },
+    select: {
+      article: true,
+    },
   });
   return article;
 }
@@ -124,6 +127,9 @@ async function deleteArticleLikeService({ userId, articleId }) {
         userId,
         articleId,
       },
+    },
+    select: {
+      article: true,
     },
   });
   return article;

@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.js";
+import prisma from '../lib/prisma.js';
 
 export default function authorization(domain) {
   return async (req, res, next) => {
@@ -12,15 +12,14 @@ export default function authorization(domain) {
         },
       });
       if (user.id !== data.userId) {
-        return res.status(403).json("권한이 없습니다.");
+        const err = new Error('권한이 없습니다.');
+        err.statusCode = 403; // 403 Forbidden
+        throw err;
       }
       next();
     } catch (e) {
       console.error(e);
-      if (e.code === "P2025") {
-        return res.status(404).json({ error: "요청한 데이터를 찾을 수 없습니다." });
-      }
-      return res.status(400).json("권한 인증에 실패했습니다.");
+      next(e);
     }
   };
 }

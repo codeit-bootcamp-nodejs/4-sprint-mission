@@ -1,8 +1,8 @@
-import { passwordHashing, validatePassword } from "../lib/bcrypt.js";
-import { generateToken, verifyAccessToken, verifyRefreshToken } from "../lib/jwtToken.js";
-import prisma from "../lib/prisma.js";
-import { redisClient } from "../lib/redis.js";
-import { REDIS_KEY } from "../lib/constants.js";
+import { passwordHashing, validatePassword } from '../lib/bcrypt.js';
+import { generateToken, verifyAccessToken, verifyRefreshToken } from '../lib/jwtToken.js';
+import prisma from '../lib/prisma.js';
+import { redisClient } from '../lib/redis.js';
+import { REDIS_KEY } from '../lib/constants.js';
 
 async function signupService({ email, nickname, password }) {
   const hashedPassword = await passwordHashing(password);
@@ -21,7 +21,7 @@ async function loginService({ email, password }) {
   const user = await prisma.user.findUniqueOrThrow({ where: { email } });
   const isPasswordValid = await validatePassword(password, user.password);
   if (!isPasswordValid) {
-    const err = new Error("비밀번호가 일치하지 않습니다.");
+    const err = new Error('비밀번호가 일치하지 않습니다.');
     err.statusCode = 401;
     throw err;
   }
@@ -42,16 +42,16 @@ async function logoutService(accessToken) {
   const payload = verifyAccessToken(accessToken);
   const remainingTime = payload.exp - Math.floor(Date.now() / 1000);
 
-  await redisClient.set(`${REDIS_KEY}:${accessToken}`, "blacklisted", {
+  await redisClient.set(`${REDIS_KEY}:${accessToken}`, 'blacklisted', {
     EX: remainingTime,
   });
-  return { message: "로그아웃 되었습니다." };
+  return { message: '로그아웃 되었습니다.' };
 }
 
 async function refreshService({ refreshToken }) {
   const isBlacklisted = await redisClient.get(`${REDIS_KEY}:${refreshToken}`);
   if (isBlacklisted) {
-    const err = new Error("만료된 리프레시 토큰입니다.");
+    const err = new Error('만료된 리프레시 토큰입니다.');
     err.statusCode = 401;
     throw err;
   }
@@ -63,12 +63,13 @@ async function refreshService({ refreshToken }) {
         id: result.id,
       },
       select: {
+        id: true,
         email: true,
         refreshToken: true,
       },
     });
     if (!user.refreshToken || user.refreshToken !== refreshToken) {
-      const err = new Error("유효하지 않은 리프레시 토큰입니다.");
+      const err = new Error('유효하지 않은 리프레시 토큰입니다.');
       err.statusCode = 403;
       throw err;
     }
@@ -82,7 +83,7 @@ async function refreshService({ refreshToken }) {
       },
     });
     const remainingTime = result.exp - Math.floor(Date.now() / 1000);
-    await redisClient.set(`${REDIS_KEY}:${refreshToken}`, "blacklisted", {
+    await redisClient.set(`${REDIS_KEY}:${refreshToken}`, 'blacklisted', {
       EX: remainingTime,
     });
     return { accessToken, refreshToken: newRefreshToken };

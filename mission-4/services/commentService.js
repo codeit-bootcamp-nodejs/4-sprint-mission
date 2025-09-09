@@ -1,14 +1,14 @@
-import prisma from "../lib/prisma.js";
+import prisma from '../lib/prisma.js';
 
 async function getCommentListService({ cursorId, pageSize, parentType }) {
-  const where = parentType === "product" ? { productId: { not: null } } : { articleId: { not: null } };
+  const where = parentType === 'product' ? { productId: { not: null } } : { articleId: { not: null } };
   const query = {
     where,
     select: {
       id: true,
       content: true,
       createdAt: true,
-      User: {
+      user: {
         select: {
           id: true,
           email: true,

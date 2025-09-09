@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.js";
+import prisma from '../lib/prisma.js';
 
 // prettier-ignore
 async function getProductListService({ keyword, page, pageSize, userId }) {
@@ -24,7 +24,7 @@ async function getProductListService({ keyword, page, pageSize, userId }) {
           likes: true,
         },
       },
-      User: {
+      user: {
         select: {
           id: true,
           email: true,
@@ -84,7 +84,7 @@ async function getProductService({ productId, userId }) {
           likes: true,
         },
       },
-      User: {
+      user: {
         select: {
           id: true,
           email: true,
@@ -123,6 +123,9 @@ async function postProductLikeService({ userId, productId }) {
       userId,
       productId,
     },
+    select: {
+      product: true,
+    },
   });
   return product;
 }
@@ -134,6 +137,9 @@ async function deleteProductLikeService({ userId, productId }) {
         userId,
         productId,
       },
+    },
+    select: {
+      product: true,
     },
   });
   return product;

@@ -1,20 +1,25 @@
-import express from "express";
-import commentValidator from "../middlewares/validation.middleware/commentValidator.js";
-import CommentController from "../controllers/commentController.js";
-import asyncHandler from "../middlewares/asyncHandler.js";
-import authentication from "../middlewares/authentication.js";
-import authorization from "../middlewares/authorizaion.js";
+import express from 'express';
+import CommentController from '../controllers/commentController.js';
+import asyncHandler from '../middlewares/asyncHandler.js';
+import authentication from '../middlewares/authentication.js';
+import authorization from '../middlewares/authorizaion.js';
+import {
+  validatePostBody,
+  validatePatchBody,
+  validateGetListQuery,
+} from '../middlewares/validators/commentValidator.js';
+import { validateId } from '../middlewares/validators/sharedValidator.js';
 
 const commentRouter = express.Router();
 
 // prettier-ignore
 commentRouter.route('/')
-    .get(commentValidator(), asyncHandler(CommentController.getCommentList))
-    .post(authentication(), commentValidator(), asyncHandler(CommentController.postComment))
+    .get(validateGetListQuery, asyncHandler(CommentController.getCommentList))
+    .post(authentication(), validatePostBody, asyncHandler(CommentController.postComment))
 
 // prettier-ignore
 commentRouter.route('/:id')
-    .patch(authentication(), commentValidator(), authorization('comment'), asyncHandler(CommentController.patchComment))
-    .delete(authentication(), commentValidator(), authorization('comment'), asyncHandler(CommentController.deleteComment))
+    .patch(authentication(), validateId, validatePatchBody, authorization('comment'), asyncHandler(CommentController.patchComment))
+    .delete(authentication(), validateId, authorization('comment'), asyncHandler(CommentController.deleteComment))
 
 export default commentRouter;
