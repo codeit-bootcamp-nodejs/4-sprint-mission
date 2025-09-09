@@ -4,7 +4,7 @@ import {
   deleteUserService,
   getUserContentListService,
   getUserContentLikeListService,
-} from "../services/userService.js";
+} from '../services/userService.js';
 
 class UserController {
   async getUser(req, res) {
@@ -12,13 +12,9 @@ class UserController {
     return res.status(200).json(result);
   }
   async patchUser(req, res) {
-    const { changePassword, currentPassword, ...data } = req.body;
-    if (req.changePassword) {
-      data.password = req.changePassword;
-    }
     const args = {
       id: req.user.id,
-      data,
+      data: req.body,
     };
     const result = await patchUserService(args);
     return res.status(200).json(result);

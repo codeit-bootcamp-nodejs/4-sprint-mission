@@ -1,5 +1,5 @@
-import { email, includes } from "zod";
-import prisma from "../lib/prisma.js";
+import { validatePassword, passwordHashing } from '../lib/bcrypt.js';
+import prisma from '../lib/prisma.js';
 
 async function getUserService({ id }) {
   const result = await prisma.user.findUniqueOrThrow({
@@ -18,6 +18,25 @@ async function getUserService({ id }) {
   return result;
 }
 async function patchUserService({ id, data }) {
+  const { changePassword, currentPassword, ...updateData } = data;
+  if (changePassword && currentPassword) {
+    // 비밀번호 변경시에만 실행
+    const user = await prisma.user.findUniqueOrThrow({
+      where: {
+        id,
+      },
+      select: {
+        password: true,
+      },
+    });
+    if (await validatePassword(currentPassword, user.password)) {
+      updateData.password = await passwordHashing(changePassword);
+    } else {
+      const err = new Error('현재 비밀번호가 일치하지 않습니다.');
+      err.statusCode = 401;
+      throw err;
+    }
+  }
   const result = await prisma.user.update({
     where: {
       id,
@@ -30,7 +49,7 @@ async function patchUserService({ id, data }) {
       createdAt: true,
       updatedAt: true,
     },
-    data,
+    data: updateData,
   });
   return result;
 }
@@ -51,9 +70,9 @@ async function deleteUserService({ id }) {
   return result;
 }
 async function getUserContentListService({ id, content }) {
-  content += "s";
+  content += 's';
   let options = {};
-  if (content === "comments") {
+  if (content === 'comments') {
     options = {
       select: {
         [content]: true,
@@ -78,7 +97,7 @@ async function getUserContentListService({ id, content }) {
     ...options,
   });
   let result = userContent;
-  if (content === "products" || content === "articles") {
+  if (content === 'products' || content === 'articles') {
     const contentList = userContent[content];
     const filteredContentList = contentList.map((content) => {
       const { likes, _count, ...filteredContent } = content;
