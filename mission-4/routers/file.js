@@ -4,7 +4,7 @@ import fileController from '../controllers/fileController.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import { validatePostFile } from '../middlewares/validators/fileValidator.js';
 import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorizaion.js';
+import authorization from '../middlewares/authorization.js';
 import { validateId } from '../middlewares/validators/sharedValidator.js';
 
 const fileRouter = express.Router();

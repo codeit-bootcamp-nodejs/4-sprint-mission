@@ -5,7 +5,7 @@ import asyncHandler from '../middlewares/asyncHandler.js';
 import ArticleController from '../controllers/articleController.js';
 import { validatePatchBody, validatePostBody } from '../middlewares/validators/articleValidator.js';
 import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorizaion.js';
+import authorization from '../middlewares/authorization.js';
 import optionalAuthentication from '../middlewares/optionalAuthentication.js';
 import { validateGetListQuery, validateId } from '../middlewares/validators/sharedValidator.js';
 

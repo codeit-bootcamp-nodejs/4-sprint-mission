@@ -73,7 +73,7 @@ async function refreshService({ refreshToken }) {
       err.statusCode = 403;
       throw err;
     }
-    const { accessToken, refreshToken: newRefreshToken } = generateToken(user.email);
+    const { accessToken, refreshToken: newRefreshToken } = generateToken(user.id);
     await tx.user.update({
       where: {
         id: user.id,

@@ -6,7 +6,7 @@ import ProductController from '../controllers/productController.js';
 import { validatePatchBody, validatePostBody } from '../middlewares/validators/productValidator.js';
 import { validateId, validateGetListQuery } from '../middlewares/validators/sharedValidator.js';
 import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorizaion.js';
+import authorization from '../middlewares/authorization.js';
 import optionalAuthentication from '../middlewares/optionalAuthentication.js';
 
 const productRouter = express.Router();

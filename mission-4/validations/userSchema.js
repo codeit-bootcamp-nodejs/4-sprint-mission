@@ -6,7 +6,7 @@ export const patchSchema = z.object({
   nickname: z.string().min(1, "닉네임은 1글자 이상 입력해주세요."),
   changePassword: z.string().min(8, '비밀번호는 8자 이상 입력해야합니다.'),
   currentPassword: z.string().min(8, '비밀번호는 8자 이상 입력해야합니다.'),
-  Image: z.url()
+  image: z.url()
 }).refine(data => {
   // changePassword나 currentPassword 중 하나만 있으면 에러
   return !(data.changePassword && !data.currentPassword || !data.changePassword && data.currentPassword);

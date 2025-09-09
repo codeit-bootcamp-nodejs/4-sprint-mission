@@ -2,7 +2,7 @@ import express from 'express';
 import CommentController from '../controllers/commentController.js';
 import asyncHandler from '../middlewares/asyncHandler.js';
 import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorizaion.js';
+import authorization from '../middlewares/authorization.js';
 import {
   validatePostBody,
   validatePatchBody,
