@@ -1,0 +1,81 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  nickname  String
+  image     String?
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  refreshToken String? //토큰
+  products  Product[]
+  comments  comment[]
+  articles  Article[]
+  likes     Like[]
+}
+
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  tags        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  comments    comment[]
+  likes     Like[]
+}
+
+model Article {
+  id       Int     @id @default(autoincrement())
+  title     String
+  content   String
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  user      User @relation(fields: [userId], references: [id])
+  comments  comment[]
+  likes     Like[]
+}
+
+model comment {
+  id       Int     @id @default(autoincrement())
+  content    String
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id])
+  articleId Int?
+  article   Article? @relation(fields: [articleId], references: [id])
+}
+
+model Like {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  productId Int?
+  articleId Int?
+  createdAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  product  Product? @relation(fields: [productId], references: [id])
+  article  Article? @relation(fields: [articleId], references: [id])
+
+  @@unique([userId, productId])
+  @@unique([userId, articleId])
+}
+
