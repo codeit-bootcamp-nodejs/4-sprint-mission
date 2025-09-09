@@ -1,4 +1,4 @@
-import multer from 'multer';
+import multer, { type FileFilterCallback } from 'multer';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -19,24 +19,27 @@ const storage = multer.diskStorage({
 });
 
 // 파일 필터 설정 (이미지 파일만 허용)
-const fileFilter = (req, file, cb) => {
+const fileFilter = (
+  req: Express.Request,
+  file: Express.Multer.File,
+  cb: FileFilterCallback
+) => {
   const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
   if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true); // 허용
+    cb(null, true);
   } else {
     cb(
       new Error(
         '허용되지 않는 파일 형식입니다. 이미지 파일만 업로드할 수 있습니다.'
-      ),
-      false
-    ); // 거부
+      )
+    );
   }
 };
 
 // Multer 미들웨어 설정
 const upload = multer({
-  storage: storage,
-  fileFilter: fileFilter,
+  storage,
+  fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB로 파일 크기 제한
     files: 5, // 최대 5개 파일까지 허용 (upload.array에 사용)

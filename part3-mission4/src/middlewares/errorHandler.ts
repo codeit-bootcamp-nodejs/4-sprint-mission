@@ -1,13 +1,13 @@
 // errorHandler.js
 import multer from 'multer';
-import AppError from '../lib/appError.js';
+import type { ErrorRequestHandler } from 'express';
 
-function errorHandler(err, req, res, next) {
-  console.error(err.stack);
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  console.error((err as Error)?.stack ?? err);
 
   // 기본값
-  let statusCode = err.statusCode || 500;
-  let message = err.message || '서버 오류';
+  let statusCode = (err && (err as any).statusCode) ?? 500;
+  let message = (err && (err as any).message) ?? '서버 오류';
 
   // 멀터 에러 처리
   if (err instanceof multer.MulterError) {
@@ -23,7 +23,7 @@ function errorHandler(err, req, res, next) {
         message = '최대 5개의 파일만 업로드할 수 있습니다.';
         break;
       default:
-        message = err.message;
+        message = (err as Error).message ?? message;
     }
   }
 
@@ -36,6 +36,6 @@ function errorHandler(err, req, res, next) {
       stack: err.stack,
     });
   }
-}
+};
 
 export default errorHandler;

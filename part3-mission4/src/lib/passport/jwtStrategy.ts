@@ -1,5 +1,10 @@
-import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import {
+  Strategy as JwtStrategy,
+  ExtractJwt,
+  type VerifiedCallback,
+} from 'passport-jwt';
 import prisma from '../prismaClient.js';
+import { type JwtPayload } from 'jsonwebtoken';
 import {
   JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET,
@@ -15,7 +20,7 @@ const refreshTokenOptions = {
   secretOrKey: JWT_REFRESH_TOKEN_SECRET,
 };
 
-async function jwtVerify(payload, done) {
+async function jwtVerify(payload: JwtPayload, done: VerifiedCallback) {
   try {
     const user = await prisma.user.findUnique({
       where: { id: payload.id },
