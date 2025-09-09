@@ -1,9 +1,11 @@
-import prisma from '../lib/prismaClient.js';
+import { prisma } from '../lib/prismaClient.js';
 import { verifyAccessToken } from '../lib/token.js';
 import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants.js';
+import type { Request, Response, NextFunction } from 'express';
 
-async function authenticate(req, res, next) {
+async function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
+    console.log('[authenticate] prisma initialized:', !!prisma);
     // 쿠키 또는 Authorization 헤더에서 토큰 가져오기
     const tokenFromCookie = req.cookies[ACCESS_TOKEN_COOKIE_NAME];
     const tokenFromHeader = req.headers.authorization?.split(' ')[1];

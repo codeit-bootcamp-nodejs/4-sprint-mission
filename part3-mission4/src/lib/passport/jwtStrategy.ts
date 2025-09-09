@@ -3,7 +3,7 @@ import {
   ExtractJwt,
   type VerifiedCallback,
 } from 'passport-jwt';
-import prisma from '../prismaClient.js';
+import { prisma } from '../prismaClient.js';
 import { type JwtPayload } from 'jsonwebtoken';
 import {
   JWT_ACCESS_TOKEN_SECRET,

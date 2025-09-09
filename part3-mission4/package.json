@@ -7,18 +7,18 @@
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "seed": "node prisma/seed.js",
+    "seed": "tsx src/prisma/seed.ts",
     "postinstall": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/app.js",
-    "start": "node src/app.js",
+    "dev": "tsx watch src/app.ts",
+    "start": "nodemon dist/app.js",
     "db:reset": "npx prisma migrate reset --skip-seed && npx prisma migrate dev && npx prisma db seed"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "tsx src/prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.13.0",
+    "@prisma/client": "^6.15.0",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -30,7 +30,6 @@
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "pg": "^8.16.3",
-    "prisma": "^6.13.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
@@ -43,6 +42,10 @@
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "prisma": "^6.15.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }

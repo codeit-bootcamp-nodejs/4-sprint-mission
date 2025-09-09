@@ -1,4 +1,4 @@
-import prisma from '../lib/prismaClient.js';
+import { prisma } from '../lib/prismaClient.js';
 import bcrypt from 'bcrypt';
 import type { Request, RequestHandler } from 'express';
 

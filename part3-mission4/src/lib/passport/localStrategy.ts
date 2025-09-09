@@ -1,11 +1,12 @@
-import { Strategy as LocalStrategy } from 'passport-local';
+import * as PassportLocal from 'passport-local';
+const LocalStrategy = PassportLocal.Strategy;
 import bcrypt from 'bcrypt';
-import prisma from '../prismaClient.js';
+import { prisma } from '../prismaClient.js';
 
 export const localStrategy = new LocalStrategy(async function (
-  username,
-  password,
-  done
+  username: string,
+  password: string,
+  done: (error: any, user?: any, info?: any) => void
 ) {
   const user = await prisma.user.findUnique({ where: { username } });
 

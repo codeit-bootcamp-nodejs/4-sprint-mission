@@ -1,13 +1,15 @@
+import dotenv from 'dotenv';
 import express from 'express';
 import routes from './routes/index.js';
 import errorHandler from './middlewares/errorHandler.js';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from './lib/passport/index.js';
 import { requestLogger } from './middlewares/logger.js';
 
 dotenv.config();
+
+console.log('[App] DATABASE_URL at app.ts start:', process.env.DATABASE_URL);
 const PORT = process.env.PORT || 3000;
 const app = express();
 
