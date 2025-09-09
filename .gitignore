@@ -1,4 +1,9 @@
-node_modules
+# Local files
+.vscode/
+node_modules/
+.env*
+!.env.example
 
-/generated/prisma
-
+# Uploaded files
+public/*
+!public/.gitkeep

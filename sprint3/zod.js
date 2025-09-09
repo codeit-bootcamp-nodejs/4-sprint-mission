@@ -46,4 +46,22 @@ const PatchArticle = CreateArticle.partial();
 const PatchProductComment = ProductComment.partial();
 const PatchArticleComment = ArticleComment.partial();
 
-export { CreateProduct, CreateArticle, PatchProduct, PatchArticle, ProductComment, ArticleComment, PatchProductComment, PatchArticleComment };
+const createValidationMiddleware = (schema) => (req, res, next) => {
+  try {
+    schema.parse(req.body);
+    next();
+  } catch (error) {
+    return res.status(400).json({ error: error.errors });
+  }
+};
+
+export default {
+  CreateProduct: createValidationMiddleware(CreateProduct),
+  CreateArticle: createValidationMiddleware(CreateArticle),
+  PatchProduct: createValidationMiddleware(PatchProduct),
+  PatchArticle: createValidationMiddleware(PatchArticle),
+  ProductComment: createValidationMiddleware(ProductComment),
+  ArticleComment: createValidationMiddleware(ArticleComment),
+  PatchProductComment: createValidationMiddleware(PatchProductComment),
+  PatchArticleComment: createValidationMiddleware(PatchArticleComment),
+};
