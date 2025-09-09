@@ -12,6 +12,7 @@ import {
   validateArticleQuery,
 } from "../middlewares/validate.js";
 import articleCommentRouter from "./articleCommentsRouter.js";
+import likeRouter from "./articleLikeRouter.js";
 import passport from "../lib/passport/index.js";
 
 const articleRouter = express.Router();
@@ -40,5 +41,6 @@ articleRouter
   );
 
 articleRouter.use("/:articleId/comments", articleCommentRouter);
+articleRouter.use("/:articleId/like", likeRouter);
 
 export default articleRouter;

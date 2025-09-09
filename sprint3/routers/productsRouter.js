@@ -13,6 +13,7 @@ import {
   validateProductQuery,
 } from "../middlewares/validate.js";
 import productCommentRouter from "./productCommentsRouter.js";
+import likeRouter from "./productLikeRouter.js";
 import passport from "../lib/passport/index.js";
 
 const productRouter = express.Router();
@@ -42,5 +43,6 @@ productRouter
   );
 
 productRouter.use("/:productId/comments", productCommentRouter);
+productRouter.use("/:productId/like", likeRouter);
 
 export default productRouter;
