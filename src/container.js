@@ -12,6 +12,7 @@ import {
   ArticleService,
   CommentService,
   UserService,
+  LikeService,
 } from './service/index.js';
 
 import {
@@ -19,6 +20,7 @@ import {
   ArticleRepository,
   CommentRepository,
   UserRepository,
+  LikeRepository,
 } from './repository/index.js';
 
 import {
@@ -35,16 +37,22 @@ const productRepository = new ProductRepository(prisma);
 const articleRepository = new ArticleRepository(prisma);
 const commentRepository = new CommentRepository(prisma);
 const userRepository = new UserRepository(prisma);
+const likeRepository = new LikeRepository(prisma);
 
 // Service
 const productService = new ProductService(productRepository, prisma);
 const articleService = new ArticleService(articleRepository, prisma);
 const commentService = new CommentService(commentRepository, prisma);
 const userService = new UserService(userRepository, productRepository, prisma);
+const likeService = new LikeService(
+  likeRepository,
+  productRepository,
+  articleRepository,
+);
 
 // controller
-const productController = new ProductController(productService);
-const articleController = new ArticleController(articleService);
+const productController = new ProductController(productService, likeService);
+const articleController = new ArticleController(articleService, likeService);
 const commentController = new CommentController(commentService);
 const imageController = new ImageController();
 const userController = new UserController(userService);
@@ -61,4 +69,5 @@ export default {
   userController,
   validationMiddleware,
   imageMiddleware,
+  likeService,
 };
