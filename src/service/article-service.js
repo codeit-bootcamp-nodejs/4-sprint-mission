@@ -57,8 +57,14 @@ export class ArticleService {
   };
 
   // 게시글 수정
-  updateArticle = async (articleId, articleData) => {
-    await this.getArticleById(articleId); // 게시글 존재 여부 확인
+  updateArticle = async (userId, articleId, articleData) => {
+    const article = await this.articleRepository.findArticleById(articleId);
+    if (!article) {
+      throw new Error('게시글을 찾을 수 없습니다.');
+    }
+    if (article.userId !== userId) {
+      throw new Error('게시글을 수정할 권한이 없습니다.');
+    }
 
     const { title, content } = articleData;
     const dataToUpdate = {};
@@ -69,8 +75,14 @@ export class ArticleService {
   };
 
   // 게시글 삭제
-  deleteArticle = async (articleId) => {
-    await this.getArticleById(articleId);
+  deleteArticle = async (userId, articleId) => {
+    const article = await this.articleRepository.findArticleById(articleId);
+    if (!article) {
+      throw new Error('게시글을 찾을 수 없습니다.');
+    }
+    if (article.userId !== userId) {
+      throw new Error('게시글을 삭제할 권한이 없습니다.');
+    }
     await this.articleRepository.deleteArticle(articleId);
   };
 }

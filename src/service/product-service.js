@@ -64,10 +64,15 @@ export class ProductService {
     return product;
   };
 
-  // 상품 수정
-  updateProduct = async (productId, productData) => {
-    // 수정 전 상품이 존재하는지 확인
-    await this.getProductById(productId);
+  updateProduct = async (userId, productId, productData) => {
+    const product = await this.productRepository.findProductById(productId);
+    if (!product) {
+      throw new Error('상품을 찾을 수 없습니다.');
+    }
+    // 권한 확인
+    if (product.userId !== userId) {
+      throw new Error('상품을 수정할 권한이 없습니다.');
+    }
 
     const { name, description, price, tags } = productData;
     const dataToUpdate = {};
@@ -80,10 +85,15 @@ export class ProductService {
   };
 
   // 상품 삭제
-
-  deleteProduct = async (productId) => {
-    // 삭제 전 상품이 존재하는지 확인
-    await this.getProductById(productId);
+  deleteProduct = async (userId, productId) => {
+    const product = await this.productRepository.findProductById(productId);
+    if (!product) {
+      throw new Error('상품을 찾을 수 없습니다.');
+    }
+    // 권한 확인
+    if (product.userId !== userId) {
+      throw new Error('상품을 삭제할 권한이 없습니다.');
+    }
     await this.productRepository.deleteProduct(productId);
   };
 }

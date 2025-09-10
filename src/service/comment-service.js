@@ -34,14 +34,26 @@ export class CommentService {
   };
 
   // 댓글 수정
-  updateComment = async (commentId, content) => {
-    await this.getCommentById(commentId); // 댓글 존재 여부 확인
+  updateComment = async (userId, commentId, content) => {
+    const comment = await this.commentRepository.findCommentById(commentId);
+    if (!comment) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+    if (comment.userId !== userId) {
+      throw new Error('댓글을 수정할 권한이 없습니다.');
+    }
     return await this.commentRepository.updateComment(commentId, content);
   };
 
   // 댓글 삭제
-  deleteComment = async (commentId) => {
-    await this.getCommentById(commentId); // 댓글 존재 여부 확인
+  deleteComment = async (userId, commentId) => {
+    const comment = await this.commentRepository.findCommentById(commentId);
+    if (!comment) {
+      throw new Error('댓글을 찾을 수 없습니다.');
+    }
+    if (comment.userId !== userId) {
+      throw new Error('댓글을 삭제할 권한이 없습니다.');
+    }
     await this.commentRepository.deleteComment(commentId);
   };
 
