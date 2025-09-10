@@ -56,4 +56,30 @@ export class UserController {
       next(error);
     }
   };
+
+  // 비밀번호 변경
+  changeMyPassword = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { currentPassword, newPassword } = req.body;
+
+      // 필수 값 확인
+      if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+          message: '현재 비밀번호와 새 비밀번호를 모두 입력해주세요.',
+        });
+      }
+
+      await this.userService.changePassword(
+        userId,
+        currentPassword,
+        newPassword,
+      );
+      res
+        .status(200)
+        .json({ message: '비밀번호가 성공적으로 변경되었습니다.' });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
