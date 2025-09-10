@@ -1,4 +1,4 @@
-export * from './product-contorller.js';
-export * from './article-contorller.js';
+export * from './product-controller.js';
+export * from './article-controller.js';
 export * from './comment-controller.js';
 export * from './image-controller.js';
