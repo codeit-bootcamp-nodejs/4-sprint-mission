@@ -51,9 +51,11 @@ export class ArticleController {
   // 게시글 수정
   updateArticle = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
       const articleData = req.body;
       const updatedArticle = await this.articleService.updateArticle(
+        userId,
         id,
         articleData,
       );
@@ -66,8 +68,9 @@ export class ArticleController {
   // 게시글 삭제
   deleteArticle = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
-      await this.articleService.deleteArticle(id);
+      await this.articleService.deleteArticle(userId, id);
       res.status(204).send();
     } catch (error) {
       next(error);

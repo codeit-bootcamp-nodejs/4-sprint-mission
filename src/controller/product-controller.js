@@ -53,9 +53,11 @@ export class ProductController {
   // 상품 수정
   updateProduct = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
       const productData = req.body;
       const updatedProduct = await this.productService.updateProduct(
+        userId,
         id,
         productData,
       );
@@ -68,8 +70,9 @@ export class ProductController {
   // 상품 삭제
   deleteProduct = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { id } = req.params;
-      await this.productService.deleteProduct(id);
+      await this.productService.deleteProduct(userId, id);
       res.status(204).send();
     } catch (error) {
       next(error);

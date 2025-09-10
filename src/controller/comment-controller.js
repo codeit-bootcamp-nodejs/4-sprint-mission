@@ -43,9 +43,11 @@ export class CommentController {
   // 댓글 수정
   updateComment = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { commentId } = req.params;
       const { content } = req.body;
       const updatedComment = await this.commentService.updateComment(
+        userId,
         commentId,
         content,
       );
@@ -58,8 +60,9 @@ export class CommentController {
   // 댓글 삭제
   deleteComment = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { commentId } = req.params;
-      await this.commentService.deleteComment(commentId);
+      await this.commentService.deleteComment(userId, commentId);
       res.status(204).send();
     } catch (error) {
       next(error);
