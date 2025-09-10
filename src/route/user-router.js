@@ -13,6 +13,8 @@ const userRouter = (userController) => {
     .get(authMiddleware, userController.getMyInfo) // 내 정보 조회
     .patch(authMiddleware, userController.updateMyInfo); // 내 정보 수정
 
+  router.patch('/me/password', authMiddleware, userController.changeMyPassword);
+
   return router;
 };
 
