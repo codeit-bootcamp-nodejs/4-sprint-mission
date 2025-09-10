@@ -1,10 +1,11 @@
 import ProductService from "../services/ProductService.js";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import type { Request, Response, NextFunction } from "express";
+import env from "../config/env.js";
+import type { CustomError } from "src/api/types/error.js";
 
 const ProductController = {
-  async createProduct(req, res, next) {
+  async createProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { name, description, price, tags } = req.body;
@@ -17,7 +18,7 @@ const ProductController = {
     }
   },
 
-  async findUniqueProduct(req, res, next) {
+  async findUniqueProduct(req: Request, res: Response, next: NextFunction) {
     try {
       //throw new Error("🔥에러 핸들러 테스트");
       const { id } = req.params;
@@ -28,7 +29,12 @@ const ProductController = {
 
       if (token) {
         try {
-          const decoded = jwt.verify(token, JWT_SECRET);
+          const decoded = jwt.verify(token, env.JWT_SECRET);
+          if (typeof decoded === "string" || !decoded.id) {
+            const error: CustomError = new Error("유효하지 않은 Token입니다.");
+            error.statusCode = 403;
+            throw error;
+          }
           userId = decoded.userId;
         } catch (err) {
           console.error("토큰 검증 오류:", err);
@@ -42,7 +48,7 @@ const ProductController = {
     }
   },
 
-  async patchProduct(req, res, next) {
+  async patchProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { id: userId } = req.user;
@@ -58,7 +64,7 @@ const ProductController = {
     }
   },
 
-  async deleteProduct(req, res, next) {
+  async deleteProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { id: userId } = req.user;
@@ -70,9 +76,10 @@ const ProductController = {
     }
   },
 
-  async findManyProduct(req, res, next) {
+  async findManyProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
+
       const products = await ProductService.findManyProduct({
         offset,
         limit,

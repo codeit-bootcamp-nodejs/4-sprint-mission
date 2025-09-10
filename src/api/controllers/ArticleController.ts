@@ -1,10 +1,11 @@
 import ArticleService from "../services/ArticleService.js";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import type { Request, Response, NextFunction } from "express";
+import env from "../config/env.js";
+import type { CustomError } from "src/api/types/error.js";
 
 const ArticleController = {
-  async createArticle(req, res, next) {
+  async createArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { title, content } = req.body;
@@ -12,10 +13,7 @@ const ArticleController = {
         return res.status(400).send("제목과 게시글을 입력해주세요.");
       }
       const articleData = { title, content };
-      const newArticle = await ArticleService.createArticle(
-        articleData,
-        userId
-      );
+      const newArticle = await ArticleService.createArticle(articleData, userId);
 
       res.status(201).json(newArticle);
     } catch (err) {
@@ -23,7 +21,7 @@ const ArticleController = {
     }
   },
 
-  async findUniqueArticle(req, res, next) {
+  async findUniqueArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const articleId = Number(id);
@@ -33,7 +31,12 @@ const ArticleController = {
 
       if (token) {
         try {
-          const decoded = jwt.verify(token, JWT_SECRET);
+          const decoded = jwt.verify(token, env.JWT_SECRET);
+          if (typeof decoded === "string" || !decoded.id) {
+            const error: CustomError = new Error("유효하지 않은 Token입니다.");
+            error.statusCode = 403;
+            throw error;
+          }
           userId = decoded.userId;
         } catch (err) {
           console.error("토큰 검증 오류:", err);
@@ -46,23 +49,19 @@ const ArticleController = {
     }
   },
 
-  async updateArticle(req, res, next) {
+  async updateArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
       const updateData = req.body;
-      const article = await ArticleService.updateArticle(
-        Number(id),
-        updateData,
-        userId
-      );
+      const article = await ArticleService.updateArticle(Number(id), updateData, userId);
       res.status(201).json(article);
     } catch (err) {
       next(err);
     }
   },
 
-  async deleteArticle(req, res, next) {
+  async deleteArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
@@ -73,7 +72,7 @@ const ArticleController = {
     }
   },
 
-  async findManyArticle(req, res, next) {
+  async findManyArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
       const articles = await ArticleService.findManyArticle({

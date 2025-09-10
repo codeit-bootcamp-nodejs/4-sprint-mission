@@ -1,5 +1,7 @@
+import type { Request, Response } from "express";
+
 const ImageController = {
-  uploadImage(req, res) {
+  uploadImage(req: Request, res: Response) {
     if (!req.file) {
       return res.status(400).json({ error: "이미지 파일 없음" });
     }

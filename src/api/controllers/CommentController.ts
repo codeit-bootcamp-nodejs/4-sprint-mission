@@ -1,7 +1,8 @@
 import CommentService from "../services/CommentService.js";
+import type { Request, Response, NextFunction } from "express";
 
 const CommentController = {
-  async createComment(req, res, next) {
+  async createComment(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { content, productId, articleId } = req.body;
@@ -11,9 +12,7 @@ const CommentController = {
       }
 
       if (productId && articleId) {
-        return res
-          .status(400)
-          .json({ error: "productId 혹은 articleId 둘 중 하나만 있어야 함" });
+        return res.status(400).json({ error: "productId 혹은 articleId 둘 중 하나만 있어야 함" });
       }
 
       const newComment = await CommentService.createComment({
@@ -32,18 +31,14 @@ const CommentController = {
     }
   },
 
-  async updateComment(req, res, next) {
+  async updateComment(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
       const updateData = req.body;
 
-      const comment = await CommentService.updateComment(
-        Number(id),
-        updateData,
-        userId
-      );
-      res.status(201).json(comment, next);
+      const comment = await CommentService.updateComment(Number(id), updateData, userId);
+      res.status(201).json(comment);
     } catch (err) {
       if (err.code === "P2025") {
         res.status(404).json({ error: "해당 댓글이 존재하지 않음" });
@@ -52,7 +47,7 @@ const CommentController = {
     }
   },
 
-  async deleteComment(req, res, next) {
+  async deleteComment(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
@@ -65,20 +60,24 @@ const CommentController = {
       next(err);
     }
   },
-  async findManyComment(req, res, next) {
-    try {
-      const { productId, articleId, cursor, limit = 10 } = req.query;
 
-      if (productId && articleId) {
-        return res
-          .status(400)
-          .json({ error: "productId 혹은 articleId 둘 중 하나만 있어야 함" });
+  async findManyComment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const q = req.query;
+
+      const productId = typeof q.productId === "string" ? Number(q.productId) : undefined;
+      const articleId = typeof q.articleId === "string" ? Number(q.articleId) : undefined;
+      const cursor = typeof q.cursor === "string" ? q.cursor : undefined;
+      const limit = typeof q.limit === "string" ? parseInt(q.limit, 10) : 10;
+
+      if (productId !== undefined && articleId !== undefined) {
+        return res.status(400).json({ error: "productId 혹은 articleId 둘 중 하나만 있어야 함" });
       }
 
       const comments = await CommentService.findManyComment({
-        productId: Number(productId),
-        articleId: Number(articleId),
-        cursor,
+        ...(productId !== undefined && { productId }),
+        ...(articleId !== undefined && { articleId }),
+        ...(cursor !== undefined && { cursor }),
         limit,
       });
 

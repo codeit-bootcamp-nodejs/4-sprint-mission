@@ -1,7 +1,8 @@
 import MypageService from "../services/MypageService.js";
+import type { Request, Response, NextFunction } from "express";
 
 const MypageController = {
-  async getUser(req, res, next) {
+  async getUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
 
@@ -12,7 +13,7 @@ const MypageController = {
     }
   },
 
-  async updateUser(req, res, next) {
+  async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const updateData = req.body;
@@ -23,7 +24,7 @@ const MypageController = {
     }
   },
 
-  async updatePassword(req, res, next) {
+  async updatePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { oldPassword, newPassword } = req.body;
@@ -35,7 +36,7 @@ const MypageController = {
     }
   },
 
-  async getProducts(req, res, next) {
+  async getProducts(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
 
@@ -46,7 +47,7 @@ const MypageController = {
     }
   },
 
-  async getLikeProducts(req, res, next) {
+  async getLikeProducts(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
 

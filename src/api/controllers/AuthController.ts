@@ -1,7 +1,8 @@
 import AuthService from "../services/AuthService.js";
+import type { Request, Response, NextFunction } from "express";
 
 const AuthController = {
-  async signup(req, res, next) {
+  async signup(req: Request, res: Response, next: NextFunction) {
     try {
       const newUser = await AuthService.signup(req.body);
       res.status(201).json(newUser);
@@ -10,9 +11,9 @@ const AuthController = {
     }
   },
 
-  async login(req, res, next) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
-      const { user, accessToken, refreshToken } = await AuthService.login(req.body);
+      const { userWithoutPassword: user, accessToken, refreshToken } = await AuthService.login(req.body);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -29,11 +30,13 @@ const AuthController = {
     }
   },
 
-  async refreshToken(req, res, next) {
+  async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const { accessToken, refreshToken: newRefreshToken } = await AuthService.refreshAccessToken(
-        req.cookies.refreshToken
-      );
+      const result = await AuthService.refreshAccessToken(req.cookies.refreshToken);
+      if (!result) {
+        return res.status(401).json({ error: "유효하지 않은 리프레시 토큰입니다." });
+      }
+      const { accessToken, refreshToken: newRefreshToken } = result;
 
       // 쿠키에 토큰 저장
       res.cookie("refreshToken", newRefreshToken, {
