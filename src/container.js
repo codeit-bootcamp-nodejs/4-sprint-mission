@@ -20,7 +20,7 @@ import {
 
 import {
   ValidationMiddleware,
-  ImageMiddleWare,
+  ImageMiddleware,
 } from './middleware/validation-middleware.js';
 
 const prisma = new PrismaClient();
@@ -45,7 +45,7 @@ const imageController = new ImageController();
 
 // middleware
 const validationMiddleware = new ValidationMiddleware();
-const imageMiddleware = new ImageMiddleWare();
+const imageMiddleware = new ImageMiddleware();
 
 export default {
   productController,
