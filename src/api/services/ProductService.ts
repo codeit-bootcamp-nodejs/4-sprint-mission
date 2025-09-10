@@ -1,14 +1,17 @@
 import prisma from "../libs/prismaClient.js";
+import type { CustomError } from "../types/error.js";
+import type { CreateProductData, UpdateProductData, FindManyProductParams } from "../types/product.js";
+import { Prisma } from "@prisma/client";
 
 const ProductService = {
-  async createProduct(productData, userId) {
+  async createProduct(productData: CreateProductData, userId: number) {
     const newProduct = await prisma.product.create({
       data: { ...productData, userId },
     });
     return newProduct;
   },
 
-  async findUniqueProduct(productId, userId) {
+  async findUniqueProduct(productId: number, userId: number) {
     const product = await prisma.product.findUnique({
       where: { id: productId },
     });
@@ -23,11 +26,17 @@ const ProductService = {
     return { ...product, isLiked: !!like };
   },
 
-  async patchProduct(id, updateData, userId) {
+  async patchProduct(id: number, updateData: UpdateProductData, userId: number) {
     const product = await prisma.product.findUnique({ where: { id } });
 
+    if (!product) {
+      const error: CustomError = new Error("존재하지 않는 상품입니다.");
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (product.userId != userId) {
-      const error = new Error("상품을 수정할 권한이 없습니다.");
+      const error: CustomError = new Error("상품을 수정할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;
     }
@@ -37,11 +46,17 @@ const ProductService = {
     });
   },
 
-  async deleteProduct(id, userId) {
+  async deleteProduct(id: number, userId: number) {
     const product = await prisma.product.findUnique({ where: { id } });
 
+    if (!product) {
+      const error: CustomError = new Error("존재하지 않는 상품입니다.");
+      error.statusCode = 404;
+      throw error;
+    }
+
     if (product.userId !== userId) {
-      const error = new Error("상품을 삭제할 권한이 없습니다.");
+      const error: CustomError = new Error("상품을 삭제할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;
     }
@@ -50,8 +65,8 @@ const ProductService = {
     });
   },
 
-  async findManyProduct({ offset, limit, order, keyword }) {
-    let orderBy;
+  async findManyProduct({ offset, limit, order, keyword }: FindManyProductParams) {
+    let orderBy: Prisma.ProductOrderByWithRelationInput;
     switch (order) {
       case "oldest":
         orderBy = { createdAt: "asc" };

@@ -1,8 +1,9 @@
 import prisma from "../libs/prismaClient.js";
+import type { LikeData } from "../types/like.js";
 
 const LikeService = {
-  async toggleLike(userId, type, contentId) {
-    const user = { userId };
+  async toggleLike(userId: number, type: string, contentId: number) {
+    const user: LikeData = { userId };
     if (type === "article") {
       user.articleId = contentId;
     } else {
