@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-import REFRESH_SECRET_KEY  from './constants'
-import ACCESS_SECRET_KEY from  './constants'
+import { REFRESH_SECRET_KEY, ACCESS_SECRET_KEY}  from './constants'
 
 export class jsonWebToken{
     /*
@@ -10,7 +9,7 @@ export class jsonWebToken{
     */
     generateAccess = (payload) => {
         const SecretKey = ACCESS_SECRET_KEY;
-        const accesToken = jwt.sign(payload.userId, secretKey,
+        const accesToken = jwt.sign(payload.userId, SecretKey,
            {expiresIn: '1h'} )
 
         return accesToken

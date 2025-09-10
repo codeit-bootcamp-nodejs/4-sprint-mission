@@ -14,6 +14,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
+passport.use('AccessToken', accessJwtStrategy)
+passport.use('RefreshToken', refreshJwtStrategy)
+
 
 
 app.use('/user', userRouter);
