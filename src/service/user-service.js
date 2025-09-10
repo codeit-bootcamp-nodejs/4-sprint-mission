@@ -75,4 +75,28 @@ export class UserService {
     delete updatedUser.password;
     return updatedUser;
   };
+
+  changePassword = async (userId, currentPassword, newPassword) => {
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    // 현재 비밀번호가 맞는지 확인
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new Error('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    // 새로운 비밀번호를 해싱
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // 데이터베이스에 새로운 비밀번호로 업데이트
+    await this.userRepository.updateUser(userId, {
+      password: hashedNewPassword,
+    });
+  };
 }
