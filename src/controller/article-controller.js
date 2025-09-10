@@ -6,8 +6,10 @@ export class ArticleController {
   // 게시글 생성
   createArticle = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { title, content } = req.body;
       const newArticle = await this.articleService.createArticle(
+        userId,
         title,
         content,
       );

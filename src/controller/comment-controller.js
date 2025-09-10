@@ -6,9 +6,11 @@ export class CommentController {
   // 댓글 생성
   createComment = async (req, res, next) => {
     try {
+      const { id: userId } = req.user;
       const { content } = req.body;
       const { productId, articleId } = req.params;
       const newComment = await this.commentService.createComment(
+        userId,
         content,
         productId,
         articleId,

@@ -6,8 +6,10 @@ export class ProductController {
   // 상품 등록
   createProduct = async (req, res, next) => {
     try {
+      const { id: userId } = req.user; // req.user에서 userId 추출
       const { name, description, price, tags } = req.body;
       const newProduct = await this.productService.createProduct(
+        userId, // userId 전달
         name,
         description,
         price,
@@ -15,7 +17,7 @@ export class ProductController {
       );
       res.status(201).json(newProduct);
     } catch (error) {
-      next(error); // 에러를 다음 미들웨어(에러 핸들러)로 전달
+      next(error);
     }
   };
 
