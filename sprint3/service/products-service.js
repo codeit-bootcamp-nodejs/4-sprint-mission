@@ -80,9 +80,6 @@ const getProductComments = async(req, res) => {
   res.status(200).send(productComments);
 }
 
-
-///////////////////////////////////////////////////////////////////////////////////
-
 const createProductComment = async(req, res) => {
   const productComments = await prisma.productComment.create({
     data: req.body,
