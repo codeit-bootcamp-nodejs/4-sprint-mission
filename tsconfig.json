@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    // Basics
+    "module": "nodenext",
+    "target": "es2024",
+    "lib": ["esnext"],
+    "types": ["node"], // install -D @types/node
+
+    // File Layout
+    "baseUrl": "./",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
+
+    // Decorators
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noUncheckedSideEffectImports": true,
+    "forceConsistentCasingInFileNames": false,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Recommended Options
+    "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "moduleResolution": "nodenext"
+  },
+  "include": ["src/**/*", "test"]
+}
