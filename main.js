@@ -6,7 +6,8 @@ import container from './src/container.js';
 import productRouter from './src/routes/product.route.js';
 import articleRouter from './src/routes/article.route.js';
 import imageRouter from './src/routes/image.route.js';
-import { errorHandler } from './src/middleware/error-handler.middleware.js';
+import userRouter from './src/route/user-router.js';
+import { errorHandler } from './src/middleware/error-handler-.js';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ const {
   articleController,
   commentController,
   imageController,
+  userController,
   validationMiddleware,
   imageMiddleware,
 } = container;
@@ -33,6 +35,7 @@ app.use(
   '/articles',
   articleRouter(articleController, commentController, validationMiddleware),
 );
+app.use('/users', userRouter(userController));
 app.use('/uploads', imageRouter(imageController, imageMiddleware));
 
 app.use(errorHandler);
