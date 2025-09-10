@@ -1,5 +1,6 @@
 import express from 'express';
 import commentRouter from './comment.route.js';
+import { authMiddleware } from '../middleware/auth-middleware.js';
 
 const productRouter = (
   productController,
@@ -10,17 +11,26 @@ const productRouter = (
 
   router
     .route('/')
-    .post(validationMiddleware.validateProduct, productController.createProduct)
+    .post(
+      authMiddleware,
+      validationMiddleware.validateProduct,
+      productController.createProduct,
+    )
     .get(productController.getProducts);
 
   router
     .route('/:id')
     .get(validationMiddleware.validateId, productController.getProductById)
     .patch(
+      authMiddleware,
       [validationMiddleware.validateId, validationMiddleware.validateProduct],
       productController.updateProduct,
     )
-    .delete(validationMiddleware.validateId, productController.deleteProduct);
+    .delete(
+      authMiddleware,
+      validationMiddleware.validateId,
+      productController.deleteProduct,
+    );
 
   const commentsRouter = commentRouter(commentController, validationMiddleware);
   router.use('/:productId/comments', commentsRouter);
