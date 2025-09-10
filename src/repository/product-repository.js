@@ -81,4 +81,18 @@ export class ProductRepository {
       where: { id: parseInt(productId) },
     });
   };
+
+  // 특정 사용자가 작성한 상품 목록 조회
+  findProductsByUserId = async (userId) => {
+    return await this.prisma.product.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true,
+      },
+    });
+  };
 }
