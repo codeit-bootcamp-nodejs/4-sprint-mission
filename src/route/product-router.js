@@ -34,6 +34,7 @@ const productRouter = (
 
   const commentsRouter = commentRouter(commentController, validationMiddleware);
   router.use('/:productId/comments', commentsRouter);
+  router.post('/:id/like', authMiddleware, productController.toggleLike);
 
   return router;
 };

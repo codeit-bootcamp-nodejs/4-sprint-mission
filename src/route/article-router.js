@@ -34,6 +34,7 @@ const articleRouter = (
 
   const commentsRouter = commentRouter(commentController, validationMiddleware);
   router.use('/:articleId/comments', commentsRouter);
+  router.post('/:id/like', authMiddleware, articleController.toggleLike);
 
   return router;
 };
