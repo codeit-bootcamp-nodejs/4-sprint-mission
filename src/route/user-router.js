@@ -14,6 +14,7 @@ const userRouter = (userController) => {
     .patch(authMiddleware, userController.updateMyInfo); // 내 정보 수정
 
   router.patch('/me/password', authMiddleware, userController.changeMyPassword);
+  router.get('/me/products', authMiddleware, userController.getMyProducts);
 
   return router;
 };
