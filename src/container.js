@@ -40,7 +40,7 @@ const userRepository = new UserRepository(prisma);
 const productService = new ProductService(productRepository, prisma);
 const articleService = new ArticleService(articleRepository, prisma);
 const commentService = new CommentService(commentRepository, prisma);
-const userService = new UserService(userRepository, prisma);
+const userService = new UserService(userRepository, productRepository, prisma);
 
 // controller
 const productController = new ProductController(productService);
