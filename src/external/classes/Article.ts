@@ -1,5 +1,11 @@
 class Article {
-  constructor(title, content, writer, likeCount) {
+  title: string;
+  content: string;
+  writer: string;
+  likeCount: number;
+  createdAt: number;
+
+  constructor(title: string, content: string, writer: string, likeCount: number) {
     this.title = title;
     this.content = content;
     this.writer = writer;
