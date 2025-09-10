@@ -44,4 +44,35 @@ export class UserService {
 
     return token;
   };
+
+  // 내 정보 조회
+  getUserInfo = async (userId) => {
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    delete user.password;
+    return user;
+  };
+
+  // 내 정보 수정
+  updateUserInfo = async (userId, userInfoData) => {
+    const { nickname, image } = userInfoData;
+    const dataToUpdate = {};
+
+    if (nickname) dataToUpdate.nickname = nickname;
+    if (image) dataToUpdate.image = image;
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      throw new Error('수정할 정보를 입력해주세요.');
+    }
+
+    const updatedUser = await this.userRepository.updateUser(
+      userId,
+      dataToUpdate,
+    );
+    delete updatedUser.password;
+    return updatedUser;
+  };
 }
