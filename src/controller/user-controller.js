@@ -82,4 +82,15 @@ export class UserController {
       next(error);
     }
   };
+
+  // 등록한 상품 조회
+  getMyProducts = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const products = await this.userService.getMyProducts(userId);
+      res.status(200).json({ data: products });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
