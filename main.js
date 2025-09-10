@@ -18,11 +18,11 @@ app.use(cors());
 
 app.use(express.json());
 
-const { productController, articleController } = container;
+const { productController, articleController, commentController } = container;
 
 app.use('/products', productRouter(productController)); // 미들웨어는 추후 적용 예정
 app.use('/articles', articleRouter(articleController)); // 미들웨어는 추후 적용 예정
-app.use('/comments', commentRouter);
+app.use('/comments', commentRouter(commentController));
 app.use('/uploads', uploadRouter);
 
 app.use(errorHandler);
