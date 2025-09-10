@@ -2,8 +2,9 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export class UserService {
-  constructor(userRepository) {
+  constructor(userRepository, productRepository) {
     this.userRepository = userRepository;
+    this.productRepository = productRepository;
   }
 
   // 회원가입
@@ -98,5 +99,11 @@ export class UserService {
     await this.userRepository.updateUser(userId, {
       password: hashedNewPassword,
     });
+  };
+
+  // 내가 등록한 상품 목록 조회
+  getMyProducts = async (userId) => {
+    const products = await this.productRepository.findProductsByUserId(userId);
+    return products;
   };
 }
