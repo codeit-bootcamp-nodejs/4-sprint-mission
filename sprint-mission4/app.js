@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import { errorHandler } from './sprint3/error.js';
-import articlesRoute from './sprint3/route/articles-route.js';
-import productsRoute from './sprint3/route/products-route.js';
-import imagesRoute from './sprint3/images.js';
+import { errorHandler } from './error.js';
+import articlesRoute from './route/articles-route.js';
+import productsRoute from './route/products-route.js';
+import imagesRoute from './images.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
