@@ -3,6 +3,11 @@ import cloudinary from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } from "../libs/constants.js";
 
+// cloudinary.v2.config 호출 직전으로 교체
+if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+  throw new Error("Cloudinary 환경 변수가 설정되지 않았습니다. 설정해주세요.");
+}
+
 cloudinary.v2.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
   api_key: CLOUDINARY_API_KEY,
@@ -11,10 +16,10 @@ cloudinary.v2.config({
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary.v2,
-  params: {
+  params: async () => ({
     folder: "sprint-mission-uploads",
     allowed_formats: ["jpg", "png", "jpeg"],
-  },
+  }),
 });
 
 const upload = multer({ storage });
