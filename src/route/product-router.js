@@ -1,18 +1,29 @@
 import express from 'express';
+import commentRouter from './comment.route.js';
 
-const productRouter = (productController) => {
+const productRouter = (
+  productController,
+  commentController, // 댓글 컨트롤러 추가
+  validationMiddleware,
+) => {
   const router = express.Router();
 
   router
     .route('/')
-    .post(productController.createProduct) // 상품 등록
-    .get(productController.getProducts); // 상품 목록 조회
+    .post(validationMiddleware.validateProduct, productController.createProduct)
+    .get(productController.getProducts);
 
   router
     .route('/:id')
-    .get(productController.getProductById) // 상품 상세 조회
-    .patch(productController.updateProduct) // 상품 수정
-    .delete(productController.deleteProduct); // 상품 삭제
+    .get(validationMiddleware.validateId, productController.getProductById)
+    .patch(
+      [validationMiddleware.validateId, validationMiddleware.validateProduct],
+      productController.updateProduct,
+    )
+    .delete(validationMiddleware.validateId, productController.deleteProduct);
+
+  const commentsRouter = commentRouter(commentController, validationMiddleware);
+  router.use('/:id/comments', commentsRouter);
 
   return router;
 };
