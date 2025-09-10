@@ -10,9 +10,10 @@ export class CommentRepository {
    * @param {number|undefined} articleId - 연결될 게시글 ID
    * @returns {Promise<object>} 생성된 댓글 객체
    */
-  createComment = async (content, productId, articleId) => {
+  createComment = async (userId, content, productId, articleId) => {
     return await this.prisma.comment.create({
       data: {
+        userId,
         content,
         productId: productId ? parseInt(productId) : undefined,
         articleId: articleId ? parseInt(articleId) : undefined,

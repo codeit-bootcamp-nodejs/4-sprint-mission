@@ -9,9 +9,9 @@ export class ArticleRepository {
    * @param {string} content - 게시글 내용
    * @returns {Promise<object>} 생성된 게시글 객체
    */
-  createArticle = async (title, content) => {
+  createArticle = async (userId, title, content) => {
     return await this.prisma.article.create({
-      data: { title, content },
+      data: { userId, title, content },
     });
   };
 

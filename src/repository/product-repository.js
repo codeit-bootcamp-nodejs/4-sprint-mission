@@ -11,9 +11,9 @@ export class ProductRepository {
    * @param {string[]} tags - 상품 태그
    * @returns {Promise<object>} 생성된 상품 객체
    */
-  createProduct = async (name, description, price, tags) => {
+  createProduct = async (userId, name, description, price, tags) => {
     return await this.prisma.product.create({
-      data: { name, description, price, tags },
+      data: { userId, name, description, price, tags },
     });
   };
 
