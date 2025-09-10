@@ -9,10 +9,7 @@ const ProductController = {
       const { id: userId } = req.user;
       const { name, description, price, tags } = req.body;
       const productData = { name, description, price, tags };
-      const newProduct = await ProductService.createProduct(
-        productData,
-        userId
-      );
+      const newProduct = await ProductService.createProduct(productData, userId);
 
       res.status(201).json(newProduct);
     } catch (err) {
@@ -51,11 +48,7 @@ const ProductController = {
       const { id: userId } = req.user;
       const updateData = req.body;
 
-      const product = await ProductService.patchProduct(
-        Number(id),
-        updateData,
-        userId
-      );
+      const product = await ProductService.patchProduct(Number(id), updateData, userId);
       if (!product) {
         return res.status(404).json({ error: "수정할 상품이 없음" });
       }

@@ -32,11 +32,12 @@
     "forceConsistentCasingInFileNames": false,
     "strictNullChecks": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
 
     // Recommended Options
     "incremental": true,
     "skipLibCheck": true,
-    "strict": true,
+    //"strict": true,
     "isolatedModules": true,
     "moduleDetection": "force",
     "verbatimModuleSyntax": true,
