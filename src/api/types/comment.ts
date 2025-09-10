@@ -9,9 +9,9 @@ export interface UpdateCommentData {
   content?: string;
 }
 
-export interface FindManyCommentParams {
+export type FindManyCommentParams = {
   productId?: number;
   articleId?: number;
   cursor?: string;
-  limit: string;
-}
+  limit: number;
+};

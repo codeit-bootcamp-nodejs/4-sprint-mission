@@ -10,14 +10,9 @@ export interface UpdateArticleData {
 
 export type ArticleOrder = "oldest" | "recent";
 
-export interface FindManyArticleParams {
+export type FindManyArticleParams = {
   offset: number;
   limit: number;
   order: ArticleOrder;
   keyword?: string;
-}
-
-export interface FindManyArticleParams {
-  offset: number;
-  limit: number;
-}
+};

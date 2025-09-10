@@ -17,6 +17,7 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/multer": "^2.0.0",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
