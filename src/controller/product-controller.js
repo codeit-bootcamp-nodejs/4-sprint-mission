@@ -78,4 +78,18 @@ export class ProductController {
       next(error);
     }
   };
+
+  toggleLike = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { id: productId } = req.params;
+      const result = await this.likeService.toggleProductLike(
+        userId,
+        parseInt(productId),
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }

@@ -76,4 +76,18 @@ export class ArticleController {
       next(error);
     }
   };
+
+  toggleLike = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const { id: articleId } = req.params;
+      const result = await this.likeService.toggleArticleLike(
+        userId,
+        parseInt(articleId),
+      );
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
