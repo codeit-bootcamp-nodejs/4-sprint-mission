@@ -4,18 +4,21 @@ import {
   ArticleController,
   CommentController,
   ImageController,
+  UserController,
 } from './controller/index.js';
 
 import {
   ProductService,
   ArticleService,
   CommentService,
+  UserService,
 } from './service/index.js';
 
 import {
   ProductRepository,
   ArticleRepository,
   CommentRepository,
+  UserRepository,
 } from './repository/index.js';
 
 import {
@@ -31,17 +34,20 @@ const prisma = new PrismaClient();
 const productRepository = new ProductRepository(prisma);
 const articleRepository = new ArticleRepository(prisma);
 const commentRepository = new CommentRepository(prisma);
+const userRepository = new UserRepository(prisma);
 
 // Service
 const productService = new ProductService(productRepository, prisma);
 const articleService = new ArticleService(articleRepository, prisma);
 const commentService = new CommentService(commentRepository, prisma);
+const userService = new UserService(userRepository, prisma);
 
 // controller
 const productController = new ProductController(productService);
 const articleController = new ArticleController(articleService);
 const commentController = new CommentController(commentService);
 const imageController = new ImageController();
+const userController = new UserController(userService);
 
 // middleware
 const validationMiddleware = new ValidationMiddleware();
@@ -52,6 +58,7 @@ export default {
   articleController,
   commentController,
   imageController,
+  userController,
   validationMiddleware,
   imageMiddleware,
 };
