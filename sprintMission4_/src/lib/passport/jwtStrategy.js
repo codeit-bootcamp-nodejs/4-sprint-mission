@@ -13,7 +13,7 @@ const refreshTokenOptions = {
   secretOrKey: REFRESH_KEY,
 };
 
-async function jwtVerify(payload, done){
+async function vertifyToken(payload, done){
   try{
     const user = await prisma.user.findUnique({
       where: { id: payload.sub}
@@ -24,5 +24,5 @@ async function jwtVerify(payload, done){
   }
 }
 
-export const accessTokenStrategy = new JwtStrategy (accessTokenOptions, jwtVerify);
-export const refreshTokenStrategy = new JwtStrategy (refreshTokenOptions, jwtVerify);
+export const accessTokenStrategy = new JwtStrategy (accessTokenOptions, vertifyToken);
+export const refreshTokenStrategy = new JwtStrategy (refreshTokenOptions, vertifyToken);

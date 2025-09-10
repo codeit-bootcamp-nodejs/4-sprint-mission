@@ -17,10 +17,17 @@ async function updateProduct(productId, data){
   });
   return updatedProduct;
 }
+
+async function deleteProduct(productId){
+  const deleteProduct = await prisma.product.delete({
+    where: { productId }
+  });
+  return deleteProduct
+}
   
 
 export default {
   registerProduct,
   updateProduct,
-
+  deleteProduct
 }
