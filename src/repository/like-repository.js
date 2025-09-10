@@ -23,4 +23,22 @@ export class LikeRepository {
       where: { userId_productId: { userId, productId } },
     });
   };
+
+  findArticleLike = async (userId, articleId) => {
+    return await this.prisma.articleLike.findUnique({
+      where: { userId_articleId: { userId, articleId } },
+    });
+  };
+
+  createArticleLike = async (userId, articleId) => {
+    return await this.prisma.articleLike.create({
+      data: { userId, articleId },
+    });
+  };
+
+  deleteArticleLike = async (userId, articleId) => {
+    return await this.prisma.articleLike.delete({
+      where: { userId_articleId: { userId, articleId } },
+    });
+  };
 }
