@@ -6,8 +6,8 @@ export class ArticleService {
 
   // 게시글 생성
 
-  createArticle = async (title, content) => {
-    return await this.articleRepository.createArticle(title, content);
+  createArticle = async (userId, title, content) => {
+    return await this.articleRepository.createArticle(userId, title, content);
   };
 
   // 게시글 목록 조회

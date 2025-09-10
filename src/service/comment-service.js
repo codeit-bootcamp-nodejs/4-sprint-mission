@@ -5,8 +5,9 @@ export class CommentService {
   }
 
   // 댓글 생성
-  createComment = async (content, productId, articleId) => {
+  createComment = async (userId, content, productId, articleId) => {
     return await this.commentRepository.createComment(
+      userId,
       content,
       productId,
       articleId,

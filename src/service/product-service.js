@@ -7,8 +7,9 @@ export class ProductService {
 
   // 상품 생성
 
-  createProduct = async (name, description, price, tags) => {
+  createProduct = async (userId, name, description, price, tags) => {
     return await this.productRepository.createProduct(
+      userId,
       name,
       description,
       price,
