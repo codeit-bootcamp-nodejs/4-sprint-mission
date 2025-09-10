@@ -23,7 +23,7 @@ const productRouter = (
     .delete(validationMiddleware.validateId, productController.deleteProduct);
 
   const commentsRouter = commentRouter(commentController, validationMiddleware);
-  router.use('/:id/comments', commentsRouter);
+  router.use('/:productId/comments', commentsRouter);
 
   return router;
 };
