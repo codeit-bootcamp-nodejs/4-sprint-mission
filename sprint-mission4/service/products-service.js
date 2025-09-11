@@ -81,14 +81,20 @@ const deleteProducts = async(req, res) => {
 
 const getProductComments = async(req, res) => {
   const productComments = await prisma.productComment.findMany({
-    where: { productId: Number(req.params.productId) },
+    where: { productId: parseInt(req.params.productId, 10) },
   });
   res.status(200).send(productComments);
 }
 
 const createProductComment = async(req, res) => {
+  const userId = req.user.userId;
+  const productId = parseInt(req.params.productId, 10);
   const productComments = await prisma.productComment.create({
-    data: req.body,
+    data: {
+      content: req.body.content,
+      product: { connect: { id: productId } },
+      user: { connect: { id: userId } },
+    }
   });
   res.status(201).send(productComments);
 }

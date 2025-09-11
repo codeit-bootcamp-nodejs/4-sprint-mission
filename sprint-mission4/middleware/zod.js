@@ -20,17 +20,15 @@ const CreateArticle = z.object({
 });
 
 const ProductComment = z.object({
-  id: uuidSchema,
+  id: uuidSchema.optional(),
   content: z.string().min(10).max(1000),
-  productId: uuidSchema,
-  articleId: uuidSchema,
+  productId: uuidSchema.optional(),
 });
 
 const ArticleComment = z.object({
-  id: uuidSchema,
+  id: uuidSchema.optional(),
   content: z.string().min(10).max(1000),
-  productId: uuidSchema,
-  articleId: uuidSchema,
+  articleId: uuidSchema.optional(),
 });
 
 const PatchProduct = CreateProduct.partial();

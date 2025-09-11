@@ -19,7 +19,7 @@ router
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticle, ArticleService.updateArticles)  
   .delete(ArticleService.deleteArticles);
 
-//article comments 등록, 조회, 수정, 삭제 라우트
+//article comments 등록, 조회 라우트
 router
   .route('/articles/:articleId/comments')
   .get(ArticleService.getArticleComments)

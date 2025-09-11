@@ -83,8 +83,14 @@ const getArticleComments = async(req, res) => {
 }
 
 const createArticleComment = async(req, res) => {
+  const userId = req.user.userId;
+  const articleId = parseInt(req.params.articleId, 10);
   const articleComments = await prisma.articleComment.create({
-    data: req.body,
+    data: {
+      content: req.body.content,
+      article: { connect: { id: articleId } },
+      user: { connect: { id: userId } },
+    }
   });
   res.status(201).send(articleComments);
 }
