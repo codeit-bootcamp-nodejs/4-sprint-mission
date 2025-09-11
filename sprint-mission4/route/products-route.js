@@ -1,6 +1,6 @@
 import express from 'express';
 import ProductService from '../service/products-service.js';
-import zod from '../zod.js';
+import zod from '../middleware/zod.js';
 
 
 const router = express.Router();

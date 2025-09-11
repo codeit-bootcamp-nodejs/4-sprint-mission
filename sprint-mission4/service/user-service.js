@@ -1,8 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import auth from '../middleware/auth.js';
+import token from '../middleware/token.js';
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 const prisma = new PrismaClient();
 
+// 유저 조회
 const getUserById = async(req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: Number(req.params.userId) },
@@ -18,6 +24,7 @@ const getUserById = async(req, res) => {
   res.status(200).send(user);
 };
 
+// 유저 생성 (회원가입)
 const createUsers = async(req, res) => {
   const existUser = await prisma.user.findUnique({
     where: { email: req.body.email }
@@ -37,21 +44,34 @@ const createUsers = async(req, res) => {
   res.status(201).send(safeUser);
 };
 
+// 유저 수정 (회원정보 수정)
 const updateUsers = async(req, res) => {
   const user = await prisma.user.update({
     where: { id: Number(req.params.userId) },
     data: req.body,
   });
   res.status(200).send(user);
-}
+};
+
+// 로그인
+const login = async(req, res) => {
+  const { email, password } = req.body;
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+  await auth.verifyPassword(password, user.password);
+  const accessToken = await token.createToken(user);
+  res.status(200).send({ accessToken });
+};
 
 export default { 
   getUserById, 
   createUsers, 
-  updateUsers  };
+  updateUsers,
+  login,
+};
 
 //////////////////////////////////////////////////////////////////////////////////
-
 
 
 const deleteArticles = async(req, res) => {

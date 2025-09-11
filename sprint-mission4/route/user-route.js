@@ -1,10 +1,23 @@
 import express from 'express';
 import UserService from '../service/user-service.js';
-import zod from '../zod.js';
+import zod from '../middleware/zod.js';
+import token from '../middleware/token.js';
+import e from 'express';
 
 
 const router = express.Router();
 
 router
   .route('/users')
-  .post(UserService.createUsers);
+  .post(UserService.createUsers)
+
+router
+  .route('/users/:userId')
+  .get(UserService.getUserById)
+  .patch(UserService.updateUsers)
+
+router
+  .route('/login')
+  .post(UserService.login)
+
+export default router;

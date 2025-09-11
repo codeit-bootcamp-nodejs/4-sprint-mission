@@ -14,7 +14,7 @@ datasource db {
 }
 
 model Product {
-  id              String           @id @default(uuid())
+  id              Int              @id @default(autoincrement())
   name            String
   description     String
   price           Float
@@ -22,45 +22,45 @@ model Product {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   productComments ProductComment[]
-  userId          String
+  userId          Int
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Article {
-  id              String           @id @default(uuid())
+  id              Int              @id @default(autoincrement())
   title           String
   content         String
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   articleComments ArticleComment[]
-  userId          String
+  userId          Int
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ProductComment {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  productId String
+  productId Int
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model ArticleComment {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  articleId String
+  articleId Int
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id             String           @id @default(uuid())
+  id             Int              @id @default(autoincrement())
   email          String           @unique
   nickname       String
   image          String?

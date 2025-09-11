@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import { errorHandler } from './error.js';
+import { errorHandler } from './middleware/error.js';
 import articlesRoute from './route/articles-route.js';
 import productsRoute from './route/products-route.js';
-import imagesRoute from './images.js';
+import userRoute from './route/user-route.js';
+import imagesRoute from './middleware/images.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -19,6 +20,8 @@ app.use(cors({
 app.use('/', articlesRoute);
 app.use('/', productsRoute);
 app.use('/', imagesRoute);
+
+app.use('/', userRoute);
 
 app.use(errorHandler);
 
