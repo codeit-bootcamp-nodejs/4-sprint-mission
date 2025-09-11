@@ -1,0 +1,43 @@
+POST http://localhost:3000/articles/1/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MDU5NiwiZXhwIjoxNzU3NTg0MTk2fQ.R1Y8KfV2OgrImmZLLQwJzJY59Wc5rI3eJ1Y0x8kF4VQ
+
+{
+  "content": "완전 동감해요. 제발 캄보 나오길"
+}
+
+###
+PATCH  http://localhost:3000/articles/1/comments/2
+Content-Type: : application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MDU5NiwiZXhwIjoxNzU3NTg0MTk2fQ.R1Y8KfV2OgrImmZLLQwJzJY59Wc5rI3eJ1Y0x8kF4VQ
+
+{
+  "content": "완전 동감해요. 제발 콤보 나오길"
+}
+
+###
+DELETE http://localhost:3000/articles/1/comments/1
+Authorization: 
+
+
+
+
+###
+POST http://localhost:3000/products/1/comments
+Content-Type: application/json
+Authorization: Bearer 
+{
+  "content": "제발 제로콜라 추가해주세요."
+}
+
+###
+PATCH http://localhost:3000/products/1/comments/1
+Content-Type: : application/json
+Authorization: 
+{
+  "content": "제발 제로 코카콜라 추가해주세요."
+}
+
+###
+DELETE http://localhost:3000/products/1/comments/1
+Authorization: 

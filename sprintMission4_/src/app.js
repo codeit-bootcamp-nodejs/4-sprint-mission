@@ -7,7 +7,7 @@ import passport from './lib/passport/passport.js';
 import authRouter from './controller/authController.js';
 import productRouter from './controller/productController.js';
 import articleRouter from './controller/articleController.js';
-import commentRouter from './controller/commentController.js';
+import userRouter from './controller/userController.js';
 //import { errorMiddleWare } from './middleware/errorMiddleWare.js';
 
 const app = express()
@@ -24,10 +24,10 @@ app.use(cookieParser());
 app.use(passport.initialize()); 
 
 
-app.use('/', authRouter);
+app.use('/auth', authRouter);
 app.use('/products', productRouter);
 app.use('/articles', articleRouter);
-app.use('/',commentRouter )
+app.use('/user', userRouter)
 
 //서버 테스트
 app.get('/', (req, res) => {

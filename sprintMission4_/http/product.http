@@ -1,29 +1,29 @@
 POST http://localhost:3000/products
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU1MTQ4NiwiZXhwIjoxNzU3NTU1MDg2fQ.6knnIfLtPNiqy60Jyu23B3XMVISP71mxvUbQcg7UGxw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU3ODc3MiwiZXhwIjoxNzU3NTgyMzcyfQ.oiC2F12oGxvaBFfCvXm3i5fodRyfvmBEVg-PguxDKtg
 
 {
   "name": "맵슐랭순살치킨",
   "description": "100% 닭다린살에 전통 마요소스와 청양고추가 한입에 쏘~옥 먹기편한 맵단 순살치킨",
   "price": 27000,
-  "tags": ["닭다리살", "청양소스", "맵단"]
+  "tags": "닭다리살, 청양소스, 맵단"
 }
 
 ###
 PATCH  http://localhost:3000/products/1
 Content-Type: : application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU1MTQ4NiwiZXhwIjoxNzU3NTU1MDg2fQ.6knnIfLtPNiqy60Jyu23B3XMVISP71mxvUbQcg7UGxw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU3Njg2NSwiZXhwIjoxNzU3NTgwNDY1fQ.f8Ha1yiwJSr1LHPNTmT_nPyh7Zf82vv_xtKLYctaUiw
 
 {
   "name": "맵슐랭순살치킨",
   "description": "100% 닭다린살에 전통 마요소스와 청양고추가 한입에 쏘~옥 먹기편한 맵콤하고 달달한 순살치킨",
   "price": 27000,
-  "tags": ["닭다리살", "청양소스", "맵단"]
+  "tags": "닭다리살, 청양소스, 맵단"
 }
 
 ###
 DELETE http://localhost:3000/product/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU1MTQ4NiwiZXhwIjoxNzU3NTU1MDg2fQ.6knnIfLtPNiqy60Jyu23B3XMVISP71mxvUbQcg7UGxw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU3Njg2NSwiZXhwIjoxNzU3NTgwNDY1fQ.f8Ha1yiwJSr1LHPNTmT_nPyh7Zf82vv_xtKLYctaUiw
 
 
 

@@ -1,10 +1,11 @@
 import prisma from '../lib/prisma.js';
 
-async function registerProductComment(productId, content){
+async function registerProductComment(productId, authorId, content){
   try{
     const newComment = await prisma.comment.create({
       data: {
         content,
+        authorId,
         productId
       }
     })
@@ -14,12 +15,13 @@ async function registerProductComment(productId, content){
   }
 }
 
-async function registerArticleComment(articleId, content){
+async function registerArticleComment(authorId, articleId, content){
   try{
     const newComment = await prisma.comment.create({
       data: {
         content,
         articleId,
+        authorId,
       }
     })
     return newComment;
@@ -32,7 +34,7 @@ async function updateComment(commmentId, content){
   try{
     const patchedComment = await prisma.comment.update({
       where: { id: commmentId},
-      data: content,
+      data: { content },
     })
     return patchedComment
   } catch(error){

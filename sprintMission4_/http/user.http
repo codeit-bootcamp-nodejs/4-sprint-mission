@@ -1,0 +1,26 @@
+GET http://localhost:3000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+
+###
+
+PATCH http://localhost:3000/user
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+
+{
+  "nickname": "KingOfChicken"
+}
+
+###
+PATCH http://localhost:3000/user/password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+
+{
+  "oldPassword": "password1123",
+  "newPassword": "password"
+}
+###
+GET http://localhost:3000/user/localhost:3000/products
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+//실패 ! 냐하

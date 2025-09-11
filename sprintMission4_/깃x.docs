@@ -77,3 +77,82 @@ async function register(authorId, tags, data){
     }
   })
 }
+
+
+
+
+////
+//    const updatedUser = await userService.updateUser(userId, data);
+// 닉네임, 이메일은 고유값 
+async function updateInfo(userId, data){
+  try{
+    if('email' in data){
+      const existedEmail = await prisma.user.findUnique({ id: data.nickname});
+      if('email' === existedEmail){
+        const error = new Error('Conflict');
+        error.code = 409;
+        throw error;
+      }
+    }
+
+    if('nickname' in data){
+      const existedNickanme = await prisma.user.findUnique({ id: data.nickname });
+      if('nickname' in data){
+        const error = new Error('Conflict');
+        error.code = 409;
+        throw error;
+      }
+    }
+
+    const updatedInfo = await prisma.user.update({
+      where: { id: userId },
+      data
+    })
+    
+    const {password, ...withoutPassword} = updatedInfo;
+    return withoutPassword;
+  } catch(error){
+    throw error;
+  }
+}
+
+
+// 
+async function updateInfo(userId, data){
+  try{
+    // 현재 사용자 정보를 조회하여 비교합니다.
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // 이메일 업데이트 시, 새 이메일이 기존 이메일과 다를 경우에만 중복 검사
+    if (data.email && data.email !== currentUser.email) {
+      const existedEmail = await prisma.user.findUnique({ where: { email: data.email } });
+      if (existedEmail) {
+        const error = new Error('Conflict: Email already exists.');
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    // 닉네임 업데이트 시, 새 닉네임이 기존 닉네임과 다를 경우에만 중복 검사
+    if (data.nickname && data.nickname !== currentUser.nickname) {
+      const existedNickname = await prisma.user.findUnique({ where: { nickname: data.nickname } });
+      if (existedNickname) {
+        const error = new Error('Conflict: Nickname already exists.');
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    const updatedInfo = await prisma.user.update({
+      where: { id: userId },
+      data
+    });
+    
+    const {password, ...withoutPassword} = updatedInfo;
+    return withoutPassword;
+  } catch(error){
+    throw error;
+  }
+}

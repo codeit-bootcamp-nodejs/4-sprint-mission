@@ -1,9 +1,8 @@
 import express from 'express';
 import userService from '../services/authService.js';
-
 import passport from '../lib/passport/passport.js';
 
-const userRouter = express.Router();
+const authRouter = express.Router();
 
 // 회원가입
 const register = async(req, res, next) => {
@@ -27,16 +26,14 @@ const login = async(req, res, next) => {
       sameSite: 'none',
       secure: true,
     });
-
-    return res.status(200).json({ accessToken });
-  
+    res.status(200).json({ accessToken });
   } catch (error) {
     next(error);
   }
 };
 
-userRouter.post('/register', register);
-userRouter.post('/login', passport.authenticate('local', { session: false }), login);
+authRouter.post('/register', register);
+authRouter.post('/login', passport.authenticate('local', { session: false }), login);
 
 
-export default userRouter;
+export default authRouter;

@@ -28,8 +28,6 @@ async function register(email, password, nickname) {
   return userWithoutPassword;
 }
 
-
-
 // 로그인 -> 토큰 만들거 리프레쉬 토큰 디비에 저장
 async function login(user) {
   const { accessToken, refreshToken } = generateTokens(user.id);

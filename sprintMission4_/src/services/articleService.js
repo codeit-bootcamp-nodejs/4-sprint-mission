@@ -2,10 +2,12 @@ import prisma from '../lib/prisma.js'
 
 async function register(authorId, data){
   try{
-    const newProduct = await prisma.product.create({
+    const {title, content} = data;
+    const newArticle = await prisma.article.create({
       data: { 
         authorId,
-        ...data,
+        title,
+        content
       },
     });
     return newArticle;
@@ -16,9 +18,9 @@ async function register(authorId, data){
 
 async function update(articleId, data){
   try{
-    const updatedProduct = await prisma.product.update({
+    const updatedArticle = await prisma.article.update({
       where: { id: articleId },
-      data
+      data: { ...data }
     });
     return updatedArticle;
   } catch(error){
@@ -28,8 +30,8 @@ async function update(articleId, data){
 
 async function remove(articleId){
   try{
-    await prisma.product.delete({ where: { articleId }});
-    return deleteArticle
+    await prisma.article.delete({ where: { id : articleId }});
+    return true
   } catch(error){
     throw error;
   }
