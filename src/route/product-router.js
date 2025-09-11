@@ -1,6 +1,7 @@
 import express from 'express';
 import commentRouter from './comment.route.js';
 import { authMiddleware } from '../middleware/auth-middleware.js';
+import { authOptionalMiddleware } from '../middleware/auth-optional-middleware.js';
 
 const productRouter = (
   productController,
@@ -16,11 +17,15 @@ const productRouter = (
       validationMiddleware.validateProduct,
       productController.createProduct,
     )
-    .get(productController.getProducts);
+    .get(authOptionalMiddleware, productController.getProducts);
 
   router
     .route('/:id')
-    .get(validationMiddleware.validateId, productController.getProductById)
+    .get(
+      authOptionalMiddleware,
+      validationMiddleware.validateId,
+      productController.getProductById,
+    )
     .patch(
       authMiddleware,
       [validationMiddleware.validateId, validationMiddleware.validateProduct],
