@@ -106,4 +106,12 @@ export class UserService {
     const products = await this.productRepository.findProductsByUserId(userId);
     return products;
   };
+
+  getLikedProducts = async (userId) => {
+    return await this.userRepository.findLikedProductsByUserId(userId);
+  };
+
+  getLikedArticles = async (userId) => {
+    return await this.userRepository.findLikedArticlesByUserId(userId);
+  };
 }
