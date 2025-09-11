@@ -4,7 +4,12 @@ export const productCommentRepository = {
   findByProductId(productId: number, userId?: number) {
     return prisma.comment.findMany({
       where: { productId, articleId: null },
-      include: {
+      select: {
+        id: true,
+        content: true,
+        createdAt: true,
+        updatedAt: true,
+        likeCount: true,
         user: { select: { username: true } },
         likedBy: {
           select: { id: true },

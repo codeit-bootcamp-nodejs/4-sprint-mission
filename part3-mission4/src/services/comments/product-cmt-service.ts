@@ -20,7 +20,6 @@ class ProductCommentService {
     return comments.map((c) => ({
       ...c,
       isLiked: c.likedBy?.length > 0 || false,
-      likeCount: c.likeCount,
     }));
   }
 
