@@ -1,6 +1,6 @@
 import * as z from 'zod';
 
-const contentType = ['product', 'article', 'comment'] as const;
+export const ContentType = ['products', 'articles', 'comments'] as const;
 
 // prettier-ignore
 export const patchSchema = z.object({
@@ -22,7 +22,7 @@ export const patchSchema = z.object({
 }).strict();
 
 export const contentSchema = z.object({
-  content: z.enum(contentType),
+  content: z.enum(ContentType),
 });
 
-export type userContentType = z.infer<typeof contentSchema>;
+export type UserContentType = z.infer<typeof contentSchema>;

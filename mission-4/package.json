@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "node dist/main.js",
-    "dev": "ts-node-dev --inspect --watch -- ./src/app.ts"
+    "start": "node -r tsconfig-paths/register dist/app.js",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
@@ -48,6 +49,7 @@
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
   }

@@ -2,8 +2,22 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
+    "baseUrl": "./src",
     "rootDir": "./src",
     "outDir": "./dist",
+
+    "paths": {
+      "@/*": ["*"],
+      // lib 폴더를 위한 별칭
+      "@lib/*": ["lib/*"],
+      // services 폴더를 위한 별칭
+      "@services/*": ["services/*"],
+      // controllers 폴더를 위한 별칭
+      "@controllers/*": ["controllers/*"],
+      "@validations/*": ["validations/*"],
+      "@routers/*": ["routers/*"],
+      "@middlewares/*": ["middlewares/*"]
+    },
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module

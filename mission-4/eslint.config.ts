@@ -33,6 +33,15 @@ export default defineConfig([
     plugins: {
       '@typescript-eslint': tseslint.plugin,
     },
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'warn', // 또는 'error'
+        {
+          varsIgnorePattern: '^_',
+          argsIgnorePattern: '^_',
+        },
+      ],
+    },
   },
   // Prettier와 충돌되는 규칙 비활성화
   // 기존 extends의 "plugin:prettier/recommended", "prettier/@typescript-eslint"에 해당합니다.

@@ -1,9 +1,13 @@
 import { Prisma } from '@prisma/client';
-import { validatePassword, passwordHashing } from '../lib/bcrypt.js';
-import { UnauthorizedError } from '../lib/errors.js';
-import prisma from '../lib/prisma.js';
-import { EntityId, PatchUserData, getUserContent } from '../types/user.types.js';
-// 이거 빨간줄 gemini 물어보고 경로들 tsconfig에서 @로 좀 깔끔하게 만들자
+import { validatePassword, passwordHashing } from '@lib/bcrypt.js';
+import { UnauthorizedError } from '@lib/errors.js';
+import prisma from '@lib/prisma.js';
+import type {
+  EntityId,
+  PatchUserData,
+  UserWithContent,
+  getUserContent,
+} from '@/types/user.types.js';
 
 async function getUserService({ id }: EntityId) {
   const result = await prisma.user.findUniqueOrThrow({
@@ -80,7 +84,6 @@ async function deleteUserService({ id }: EntityId) {
   return result;
 }
 async function getUserContentListService({ id, content }: getUserContent) {
-  content += 's';
   let options = {};
   if (content === 'comments') {
     options = {
@@ -100,17 +103,17 @@ async function getUserContentListService({ id, content }: getUserContent) {
       },
     };
   }
-  const userContent = await prisma.user.findUniqueOrThrow({
+  const userContent = (await prisma.user.findUniqueOrThrow({
     where: {
       id,
     },
     ...options,
-  });
+  })) as UserWithContent;
   let result = userContent;
   if (content === 'products' || content === 'articles') {
-    const contentList = userContent[content];
+    const contentList = userContent[content] ?? [];
     const filteredContentList = contentList.map((content) => {
-      const { likes, _count, ...filteredContent } = content;
+      const { likes: _likesNouse, _count: _countNoUse, ...filteredContent } = content;
       return {
         likeCount: content._count.likes,
         isLike: id ? content.likes.length === 1 : false,
@@ -121,7 +124,7 @@ async function getUserContentListService({ id, content }: getUserContent) {
   }
   return result;
 }
-async function getUserContentLikeListService({ id, content }) {
+async function getUserContentLikeListService({ id, content }: getUserContent) {
   const result = await prisma.user.findUniqueOrThrow({
     where: {
       id,
