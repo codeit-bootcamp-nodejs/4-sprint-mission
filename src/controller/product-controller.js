@@ -27,13 +27,14 @@ export class ProductController {
       const page = parseInt(req.query.page || '1');
       const limit = parseInt(req.query.limit || '10');
       const search = req.query.search;
-
-      const products = await this.productService.getProducts(
+      const userId = req.user?.id;
+      const result = await this.productService.getProducts(
         page,
         limit,
         search,
+        userId,
       );
-      res.status(200).json(products);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -42,9 +43,10 @@ export class ProductController {
   //  상품 상세 조회
   getProductById = async (req, res, next) => {
     try {
+      const userId = req.user?.id;
       const { id } = req.params;
-      const product = await this.productService.getProductById(id);
-      res.status(200).json(product);
+      const result = await this.productService.getProductById(id, userId);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

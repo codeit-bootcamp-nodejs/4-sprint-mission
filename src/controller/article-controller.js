@@ -25,13 +25,14 @@ export class ArticleController {
       const page = parseInt(req.query.page || '1');
       const limit = parseInt(req.query.limit || '10');
       const search = req.query.search;
-
-      const articles = await this.articleService.getArticles(
+      const userId = req.user?.id;
+      const result = await this.articleService.getArticles(
         page,
         limit,
         search,
+        userId,
       );
-      res.status(200).json(articles);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -40,9 +41,10 @@ export class ArticleController {
   // 게시글 상세 조회
   getArticleById = async (req, res, next) => {
     try {
+      const userId = req.user?.id;
       const { id } = req.params;
-      const article = await this.articleService.getArticleById(id);
-      res.status(200).json(article);
+      const result = await this.articleService.getArticleById(id, userId);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
