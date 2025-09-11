@@ -38,12 +38,55 @@ export class UserService {
       throw new Error('비밀번호가 일치하지 않습니다.');
     }
 
-    // Access Token 생성 (유효기간: 12시간)
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: '12h',
+    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
     });
 
-    return token;
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '7d',
+    });
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.updateUser(user.id, {
+      currentHashedRefreshToken: hashedRefreshToken,
+    });
+
+    return { accessToken, refreshToken };
+  };
+
+  // 토근 재발급
+  refreshToken = async (refreshToken) => {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const user = await this.userRepository.findUserById(userId);
+    if (!user || !user.currentHashedRefreshToken) {
+      throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    const isTokenValid = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+    if (!isTokenValid) {
+      throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    const newAccessToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1h',
+      },
+    );
+
+    return newAccessToken;
+  };
+
+  signOut = async (userId) => {
+    await this.userRepository.updateUser(userId, {
+      currentHashedRefreshToken: null,
+    });
   };
 
   // 내 정보 조회
