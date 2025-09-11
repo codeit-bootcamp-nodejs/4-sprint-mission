@@ -2,7 +2,6 @@ import express from 'express';
 import UserService from '../service/user-service.js';
 import zod from '../middleware/zod.js';
 import token from '../middleware/token.js';
-import e from 'express';
 
 
 const router = express.Router();

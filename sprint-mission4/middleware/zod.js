@@ -6,28 +6,22 @@ const uuidSchema = z.string().refine(isUuid, {
 });
 
 const CreateProduct = z.object({
-  id: uuidSchema,
+  id: uuidSchema.optional(),
   name: z.string().min(2).max(100),
   description: z.string().max(500).optional(),
   price: z.number().min(0),
   tags: z.array(z.string().min(2).max(100)),
-  createdAt: z.date(),
-  updatedAt: z.date(),
 });
 
 const CreateArticle = z.object({
-  id: uuidSchema,
+  id: uuidSchema.optional(),
   title: z.string().min(2).max(100),
-  content: z.string().min(10).max(1000),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  content: z.string().min(2).max(1000),
 });
 
 const ProductComment = z.object({
   id: uuidSchema,
   content: z.string().min(10).max(1000),
-  createdAt: z.date(),
-  updatedAt: z.date(),
   productId: uuidSchema,
   articleId: uuidSchema,
 });
@@ -35,8 +29,6 @@ const ProductComment = z.object({
 const ArticleComment = z.object({
   id: uuidSchema,
   content: z.string().min(10).max(1000),
-  createdAt: z.date(),
-  updatedAt: z.date(),
   productId: uuidSchema,
   articleId: uuidSchema,
 });
@@ -51,7 +43,7 @@ const createValidationMiddleware = (schema) => (req, res, next) => {
     schema.parse(req.body);
     next();
   } catch (error) {
-    return res.status(400).json({ error: error.errors });
+    return res.status(400).json({ error: error.errors || error.issues });
   }
 };
 

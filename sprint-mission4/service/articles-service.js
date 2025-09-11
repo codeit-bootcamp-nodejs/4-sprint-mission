@@ -34,8 +34,15 @@ const getArticles = async(req, res) => {
 };
 
 const createArticles = async(req, res) => {
+  const userId = req.user.userId;
+  const { title, content } = req.body;
+  const articleData = {
+    title,
+    content,
+    userId, // JWT에서 추출한 userId를 article 데이터에 추가
+    };
   const article = await prisma.article.create({
-    data: req.body,
+    data: articleData
   });
   res.status(201).send(article);
 };

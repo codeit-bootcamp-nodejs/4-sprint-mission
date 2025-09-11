@@ -35,12 +35,18 @@ const getProducts = async(req, res) => {
 };
 
 const createProducts = async(req, res) =>  {
+  const userId = req.user.userId;
+  const { name, price } = req.body;
+  const productData = {
+    name,
+    price,
+    userId,   // JWT에서 추출한 userId를 product 데이터에 추가
+  }  
   const products = await prisma.product.create({
-    data: req.body,
+    data: productData,
   });
   res.status(201).send(products);
 };
-
 
 const getProductsById = async(req, res) => {
   const products = await prisma.product.findUnique({

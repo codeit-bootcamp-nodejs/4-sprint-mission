@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
+import { expressjwt } from 'express-jwt';
 
+// 비밀번호 검증 함수
 async function verifyPassword(inputPassword, password) {
   try {
     return await bcrypt.compare(inputPassword, password);
@@ -8,4 +10,26 @@ async function verifyPassword(inputPassword, password) {
   }
 }
 
-export default { verifyPassword };
+// JWT 토큰 검증 미들웨어 (인증 미들웨어)
+const verifyAccessToken = expressjwt({
+  secret: process.env.JWT_SECRET,
+  algorithms: ['HS256'],
+  requestProperty: 'user'
+});
+
+// 등록 user 권한 (인가)
+const verifyUserRole = async(req, res, next) => {
+  const { id: reviewId } = req.params;
+  const review = await reviewRepository.getById(reviewId);
+  if (review.userId !== req.user.userId) {
+    const error = new Error('작성자만 수정할 수 있습니다')
+    throw error
+  }
+  return next()
+};
+
+export default { 
+  verifyPassword,
+  verifyAccessToken,
+  verifyUserRole
+ };

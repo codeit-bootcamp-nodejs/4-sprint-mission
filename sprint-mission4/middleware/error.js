@@ -7,7 +7,7 @@ function errorHandler(handler) {
     }
     catch (e) {
       if (e instanceof ZodError) {
-          res.status(400).json({ message: e.message, issues: e.errors });
+          res.status(400).json({ message: e.message || error.issues, issues: e.errors });
         } else if (e.name === 'StructError' || 
                    e.name === 'ValidationError' ||
                    e instanceof Prisma.PrismaClientValidationError) {

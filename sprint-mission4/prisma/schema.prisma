@@ -16,7 +16,7 @@ datasource db {
 model Product {
   id              Int              @id @default(autoincrement())
   name            String
-  description     String
+  description     String?
   price           Float
   tags            String[]
   createdAt       DateTime         @default(now())

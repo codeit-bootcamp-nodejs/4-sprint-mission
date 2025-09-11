@@ -1,25 +1,29 @@
 import express from 'express';
 import ArticleService from '../service/articles-service.js';
+import auth from '../middleware/auth.js'
 import zod from '../middleware/zod.js';
 
 
 const router = express.Router();
 
+//articles 등록, 조회 라우트
 router
   .route('/articles')
-  .post(zod.CreateArticle, ArticleService.createArticles)
+  .post(auth.verifyAccessToken, zod.CreateArticle, ArticleService.createArticles)
   .get(ArticleService.getArticles);
+
 
 router
   .route('/articles/:articleId')
   .get(ArticleService.getArticleById)
-  .patch(zod.PatchArticle, ArticleService.updateArticles)  
+  .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticle, ArticleService.updateArticles)  
   .delete(ArticleService.deleteArticles);
 
+//article comments 등록, 조회, 수정, 삭제 라우트
 router
   .route('/articles/:articleId/comments')
   .get(ArticleService.getArticleComments)
-  .post(zod.ArticleComment, ArticleService.createArticleComment)
+  .post(auth.verifyAccessToken, zod.ArticleComment, ArticleService.createArticleComment)
 
 router
   .route('/articles/:articleId/comments/:commentId')

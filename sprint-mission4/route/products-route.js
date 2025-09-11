@@ -1,13 +1,14 @@
 import express from 'express';
 import ProductService from '../service/products-service.js';
 import zod from '../middleware/zod.js';
+import auth from '../middleware/auth.js'
 
 
 const router = express.Router();
 
 router
   .route('/products')
-  .post(zod.CreateProduct, ProductService.createProducts)
+  .post(auth.verifyAccessToken, zod.CreateProduct, ProductService.createProducts)
   .get(ProductService.getProducts);
 
 router

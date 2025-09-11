@@ -1,10 +1,8 @@
 import jwt from 'jsonwebtoken';
-import UserService from '../service/user-service.js';
-
 
 const createToken = async(user) => {
-  const payload = { userId: user.email };
-  const options = { expiresIn: '1h' };
+  const payload = { userId: user.id };
+  const options = { expiresIn: '24h' };
   return jwt.sign(payload, process.env.JWT_SECRET, options);
 }
 

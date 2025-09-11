@@ -6,6 +6,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
     "is-uuid": "^1.0.2",
     "jsonwebtoken": "^9.0.2",
     "list": "^2.0.19",
