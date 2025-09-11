@@ -6,6 +6,8 @@ const userRouter = (userController) => {
 
   router.post('/signup', userController.signUp);
   router.post('/signin', userController.signIn);
+  router.post('/token/refresh', userController.refresh);
+  router.post('/signout', authMiddleware, userController.signOut);
 
   // '내 정보' 관련 라우트 추가
   router
