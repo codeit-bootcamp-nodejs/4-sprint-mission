@@ -14,17 +14,21 @@ import { createProductCommentController } from "../controllers/comment/create_co
 import { updateCommentController } from "../controllers/comment/update_comment_controller.js";
 import { deleteCommentController } from "../controllers/comment/delete_comment_controller.js";
 
+import { ProductLikeController } from "../controllers/like_controller.js";
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(getProductController)
+  .get(authenticate, getProductController)
   .post(authenticate, Validate.validateProduct, createProductController);
 router
   .route("/:id")
-  .get(getProductByIdController)
+  .get(authenticate, getProductByIdController)
   .patch(authenticate, updateProductController)
   .delete(authenticate, deleteProductController);
+
+router.post("/:id/like", authenticate, ProductLikeController);
 
 router
   .route("/:id/comment")

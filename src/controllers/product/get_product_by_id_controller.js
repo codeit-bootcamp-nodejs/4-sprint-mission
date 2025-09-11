@@ -3,7 +3,8 @@ import { getProductByIdService } from "../../services/product/get_product_by_id_
 export async function getProductByIdController(req, res) {
   try {
     const id = parseInt(req.params.id);
-    const result = await getProductByIdService(id);
+    const user = req.user;
+    const result = await getProductByIdService(id, user);
     res.send(result);
   } catch (e) {
     res.json({ message: e.message });

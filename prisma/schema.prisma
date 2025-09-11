@@ -76,4 +76,7 @@ model Like {
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   userId    Int?
   user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, userId])
+  @@unique([productId, userId])
 }

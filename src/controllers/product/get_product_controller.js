@@ -5,8 +5,9 @@ export async function getProductController(req, res) {
     const offset = parseInt(req.query.offset) || 0;
     const limit = parseInt(req.query.limit) || 10;
     const search = req.query.search?.toString() || "";
+    const user = req.user;
 
-    const result = await getProductService(offset, limit, search);
+    const result = await getProductService(offset, limit, search, user);
     res.send(result);
   } catch (e) {
     res.json({ message: e.message });

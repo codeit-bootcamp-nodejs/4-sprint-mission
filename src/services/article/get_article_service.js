@@ -1,6 +1,6 @@
 import prisma from "../prisma.js";
 
-export async function getArticleService(offset, limit, search) {
+export async function getArticleService(offset, limit, search, user) {
   try {
     const article = await prisma.article.findMany({
       where: {
@@ -19,9 +19,19 @@ export async function getArticleService(offset, limit, search) {
         createdAt: true,
         comment: true,
         userId: true,
+        _count: {
+          select: { like: true },
+        },
+        like: {
+          select: { userId: true },
+        },
       },
     });
-    return article;
+    return article.map(({ _count, like, ...rest }) => ({
+      ...rest,
+      likeCount: _count.like,
+      isLiked: !!user.id && like.some((l) => l.userId === user.id),
+    }));
   } catch (e) {
     console.log(e);
   }

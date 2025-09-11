@@ -13,17 +13,21 @@ import { updateCommentController } from "../controllers/comment/update_comment_c
 import { createArticleCommentController } from "../controllers/comment/create_comment_controller.js";
 import { deleteCommentController } from "../controllers/comment/delete_comment_controller.js";
 
+import { ArticleLikeController } from "../controllers/like_controller.js";
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(getArticleController)
+  .get(authenticate, getArticleController)
   .post(authenticate, Validate.validateArticle, createArticleController);
 router
   .route("/:id")
-  .get(getArticleByIdController)
+  .get(authenticate, getArticleByIdController)
   .patch(authenticate, updateArticleController)
   .delete(authenticate, deleteArticleController);
+
+router.post("/:id/like", authenticate, ArticleLikeController);
 
 router
   .route("/:id/comment")

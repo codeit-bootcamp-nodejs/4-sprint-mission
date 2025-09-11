@@ -1,6 +1,6 @@
 import prisma from "../prisma.js";
 
-export async function getProductService(offset, limit, search) {
+export async function getProductService(offset, limit, search, user) {
   const products = await prisma.product.findMany({
     where: {
       OR: [
@@ -20,7 +20,17 @@ export async function getProductService(offset, limit, search) {
       createdAt: true,
       comment: true,
       userId: true,
+      _count: {
+        select: { like: true },
+      },
+      like: {
+        select: { userId: true },
+      },
     },
   });
-  return products;
+  return products.map(({ _count, like, ...rest }) => ({
+    ...rest,
+    likeCount: _count.like,
+    isLiked: !!user.id && like.some((l) => l.userId === user.id),
+  }));
 }
