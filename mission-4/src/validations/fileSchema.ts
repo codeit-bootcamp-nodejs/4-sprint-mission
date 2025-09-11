@@ -1,6 +1,6 @@
-import * as z from "zod";
+import * as z from 'zod';
 
-const imageType = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const imageType = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export const imageSchema = z.object({
   // 일단 이미지 파일만 테스트

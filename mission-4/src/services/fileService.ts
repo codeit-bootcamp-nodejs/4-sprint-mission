@@ -1,13 +1,12 @@
-import { cloudinaryUpload, deleteCloudinaryFile } from "../lib/cloudinary.js";
-import prisma from "../lib/prisma.js";
+import { cloudinaryUpload, deleteCloudinaryFile } from '../lib/cloudinary.js';
+import prisma from '../lib/prisma.js';
 
-async function postFileService({ path, userId }) {
+async function postFileService({ path }) {
   const result = await cloudinaryUpload(path);
   await prisma.image.create({
     data: {
       url: result.secure_url,
       publicId: result.public_id,
-      userId,
     },
   });
   return { imageUrl: result.secure_url }; // prettier-ignore

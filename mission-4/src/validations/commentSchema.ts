@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from 'zod';
 
 // prettier-ignore
 export const postSchema = z.object({
@@ -6,7 +6,7 @@ export const postSchema = z.object({
 }).strict();
 
 export const getCommentListSchema = z.object({
-  cursorId: z.coerce.number().int().catch(null),
+  cursorId: z.coerce.number().int().optional(),
   page: z.coerce.number().int().catch(0),
   pageSize: z.coerce.number().int().catch(10),
 });

@@ -1,5 +1,7 @@
 import * as z from 'zod';
 
+const contentType = ['product', 'article', 'comment'] as const;
+
 // prettier-ignore
 export const patchSchema = z.object({
   email: z.email('이메일 형식이 올바르지 않습니다.'),
@@ -20,5 +22,7 @@ export const patchSchema = z.object({
 }).strict();
 
 export const contentSchema = z.object({
-  content: z.enum(['product', 'article', 'comment']),
+  content: z.enum(contentType),
 });
+
+export type userContentType = z.infer<typeof contentSchema>;

@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 
 async function passwordHashing(password) {
   const salt = await bcrypt.genSalt(10);
