@@ -18,11 +18,39 @@ export class UserController {
   signIn = async (req, res, next) => {
     try {
       const { email, password } = req.body;
-      const token = await this.userService.signIn(email, password);
+      const tokens = await this.userService.signIn(email, password);
       res.status(200).json({
         message: '로그인에 성공했습니다.',
-        accessToken: token,
+        data: tokens, // accessToken과 refreshToken을 모두 반환
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // 토큰 재발급
+  refresh = async (req, res, next) => {
+    try {
+      const { refreshToken } = req.body;
+      if (!refreshToken) {
+        return res.status(400).json({ message: '리프레시 토큰이 필요합니다.' });
+      }
+      const newAccessToken = await this.userService.refreshToken(refreshToken);
+      res.status(200).json({
+        message: '토큰이 성공적으로 재발급되었습니다.',
+        data: { accessToken: newAccessToken },
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // 로그아웃
+  signOut = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      await this.userService.signOut(userId);
+      res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
     } catch (error) {
       next(error);
     }
