@@ -1,5 +1,6 @@
-import prisma from "../libs/prismaClient.js";
 import type { LikeData } from "../types/like.js";
+import * as LikeRepository from "../repositories/LikeRepository.js";
+import type { Prisma } from "@prisma/client";
 
 const LikeService = {
   async toggleLike(userId: number, type: string, contentId: number) {
@@ -10,19 +11,18 @@ const LikeService = {
       user.productId = contentId;
     }
 
-    const existingLike = await prisma.like.findFirst({
-      where: user,
-    });
+    const existingLike = await LikeRepository.findFirst(user);
 
     if (existingLike) {
-      await prisma.like.delete({
-        where: { id: existingLike.id },
-      });
+      await LikeRepository.remove(existingLike.id);
       return { message: "좋아요가 취소되었습니다.", liked: false };
     } else {
-      await prisma.like.create({
-        data: user,
-      });
+      const createData: Prisma.LikeCreateInput = {
+        user: { connect: { id: userId } },
+        ...(type === "article" && { article: { connect: { id: contentId } } }),
+        ...(type === "product" && { product: { connect: { id: contentId } } }),
+      };
+      await LikeRepository.create(createData);
       return { message: "좋아요를 눌렀습니다.", liked: true };
     }
   },

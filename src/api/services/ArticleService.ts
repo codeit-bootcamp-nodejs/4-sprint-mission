@@ -1,33 +1,35 @@
-import prisma from "../libs/prismaClient.js";
 import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../types/article.js";
 import type { CustomError } from "../types/error.js";
-import { Prisma } from "@prisma/client";
+import * as ArticleRepository from "../repositories/ArticleRepository.js";
 
 const ArticleService = {
   async createArticle(articleData: CreateArticleData, userId: number) {
-    const newArticle = await prisma.article.create({
-      data: { ...articleData, userId },
+    const newArticle = await ArticleRepository.create({
+      ...articleData,
+      user: { connect: { id: userId } },
     });
     return newArticle;
   },
 
   async findUniqueArticle(articleId: number, userId?: number) {
-    const article = await prisma.article.findUnique({
-      where: { id: articleId },
-    });
+    const article = await ArticleRepository.findById(articleId);
+
+    if (!article) {
+      throw new Error("존재하지 않는 게시글입니다.");
+    }
 
     if (!userId) {
       return { ...article, isLiked: false };
     }
 
-    const like = await prisma.like.findFirst({
-      where: { userId, articleId },
-    });
+    // 좋아요 정보 조회
+    const like = await ArticleRepository.findLikeByUserAndArticle(userId, articleId);
+
     return { ...article, isLiked: !!like };
   },
 
   async updateArticle(id: number, updateData: UpdateArticleData, userId: number) {
-    const article = await prisma.article.findUnique({ where: { id } });
+    const article = await ArticleRepository.findById(id);
 
     if (!article) {
       const error: CustomError = new Error("존재하지 않는 게시글입니다.");
@@ -41,14 +43,11 @@ const ArticleService = {
       throw error;
     }
 
-    return await prisma.article.update({
-      where: { id },
-      data: updateData,
-    });
+    return await ArticleRepository.update(id, updateData);
   },
 
   async deleteArticle(id: number, userId: number) {
-    const article = await prisma.article.findUnique({ where: { id } });
+    const article = await ArticleRepository.findById(id);
 
     if (!article) {
       const error: CustomError = new Error("존재하지 않는 게시글입니다.");
@@ -62,40 +61,11 @@ const ArticleService = {
       throw error;
     }
 
-    await prisma.article.delete({
-      where: { id },
-    });
+    await ArticleRepository.remove(id);
   },
 
-  async findManyArticle({ offset, limit, order, keyword }: FindManyArticleParams) {
-    let orderBy: Prisma.ArticleOrderByWithRelationInput;
-    switch (order) {
-      case "oldest":
-        orderBy = { createdAt: "asc" };
-        break;
-      case "recent":
-      default:
-        orderBy = { createdAt: "desc" };
-    }
-
-    let where = {};
-
-    if (keyword) {
-      where = {
-        OR: [
-          { title: { contains: keyword, mode: "insensitive" } },
-          { content: { contains: keyword, mode: "insensitive" } },
-        ],
-      };
-    }
-
-    const articles = await prisma.article.findMany({
-      select: { id: true, title: true, content: true, createdAt: true },
-      skip: offset,
-      take: limit,
-      orderBy,
-      where,
-    });
+  async findManyArticle(params: FindManyArticleParams) {
+    const articles = await ArticleRepository.findMany(params);
     return articles;
   },
 };

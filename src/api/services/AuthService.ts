@@ -1,4 +1,3 @@
-import prisma from "../libs/prismaClient.js";
 import jwt from "jsonwebtoken";
 import env from "../config/env.js";
 import { hashing, compareWords } from "../libs/hashing.js";
@@ -6,13 +5,12 @@ import { generateTokens } from "../libs/token.js";
 import type { CustomError } from "src/api/types/error.js";
 import type { SignupData } from "src/api/types/signup.js";
 import type { loginData } from "src/api/types/login.js";
+import * as AuthRepository from "../repositories/AuthRepository.js";
 
 const AuthService = {
   async signup(signupData: SignupData) {
     // 이메일로 이미 존재하는 사용자인지 확인
-    const existingUser = await prisma.user.findUnique({
-      where: { email: signupData.email },
-    });
+    const existingUser = await AuthRepository.findByEmail(signupData.email);
 
     if (existingUser) {
       const error: CustomError = new Error("이미 가입된 이메일입니다.");
@@ -25,9 +23,7 @@ const AuthService = {
     const hashedPassword = await hashing(password);
 
     // 사용자 생성
-    const newUser = await prisma.user.create({
-      data: { email, nickname, password: hashedPassword },
-    });
+    const newUser = await AuthRepository.create(signupData);
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
@@ -35,9 +31,7 @@ const AuthService = {
 
   async login(loginData: loginData) {
     // 이메일로 존재하는 사용자인지 확인
-    const user = await prisma.user.findUnique({
-      where: { email: loginData.email },
-    });
+    const user = await AuthRepository.findByEmail(loginData.email);
 
     if (!user) {
       const error: CustomError = new Error("가입되지 않은 사용자입니다");
@@ -54,15 +48,12 @@ const AuthService = {
       throw error;
     }
 
-    // 액세스 토큰 및 리프레시 토큰 생성
+    // 액세스 토큰 및 리프레시 토큰 생성 및 해싱
     const { accessToken, refreshToken } = generateTokens(user.id);
+    const hashedRefreshToken = await hashing(refreshToken);
 
     // DB에 리프레시 토큰 저장
-    const hashedRefreshToken = await hashing(refreshToken);
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken: hashedRefreshToken },
-    });
+    await AuthRepository.updateUserRefreshToken(user.id, hashedRefreshToken);
 
     const { password: _, ...userWithoutPassword } = user;
     // 테스트를 위해 refreshToken 출력
@@ -88,9 +79,7 @@ const AuthService = {
 
       const userId = decoded.id;
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-      });
+      const user = await AuthRepository.findById(userId);
 
       if (!user) {
         const error: CustomError = new Error("해당하는 user가 없습니다. (Refresh Token 에러)");
@@ -116,10 +105,7 @@ const AuthService = {
       const { accessToken, refreshToken } = generateTokens(user.id);
       const hashedNewRefreshToken = await hashing(refreshToken);
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { refreshToken: hashedNewRefreshToken },
-      });
+      await AuthRepository.updateUserRefreshToken(user.id, hashedNewRefreshToken);
 
       return { accessToken, refreshToken };
     } catch (err) {
