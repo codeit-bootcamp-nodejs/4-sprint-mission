@@ -32,7 +32,7 @@ const patchArticle = async(req, res, next) => {
   }
 }
 
-const deleteArticle = async (req, res, next) => {
+const deleteArticle = async(req, res, next) => {
   try{
     const articleId = +req.params.articleId;
     await articleService.remove(articleId);
@@ -55,7 +55,7 @@ const createArticleComment = async(req, res, next) => {
   }
 }
 
-const patchComment = async (req, res, next) => {
+const patchComment = async(req, res, next) => {
   try{
     const content = req.body.content;
     const commentId = +req.params.commentId;
@@ -66,7 +66,7 @@ const patchComment = async (req, res, next) => {
   }
 }
 
-const deleteComment = async (req, res, next) => {
+const deleteComment = async(req, res, next) => {
   try{
     const commentId = +req.params.commentId;
     await commentService.deleteComment(commentId);
@@ -75,6 +75,24 @@ const deleteComment = async (req, res, next) => {
     next(error);
   }
 };
+
+const controlLike = async(req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { articleId } = req.body;
+    const isLiked = await articleService.like(userId, articleId);
+    if (isLiked) {
+      res.status(201).json({ message: 'Like added successfully.', isLiked: true });
+    } else {
+      res.status(200).json({ message: 'Like removed successfully.', isLiked: false });
+    }
+  } catch(error){
+    next(error);
+  }
+}
+
+//path: http://localhost:3000/aritcles
+//좋아요를 눌렀는지 안 눌렀는지... 그러면 이건 쿼리로 sort=
 
 
 articleRouter.route('/')
@@ -90,6 +108,7 @@ articleRouter.route('/:articleId/comments')
 articleRouter.route('/:articleId/comments/:commentId')
    .patch(passport.authenticate('access-token', { session: false }), checkArticleCommentOwner, patchComment)
    .delete(passport.authenticate('access-token', { session: false }), checkArticleCommentOwner, deleteComment)
- 
+
+articleRouter.post('/:articleId/likes',passport.authenticate('access-token', { session: false}), controlLike)
 export default articleRouter
 

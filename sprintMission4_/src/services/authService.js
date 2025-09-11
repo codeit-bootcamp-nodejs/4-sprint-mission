@@ -33,14 +33,30 @@ async function login(user) {
   const { accessToken, refreshToken } = generateTokens(user.id);
   await prisma.user.update({
     where: { id: user.id },
-    data: { refreshToken: refreshToken },
+    data: { refreshToken },
   });
   
   return { accessToken, refreshToken };
 }
 
+async function reissueTokens(userId, oldRefreshToken){
+  const user = await prisma.user.findFirst({ where : { id: userId }});
+  if( !user || user.refreshToken !== oldRefreshToken){
+    const error = new Error('Forbidden');
+    error.status = 403;
+    throw error;
+  } else {
+    const { accessToken, refreshToken } = generateTokens(userId);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken }
+    });
+    return { accessToken, refreshToken };
+  }
+}
 
 export default {
   register, 
   login,
+  reissueTokens
 };

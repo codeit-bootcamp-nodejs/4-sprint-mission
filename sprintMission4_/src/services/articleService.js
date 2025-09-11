@@ -37,8 +37,35 @@ async function remove(articleId){
   }
 }
 
+async function like(userId, articleId){
+  try{
+    const existedLike = await prisma.articleLike.findUnique({
+      where: {
+        userId_articleId : {
+           userId,
+           articleId, 
+          }
+      },
+    });
+
+    if(existedLike){
+      await prisma.articleLike.delete({ where: { id: existedLike.id}});
+      return false;
+    } else{
+      await prisma.articleLike.create({ data: { userId, articleId }})
+      return true;
+    }
+  } catch(error){
+    next(error);
+  }
+}
+
+
+
 export default {
   register,
   update,
   remove,
+  like,
+  getArticleList
 }
