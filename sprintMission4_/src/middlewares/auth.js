@@ -3,7 +3,7 @@ import prisma from '../lib/prisma.js'
 export async function checkProductOwner(req, res, next){
   try{
     const productId = req.params.id;
-    const product = await prisma.findUnique({
+    const product = await prisma.product.findUnique({
       where: { id: productId },
     });
 
@@ -24,7 +24,7 @@ export async function checkProductOwner(req, res, next){
 export async function checkArticleOwner(req, res, next){
   try{
     const articletId = req.params.id;
-    const article = await prisma.findUnique({
+    const article = await prisma.article.findUnique({
       where: { id: articletId },
     });
 
@@ -41,4 +41,63 @@ export async function checkArticleOwner(req, res, next){
       return next(error);
     }
   }
+
+export async function checkProductCommentOwner(req, res, next){
+  try{
+    const productId = +req.params.productId;
+    const commentId = +req.params.commentId;
+
+    const product = await prisma.comment.findUnique({ where: { productId }})
+
+    if(!product){
+      const error = new Error('Products not found');
+      throw error;
+    }
+
+    const comment = await prisma.comment.findUnique({ where: { id: commentId }});
+
+    if(!comment){
+      const error = new Error('Comment not found');
+      throw error;
+    }
+    if( comment.authorId !== req.user.id ){
+      const error = new Error('Forbbiden');
+      throw error;
+    }
+    return next();
+   } catch (error){
+     return next(error);
+   }
+ }
+
+  export async function checkArticleCommentOwner(req, res, next){
+  try{
+    const articleId = +req.params.articleId;
+    const commentId = +req.params.commentId;
+
+    const article = await prisma.comment.findUnique({ where: { articleId }})
+
+    if(!article){
+      const error = new Error('Article not found');
+      throw error;
+    }
+
+    const comment = await prisma.comment.findUnique({ where: { id: commentId }});
+
+    if(!comment){
+      const error = new Error('Comment not found');
+      throw error;
+    }
+    if( comment.authorId !== req.user.id ){
+      const error = new Error('Forbbiden');
+      throw error;
+    }
+      return next();
+    } catch (error){
+      return next(error);
+    }
+  }
+
+
+  
 

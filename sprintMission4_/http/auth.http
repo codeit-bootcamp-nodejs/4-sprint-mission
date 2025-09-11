@@ -1,19 +1,17 @@
-POST  http://localhost:3000/auth/register
+POST  http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "email": "testnpm @example.com",
-  "nickname": "testuser",
-  "password": "yourpassword123"
+  "email": "chicken@example.com",
+  "nickname": "chickenLover",
+  "password": "password1123"
 }
 
 ###
-
-###
-POST http://localhost:3000/auth/login
+POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "testnpm @example.com",
-  "password": "yourpassword123"
+  "email": "chicken@example.com",
+  "password": "password1123"
 }
