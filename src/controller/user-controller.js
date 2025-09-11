@@ -93,4 +93,24 @@ export class UserController {
       next(error);
     }
   };
+
+  getLikedProducts = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const products = await this.userService.getLikedProducts(userId);
+      res.status(200).json({ data: products });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getLikedArticles = async (req, res, next) => {
+    try {
+      const { id: userId } = req.user;
+      const articles = await this.userService.getLikedArticles(userId);
+      res.status(200).json({ data: articles });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
