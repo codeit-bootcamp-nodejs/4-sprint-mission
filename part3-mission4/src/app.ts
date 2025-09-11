@@ -6,6 +6,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from './lib/passport/index.js';
 import { requestLogger } from './middlewares/logger.js';
+import { setupSwagger } from './swagger.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(passport.initialize());
 app.use(requestLogger);
 
 app.use('/', routes);
+setupSwagger(app);
 
 app.use(errorHandler);
 

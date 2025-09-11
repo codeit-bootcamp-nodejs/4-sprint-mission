@@ -3,7 +3,7 @@ import { productCommentService } from '../services/comments/product-cmt-service.
 
 class ProductCommentController {
   async getComments(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const productId = parseInt(idParam!, 10);
     const userId = req.user?.id;
     const comments = await productCommentService.getCommentsByProductId(
@@ -14,7 +14,7 @@ class ProductCommentController {
   }
 
   async createComment(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const productId = parseInt(idParam!, 10);
     const { content } = req.body;
     const userId = req.user!.id;
@@ -27,7 +27,7 @@ class ProductCommentController {
   }
 
   async updateComment(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const commentId = parseInt(idParam!, 10);
     const { content } = req.body;
     const userId = req.user!.id;
@@ -40,7 +40,7 @@ class ProductCommentController {
   }
 
   async deleteComment(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const commentId = parseInt(idParam!, 10);
     const userId = req.user!.id;
     const result = await productCommentService.deleteComment(commentId, userId);
@@ -48,7 +48,7 @@ class ProductCommentController {
   }
 
   async likeComment(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const commentId = parseInt(idParam!, 10);
     const userId = req.user!.id;
     const result = await productCommentService.commentLike(userId, commentId);
@@ -56,7 +56,7 @@ class ProductCommentController {
   }
 
   async unlikeComment(req: Request, res: Response) {
-    const idParam = req.params.id;
+    const idParam = req.params.productId;
     const commentId = parseInt(idParam!, 10);
     const userId = req.user!.id;
     const result = await productCommentService.commentUnlike(userId, commentId);

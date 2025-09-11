@@ -1,31 +1,21 @@
-import { prisma } from '../../lib/prismaClient.js';
 import AppError from '../../lib/appError.js';
-import { commentRepository } from './comment-repo.js';
-
-type Comment = Awaited<ReturnType<typeof prisma.comment.findMany>>[number];
+import { commentService } from './comment-service.js';
+import { articleCommentRepository } from '../../repositories/article-cmt-repository.js';
 
 class ArticleCommentService {
-  // 공통 로직 조합
-  updateComment = commentRepository.updateComment;
-  deleteComment = commentRepository.deleteComment;
-  commentLike = commentRepository.like;
-  commentUnlike = commentRepository.unlike;
+  updateComment = commentService.updateComment;
+  deleteComment = commentService.deleteComment;
+  commentLike = commentService.likeComment;
+  commentUnlike = commentService.unlikeComment;
 
-  // 게시글의 댓글 조회
   async getCommentsByArticleId(articleId: number, userId?: number) {
-    const comments = await prisma.comment.findMany({
-      where: { articleId, productId: null },
-      include: {
-        user: { select: { username: true } },
-        likedBy: {
-          select: { id: true },
-          ...(userId && { where: { id: userId } }),
-        },
-      },
-    });
+    const comments = await articleCommentRepository.findByArticleId(
+      articleId,
+      userId
+    );
 
     if (!comments.length)
-      throw new AppError('해당 게시글의 댓글을 찾을 수 없습니다.', 404);
+      throw new AppError('해당 상품의 댓글을 찾을 수 없습니다.', 404);
 
     return comments.map((c) => ({
       ...c,
@@ -34,19 +24,12 @@ class ArticleCommentService {
     }));
   }
 
-  // 게시글 댓글 작성
   async createArticleComment(
     articleId: number,
     content: string,
     userId: number
   ) {
-    return prisma.comment.create({
-      data: {
-        content,
-        user: { connect: { id: userId } },
-        article: { connect: { id: articleId } },
-      },
-    });
+    return articleCommentRepository.create(articleId, content, userId);
   }
 }
 
