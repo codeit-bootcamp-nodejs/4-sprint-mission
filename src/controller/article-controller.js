@@ -1,6 +1,7 @@
 export class ArticleController {
-  constructor(articleService) {
+  constructor(articleService, likeService) {
     this.articleService = articleService;
+    this.likeService = likeService;
   }
 
   // 게시글 생성
