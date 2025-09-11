@@ -88,8 +88,8 @@ const ProductService = {
 
     const products = await prisma.product.findMany({
       select: { id: true, name: true, price: true, createdAt: true },
-      skip: parseInt(offset),
-      take: parseInt(limit),
+      skip: offset,
+      take: limit,
       orderBy,
       where,
     });

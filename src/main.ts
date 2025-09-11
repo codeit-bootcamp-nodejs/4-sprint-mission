@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 // import { testAllArticleService } from "./external/tests/testArticleService.js";
 // import { testAllProductService } from "./external/tests/testProductService.js";
 
-// //testAllArticleService();
+// testAllArticleService();
 // testAllProductService();
 
 const app = express();

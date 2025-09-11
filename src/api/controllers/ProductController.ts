@@ -80,11 +80,16 @@ const ProductController = {
     try {
       const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
 
+      const finalOffset = Number(offset) || 0;
+      const finalLimit = Number(limit) || 10;
+      const finalOrder = typeof order === "string" ? order : "recent";
+      const finalKeyword = typeof keyword === "string" ? keyword : undefined;
+
       const products = await ProductService.findManyProduct({
-        offset,
-        limit,
-        order,
-        keyword,
+        offset: finalOffset,
+        limit: finalLimit,
+        order: finalOrder,
+        ...(finalKeyword && { keyword: finalKeyword }),
       });
       res.status(200).json(products);
     } catch (err) {

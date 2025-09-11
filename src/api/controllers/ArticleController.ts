@@ -74,12 +74,18 @@ const ArticleController = {
 
   async findManyArticle(req: Request, res: Response, next: NextFunction) {
     try {
-      const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
+      const { offset = 0, limit = 10, order, keyword } = req.query;
+
+      const finalOffset = Number(offset) || 0;
+      const finalLimit = Number(limit) || 10;
+      const finalOrder = typeof order === "string" ? order : "recent";
+      const finalKeyword = typeof keyword === "string" ? keyword : undefined;
+
       const articles = await ArticleService.findManyArticle({
-        offset,
-        limit,
-        order,
-        keyword,
+        offset: finalOffset,
+        limit: finalLimit,
+        order: finalOrder,
+        ...(finalKeyword && { keyword: finalKeyword }),
       });
       res.status(200).json(articles);
     } catch (err) {

@@ -27,7 +27,7 @@ const CommentService = {
 
     if (comment.userId != userId) {
       const error: CustomError = new Error("댓글을 수정할 권한이 없습니다.");
-      error.status = 403;
+      error.statusCode = 403;
       throw error;
     }
 
@@ -77,7 +77,7 @@ const CommentService = {
     const comments = await prisma.comment.findMany({
       where,
       orderBy: { id: "asc" },
-      take: parseInt(limit),
+      take: limit,
       select: {
         id: true,
         content: true,

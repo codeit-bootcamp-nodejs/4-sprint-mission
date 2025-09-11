@@ -1,5 +1,5 @@
 import prisma from "../libs/prismaClient.js";
-import type { CreateArticleData, UpdateArticleData, FindManyArticleParams, ArticleOrder } from "../types/article.js";
+import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../types/article.js";
 import type { CustomError } from "../types/error.js";
 import { Prisma } from "@prisma/client";
 

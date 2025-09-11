@@ -14,9 +14,9 @@ export interface UpdateProductData {
 
 export type ProductOrder = "oldest" | "recent";
 
-// export interface FindManyProductParams {
-//   offset: number;
-//   limit: number;
-//   order?: string;
-//   keyword?: string;
-// }
+export interface FindManyProductParams {
+  offset: number;
+  limit: number;
+  order?: string;
+  keyword?: string;
+}
