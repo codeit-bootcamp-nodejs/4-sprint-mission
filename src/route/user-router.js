@@ -15,6 +15,16 @@ const userRouter = (userController) => {
 
   router.patch('/me/password', authMiddleware, userController.changeMyPassword);
   router.get('/me/products', authMiddleware, userController.getMyProducts);
+  router.get(
+    '/me/liked-products',
+    authMiddleware,
+    userController.getLikedProducts,
+  );
+  router.get(
+    '/me/liked-articles',
+    authMiddleware,
+    userController.getLikedArticles,
+  );
 
   return router;
 };
