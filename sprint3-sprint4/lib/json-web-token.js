@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { REFRESH_SECRET_KEY, ACCESS_SECRET_KEY}  from './constants'
+import { REFRESH_SECRET_KEY, ACCESS_SECRET_KEY}  from './constants.js'
 
 export class jsonWebToken{
     /*

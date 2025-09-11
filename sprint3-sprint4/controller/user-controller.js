@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt'
-import prisma from 'lib/prisma.js'
+import prisma from '../lib/prisma.js'
 import jsonWebToken from '../lib/json-web-token.js';
 import userService from '../service/user-service.js';
 
-class UserController{
+export class UserController{
     //회원가입 유효성 검사 필요
     register = async(req,res,next) => {
         const {email, nickname, password} = req.body;

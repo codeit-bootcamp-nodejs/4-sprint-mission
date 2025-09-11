@@ -5,15 +5,10 @@ import LikeController from '../controller/like-controller.js';
 import articleController from '../controller/article-controller.js';
 import articleMiddleware from '../middleware/article-middleware.js';
 
-import checkAuthenticated from '../middleware/auth-middleware.js';
-import checkArticleAuthorize from '../middleware/auth-middleware.js';
-import checkArticleCommentAuth from  '../middleware/auth-middleware.js'
+import { checkAuthenticated, checkArticleAuthorize,  checkArticleCommentAuth} from '../middleware/auth-middleware.js';
 
 import passport from 'passport';
 
-
-
-const prisma = new PrismaClient();
 
 const ArticleRouter = express.Router();
 
@@ -46,12 +41,12 @@ ArticleRouter.delete('/detail/:id',
 //like feature
 ArticleRouter.post('detail/:id',
     passport.authenticate('AccessToken', {session:false}) ,
-    likeController.ArticleLike
+    LikeController.ArticleLike
 )
 
 ArticleRouter.delete('detail/:id',
     passport.authenticate('AccessToken', {session:false}) ,
-    likeController.ArticleDislike
+    LikeController.ArticleDislike
 )
 
 
@@ -76,5 +71,5 @@ ArticleRouter.delete('/detail/:id/comments/:commentId',
     checkArticleCommentAuth,
     articleController.deleteComment)
 
-export default new ArticleRouter;
+export default ArticleRouter;
 

@@ -1,14 +1,14 @@
 import express from 'express'
 
-import likeController from '../controller/like-controller.js';
+import LikeController from '../controller/like-controller.js';
 
 import productController from '../controller/product-controller.js';
+
 import productMiddleware from '../middleware/product-middleware.js';
 
-import checkProductCommentAuth from '../middleware/auth-middleware.js'
-import checkProductAuthorize from '../middleware/auth-middleware.js';
+import { checkProductCommentAuth ,checkProductAuthorize } from '../middleware/auth-middleware.js'
 
-const prisma = new PrismaClient();
+import passport from 'passport'
 
 const ProductRouter = express.Router()
 
@@ -46,13 +46,13 @@ ProductRouter.delete('/detail/:id',
 ProductRouter.post('detail/:id',
     productMiddleware.validateId,
     passport.authenticate('AccessToken', {session:false}) ,
-    likeController.ProductLike
+    LikeController.ProductLike
 )
 
 ProductRouter.delete('detail/:id',
     productMiddleware.validateId,
     passport.authenticate('AccessToken', {session:false}) ,
-    likeController.ProductDislike
+    LikeController.ProductDislike
 )
 
 
@@ -81,4 +81,4 @@ ProductRouter.delete('/detail/:id/comment/:commentId',
     productController.deleteComment)
 
 
-export default new ProductRouter;
+export default ProductRouter;

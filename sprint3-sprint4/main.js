@@ -8,7 +8,7 @@ import express from 'express';
 import 'dotenv/config';
 import passport from "passport";
 
-
+import { refreshJwtStrategy, accessJwtStrategy } from "./lib/passport-lib.js";
 const app = express();
 
 app.use(cors());

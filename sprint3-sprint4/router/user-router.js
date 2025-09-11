@@ -1,9 +1,8 @@
 import express from 'express';
-import userController from '../controller/user-controller';
+import userController from '../controller/user-controller.js';
 import passport from 'passport';
-import checkAuthenticated from '../middleware/auth-middleware.js';
 
-userRouter = express.router();
+const userRouter = express.Router();
 
 // register, login, get login user information
 userRouter.post('/login', 

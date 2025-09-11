@@ -2,7 +2,6 @@ import express from 'express'
 import prisma from '../lib/prisma.js'
 import articleService from '../service/article-service.js';
 
-const ArticleRouter = express.Router();
 
 //모든 게시글 불러오기, 댓글 미포함
 
@@ -14,7 +13,7 @@ export class ArticleController{
         
         skip = parseInt(skip);
         take = parseInt(take);
-        const data = {sort, skip, take, searchtitle,searchcontent, skip, take}
+        const data = {sort, skip, take, searchtitle,searchcontent}
         
 
         try{

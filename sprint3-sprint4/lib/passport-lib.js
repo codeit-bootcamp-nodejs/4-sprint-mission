@@ -2,7 +2,7 @@ import passport from 'passport'
 
 import { Strategy as JwtStrategy } from 'passport-jwt';
 
-import prisma from 'lib/prisma.js';
+import prisma from './prisma.js';
 
 
 import {ACCESS_SECRET_KEY,
@@ -10,7 +10,7 @@ import {ACCESS_SECRET_KEY,
     ACCESS_TOKEN_COOKIE_NAME,
     REFRESH_TOKEN_COOKIE_NAME
  }from './constants.js'
-import REFRESH_SECRET_KEY from './constants.js'
+
 
 
 //request로 부터 token을 받고, 해석하는 부분(options)
@@ -40,18 +40,18 @@ async function jwtVerify(payload, done){
 }
 
 //Access Token을 검증하는 전략 
-const accessJwtStrategy = new JwtStrategy(accessJwtOptions, (payload, done) => {
+export const accessJwtStrategy = new JwtStrategy(accessJwtOptions, (payload, done) => {
     accessJwtOptions,
     jwtVerify
 })
 
 //Refresh Token을 검증하는 전략 
-const refreshJwtStrategy = new JwtStrategy(refreshJwtOptions, (payload, done) => {
+export const refreshJwtStrategy = new JwtStrategy(refreshJwtOptions, (payload, done) => {
     refreshJwtOptions,
     jwtVerify
 })
 
 
-passport.use('AccessToken', accessJwtStrategy)
-passport.use('RefreshToken', refreshJwtStrategy)
+// passport.use('AccessToken', accessJwtStrategy)
+// passport.use('RefreshToken', refreshJwtStrategy)
 

@@ -1,13 +1,15 @@
 
 
-const ACCESS_SECRET_KEY = qwer; 
-const REFRESH_SECRET_KEY = asdf;
-const JWS_SECRET_KEY = zxcv;
-const ACCESS_TOKEN_COOKIE_NAME = qwer;
-const REFRESH_TOKEN_COOKIE_NAME = asdf;
+const ACCESS_SECRET_KEY = 'qwer'; 
+const REFRESH_SECRET_KEY = 'asdf';
+const JWT_SECRET_KEY = 'zxcv';
+const ACCESS_TOKEN_COOKIE_NAME = 'qwer';
+const REFRESH_TOKEN_COOKIE_NAME = 'asdf';
 
 export {
     ACCESS_SECRET_KEY,
     REFRESH_SECRET_KEY,
-    JWS_SECRET_KEY
+    JWT_SECRET_KEY,
+    ACCESS_TOKEN_COOKIE_NAME,
+    REFRESH_TOKEN_COOKIE_NAME
 }
