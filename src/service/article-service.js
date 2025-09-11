@@ -11,7 +11,8 @@ export class ArticleService {
   };
 
   // 게시글 목록 조회
-  getArticles = async (page, limit, search) => {
+  getArticles = async (page, limit, search, userId) => {
+    // userId 파라미터 추가
     const whereCondition = search
       ? {
           OR: [
@@ -20,15 +21,16 @@ export class ArticleService {
           ],
         }
       : {};
-
     const offset = (page - 1) * limit;
 
     const [articles, totalCount] = await this.prisma.$transaction(
       async (tx) => {
+        // 레포지토리로 userId 전달
         const articles = await this.articleRepository.findManyArticles(
           whereCondition,
           offset,
           limit,
+          userId,
           tx,
         );
         const totalCount = await this.articleRepository.countArticles(
@@ -40,7 +42,6 @@ export class ArticleService {
     );
 
     const totalPages = Math.ceil(totalCount / limit);
-
     return {
       data: articles,
       pagination: { page, limit, totalCount, totalPages },
@@ -48,8 +49,12 @@ export class ArticleService {
   };
 
   // 게시글 상세 조회
-  getArticleById = async (articleId) => {
-    const article = await this.articleRepository.findArticleById(articleId);
+  getArticleById = async (articleId, userId) => {
+    // userId 파라미터 추가
+    const article = await this.articleRepository.findArticleById(
+      articleId,
+      userId,
+    ); // 레포지토리로 userId 전달
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');
     }

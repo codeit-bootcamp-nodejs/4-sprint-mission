@@ -19,7 +19,8 @@ export class ProductService {
 
   // 상품 목록 조회
 
-  getProducts = async (page, limit, search) => {
+  getProducts = async (page, limit, search, userId) => {
+    // userId 파라미터 추가
     const whereCondition = search
       ? {
           OR: [
@@ -28,25 +29,17 @@ export class ProductService {
           ],
         }
       : {};
-
     const offset = (page - 1) * limit;
 
-    const [products, totalCount] = await this.prisma.$transaction(
-      async (tx) => {
-        const products = await this.productRepository.findManyProducts(
-          whereCondition,
-          offset,
-          limit,
-          tx,
-        );
-        const totalCount = await this.productRepository.countProducts(
-          whereCondition,
-          tx,
-        );
-        return [products, totalCount];
-      },
+    // 레포지토리로 userId 전달
+    const products = await this.productRepository.findManyProducts(
+      whereCondition,
+      offset,
+      limit,
+      userId,
     );
-
+    const totalCount =
+      await this.productRepository.countProducts(whereCondition);
     const totalPages = Math.ceil(totalCount / limit);
 
     return {
@@ -56,10 +49,14 @@ export class ProductService {
   };
 
   // 상품 상세 조회
-  getProductById = async (productId) => {
-    const product = await this.productRepository.findProductById(productId);
+  getProductById = async (productId, userId) => {
+    // userId 파라미터 추가
+    const product = await this.productRepository.findProductById(
+      productId,
+      userId,
+    ); // 레포지토리로 userId 전달
     if (!product) {
-      throw new Error('상품을 찾을 수 없습니다.'); // 에러 처리 로직 추가
+      throw new Error('상품을 찾을 수 없습니다.');
     }
     return product;
   };
