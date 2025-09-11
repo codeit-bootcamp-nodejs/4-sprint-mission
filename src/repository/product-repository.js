@@ -25,15 +25,34 @@ export class ProductRepository {
    * @param {object} [tx] - (선택) 트랜잭션용 Prisma 클라이언트
    * @returns {Promise<Array<object>>} 상품 목록
    */
-  findManyProducts = async (whereCondition, offset, limit, tx) => {
-    const prismaClient = tx || this.prisma;
-    return await prismaClient.product.findMany({
+  findManyProducts = async (whereCondition, offset, limit, userId) => {
+    const products = await this.prisma.product.findMany({
       where: whereCondition,
-      select: { id: true, name: true, price: true, createdAt: true },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true,
+        // '좋아요' 개수 카운트
+        _count: { select: { likes: true } },
+      },
       orderBy: { createdAt: 'desc' },
       skip: offset,
       take: limit,
     });
+
+    // 로그인한 사용자라면 isLiked 필드 추가
+    if (userId) {
+      return await Promise.all(
+        products.map(async (product) => {
+          const like = await this.prisma.productLike.findUnique({
+            where: { userId_productId: { userId, productId: product.id } },
+          });
+          return { ...product, isLiked: !!like };
+        }),
+      );
+    }
+    return products;
   };
 
   /**
@@ -52,10 +71,23 @@ export class ProductRepository {
    * @param {number} productId - 상품 ID
    * @returns {Promise<object|null>} 조회된 상품 객체
    */
-  findProductById = async (productId) => {
-    return await this.prisma.product.findUnique({
+  findProductById = async (productId, userId) => {
+    const product = await this.prisma.product.findUnique({
       where: { id: parseInt(productId) },
+      include: {
+        // '좋아요' 개수 포함
+        _count: { select: { likes: true } },
+      },
     });
+
+    // 로그인한 사용자라면 isLiked 필드 추가
+    if (product && userId) {
+      const like = await this.prisma.productLike.findUnique({
+        where: { userId_productId: { userId, productId: parseInt(productId) } },
+      });
+      product.isLiked = !!like;
+    }
+    return product;
   };
 
   /**

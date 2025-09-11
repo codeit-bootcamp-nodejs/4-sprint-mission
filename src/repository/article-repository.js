@@ -23,15 +23,33 @@ export class ArticleRepository {
    * @param {object} [tx] - (선택) 트랜잭션용 Prisma 클라이언트
    * @returns {Promise<Array<object>>} 게시글 목록
    */
-  findManyArticles = async (whereCondition, offset, limit, tx) => {
+  findManyArticles = async (whereCondition, offset, limit, userId, tx) => {
     const prismaClient = tx || this.prisma;
-    return await prismaClient.article.findMany({
+    const articles = await prismaClient.article.findMany({
       where: whereCondition,
-      select: { id: true, title: true, content: true, createdAt: true },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        _count: { select: { likes: true } },
+      },
       orderBy: { createdAt: 'desc' },
       skip: offset,
       take: limit,
     });
+
+    if (userId) {
+      return await Promise.all(
+        articles.map(async (article) => {
+          const like = await this.prisma.articleLike.findUnique({
+            where: { userId_articleId: { userId, articleId: article.id } },
+          });
+          return { ...article, isLiked: !!like };
+        }),
+      );
+    }
+    return articles;
   };
 
   /**
@@ -50,10 +68,21 @@ export class ArticleRepository {
    * @param {number} articleId - 게시글 ID
    * @returns {Promise<object|null>} 조회된 게시글 객체
    */
-  findArticleById = async (articleId) => {
-    return await this.prisma.article.findUnique({
+  findArticleById = async (articleId, userId) => {
+    const article = await this.prisma.article.findUnique({
       where: { id: parseInt(articleId) },
+      include: {
+        _count: { select: { likes: true } },
+      },
     });
+
+    if (article && userId) {
+      const like = await this.prisma.articleLike.findUnique({
+        where: { userId_articleId: { userId, articleId: parseInt(articleId) } },
+      });
+      article.isLiked = !!like;
+    }
+    return article;
   };
 
   /**
