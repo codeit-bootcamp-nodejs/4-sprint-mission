@@ -22,11 +22,15 @@ router
   .patch(auth.verifyAccessToken, auth.verifyUserRole, UserService.updateUsers)
 
 router
+  .route('/users/:userId/productLike')
+  .get(auth.verifyAccessToken, auth.verifyUserRole, UserService.getLikeByUserId)
+
+router
   .route('/users/:userId/products')
   .get(auth.verifyAccessToken, auth.verifyUserRole, UserService.getProductsByUserId)
 
 router
   .route('/token/refresh')
-  .post(auth.verifyRefreshToken, )
+  .post(auth.verifyRefreshToken, UserService.refreshToken)
 
 export default router;

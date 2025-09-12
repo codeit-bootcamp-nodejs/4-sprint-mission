@@ -16,7 +16,7 @@ router
 //products 수정, 삭제 라우트
 router
   .route('/products/:productId')
-  .get(ProductService.getProductsById)
+  .get(auth.verifyAccessToken, ProductService.getProductsById)
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchProduct, ProductService.updateProducts)
   .delete(auth.verifyAccessToken, auth.verifyUserRole, ProductService.deleteProducts);
 

@@ -49,6 +49,7 @@ const createProducts = async(req, res) =>  {
 };
 
 const getProductsById = async(req, res) => {
+  const productId = Number(req.params.productId)
   const products = await prisma.product.findUnique({
     where: { id: Number(req.params.productId) },
     select: {
@@ -60,8 +61,14 @@ const getProductsById = async(req, res) => {
       createdAt: true,
       }
   });
-  res.status(200).send(products);
-}
+  const likeCount = await prisma.productLike.count({
+    where: { productId : productId}
+  })
+  const Liked = likeCount > 0;
+  res.status(200).json({
+    products, Liked
+  });
+};
 
 const updateProducts = async(req, res) => {
   const product = await prisma.product.update({

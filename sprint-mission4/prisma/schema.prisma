@@ -24,7 +24,7 @@ model Product {
   productComments ProductComment[]
   userId          Int
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes    ProductLike[]
+  likes           ProductLike[]
 }
 
 model Article {
@@ -36,7 +36,7 @@ model Article {
   articleComments ArticleComment[]
   userId          Int
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes   ArticleLike[]
+  likes           ArticleLike[]
 }
 
 model ProductComment {
@@ -74,24 +74,26 @@ model User {
   Article        Article[]
   ProductComment ProductComment[]
   ArticleComment ArticleComment[]
-    productLikes  ProductLike[]
-  articleLikes  ArticleLike[]
+  productLikes   ProductLike[]
+  articleLikes   ArticleLike[]
 }
 
 model ProductLike {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   userId    Int
   productId Int
-  user      User   @relation(fields: [userId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
   product   Product @relation(fields: [productId], references: [id])
+
   @@unique([userId, productId])
 }
 
 model ArticleLike {
-  id         Int    @id @default(autoincrement())
-  userId     Int
-  articleId  Int
-  user       User   @relation(fields: [userId], references: [id])
-  article    Article @relation(fields: [articleId], references: [id])
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  articleId Int
+  user      User    @relation(fields: [userId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id])
+
   @@unique([userId, articleId])
 }

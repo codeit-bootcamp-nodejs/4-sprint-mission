@@ -88,9 +88,21 @@ const getProductsByUserId = async(req, res) => {
       price: true,
       tags: true,
       createdAt: true,
+      productLikes : true,
       }
   });
   res.status(200).send(products);
+}
+
+const getLikeByUserId = async(req, res) => {
+  const userId = req.user.userId
+  const likeproducts = await prisma.productLike.findMany({
+    where: { userId: userId },
+    select: {
+      product : true
+      }
+  });
+  res.status(200).send(likeproducts);
 }
 
 const refreshToken = async (req, res, next) => {
@@ -114,5 +126,6 @@ export default {
   updateUsers,
   login,
   getProductsByUserId,
-  refreshToken
+  refreshToken,
+  getLikeByUserId
 };

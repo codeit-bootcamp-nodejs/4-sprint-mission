@@ -48,6 +48,7 @@ const createArticles = async(req, res) => {
 };
 
 const getArticleById = async(req, res) => {
+  const articleId = Number(req.params.articleId)
   const article = await prisma.article.findUnique({
     where: { id: Number(req.params.articleId) },
     select: {
@@ -55,9 +56,15 @@ const getArticleById = async(req, res) => {
       title: true,
       content: true,
       createdAt: true,
-      }
+        }
+      })
+  const likeCount = await prisma.articleLike.count({
+    where: { articleId : articleId}
+  })
+  const Liked = likeCount > 0;
+  res.status(200).json({
+    article, Liked
   });
-  res.status(200).send(article);
 };
 
 const updateArticles = async(req, res) => {

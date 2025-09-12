@@ -16,7 +16,7 @@ router
 //articles 수정, 삭제 라우트
 router
   .route('/articles/:articleId')
-  .get(ArticleService.getArticleById)
+  .get(auth.verifyAccessToken, ArticleService.getArticleById)
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticle, ArticleService.updateArticles)  
   .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticles)
 
@@ -34,10 +34,10 @@ router
 
 // articleLike 등록 삭제 라우트
 router
-  .route('/articles/"articleId/articleLike')
-  .post(auth.verifyAccessToken, auth.verifyUserRole, Like.articleLike)
+  .route('/articles/:articleId/articleLike')
+  .post(auth.verifyAccessToken, Like.articleLike)
 router
-  .route('/articles/"articleId/articleLike/:articleLikeId')
+  .route('/articles/:articleId/articleLike/:articleLikeId')
   .delete(auth.verifyAccessToken, auth.verifyUserRole, Like.articleUnLike)
 
 export default router;
