@@ -32,9 +32,12 @@ const verifyUserRole = async(req, res, next) => {
     review = await prisma.articleComment.findUnique({ where: { id: Number(req.params.articleCommentId) } });
   } else if (req.params.productCommentId) {
     review = await prisma.productComment.findUnique({ where: { id: Number(req.params.productCommentId) } });
+  } else if (req.params.userId) {
+    review = await prisma.user.findUnique({ where: { id: Number(req.params.userId) } });
   }
-  if (review.userId !== req.user.userId) {
-    const error = new Error('작성자만 수정할 수 있습니다')
+  const reviewId = review.userId || review.id
+  if (reviewId !== req.user.userId) {
+    const error = new Error('작성자만 가능합니다.')
     throw error
   }
   return next()

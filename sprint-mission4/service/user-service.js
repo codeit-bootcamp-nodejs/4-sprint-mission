@@ -46,9 +46,14 @@ const createUsers = async(req, res) => {
 
 // 유저 수정 (회원정보 수정)
 const updateUsers = async(req, res) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const user = await prisma.user.update({
     where: { id: Number(req.params.userId) },
-    data: req.body,
+    data: {
+      ...req.body,
+      password: hashedPassword,
+    }
   });
   res.status(200).send(user);
 };
@@ -64,48 +69,25 @@ const login = async(req, res) => {
   res.status(200).send({ accessToken });
 };
 
+const getProductsByUserId = async(req, res) => {
+  const products = await prisma.product.findMany({
+    where: { userId: Number(req.params.userId) },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      tags: true,
+      createdAt: true,
+      }
+  });
+  res.status(200).send(products);
+}
+
 export default { 
   getUserById, 
   createUsers, 
   updateUsers,
   login,
+  getProductsByUserId,
 };
-
-//////////////////////////////////////////////////////////////////////////////////
-
-
-const deleteArticles = async(req, res) => {
-  await prisma.article.delete({
-    where: { id: Number(req.params.articleId) },
-  });
-  res.status(204).send();
-}
-
-const getArticleComments = async(req, res) => {
-  const articleComments = await prisma.articleComment.findMany({
-    where: { articleId: Number(req.params.articleId) },
-  });
-  res.status(200).send(articleComments);
-}
-
-const createArticleComment = async(req, res) => {
-  const articleComments = await prisma.articleComment.create({
-    data: req.body,
-  });
-  res.status(201).send(articleComments);
-}
-
-const updateArticleComment = async(req, res) => {
-  const articleComments = await prisma.articleComment.update({
-    where: { id: Number(req.params.commentId) },
-    data: req.body,
-  });
-  res.status(200).send(articleComments);
-}
-
-const deleteArticleComment = async(req, res) => {
-  const articleComments = await prisma.articleComment.delete({
-    where: { id: Number(req.params.commentId) },
-  });
-  res.status(204).send(articleComments);
-}

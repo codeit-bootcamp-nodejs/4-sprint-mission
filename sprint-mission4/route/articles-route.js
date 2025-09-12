@@ -31,5 +31,4 @@ router
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticleComment, ArticleService.updateArticleComment)
   .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticleComment);
 
-
 export default router;

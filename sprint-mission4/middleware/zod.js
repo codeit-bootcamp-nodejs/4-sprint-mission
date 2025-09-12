@@ -1,8 +1,13 @@
 import { z } from "zod";
-import isUuid from "is-uuid"
+import isUuid from "is-uuid";
+import isemail from "is-email"
 
 const uuidSchema = z.string().refine(isUuid, {
-  message: "Invalid UUID format",
+  message: "잘못된 ID 형식입니다.",
+});
+
+const uuemaileSchema = z.string().refine(isemail, {
+  message: "잘못된 e-mail 형식입니다.",
 });
 
 const CreateProduct = z.object({
@@ -45,6 +50,15 @@ const createValidationMiddleware = (schema) => (req, res, next) => {
   }
 };
 
+const CreateUserId = z.object({
+  id: uuidSchema.optional(),
+  email : uuemaileSchema,
+  nickname: z.string().min(2).max(100),
+  password : z.string().trim().min(4, '비밀번호는 최소 4자 이상!')
+});
+
+const PatchUserId = CreateUserId.partial();
+
 export default {
   CreateProduct: createValidationMiddleware(CreateProduct),
   CreateArticle: createValidationMiddleware(CreateArticle),
@@ -54,4 +68,6 @@ export default {
   ArticleComment: createValidationMiddleware(ArticleComment),
   PatchProductComment: createValidationMiddleware(PatchProductComment),
   PatchArticleComment: createValidationMiddleware(PatchArticleComment),
+  CreateUserId : createValidationMiddleware(CreateUserId),
+  PatchUserId : createValidationMiddleware(PatchUserId),
 };
