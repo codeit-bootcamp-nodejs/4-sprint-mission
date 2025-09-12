@@ -33,7 +33,6 @@ export class ProductRepository {
         name: true,
         price: true,
         createdAt: true,
-        // '좋아요' 개수 카운트
         _count: { select: { likes: true } },
       },
       orderBy: { createdAt: 'desc' },
@@ -41,17 +40,26 @@ export class ProductRepository {
       take: limit,
     });
 
-    // 로그인한 사용자라면 isLiked 필드 추가
-    if (userId) {
-      return await Promise.all(
-        products.map(async (product) => {
-          const like = await this.prisma.productLike.findUnique({
-            where: { userId_productId: { userId, productId: product.id } },
-          });
-          return { ...product, isLiked: !!like };
-        }),
-      );
+    if (userId && products.length > 0) {
+      const productIds = products.map((p) => p.id);
+
+      const likes = await this.prisma.productLike.findMany({
+        where: {
+          userId: userId,
+          productId: { in: productIds },
+        },
+        select: {
+          productId: true,
+        },
+      });
+
+      const likedProductIds = new Set(likes.map((like) => like.productId));
+
+      products.forEach((product) => {
+        product.isLiked = likedProductIds.has(product.id);
+      });
     }
+
     return products;
   };
 
