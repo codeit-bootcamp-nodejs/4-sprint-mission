@@ -1,5 +1,6 @@
 import express from 'express';
 import ArticleService from '../service/articles-service.js';
+import Like from '../service/like-service.js';
 import auth from '../middleware/auth.js'
 import zod from '../middleware/zod.js';
 
@@ -17,7 +18,7 @@ router
   .route('/articles/:articleId')
   .get(ArticleService.getArticleById)
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticle, ArticleService.updateArticles)  
-  .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticles);
+  .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticles)
 
 //articleComments 등록, 조회 라우트
 router
@@ -30,5 +31,13 @@ router
   .route('/articles/:articleId/articleComments/:articlecommentId')
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticleComment, ArticleService.updateArticleComment)
   .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticleComment);
+
+// articleLike 등록 삭제 라우트
+router
+  .route('/articles/"articleId/articleLike')
+  .post(auth.verifyAccessToken, auth.verifyUserRole, Like.articleLike)
+router
+  .route('/articles/"articleId/articleLike/:articleLikeId')
+  .delete(auth.verifyAccessToken, auth.verifyUserRole, Like.articleUnLike)
 
 export default router;
