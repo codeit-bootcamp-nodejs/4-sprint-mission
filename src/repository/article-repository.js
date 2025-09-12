@@ -39,16 +39,26 @@ export class ArticleRepository {
       take: limit,
     });
 
-    if (userId) {
-      return await Promise.all(
-        articles.map(async (article) => {
-          const like = await this.prisma.articleLike.findUnique({
-            where: { userId_articleId: { userId, articleId: article.id } },
-          });
-          return { ...article, isLiked: !!like };
-        }),
-      );
+    if (userId && articles.length > 0) {
+      const articleIds = articles.map((a) => a.id);
+
+      const likes = await this.prisma.articleLike.findMany({
+        where: {
+          userId: userId,
+          articleId: { in: articleIds },
+        },
+        select: {
+          articleId: true,
+        },
+      });
+
+      const likedArticleIds = new Set(likes.map((like) => like.articleId));
+
+      articles.forEach((article) => {
+        article.isLiked = likedArticleIds.has(article.id);
+      });
     }
+
     return articles;
   };
 
