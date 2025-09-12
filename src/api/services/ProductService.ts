@@ -1,9 +1,10 @@
 import type { CustomError } from "../types/error.js";
 import type { CreateProductData, UpdateProductData, FindManyProductParams } from "../types/product.js";
 import * as ProductRepository from "../repositories/ProductRepository.js";
+import type { ProductDto } from "../types/dtos/product.dto.js";
 
 const ProductService = {
-  async createProduct(productData: CreateProductData, userId: number) {
+  async createProduct(productData: ProductDto, userId: number) {
     const newProduct = await ProductRepository.create({
       ...productData,
       user: { connect: { id: userId } },
@@ -22,7 +23,7 @@ const ProductService = {
     return { ...product, isLiked: !!like };
   },
 
-  async patchProduct(id: number, updateData: UpdateProductData, userId: number) {
+  async patchProduct(id: number, updateData: ProductDto, userId: number) {
     const product = await ProductRepository.findById(id);
 
     if (!product) {

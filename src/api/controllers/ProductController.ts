@@ -3,13 +3,13 @@ import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import env from "../config/env.js";
 import type { CustomError } from "src/api/types/error.js";
+import type { ProductDto } from "../types/dtos/product.dto.js";
 
 const ProductController = {
   async createProduct(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const { name, description, price, tags } = req.body;
-      const productData = { name, description, price, tags };
+      const productData: ProductDto = req.body;
       const newProduct = await ProductService.createProduct(productData, userId);
 
       res.status(201).json(newProduct);
@@ -52,7 +52,7 @@ const ProductController = {
     try {
       const { id } = req.params;
       const { id: userId } = req.user;
-      const updateData = req.body;
+      const updateData: ProductDto = req.body;
 
       const product = await ProductService.patchProduct(Number(id), updateData, userId);
       if (!product) {
