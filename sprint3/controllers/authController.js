@@ -1,4 +1,8 @@
-import { registerUser, loginUser } from "../services/authService.js";
+import {
+  registerUser,
+  loginUser,
+  refreshAccessToken,
+} from "../services/authService.js";
 import {
   NODE_ENV,
   ACCESS_TOKEN_COOKIE_NAME,
@@ -29,6 +33,27 @@ export const login = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const refresh = async (req, res, next) => {
+  const user = req.user;
+
+  try {
+    const { accessToken, refreshToken } = await refreshAccessToken(user);
+
+    setTokenCookies(res, accessToken, refreshToken);
+
+    return res.status(200).json({ token: accessToken });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = (req, res) => {
+  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+
+  res.status(200).json({ success: true, message: "로그아웃 되었습니다." });
 };
 
 function setTokenCookies(res, accessToken, refreshToken) {

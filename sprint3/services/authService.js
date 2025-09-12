@@ -35,3 +35,13 @@ export const loginUser = async (user) => {
     throw err;
   }
 };
+
+export const refreshAccessToken = async (user) => {
+  try {
+    const { accessToken, refreshToken } = generateTokens(user.id);
+
+    return { accessToken, refreshToken };
+  } catch (err) {
+    throw err;
+  }
+};
