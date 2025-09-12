@@ -28,7 +28,7 @@ const refreshJwtOptions = {
 
 //passport에서 인증이 이루어지는 부분(verify)
 async function jwtVerify(payload, done){
-    const userId = payload.userId
+    const userId = payload.userId;
     if (!userId){
         done(error,null);
     }
@@ -52,6 +52,16 @@ export const refreshJwtStrategy = new JwtStrategy(refreshJwtOptions, (payload, d
 })
 
 
-// passport.use('AccessToken', accessJwtStrategy)
-// passport.use('RefreshToken', refreshJwtStrategy)
+passport.use('AccessToken', accessJwtStrategy)
+passport.use('RefreshToken', refreshJwtStrategy)
 
+export const authUserWithParmaId = passport.authenticate("Access Token", (req,res) =>{
+    const paramId = req.params.id;
+    const tokenId = req.user.id
+
+    if (pramaId != tokenId){
+        return res.send("no authorization")
+    }else{
+        return next()
+    }
+})

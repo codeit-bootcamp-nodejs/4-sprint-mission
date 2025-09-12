@@ -3,6 +3,7 @@ import productRouter from "./router/product-router.js";
 import userRouter from "./router/user-router.js";
 import fileRouter from "./file.js";
 
+import cookieParser from "cookie-parser";
 import cors from 'cors';
 import express from 'express';
 import 'dotenv/config';
@@ -13,9 +14,10 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(passport.initialize());
-passport.use('AccessToken', accessJwtStrategy)
-passport.use('RefreshToken', refreshJwtStrategy)
+passport.use('Access Token', accessJwtStrategy)
+passport.use('Refresh Token', refreshJwtStrategy)
 
 
 

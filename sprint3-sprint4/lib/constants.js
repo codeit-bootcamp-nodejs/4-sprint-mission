@@ -3,7 +3,7 @@
 const ACCESS_SECRET_KEY = 'qwer'; 
 const REFRESH_SECRET_KEY = 'asdf';
 const JWT_SECRET_KEY = 'zxcv';
-const ACCESS_TOKEN_COOKIE_NAME = 'qwer';
+const ACCESS_TOKEN_COOKIE_NAME = 'AccessToken';
 const REFRESH_TOKEN_COOKIE_NAME = 'asdf';
 
 export {

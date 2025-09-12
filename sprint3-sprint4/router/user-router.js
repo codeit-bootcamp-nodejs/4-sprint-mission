@@ -1,6 +1,9 @@
 import express from 'express';
 import userController from '../controller/user-controller.js';
 import passport from 'passport';
+import { checkUserAuth } from '../middleware/auth-middleware.js';
+import { authUserWithParmaId } from '../lib/passport-lib.js';
+import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants.js';
 
 const userRouter = express.Router();
 
@@ -22,8 +25,9 @@ userRouter.patch('/:id',
      userController.patchPassword)
 
 //get products of login user
-userRouter.get(':id/products',
-     passport.authenticate('AccessToken', {session:false}) ,
+userRouter.get('/:id/products',
+     passport.authenticate("Access Token", {session:false}),
+    checkUserAuth, 
      userController.getUserProduct)
 
 //get liked products of login user
@@ -32,6 +36,10 @@ userRouter.get(':id/like',
 
 )
 
+//refresh token
+userRouter.post('auth/refresh',
+    passport.authenticate('RefreshToken', {session:false})
+)
 
 
 // passport.authenticate('local'),

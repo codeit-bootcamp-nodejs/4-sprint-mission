@@ -1,6 +1,6 @@
 import express from 'express'
 import prisma from '../lib/prisma.js'
-import articleService from '../service/article-service.js';
+import ArticleService from '../service/article-service.js';
 
 
 //모든 게시글 불러오기, 댓글 미포함
@@ -15,11 +15,13 @@ export class ArticleController{
         take = parseInt(take);
         const data = {sort, skip, take, searchtitle,searchcontent}
         
+        const user = req.user
+        console.log(user)
 
         try{
-            let articles = ArticleService.getArticles(data)
+            let articles = await ArticleService.getArticles(data)
             for (let article of articles){
-                articleService.addIsLiked(article)
+                ArticleService.addIsLiked(user, article)
             }
             res.status(200).send(articles);
         } catch(error){

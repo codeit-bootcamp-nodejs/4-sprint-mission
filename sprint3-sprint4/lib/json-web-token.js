@@ -7,11 +7,14 @@ export class jsonWebToken{
       userId: Int
     }
     */
-    generateAccess = (payload) => {
+    generateAccess = (user) => {
         const SecretKey = ACCESS_SECRET_KEY;
-        const accesToken = jwt.sign(payload.userId, SecretKey,
-           {expiresIn: '1h'} )
-
+        const payload = {
+            userId: user.id
+        }
+        const accesToken = jwt.sign(payload, SecretKey,
+           {expiresIn: '10h'} )
+        console.log("at json-web-token.js, acceessToken: ", accesToken)
         return accesToken
     }
 

@@ -5,14 +5,14 @@ import prisma from '../lib/prisma.js'
 
 export class ProductController{
     getProducts = async (req,res,next) =>{
-        let {sort = 'recent', skip = 10, take= 10, searchName, searchDescription} = req.query;
+        let {sort = 'recent', skip = 0, take= 10, searchName, searchDescription} = req.query;
         
         const data = {sort, skip, take, searchName, searchDescription};
         try{
-            let products = productService.getProducts(data);
+            let products = await productService.getProducts(data);
             
             for (let product of products){
-                product = productService.addIsLiked(product);
+                product = await productService.addIsLiked(product);
             }
 
             return res.status(200).send(products);

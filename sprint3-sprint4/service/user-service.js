@@ -4,16 +4,25 @@ import prisma from '../lib/prisma.js'
 import jsonWebToken from '../lib/json-web-token.js';
 
 class userService{
-    createUser = async({password,email,nickname}) => {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password,hash);
-        const data= {
-                    password: hashedPassword,
-                    email,
-                    nickname}
+    createUser = async({password,email,nickname,image}) => {
+        try{
+            const salt = await bcrypt.genSalt(10);
+            password = String(password)
+            const hashedPassword = await bcrypt.hash(password, salt);
+            const data= {
+                        password: hashedPassword,
+                        email,
+                        nickname,
+                        image
+                    }
 
-        const newUser = await prisma.user.create({data})
-        return newUser
+            const newUser = await prisma.user.create({data})
+            return newUser
+        }catch(error){
+            console.error(error);
+            throw new Error(error.message)
+        }
+        
     }
     
     loginAndGiveToken = async({email,password}) => {
@@ -25,11 +34,14 @@ class userService{
             let accessToken
             const isMatch = await bcrypt.compare(password, user.password);
             if (isMatch){
-                accessToken = jsonWebToken.generateAccess(user.id)
+                accessToken = await jsonWebToken.generateAccess(user)
+            }else{
+                throw new Error("check Id and Password again")
             }
+            console.log("at user-service, accees: ", accessToken)
             return accessToken
         }else{
-            throw Error;
+            throw new Error("no user");
         }
     }
 
@@ -59,7 +71,6 @@ class userService{
         formattedUser.image = user.image;
         formattedUser.createdAt = user.createdAt;
         formattedUser.updatedAt = user.updatedAt;
-
         return formattedUser
     }
         

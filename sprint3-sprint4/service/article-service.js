@@ -2,7 +2,7 @@ import prisma from '../lib/prisma.js'
 
 
 export class ArticleService{
-    getArticles = async(skip,take,sort,searchtitle, searchcontent) =>{
+    getArticles = async({skip, take, sort, searchtitle, searchcontent}) =>{
     
         let orderBy ;
         skip = parseInt(skip);
@@ -16,7 +16,7 @@ export class ArticleService{
             orderBy = {createdAt : 'desc'};
         }
 
-        const Articles = await prisma.Article.findMany({
+        const Articles = await prisma.article.findMany({
             skip,
             take,
             orderBy,
@@ -47,16 +47,20 @@ export class ArticleService{
     addIsLiked = async(user,article) => {
         const articleLikeList = user.articleLike;
         const likedArticleIds = [];
-        for (const articleLike of articleLikeList){
-            let articleId = articleLike.articleId;
-            likedArticles.push(article)
-        }
-
-        const articleId = Number(article.id)
-        if (likedArticleIds.includes(articleId)){
-            article.isLiked = true;
-        }else {
+        if (!articleLikeList){
             article.isLiked = false;
+        }else{
+            for (const articleLike of articleLikeList){
+                let articleId = articleLike.articleId;
+                likedArticles.push(article)
+            }
+
+            const articleId = Number(article.id)
+            if (likedArticleIds.includes(articleId)){
+                article.isLiked = true;
+            }else {
+                article.isLiked = false;
+            }
         }
         return article
     }

@@ -77,3 +77,13 @@ export async function checkProductCommentAuth(req,res,next){
         throw error
     }
 }
+
+export async function checkUserAuth(req,res,next){
+    const paramId = Number(req.params.id);
+    const userId = Number(req.user.id);
+    if (paramId == userId){
+        return next();
+    }else{
+        throw new Error("no auth")
+    }
+}
