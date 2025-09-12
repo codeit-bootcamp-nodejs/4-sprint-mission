@@ -44,7 +44,8 @@ export class ArticleService{
         return articleComment;
     }
 
-    addIsLiked = async(user,article) => {
+    addIsLiked = async(user, article) => {
+        
         const articleLikeList = user.articleLike;
         const likedArticleIds = [];
         if (!articleLikeList){

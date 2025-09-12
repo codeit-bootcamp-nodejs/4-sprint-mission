@@ -1,5 +1,5 @@
 
-
+import prisma from "../lib/prisma.js";
 
 class ArticleMiddleware{
     ArticleValid = async (req,res,next) =>{

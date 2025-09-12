@@ -36,13 +36,14 @@ export class ArticleController{
         try{
             let id = req.params.id;
             id = parseInt(id);
-            
+            const user = req.user;
+            console.log(user)
             let article = await prisma.Article.findUnique({
                 where: {id},
                 include : {comment: true}
             });
 
-            article = articleService.addIsLiked(article);
+            article = ArticleService.addIsLiked(user, article);
 
             return res.status(200).send(article);
             
@@ -115,7 +116,7 @@ export class ArticleController{
             let {take = '10',skip= '1',commentId = '1'} = req.query;
             
             data = {take, skip, commentId}
-            const articleComment =await articleService.getComment(data);
+            const articleComment =await ArticleService.getComment(data);
 
             return res.status(200).send(articleComment);
 

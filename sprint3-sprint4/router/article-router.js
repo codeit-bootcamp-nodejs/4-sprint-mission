@@ -16,6 +16,7 @@ const ArticleRouter = express.Router();
 ArticleRouter.get('/', articleController.getArticles)
 
 ArticleRouter.get('/detail/:id', 
+    passport.authenticate('AccessToken', {session:false}),
     articleMiddleware.ValidateId,
     articleController.getOneArticle)
 

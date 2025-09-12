@@ -16,8 +16,8 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
-passport.use('Access Token', accessJwtStrategy)
-passport.use('Refresh Token', refreshJwtStrategy)
+passport.use('AccessToken', accessJwtStrategy)
+passport.use('RefreshToken', refreshJwtStrategy)
 
 
 
