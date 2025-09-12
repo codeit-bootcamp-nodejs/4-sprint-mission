@@ -12,23 +12,24 @@ router
   .post(auth.verifyAccessToken, zod.CreateArticle, ArticleService.createArticles)
   .get(ArticleService.getArticles);
 
-
+//articles 수정, 삭제 라우트
 router
   .route('/articles/:articleId')
   .get(ArticleService.getArticleById)
   .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticle, ArticleService.updateArticles)  
-  .delete(ArticleService.deleteArticles);
+  .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticles);
 
-//article comments 등록, 조회 라우트
+//articleComments 등록, 조회 라우트
 router
-  .route('/articles/:articleId/comments')
+  .route('/articles/:articleId/articleComments')
   .get(ArticleService.getArticleComments)
   .post(auth.verifyAccessToken, zod.ArticleComment, ArticleService.createArticleComment)
 
+//articleComments 수정, 삭제 라우트
 router
-  .route('/articles/:articleId/comments/:commentId')
-  .patch(zod.PatchArticleComment, ArticleService.updateArticleComment)
-  .delete(ArticleService.deleteArticleComment);
+  .route('/articles/:articleId/articleComments/:articlecommentId')
+  .patch(auth.verifyAccessToken, auth.verifyUserRole, zod.PatchArticleComment, ArticleService.updateArticleComment)
+  .delete(auth.verifyAccessToken, auth.verifyUserRole, ArticleService.deleteArticleComment);
 
 
 export default router;

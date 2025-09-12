@@ -97,7 +97,7 @@ const createArticleComment = async(req, res) => {
 
 const updateArticleComment = async(req, res) => {
   const articleComments = await prisma.articleComment.update({
-    where: { id: Number(req.params.commentId) },
+    where: { id: Number(req.params.articleCommentId) },
     data: req.body,
   });
   res.status(200).send(articleComments);
@@ -105,7 +105,7 @@ const updateArticleComment = async(req, res) => {
 
 const deleteArticleComment = async(req, res) => {
   const articleComments = await prisma.articleComment.delete({
-    where: { id: Number(req.params.commentId) },
+    where: { id: Number(req.params.articleCommentId) },
   });
   res.status(204).send(articleComments);
 }

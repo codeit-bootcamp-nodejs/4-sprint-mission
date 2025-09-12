@@ -1,5 +1,9 @@
 import bcrypt from 'bcrypt';
 import { expressjwt } from 'express-jwt';
+import { PrismaClient } from '@prisma/client';
+
+import UserService from '../service/user-service.js'
+const prisma = new PrismaClient();
 
 // 비밀번호 검증 함수
 async function verifyPassword(inputPassword, password) {
@@ -19,8 +23,16 @@ const verifyAccessToken = expressjwt({
 
 // 등록 user 권한 (인가)
 const verifyUserRole = async(req, res, next) => {
-  const { id: reviewId } = req.params;
-  const review = await reviewRepository.getById(reviewId);
+  let review = null;
+  if (req.params.articleId) {
+    review = await prisma.article.findUnique({ where: { id: Number(req.params.articleId) } });
+  } else if (req.params.productId) {
+    review = await prisma.product.findUnique({ where: { id: Number(req.params.productId) } });
+  } else if (req.params.articleCommentId) {
+    review = await prisma.articleComment.findUnique({ where: { id: Number(req.params.articleCommentId) } });
+  } else if (req.params.productCommentId) {
+    review = await prisma.productComment.findUnique({ where: { id: Number(req.params.productCommentId) } });
+  }
   if (review.userId !== req.user.userId) {
     const error = new Error('작성자만 수정할 수 있습니다')
     throw error

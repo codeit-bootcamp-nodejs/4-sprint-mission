@@ -101,7 +101,7 @@ const createProductComment = async(req, res) => {
 
 const updateProductComment = async(req, res) => {
   const productComments = await prisma.productComment.update({
-    where: { id: Number(req.params.commentId) },
+    where: { id: Number(req.params.productCommentId) },
     data: req.body,
   });
   res.status(200).send(productComments);
@@ -109,7 +109,7 @@ const updateProductComment = async(req, res) => {
 
 const deleteProductComment = async(req, res) => {
   const productComments = await prisma.productComment.delete({
-    where: { id: Number(req.params.commentId) },
+    where: { id: Number(req.params.productCommentId) },
   });
   res.status(204).send(productComments);
 }
