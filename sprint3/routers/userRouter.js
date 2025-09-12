@@ -1,6 +1,7 @@
 import express from "express";
 import passport from "../lib/passport/index.js";
 import {
+  getLikedProducts,
   getUser,
   getUserProduct,
   patchPassword,
@@ -28,4 +29,10 @@ router
     getUserProduct
   );
 
+router
+  .route("/like-products")
+  .get(
+    passport.authenticate("access-token", { session: false }),
+    getLikedProducts
+  );
 export default router;

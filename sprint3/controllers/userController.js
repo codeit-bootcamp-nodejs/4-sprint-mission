@@ -1,4 +1,5 @@
 import {
+  findLikedProducts,
   findUser,
   findUserProduct,
   updatePassword,
@@ -47,6 +48,16 @@ export const getUserProduct = async (req, res, next) => {
     const userProduct = await findUserProduct(req.user.id);
 
     res.status(200).json(userProduct);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getLikedProducts = async (req, res, next) => {
+  try {
+    const products = await findLikedProducts(req.user.id);
+
+    res.status(200).json(products);
   } catch (err) {
     next(err);
   }

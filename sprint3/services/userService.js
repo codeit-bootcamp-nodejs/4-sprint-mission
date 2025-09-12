@@ -94,3 +94,28 @@ export const findUserProduct = async (id) => {
     throw err;
   }
 };
+
+export async function findLikedProducts(userId) {
+  const products = await prisma.product.findMany({
+    where: {
+      like: {
+        some: {
+          userId,
+        },
+      },
+    },
+    include: {
+      user: {
+        select: { id: true, nickname: true },
+      },
+      _count: {
+        select: { like: true },
+      },
+    },
+  });
+
+  return products.map((product) => ({
+    ...product,
+    isLiked: true,
+  }));
+}
