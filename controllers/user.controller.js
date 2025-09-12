@@ -131,7 +131,6 @@ export async function refreshController(req, res, next) {
 
     res.status(200).json({
       message: "토큰 재발급 성공",
-      success: true,
       accesToken: newAccessToken,
     });
   } catch (err) {
@@ -150,7 +149,6 @@ export async function listupController(req, res, next) {
 
     // 응답
     res.status(200).json({
-      success: true,
       message: "등록한 상품 목록 조회 성공",
       data: listup,
     });
