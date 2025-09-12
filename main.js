@@ -7,7 +7,7 @@ import productRouter from './src/routes/product.route.js';
 import articleRouter from './src/routes/article.route.js';
 import imageRouter from './src/routes/image.route.js';
 import userRouter from './src/route/user-router.js';
-import { errorHandler } from './src/middleware/error-handler-.js';
+import { errorHandler } from './src/middleware/index.js';
 
 dotenv.config();
 
