@@ -38,9 +38,37 @@ async function remove(productId){
     throw error;
   }
 }
+
+async function like(userId, productId){
+  try{
+    const existingLike = await prisma.articleLike.findUnique({
+      where: {
+        userId_articleId : {
+           userId,
+           productId, 
+          }
+      },
+    });
+
+    let isLiked 
+
+    if(existedLike){
+      await prisma.productLike.delete({ where: { id: existingLike.id}});
+      isLiked = false;
+    } else{
+      await prisma.productLike.create({ data: { userId, productId }});
+      isLiked = true;
+    }
+    return { message: isLiked ? 'Like added successfully' : 'Like removed successfully' }
+  } catch(error){
+    next(error);
+  }
+}
   
 export default {
   register,
   update,
   remove,
+  like,
+  
 }

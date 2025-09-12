@@ -79,24 +79,28 @@ const deleteComment = async(req, res, next) => {
 const controlLike = async(req, res, next) => {
   try {
     const userId = req.user.id;
-    const { articleId } = req.body;
-    const isLiked = await articleService.like(userId, articleId);
-    if (isLiked) {
-      res.status(201).json({ message: 'Like added successfully.', isLiked: true });
-    } else {
-      res.status(200).json({ message: 'Like removed successfully.', isLiked: false });
-    }
+    const articleId  = +req.body.articleId;
+    const likeStatus = await articleService.like(userId, articleId);
+    res.status(200).json(likeStatus);
   } catch(error){
     next(error);
   }
 }
 
-//path: http://localhost:3000/aritcles
-//좋아요를 눌렀는지 안 눌렀는지... 그러면 이건 쿼리로 sort=
-
+// 아직 파악 못함 
+const getArticleListWithLike = async(req, res, next) => {
+  try{
+    const userId = req.user.id;
+    const articleList = await articleService.articleList(userId);
+    res.status(200).json( articleList );
+  } catch(error){
+    next(error);
+  }
+}
 
 articleRouter.route('/')
  .post(passport.authenticate('access-token', { session: false}), createArticle)
+ .get(passport.authenticate('access-token', { session: false}), getArticleListWithLike)
 
 articleRouter.route('/:articleId')
  .patch(passport.authenticate('access-token', { session: false }),checkArticleOwner,patchArticle)

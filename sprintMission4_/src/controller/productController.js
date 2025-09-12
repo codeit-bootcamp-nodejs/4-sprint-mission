@@ -76,6 +76,19 @@ const deleteComment = async (req, res, next) => {
   }
 };
 
+
+const controlLike = async(req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const productId  = +req.body.productId;
+    const likeStatus = await articleService.like(userId, productId);
+    res.status(200).json(likeStatus);
+  } catch(error){
+    next(error);
+  }
+}
+
+
 productRouter.route('/')
   .post(passport.authenticate('access-token', { session: false}),createProduct);
 
@@ -89,5 +102,6 @@ productRouter.route('/:productId/comments')
 productRouter.route('/:productId/comments/:commentId')
   .patch(passport.authenticate('access-token', { session: false }), checkProductCommentOwner, patchComment)
   .delete(passport.authenticate('access-token', { session: false }), checkProductCommentOwner, deleteComment)
-  
+
+productRouter.post('/:productId/likes',passport.authenticate('access-token', { session: false}), controlLike)
 export default productRouter

@@ -39,7 +39,7 @@ async function remove(articleId){
 
 async function like(userId, articleId){
   try{
-    const existedLike = await prisma.articleLike.findUnique({
+    const existingLike = await prisma.articleLike.findUnique({
       where: {
         userId_articleId : {
            userId,
@@ -48,15 +48,41 @@ async function like(userId, articleId){
       },
     });
 
+    let isLiked 
+
     if(existedLike){
-      await prisma.articleLike.delete({ where: { id: existedLike.id}});
-      return false;
+      await prisma.articleLike.delete({ where: { id: existingLike.id}});
+      isLiked = false;
     } else{
-      await prisma.articleLike.create({ data: { userId, articleId }})
-      return true;
+      await prisma.articleLike.create({ data: { userId, articleId }});
+      isLiked = true;
     }
+    return { message: isLiked ? 'Like added successfully' : 'Like removed successfully' }
   } catch(error){
     next(error);
+  }
+}
+
+async function articleList (userId){
+  try{
+    const articles = await prisma.article.findMany();
+
+    const articleWithLike = await Promise.all(
+      articles.map(async (article) => {
+         const isLiked = await prisma.articleLike.findUnique({
+          where: {
+            userId_articleId: {
+              userId,
+              articleId: article.id,
+            }
+          }
+         });
+         return { ...article, isLiked: !!isLiked };
+      })
+    );
+    return articleWithLike
+  } catch(error){
+    throw error;
   }
 }
 
@@ -67,5 +93,5 @@ export default {
   update,
   remove,
   like,
-  getArticleList
+  articleList
 }
