@@ -2,6 +2,8 @@ import bcrypt from "bcrypt";
 import type { UserData } from "../types/user.js";
 import type { CustomError } from "../types/error.js";
 import * as MypageRepository from "../repositories/MypageRepository.js";
+import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
+import type { Prisma } from "@prisma/client";
 
 const MypageService = {
   async getUser(userId: number) {
@@ -10,19 +12,31 @@ const MypageService = {
     if (!user) {
       const error: CustomError = new Error("사용자를 찾을 수 없습니다.");
       error.statusCode = 404;
+      throw error;
     }
 
     return user;
   },
 
-  async updateUser(userId: number, updateData: UserData) {
-    const updatedUser = await MypageRepository.update(userId, updateData);
+  async updateUser(userId: number, updateData: UpdateUserDTO) {
+    const dataToUpdate: Prisma.UserUpdateInput = {};
+
+    if (updateData.nickname !== undefined) {
+      dataToUpdate.nickname = updateData.nickname;
+    }
+
+    if (updateData.image !== undefined) {
+      dataToUpdate.nickname = updateData.image;
+    }
+
+    const updatedUser = await MypageRepository.update(userId, dataToUpdate);
 
     const { password, refreshToken, ...UserData } = updatedUser;
     return UserData;
   },
 
-  async updatePassword(userId: number, oldPassword: string, newPassword: string) {
+  async updatePassword(userId: number, updatePasswordDTO: UpdatePasswordDTO) {
+    const { oldPassword, newPassword } = updatePasswordDTO;
     const user = await MypageRepository.findUserForAuth(userId);
 
     if (!user) {

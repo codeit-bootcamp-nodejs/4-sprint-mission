@@ -1,5 +1,6 @@
 import MypageService from "../services/MypageService.js";
 import type { Request, Response, NextFunction } from "express";
+import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
 
 const MypageController = {
   async getUser(req: Request, res: Response, next: NextFunction) {
@@ -16,7 +17,7 @@ const MypageController = {
   async updateUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const updateData = req.body;
+      const updateData: UpdateUserDTO = req.body;
       const updatedUser = await MypageService.updateUser(userId, updateData);
       res.status(201).json(updatedUser);
     } catch (err) {
@@ -27,9 +28,9 @@ const MypageController = {
   async updatePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const { oldPassword, newPassword } = req.body;
+      const updatePasswordData: UpdatePasswordDTO = req.body;
 
-      await MypageService.updatePassword(userId, oldPassword, newPassword);
+      await MypageService.updatePassword(userId, updatePasswordData);
       res.status(201).json("비밀번호 변경이 완료되었습니다.");
     } catch (err) {
       next(err);

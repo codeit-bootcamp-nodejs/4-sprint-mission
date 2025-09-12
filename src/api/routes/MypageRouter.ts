@@ -1,11 +1,14 @@
 import express from "express";
 import authenticate from "../middlewares/authenticate.js";
 import MypageController from "../controllers/MypageController.js";
+import validate from "../middlewares/validate.js";
+import { updateUserSchema, updatePasswordSchema } from "../types/dtos/mypage.dto.js";
+
 const router = express.Router();
 
 router.get("/", authenticate, MypageController.getUser);
-router.patch("/", authenticate, MypageController.updateUser);
-router.patch("/password", authenticate, MypageController.updatePassword);
+router.patch("/", authenticate, validate(updateUserSchema), MypageController.updateUser);
+router.patch("/password", authenticate, validate(updatePasswordSchema), MypageController.updatePassword);
 router.get("/products", authenticate, MypageController.getProducts);
 router.get("/like-products", authenticate, MypageController.getLikeProducts);
 
