@@ -1,7 +1,6 @@
 import express from 'express';
 import commentRouter from './comment.route.js';
-import { authMiddleware } from '../middleware/auth-middleware.js';
-import { authOptionalMiddleware } from '../middleware/auth-optional-middleware.js';
+import { authMiddleware, authOptionalMiddleware } from '../middleware/index.js';
 
 const productRouter = (
   productController,
