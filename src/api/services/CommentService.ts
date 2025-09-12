@@ -1,9 +1,11 @@
 import type { CustomError } from "../types/error.js";
-import type { CreateCommentData, UpdateCommentData, FindManyCommentParams } from "../types/comment.js";
+import type { FindManyCommentParams } from "../types/comment.js";
 import * as CommentRepository from "../repositories/CommentRepository.js";
+import type { CommentDto } from "../types/dtos/comment.dto.js";
 
 const CommentService = {
-  async createComment({ content, productId, articleId, userId }: CreateCommentData) {
+  async createComment(data: CommentDto & { userId: number }) {
+    const { content, productId, articleId, userId } = data;
     const newComment = await CommentRepository.create({
       content,
       ...(productId && { product: { connect: { id: productId } } }),
@@ -13,7 +15,7 @@ const CommentService = {
     return newComment;
   },
 
-  async updateComment(id: number, updateData: UpdateCommentData, userId: number) {
+  async updateComment(id: number, updateData: CommentDto, userId: number) {
     const comment = await CommentRepository.findById(id);
 
     if (!comment) {

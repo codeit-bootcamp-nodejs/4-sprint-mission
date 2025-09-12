@@ -1,24 +1,15 @@
 import CommentService from "../services/CommentService.js";
 import type { Request, Response, NextFunction } from "express";
+import type { CommentDto } from "../types/dtos/comment.dto.js";
 
 const CommentController = {
   async createComment(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const { content, productId, articleId } = req.body;
-
-      if (!content || (!productId && !articleId)) {
-        return res.status(400).json({ error: "댓글과 게시글 ID는 필수값" });
-      }
-
-      if (productId && articleId) {
-        return res.status(400).json({ error: "productId 혹은 articleId 둘 중 하나만 있어야 함" });
-      }
+      const commentData: CommentDto = req.body;
 
       const newComment = await CommentService.createComment({
-        content,
-        productId,
-        articleId,
+        ...commentData,
         userId,
       });
       res.status(201).json(newComment);
@@ -35,7 +26,7 @@ const CommentController = {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
-      const updateData = req.body;
+      const updateData: CommentDto = req.body;
 
       const comment = await CommentService.updateComment(Number(id), updateData, userId);
       res.status(201).json(comment);
