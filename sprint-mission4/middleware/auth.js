@@ -43,8 +43,16 @@ const verifyUserRole = async(req, res, next) => {
   return next()
 };
 
+//refresh token 재발급
+const verifyRefreshToken = expressjwt({
+  secret: process.env.JWT_SECRET,
+  algorithms: ['HS256'],
+  getToken: (req) => req.cookies.refreshToken,
+});
+
 export default { 
   verifyPassword,
   verifyAccessToken,
-  verifyUserRole
+  verifyUserRole,
+  verifyRefreshToken
  };

@@ -65,6 +65,7 @@ model User {
   nickname       String
   image          String?
   password       String
+  refreshToken   String?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   Products       Product[]

@@ -25,5 +25,8 @@ router
   .route('/users/:userId/products')
   .get(auth.verifyAccessToken, auth.verifyUserRole, UserService.getProductsByUserId)
 
+router
+  .route('/token/refresh')
+  .post(auth.verifyRefreshToken, )
 
 export default router;

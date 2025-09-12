@@ -55,7 +55,9 @@ const updateUsers = async(req, res) => {
       password: hashedPassword,
     }
   });
-  res.status(200).send(user);
+  const accessToken = await token.createToken(user);
+  const refreshToken = await token.createToken(user, 'refresh');
+  res.status(200).send({ accessToken, refreshToken });
 };
 
 // 로그인
@@ -66,7 +68,14 @@ const login = async(req, res) => {
   });
   await auth.verifyPassword(password, user.password);
   const accessToken = await token.createToken(user);
-  res.status(200).send({ accessToken });
+  const refreshToken = await token.createToken(user, 'refresh');
+  //cookie-header로 refreshToken response
+  res.cookie('refreshToken', refreshToken, { 
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true
+    });
+    return res.json({ accessToken });
 };
 
 const getProductsByUserId = async(req, res) => {
@@ -84,10 +93,26 @@ const getProductsByUserId = async(req, res) => {
   res.status(200).send(products);
 }
 
+const refreshToken = async (req, res, next) => {
+  const { refreshToken } = req.cookies
+  const userId = req.user.userId;
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  })
+  if (!user || user.refreshToken !== refreshToken) {
+    const error = new Error("Unauthorized");
+    error.code = 401;
+    throw error;
+  }
+  const newAccessToken = createToken(user, "access");
+  return res.json({ accessToken: newAccessToken });
+}
+
 export default { 
   getUserById, 
   createUsers, 
   updateUsers,
   login,
   getProductsByUserId,
+  refreshToken
 };
