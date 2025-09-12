@@ -1,9 +1,10 @@
 import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../types/article.js";
 import type { CustomError } from "../types/error.js";
 import * as ArticleRepository from "../repositories/ArticleRepository.js";
+import type { ArticleDto } from "../types/dtos/article.dto.js";
 
 const ArticleService = {
-  async createArticle(articleData: CreateArticleData, userId: number) {
+  async createArticle(articleData: ArticleDto, userId: number) {
     const newArticle = await ArticleRepository.create({
       ...articleData,
       user: { connect: { id: userId } },
@@ -28,7 +29,7 @@ const ArticleService = {
     return { ...article, isLiked: !!like };
   },
 
-  async updateArticle(id: number, updateData: UpdateArticleData, userId: number) {
+  async updateArticle(id: number, updateData: ArticleDto, userId: number) {
     const article = await ArticleRepository.findById(id);
 
     if (!article) {

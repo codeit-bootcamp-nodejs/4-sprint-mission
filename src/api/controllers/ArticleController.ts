@@ -3,16 +3,13 @@ import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import env from "../config/env.js";
 import type { CustomError } from "src/api/types/error.js";
+import type { ArticleDto } from "../types/dtos/article.dto.js";
 
 const ArticleController = {
   async createArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const { title, content } = req.body;
-      if (!title || !content) {
-        return res.status(400).send("제목과 게시글을 입력해주세요.");
-      }
-      const articleData = { title, content };
+      const articleData: ArticleDto = req.body;
       const newArticle = await ArticleService.createArticle(articleData, userId);
 
       res.status(201).json(newArticle);
@@ -53,7 +50,7 @@ const ArticleController = {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
-      const updateData = req.body;
+      const updateData: ArticleDto = req.body;
       const article = await ArticleService.updateArticle(Number(id), updateData, userId);
       res.status(201).json(article);
     } catch (err) {
