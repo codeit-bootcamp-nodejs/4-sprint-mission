@@ -3,12 +3,11 @@ import env from "../config/env.js";
 import { hashing, compareWords } from "../libs/hashing.js";
 import { generateTokens } from "../libs/token.js";
 import type { CustomError } from "src/api/types/error.js";
-import type { SignupData } from "src/api/types/signup.js";
-import type { loginData } from "src/api/types/login.js";
 import * as AuthRepository from "../repositories/AuthRepository.js";
+import type { SignupDto, LoginDto } from "../types/dtos/user.dto.js";
 
 const AuthService = {
-  async signup(signupData: SignupData) {
+  async signup(signupData: SignupDto) {
     // 이메일로 이미 존재하는 사용자인지 확인
     const existingUser = await AuthRepository.findByEmail(signupData.email);
 
@@ -19,17 +18,20 @@ const AuthService = {
     }
 
     // 사용자 생성 전 비밀번호 해싱
-    const { email, nickname, password } = signupData;
-    const hashedPassword = await hashing(password);
+    const hashedPassword = await hashing(signupData.password);
 
     // 사용자 생성
-    const newUser = await AuthRepository.create(signupData);
+    const newUser = await AuthRepository.create({
+      email: signupData.email,
+      password: hashedPassword,
+      nickname: signupData.nickname,
+    });
 
     const { password: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
   },
 
-  async login(loginData: loginData) {
+  async login(loginData: LoginDto) {
     // 이메일로 존재하는 사용자인지 확인
     const user = await AuthRepository.findByEmail(loginData.email);
 

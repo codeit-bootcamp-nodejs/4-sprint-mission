@@ -1,8 +1,7 @@
 import express from "express";
 import AuthController from "../controllers/AuthController.js";
 import validate from "../middlewares/validate.js";
-import { signupSchema, loginSchema } from "../middlewares/validators/validateUser.js";
-
+import { loginSchema, signupSchema } from "../types/dtos/user.dto.js";
 const router = express.Router();
 
 router.post("/signup", validate(signupSchema), AuthController.signup);
