@@ -12,5 +12,6 @@ const router = Router();
 router.post("/", authMiddleware, PostRegisterController);
 router.put("/:postId", authMiddleware, PostPutController);
 router.delete("/:postId", authMiddleware, PostDeleteController);
-router.get("/", authMiddleware, PostListController)
+router.get("/", authMiddleware, PostListController);
+
 export default router;

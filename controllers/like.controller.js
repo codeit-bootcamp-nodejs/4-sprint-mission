@@ -21,8 +21,10 @@ export async function likeProductController(req, res, next) {
     // 서비스 로직
     const createdLike = await likeProductService(userId, productId);
 
+    const isAdded = createdLike.message === "좋아요 추가";
+
     res.status(200).json({
-      message: "좋아요 추가",
+      message: isAdded ? "좋아요 추가" : "좋아요 취소",
       data: createdLike,
     });
   } catch (err) {
@@ -39,8 +41,10 @@ export async function likePostController(req, res, next) {
     // 서비스 로직
     const createdLikePost = await likePostService(userId, postId);
 
+    const isAdded = createdLikePost.message === "좋아요 추가";
+
     res.status(200).json({
-      message: "좋아요 추가",
+      message: isAdded ? "좋아요 추가" : "좋아요 취소",
       data: createdLikePost,
     });
   } catch (err) {

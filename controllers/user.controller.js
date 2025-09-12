@@ -67,7 +67,6 @@ export async function inquiryController(req, res, next) {
       message: "내 정보 조회 성공",
       user: inquiryUser,
     });
-    console.log("req.user:", req.user);
   } catch (err) {
     next(err);
   }

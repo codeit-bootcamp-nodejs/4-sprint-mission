@@ -12,4 +12,5 @@ router.post("/", authMiddleware, ProductRegisterController);
 router.put("/:productId", authMiddleware, ProductPutController);
 router.delete("/:productId", authMiddleware, ProductDeleteController);
 router.get("/", authMiddleware, ProductListupController);
+
 export default router;

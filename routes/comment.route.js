@@ -14,5 +14,6 @@ router.post("/products", authMiddleware, CommentRegisterProductController);
 router.post("/posts", authMiddleware, CommentRegisterPostController);
 router.put("/:commentId", authMiddleware, CommentPutController);
 router.delete("/:commentId", authMiddleware, CommentDeleteController);
-router.get("/", authMiddleware, CommentListController)
+router.get("/", authMiddleware, CommentListController);
+
 export default router;

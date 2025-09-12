@@ -11,9 +11,6 @@ export function authMiddleware(req, res, next) {
     // "Bearer 토큰값" 형태 에서 "토큰값"만 분리
     const token = authHeader.split(" ")[1];
 
-    console.log("JWT_SECRET in middleware:", process.env.JWT_SECRET);
-    console.log("받은 token:", token);
-
     // 토큰 검증 ( 비밀키는 .env에 저장)
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 

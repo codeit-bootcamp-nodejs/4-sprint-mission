@@ -17,15 +17,18 @@ export async function likeProductService(userId, productId) {
       where: { id: existingLike.id },
     });
       return { message: "좋아요 취소" };
-  }
-
-  const createdLike = await prisma.like.create({
+  } else { 
+    const createdLike = await prisma.like.create({
     data: {
       userId,
       productId,
     },
   });
-  return createdLike;
+    return {
+      message: "좋아요 추가",
+      data: createdLike,
+    }
+    }
 }
 
 // 로그인한 유저는 게시글에 '좋아요'와 '좋아요 취소' 가능
@@ -44,16 +47,19 @@ export async function likePostService(userId, postId) {
     await prisma.like.delete({
       where: { id: existingLike.id },
     });
-    return res.json({ message: "좋아요 삭제" });
-  }
-
-  const createdLikePost = await prisma.like.create({
+    return { message: "좋아요 취소" };
+  } else {
+    const createdLikePost = await prisma.like.create({
     data: {
       userId,
       postId,
     },
   });
-  return createdLikePost;
+  return {
+    message: "좋아요 추가",
+    data: createdLikePost
+  }
+  }
 }
 
 // 상품 또는 게시글을 조회할 때, 유저가 '좋아요'를 누른 항목인지 확인할 수 있도록 isLiked와 같은 불린형 필드를 리스폰스 객체에 포함시켜 리스폰스해 주세요.
@@ -70,7 +76,9 @@ export async function guessLikedProductService(userId, productId) {
   });
 
   if (!listup) {
-    return res.status(404).json({ message: "상품을 찾을 수 없습니다." });
+    const error = new Error("상품을 찾을 수 없습니다.")
+    error.status = 404;
+    throw error;
   }
 
   // 좋아요 여부 확인 (이해 못함)
@@ -123,6 +131,7 @@ export async function likeProductListService(userId) {
       Product: {
         select: {
           id: true,
+          title: true,
           content: true,
         },
       },
