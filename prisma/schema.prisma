@@ -1,45 +1,132 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
+// 유저 모델
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String
+  image     String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 유저가 작성한 상품들
+  products Product[]
+  
+  // 유저가 작성한 게시글들
+  posts    Post[]
+  
+  // 유저가 작성한 댓글들
+  comments Comment[]
+  
+  // 유저가 좋아요한 상품들
+  productLikes ProductLike[]
+  
+  // 유저가 좋아요한 게시글들
+  postLikes    PostLike[]
+  
+  // 리프레시 토큰
+  refreshTokens RefreshToken[]
+}
+
+// 상품 모델
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String
-  description String
+  title       String
+  content     String
+  image       String?
   price       Int
-  tags        String[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  comments    Comment[] @relation("ProductComments")
+  
+  // 상품 작성자
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    Int
+  
+  // 상품에 달린 댓글들
+  comments    Comment[]
+  
+  // 상품 좋아요
+  likes       ProductLike[]
 }
 
-model Article {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  comments  Comment[] @relation("ArticleComments")
+// 게시글 모델
+model Post {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 게시글 작성자
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    Int
+  
+  // 게시글에 달린 댓글들
+  comments    Comment[]
+  
+  // 게시글 좋아요
+  likes       PostLike[]
 }
 
+// 댓글 모델
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
+  id          Int      @id @default(autoincrement())
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 댓글 작성자
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId    Int
+  
+  // 상품 댓글인 경우
+  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId   Int?
+  
+  // 게시글 댓글인 경우
+  post        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId      Int?
+}
+
+// 상품 좋아요 모델
+model ProductLike {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, productId])
+}
 
-  // Relations
-  productId Int?
-  product   Product? @relation("ProductComments", fields: [productId], references: [id], onDelete: Cascade)
+// 게시글 좋아요 모델
+model PostLike {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  createdAt DateTime @default(now())
+  
+  @@unique([userId, postId])
+}
 
-  articleId Int?
-  article   Article? @relation("ArticleComments", fields: [articleId], references: [id], onDelete: Cascade)
+// 리프레시 토큰 모델
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
 }

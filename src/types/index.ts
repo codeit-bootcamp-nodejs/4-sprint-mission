@@ -30,7 +30,7 @@ export interface PaginationQuery {
 // 정렬 타입
 export interface SortQuery {
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 // 공통 쿼리 파라미터 타입

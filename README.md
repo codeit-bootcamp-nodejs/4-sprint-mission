@@ -1,29 +1,67 @@
-# 중고 마켓 & 게시판 API 서버
+# 토큰 기반 유저 인증/인가 API 시스템
 
-중고 마켓과 커뮤니티 게시판 애플리케이션을 위한 API 서버입니다.
+Node.js, Express, TypeScript, Prisma를 사용한 JWT 기반 인증/인가 시스템입니다.
 
-## 주요 기능
+## 🚀 구현된 기능
 
-- **중고 마켓:**
-  - 상품 CRUD (생성, 조회, 수정, 삭제)
-  - 페이지네이션, 검색, 정렬 기능이 포함된 상품 목록 조회
-  - 상품 이미지 업로드
-- **커뮤니티 게시판:**
-  - 게시글 CRUD
-  - 페이지네이션, 검색, 정렬 기능이 포함된 게시글 목록 조회
-- **댓글:**
-  - 상품과 게시글에 댓글 추가 기능
-  - 댓글 CRUD
-  - 커서 기반 페이지네이션을 사용한 댓글 목록 조회
+### 기본 요구사항
+- ✅ JWT Access Token 기반 인증
+- ✅ 회원가입/로그인 API
+- ✅ 비밀번호 해싱 (bcrypt)
+- ✅ 상품/게시글/댓글 CRUD + 인가
+- ✅ 유저 정보 관리
 
+### 심화 요구사항  
+- ✅ Refresh Token 구현
+- ✅ 상품/게시글 좋아요 기능
+- ✅ Prisma 관계형 데이터베이스
+- ✅ isLiked 필드로 좋아요 상태 표시
 
-## 배포
+## 🛠 기술 스택
 
-이 프로젝트는 [Render](https://splint-mission-3.onrender.com/)에 배포할 수 있도록 설정되어 있습니다.
+- **언어**: TypeScript
+- **프레임워크**: Node.js + Express
+- **데이터베이스**: SQLite + Prisma ORM
+- **인증**: JWT + bcrypt
 
-`render-build.sh` 스크립트가 빌드 및 배포 과정을 처리합니다:
-1.  의존성 설치 (`npm install`).
-2.  데이터베이스 마이그레이션 적용 (`npm run prisma:deploy`).
-3.  데이터베이스 시딩 (`npm run prisma:seed`).
+서버: `http://localhost:3000`
 
-Render 대시보드에서 시작 명령어는 `npm start`로 설정해야 합니다.
+## 📖 주요 API
+
+### 인증
+- `POST /api/auth/signup` - 회원가입
+- `POST /api/auth/login` - 로그인
+- `POST /api/auth/refresh` - 토큰 갱신
+- `POST /api/auth/logout` - 로그아웃
+
+### 유저
+- `GET /api/users/me` - 내 정보 조회
+- `PUT /api/users/me` - 내 정보 수정
+- `PUT /api/users/me/password` - 비밀번호 변경
+
+### 상품/게시글
+- `GET /api/products` - 목록 조회
+- `POST /api/products` - 등록 (인증 필요)
+- `PUT /api/products/:id` - 수정 (작성자만)
+- `DELETE /api/products/:id` - 삭제 (작성자만)
+- `POST /api/products/:id/like` - 좋아요/취소
+
+게시글 API(`/api/posts`)도 동일한 패턴으로 구현됨
+
+## 🔐 인증/인가
+
+- **Access Token**: 1시간, API 요청 인증용
+- **Refresh Token**: 7일, 토큰 갱신용
+- **권한**: 비인증(조회만) → 인증(CRUD) → 작성자(수정/삭제)
+
+## 📁 프로젝트 구조
+
+```
+src/
+├── types/          # TypeScript 타입 정의
+├── controllers/    # API 컨트롤러
+├── middleware/     # 인증 미들웨어  
+├── routes/         # 라우터
+├── utils/          # 유틸리티
+└── app.ts         # 메인 애플리케이션
+```
