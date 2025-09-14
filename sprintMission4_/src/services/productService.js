@@ -41,9 +41,9 @@ async function remove(productId){
 
 async function like(userId, productId){
   try{
-    const existingLike = await prisma.articleLike.findUnique({
+    const existingLike = await prisma.productLike.findUnique({
       where: {
-        userId_articleId : {
+        userId_productId : {
            userId,
            productId, 
           }
@@ -61,7 +61,7 @@ async function like(userId, productId){
     }
     return { message: isLiked ? 'Like added successfully' : 'Like removed successfully' }
   } catch(error){
-    next(error);
+    throw(error);
   }
 }
 
@@ -91,14 +91,18 @@ async function productList (userId){
 }
 
 async function likedProduct (userId){
-  const likedProducts = await prisma.productLike.findUnique({
-    where: userId,
-    include: {
-      product: true, 
-    },
-  });
+  try{
+    const likedProducts = await prisma.productLike.findMany({
+      where: { userId },
+      include: {
+        product: true, 
+      },
+    });
 
-  return likedProducts;
+    return likedProducts.map((productList) => productList.product) ;
+  } catch(error){
+    throw error;
+  }
 }
 
 export default {
