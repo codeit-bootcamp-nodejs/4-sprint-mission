@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
 import userRepository from '../repositories/userRepository.js';
+import jwt from 'jsonwebtoken';
 
 async function hashingPassword(password) {
     return bcrypt.hash(password, 10);
@@ -32,7 +33,7 @@ function filterSensitiveUserData(user) {
         error.code = 401;
         throw error;
     }
-    verifyPassword(password, user.password);
+    await verifyPassword(password, user.password);
     return filterSensitiveUserData(user);
  }
 
@@ -44,9 +45,33 @@ async function verifyPassword(inputPassword, savedpassword) { //isValid: 유효�
         throw error;
     }
  } 
+////////////////////////////////////////////////////////////
+async function createToken(user) {
+  const payload = { userId: user.id };
+  const options = { expiresIn: '1h' };
+  return jwt.sign(payload, process.env.JWT_SECRET, options);
+}
+
+/////////////////////////////////////////////////////////////////
+async function getUserById(id) {
+    const user = await userRepository.findById(id);
+
+    if (!user) {
+        const error = new Error('Not Found');
+        error.code = 404;
+        throw error;
+    }
+
+    return filterSensitiveUserData(user);
+}
+
+
+
 
 export default {
     createUser,
     getUser,
     verifyPassword,
+    createToken,
+    getUserById,
 };
