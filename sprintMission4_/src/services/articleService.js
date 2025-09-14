@@ -63,30 +63,30 @@ async function like(userId, articleId){
   }
 }
 
-async function articleList (userId){
-  try{
+async function articleList(userId) {
+  try {
     const articles = await prisma.article.findMany();
 
-    const articleWithLike = await Promise.all(
-      articles.map(async (article) => {
-         const isLiked = await prisma.articleLike.findUnique({
+    const articlesWithLike = await Promise.all(
+      articles.map(async(article) => {
+        const like = await prisma.articleLike.findUnique({
           where: {
             userId_articleId: {
               userId,
               articleId: article.id,
-            }
-          }
-         });
-         return { ...article, isLiked: !!isLiked };
+            },
+          },
+        });
+
+        return { article, isLiked: Boolean(like) };
       })
     );
-    return articleWithLike
-  } catch(error){
+
+    return articlesWithLike;
+  } catch (error) {
     throw error;
   }
 }
-
-
 
 export default {
   register,

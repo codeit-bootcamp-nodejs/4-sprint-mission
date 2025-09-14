@@ -64,11 +64,48 @@ async function like(userId, productId){
     next(error);
   }
 }
-  
+
+async function productList (userId){
+  try{ 
+    const products = await prisma.product.findMany();
+
+    const productWithLike = await Promise.all(
+      products.map(async(product) => {
+        const like = await prisma.productLike.findUnique({
+          where: {
+            userId_productId: {
+              userId,
+              productId : product.id,
+            },
+          }
+        });
+      
+
+        return { product, isLike: Boolean(like)}
+      })
+    );
+    return productWithLike;
+  } catch(error){
+    throw error;
+  }  
+}
+
+async function likedProduct (userId){
+  const likedProducts = await prisma.productLike.findUnique({
+    where: userId,
+    include: {
+      product: true, 
+    },
+  });
+
+  return likedProducts;
+}
+
 export default {
   register,
   update,
   remove,
   like,
-  
+  productList,
+  likedProduct
 }

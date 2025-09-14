@@ -46,6 +46,8 @@ const getUserProduct = async (req, res, next) => {
     next(error);
   }
 }
+
+
 userRouter.route('/')
   .get(passport.authenticate('access-token',{ session: false }), getUser)
   .patch(passport.authenticate('access-token',{ session: false }), updateUser)

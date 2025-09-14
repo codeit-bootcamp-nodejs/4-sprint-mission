@@ -87,7 +87,6 @@ const controlLike = async(req, res, next) => {
   }
 }
 
-// 아직 파악 못함 
 const getArticleListWithLike = async(req, res, next) => {
   try{
     const userId = req.user.id;

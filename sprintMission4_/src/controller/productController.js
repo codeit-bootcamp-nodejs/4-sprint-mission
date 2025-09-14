@@ -88,9 +88,31 @@ const controlLike = async(req, res, next) => {
   }
 }
 
+const getProductListWithLike = async(req,res,next) => {
+  try{
+    const userId = req.user.id;
+    const productList = await productService.productList(userId)
+    res.status(200).json( productList );
+  } catch(error){
+    next(error);
+  }
+}
+
+//유저가 '좋아요'를 표시한 상품의 목록을 조회하는 기능을 구현합니다.
+const getLikedProduct = async(req, res, next) => {
+  try{
+    const userId = req.user.id;
+    const likedProducts = await productService.likedProduct(userId);
+    res.status(200).json(likedProducts)
+  } catch(error){
+    next(error);
+  }
+}
 
 productRouter.route('/')
-  .post(passport.authenticate('access-token', { session: false}),createProduct);
+  .post(passport.authenticate('access-token', { session: false}),createProduct)
+  .get(passport.authenticate('access-token', { session: false}), getProductListWithLike)
+  .get(passport.authenticate('access-token', { session: false}), getLikedProduct)
 
 productRouter.route('/:productId')
   .patch(passport.authenticate('access-token', { session: false }),checkProductOwner,patchProduct)
