@@ -1,0 +1,35 @@
+GET http://localhost:3000/product
+
+# GET http://localhost:3000/product/detail/:id
+    
+
+# POST http://localhost:3000/product
+
+
+# PATCH http://localhost:3000/product/detail/:id
+   
+
+# DELETE http://localhost:3000/product/detail/:id
+   
+
+
+
+# //like feature
+# POST http://localhost:3000/product/detail/:id
+    
+
+# DELETE http://localhost:3000/product/detail/:id
+    
+
+
+# //Product Comment API 라우팅
+# GET http://localhost:3000/product/comments
+    
+# POST http://localhost:3000/product/detail/:id/comment
+   
+
+# PATCH http://localhost:3000/product/detail/:id/comment/:commentId
+  
+
+# DELETE http://localhost:3000/product/detail/:id/comment/:commentId
+  

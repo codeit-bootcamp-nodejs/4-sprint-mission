@@ -1,7 +1,7 @@
 
+import type { Request, Response, NextFunction } from 'express';
 
-
-export async function ValidCommentForm(req,res,next){
+export async function ValidCommentForm(req: Request,res: Response,next: NextFunction){
     const id = Number(req.params.id) ;
     const CommentId= Number(req.params.commentId);
     

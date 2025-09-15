@@ -1,12 +1,26 @@
 import prisma from '../lib/prisma.js'
 
+interface getArticleParams{
+    sort: string,
+    skip: number,
+    take: number,
+    searchtitle: string,
+    searchcontent: string
+}
+
+interface getCommentParams{
+    take:number,
+    skip:number,
+    commentId:number
+}
+
 
 export class ArticleService{
-    getArticles = async({skip, take, sort, searchtitle, searchcontent}) =>{
+    getArticles = async({skip, take, sort, searchtitle, searchcontent}:getArticleParams) =>{
     
         let orderBy ;
-        skip = parseInt(skip);
-        take = parseInt(take);
+        skip = Number(skip);
+        take = Number(take);
 
         if (sort == 'oldest'){        
             orderBy = {createdAt : 'desc'};
@@ -29,13 +43,13 @@ export class ArticleService{
          return Articles
     }
 
-    getComment = async({take,skip,commentId}) => {
-        take = parseInt(take);
-        skip = parseInt(skip);
-        commentId = parseInt(commentId);
+    getComment = async({take,skip,commentId}:getCommentParams) => {
+        take = Number(take);
+        skip = Number(skip);
+        commentId = Number(commentId);
 
         
-        const articleComment =await prisma.ArticleComment.findMany({
+        const articleComment =await prisma.articleComment.findMany({
             take,
             skip,
             cursor: {id: commentId},

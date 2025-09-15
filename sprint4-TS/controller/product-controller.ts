@@ -1,18 +1,19 @@
 
-import productService from '../service/product-service.js';
-import prisma from '../lib/prisma.js'
-
+import productService from '../service/product-service';
+import prisma from '../lib/prisma'
+import type { Request, Response, NextFunction } from 'express';
 
 export class ProductController{
-    getProducts = async (req,res,next) =>{
+    getProducts = async (req: Request,res: Response,next: NextFunction) =>{
         let {sort = 'recent', skip = 0, take= 10, searchName, searchDescription} = req.query;
         
         const data = {sort, skip, take, searchName, searchDescription};
         try{
+            let user = req.user;
             let products = await productService.getProducts(data);
             
             for (let product of products){
-                product = await productService.addIsLiked(product);
+                product = await productService.addIsLiked(user,product);
             }
 
             return res.status(200).send(products);
@@ -20,32 +21,33 @@ export class ProductController{
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
             
         }
     }
 
-    getOneProduct = async (req,res,next) =>{
+    getOneProduct = async (req: Request,res: Response,next: NextFunction) =>{
         const id = Number(req.params.id);
     
         try{
+            const user = req.user;
             let product = await prisma.product.findUnique({
                 where:{id},
                 include: {comment:true}
             });
-            product = productService.addIsLiked(product);
+            product = await productService.addIsLiked(user, product);
             return res.status(200).send(product);
             
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    postProduct = async (req,res,next) =>{
+    postProduct = async (req: Request,res: Response,next: NextFunction) =>{
         const {name,description, price, tags} = req.body;
 
         try{
@@ -63,13 +65,13 @@ export class ProductController{
         }catch(error){
             console.log('post product failed because of server error');
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
 
-    patchProduct = async (req,res,next) =>{
+    patchProduct = async (req: Request,res: Response,next: NextFunction) =>{
         const {name, description, price, tags} = req.body;
         const id = Number(req.params.id) ;
 
@@ -89,15 +91,15 @@ export class ProductController{
         }catch(error){
             console.log('patch product failed because of server error');
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    deleteProduct = async (req,res,next) =>{
+    deleteProduct = async (req: Request,res: Response,next: NextFunction) =>{
         const id = Number(req.params.id) ;
         try{
-            await prisma.Product.delete({
+            await prisma.product.delete({
                 where:{id}
             });
             console.log("deleting success");
@@ -106,19 +108,19 @@ export class ProductController{
         }catch(error){
             console.log('deleting product failed because of server error');
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    getComments = async (req,res,next) =>{
+    getComments = async (req: Request,res: Response,next: NextFunction) =>{
         try{
-            let {take = '10',skip= '1',commentId = '1'} = req.query;
-            take = parseInt(take);
-            skip = parseInt(skip);
-            commentId = parseInt(commentId);
+            let {take = 10,skip= 1,commentId = 1} = req.query;
+            take = Number(take);
+            skip = Number(skip);
+            commentId = Number(commentId);
 
-            const comments= await prisma.ProductComment.findMany({
+            const comments= await prisma.productComment.findMany({
                 take,
                 skip,
                 cursor: {id: commentId},
@@ -133,12 +135,12 @@ export class ProductController{
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    postComment = async (req,res,next) =>{
+    postComment = async (req: Request,res: Response,next: NextFunction) =>{
         let id;
         id = Number(req.params.id) ;
 
@@ -146,10 +148,10 @@ export class ProductController{
             const commentContent = req.body.commentContent;
             if(!commentContent || commentContent.length>1000){
                 const err = new Error("invalid body data");
-                err.status = 400;
+                // err.status = 400;
                 return next(err);
             }
-            const newComment = await prisma.ProductComment.create({
+            const newComment = await prisma.productComment.create({
                 data: {
                     commentContent,
                     product:{connect: {id}}
@@ -158,21 +160,21 @@ export class ProductController{
             res.status(201).send(newComment);
         }catch(error){
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err); 
         }
         
 
     }
 
-    patchComment = async (req,res,next) =>{
+    patchComment = async (req: Request,res: Response,next: NextFunction) =>{
         const id = Number(req.params.id) ;
-
+        const commentId = Number(req.params.commentId)
         try{
             const commentContent = req.body.commentContent;
 
-            const newComment = await prisma.ProductComment.update({
-                where:{id:CommentId},
+            const newComment = await prisma.productComment.update({
+                where:{id:commentId},
                 data: {commentContent}
             });
             return res.status(200).send(newComment);
@@ -180,25 +182,25 @@ export class ProductController{
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err); 
         } 
     }
 
-    deleteComment = async (req,res,next) =>{
+    deleteComment = async (req: Request,res: Response,next: NextFunction) =>{
 
         const id = Number(req.params.id) ;
-
+        const commentId = Number(req.params.commentId)
         try{
-            await prisma.ProductComment.delete({
-                where:{id:CommentId}
+            await prisma.productComment.delete({
+                where:{id:commentId}
             });
             return res.status(204).send("delete success");
 
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err); 
         }
     }

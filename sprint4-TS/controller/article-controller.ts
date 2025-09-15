@@ -1,21 +1,48 @@
 import express from 'express'
-import prisma from '../lib/prisma.js'
-import ArticleService from '../service/article-service.js';
-
+import prisma from '../lib/prisma'
+import ArticleService from '../service/article-service';
+import type { Request, Response, NextFunction } from 'express';
 
 //모든 게시글 불러오기, 댓글 미포함
+interface User{
+    id: number,
+    password: string,
+    image: string,
+    email: string,
 
+}
+
+interface Article{
+    id: number,
+    title: string,
+    articleContent: string,
+    createdAt: Date,
+    updatedAt: Date,
+    userId: number
+}
+
+interface Product{
+    id: number
+}
+
+interface getArticleParams{
+    sort: string,
+    skip: number,
+    take: number,
+    searchtitle: string,
+    searchcontent: string
+}
 
 export class ArticleController{
 
-    getArticles = async (req,res,next) =>{
-        let {sort='recent', skip='0', take='30', searchtitle, searchcontent} = req.query;
+    getArticles = async (req: Request<{},{},{}, getArticleParams>, res: Response, next: NextFunction) =>{
+        let {sort ='recent', skip = 0, take=30, searchtitle, searchcontent} = req.query;
+    
+        skip = Number(skip);
+        take = Number(take);
+        const data: getArticleParams = {sort, skip, take, searchtitle,searchcontent}
         
-        skip = parseInt(skip);
-        take = parseInt(take);
-        const data = {sort, skip, take, searchtitle,searchcontent}
-        
-        const user = req.user
+        const user = req.user;
         console.log(user)
 
         try{
@@ -27,39 +54,39 @@ export class ArticleController{
         } catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    getOneArticle = async (req,res,next) =>{
+    getOneArticle = async (req: Request<{id:number},{},{}, {}>, res: Response, next: NextFunction) =>{
         try{
             let id = req.params.id;
-            id = parseInt(id);
+            id = Number(id);
             const user = req.user;
             console.log(user)
-            let article = await prisma.Article.findUnique({
+            let article = await prisma.article.findUnique({
                 where: {id},
                 include : {comment: true}
             });
 
-            article = ArticleService.addIsLiked(user, article);
+            article = await ArticleService.addIsLiked(user, article);
 
             return res.status(200).send(article);
             
         } catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    postArticle = async (req,res,next) =>{
+    postArticle = async (req: Request,res: Response,next: NextFunction) =>{
         const {title, articleContent} = req.body;
 
         try{
-            let Article =  await prisma.Article.create({
+            let Article =  await prisma.article.create({
                 data: {title,articleContent}
             });
             console.log("post Article success");
@@ -67,18 +94,18 @@ export class ArticleController{
         }catch(error){
             console.log("post Article failed because of server");
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     
     }
 
-    patchArticle = async (req,res,next) =>{
+    patchArticle = async (req: Request,res: Response,next:NextFunction) =>{
         try{
             const id = Number(req.params.id);
             const {title, articleContent} = req.body;
 
-            const Article = await prisma.Article.update({
+            const Article: Article = await prisma.article.update({
                 where:{id},
                 data: {title,articleContent}
             })
@@ -88,16 +115,16 @@ export class ArticleController{
         } catch(error){
             console.log("patch Article failed because of server");
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    deleteArticle = async(req,res,next) =>{
+    deleteArticle = async(req: Request,res: Response,next:NextFunction) =>{
         try{
             const id = Number(req.params.id);
 
-            await prisma.Article.delete({
+            await prisma.article.delete({
                 where:{id}
             });
 
@@ -106,16 +133,16 @@ export class ArticleController{
         } catch(error){
             console.log("delete Article failed because of server");
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    getComments = async(req,res,next) =>{
+    getComments = async(req: Request,res: Response,next:NextFunction) =>{
         try{
             let {take = '10',skip= '1',commentId = '1'} = req.query;
             
-            data = {take, skip, commentId}
+            const data = {take, skip, commentId}
             const articleComment =await ArticleService.getComment(data);
 
             return res.status(200).send(articleComment);
@@ -123,12 +150,12 @@ export class ArticleController{
         }catch(error){
             console.error(error)
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
     }
 
-    postComment = async (req,res,next) =>{
+    postComment = async (req: Request,res: Response,next:NextFunction) =>{
 
         const id = Number(req.params.id) ;
 
@@ -138,7 +165,7 @@ export class ArticleController{
         }
 
         try{
-            const newComment = await prisma.ArticleComment.create({
+            const newComment = await prisma.articleComment.create({
             data: {
                 commentContent,
                 article: {
@@ -150,13 +177,13 @@ export class ArticleController{
         } catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);
         }
         
     }
 
-    patchComment = async (req,res,next) =>{
+    patchComment = async (req: Request,res: Response,next:NextFunction) =>{
 
         const id = Number(req.params.id) ;
         try{
@@ -165,11 +192,11 @@ export class ArticleController{
 
             if(!commentContent){
                 const err = new Error("invalid body data");
-                err.status = 400;
+                // err.status = 400;
                 return next(err)
             }
 
-            const newComment = await prisma.ArticleComment.update({
+            const newComment = await prisma.articleComment.update({
                 where:{id:CommentId},
                 data: {commentContent}
             });
@@ -178,23 +205,24 @@ export class ArticleController{
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);;
             
         }
     }
 
-    deleteComment = async (req,res,next) =>{
+    deleteComment = async (req: Request,res: Response,next:NextFunction) =>{
         try{
-            await prisma.ArticleComment.delete({
-                where:{id:CommentId}
+            const CommentId= req.params.commentId
+            await prisma.articleComment.delete({
+                where:{id: CommentId}
             })
             return res.status(204).send("deleting success");
 
         }catch(error){
             console.error(error);
             const err = new Error("Server Error");
-            err.status = 500;
+            // err.status = 500;
             return next(err);;
             
         }

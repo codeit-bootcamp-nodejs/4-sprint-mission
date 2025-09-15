@@ -1,0 +1,36 @@
+POST http://localhost:3000/user/login
+Content-Type: application/json
+
+{
+    "email": "sonj0407@naver.com",
+    "password": "1234"
+}
+    
+# POST http://localhost:3000/user/register
+# Content-Type: application/json
+
+# {
+#     "email":"sonj0404@naver.com",
+#     "nickname": "sonj0407",
+#     "password": "1234",
+#     "image": "1234@naver.com"
+# }
+    
+# GET http://localhost:3000/user/:id
+# GET http://localhost:3000/user/1
+# Cookie:Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc1NzY0MzY4OSwiZXhwIjoxNzU3NjQ3Mjg5fQ.pEMakQWKC_B_ZLf_SfL_wQIK3fKfXh93Cy79wG9qQ4Y}
+
+
+# PATCH http://localhost:3000/user/:id
+# Cookie:Access_Token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc1NzY0MzY4OSwiZXhwIjoxNzU3NjQ3Mjg5fQ.pEMakQWKC_B_ZLf_SfL_wQIK3fKfXh93Cy79wG9qQ4Y}
+
+# {}
+
+
+# GET http://localhost:3000/user/2/products
+# Content-Type: application/json
+# Cookie:AccessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc1NzY1MDQzMCwiZXhwIjoxNzU3Njg2NDMwfQ.04zeYmKyXamK3CI-uUzJpSsM_K2aV3TXfslWBV9mHyI
+
+
+
+# GET http://localhost:3000:id/user/like

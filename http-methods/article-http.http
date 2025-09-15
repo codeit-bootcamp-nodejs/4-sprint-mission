@@ -1,0 +1,41 @@
+# GET http://localhost:3000/article
+
+GET http://localhost:3000/article/detail/1
+Cookie:"AccessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImlhdCI6MTc1NzY2MTg3MSwiZXhwIjoxNzU3Njk3ODcxfQ.Q5O4_QkksxGl24iB7fFFQjONGwugVV8aq9Pa3xWZ1cQ"
+
+# POST http://localhost:3000/article
+# Content-Type: application/json
+# Cookie: 
+# {
+#     "title": "posted Article",
+#     "articleContent": "posted Article",
+#     "userId": 1
+# }
+
+# PATCH http://localhost:3000/article/detail/:id
+
+
+# DELETE http://localhost:3000/article/detail/:id
+    
+
+
+# //like feature
+# POST http://localhost:3000/article/detail/:id'
+    
+
+# DELETE http://localhost:3000/article/detail/:id
+    
+
+
+# //article comments API routing
+# GET http://localhost:3000/article/comments
+
+
+# POST http://localhost:3000/article/detail/:id/comments
+
+
+# PATCH http://localhost:3000/article/detail/:id/comments
+
+    
+# DELETE http://localhost:3000/article/detail/:id/comments/:commentId
+

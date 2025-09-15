@@ -1,4 +1,5 @@
 import passport from 'passport'
+import type { Request, Response, NextFunction } from 'express';
 
 import { Strategy as JwtStrategy } from 'passport-jwt';
 
@@ -11,43 +12,46 @@ import {ACCESS_SECRET_KEY,
     REFRESH_TOKEN_COOKIE_NAME
  }from './constants.js'
 
+interface payload{
+    userId: number
+}
 
 
 //request로 부터 token을 받고, 해석하는 부분(options)
 const accessJwtOptions = {
-    jwtFromRequest : (req) => 
+    jwtFromRequest : (req:Request) => 
         req.cookies[ACCESS_TOKEN_COOKIE_NAME],
         secretOrKey: ACCESS_SECRET_KEY
 }
 const refreshJwtOptions = {
-    jwtFromRequest : (req) => 
+    jwtFromRequest : (req:Request) => 
         req.cookies[REFRESH_TOKEN_COOKIE_NAME],
         secretOrKey: REFRESH_SECRET_KEY
 }
 
 
 //passport에서 인증이 이루어지는 부분(verify)
-async function jwtVerify(payload, done){
+async function jwtVerify(payload:payload, done){
     const userId = payload.userId;
     if (!userId){
-        done(error,null);
+        done(Error,null);
     }
-    const user = await prisma.user.findUnique({id:userId})
+    const user = await prisma.user.findUnique({
+        where:{id:userId}
+    })
     if (!user){
-        done(error,null);
+        done(Error,null);
     }
     done(null,user);
 }
 
 //Access Token을 검증하는 전략 
 export const accessJwtStrategy = new JwtStrategy(accessJwtOptions, (payload, done) => {
-    accessJwtOptions,
     jwtVerify
 })
 
 //Refresh Token을 검증하는 전략 
 export const refreshJwtStrategy = new JwtStrategy(refreshJwtOptions, (payload, done) => {
-    refreshJwtOptions,
     jwtVerify
 })
 
@@ -55,13 +59,13 @@ export const refreshJwtStrategy = new JwtStrategy(refreshJwtOptions, (payload, d
 passport.use('AccessToken', accessJwtStrategy)
 passport.use('RefreshToken', refreshJwtStrategy)
 
-export const authUserWithParmaId = passport.authenticate("Access Token", (req,res) =>{
-    const paramId = req.params.id;
-    const tokenId = req.user.id
+// export const authUserWithParmaId = passport.authenticate("Access Token", (req,res) =>{
+//     const paramId = req.params.id;
+//     const tokenId = req.user.id
 
-    if (pramaId != tokenId){
-        return res.send("no authorization")
-    }else{
-        return next()
-    }
-})
+//     if (paramId != tokenId){
+//         return res.send("no authorization")
+//     }else{
+//         return next()
+//     }
+// })

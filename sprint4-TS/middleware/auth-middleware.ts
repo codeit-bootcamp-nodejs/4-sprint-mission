@@ -1,9 +1,9 @@
 
 
 import prisma from '../lib/prisma.js'
+import type { Request, Response, NextFunction } from 'express';
 
-
-export function checkAuthenticated(req,res,next){
+export function checkAuthenticated(req: Request,res: Response,next: NextFunction){
     if (req.isAuthenticated()){
         return next()
     }else{
@@ -11,11 +11,11 @@ export function checkAuthenticated(req,res,next){
     }
 }
 
-export function checkAccessToken(req,res,next){
+export function checkAccessToken(req: Request,res: Response,next: NextFunction){
 
 }
 
-export async function checkProductAuthorize(req,res,next){
+export async function checkProductAuthorize(req: Request,res: Response,next: NextFunction){
     const productId = Number(req.params.id);
     const user = req.user;
     const product = await prisma.product.findUnique({
@@ -25,12 +25,12 @@ export async function checkProductAuthorize(req,res,next){
         return next()
     }else{
         const error = new Error("401 unathorized")
-        error.status = 401
+        // error.status = 401
         throw error
     }
 }
 
-export async function checkArticleAuthorize(req,res,next){
+export async function checkArticleAuthorize(req: Request,res: Response,next: NextFunction){
     const articleId = Number(req.params.id);
     const user = req.user;
     const article = await prisma.article.findUnique({
@@ -40,13 +40,13 @@ export async function checkArticleAuthorize(req,res,next){
         return next()
     }else{
         const error = new Error("401 unathorized")
-        error.status = 401
+        // error.status = 401
         throw error
     }
 }
 
 
-export async function checkArticleCommentAuth(req,res,next){
+export async function checkArticleCommentAuth(req: Request,res: Response,next: NextFunction){
     const commentId = Number(req.params.commentId);
     const comment = await prisma.article.findUnique({
         where:{id:commentId}
@@ -57,12 +57,12 @@ export async function checkArticleCommentAuth(req,res,next){
         return next()
     }else{
         const error = new Error("401 unathorized")
-        error.status = 401
+        // error.status = 401
         throw error
     }
 }
 
-export async function checkProductCommentAuth(req,res,next){
+export async function checkProductCommentAuth(req: Request,res: Response,next: NextFunction){
     const commentId = Number(req.params.commentId);
     const comment = await prisma.product.findUnique({
         where:{id:commentId}
@@ -73,12 +73,12 @@ export async function checkProductCommentAuth(req,res,next){
         return next()
     }else{
         const error = new Error("401 unathorized")
-        error.status = 401
+        // error.status = 401
         throw error
     }
 }
 
-export async function checkUserAuth(req,res,next){
+export async function checkUserAuth(req: Request,res: Response,next: NextFunction){
     const paramId = Number(req.params.id);
     const userId = Number(req.user.id);
     if (paramId == userId){
