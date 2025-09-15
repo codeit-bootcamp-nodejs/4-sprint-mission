@@ -1,0 +1,22 @@
+POST http://localhost:3000/articles
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+
+{
+  "title": "닭다리랑 날개만 있는 조함으로도 만들어주세요",
+  "content": "닭다리랑 날개만 먹고 싶어요. 제발 콤보조합 만들어주세요. 맨날 시켜먹을게요."
+}
+
+###
+PATCH  http://localhost:3000/articles/5
+Content-Type: : application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+ 
+{
+  "content": "닭다리랑 날개만 먹고 싶어요. 제발 콤보조합 만들어주세요. 자주 시켜먹을게요."
+}
+
+###
+DELETE http://localhost:3000/articles/7
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsImlhdCI6MTc1NzU4MTkwMCwiZXhwIjoxNzU3NTg1NTAwfQ._ITYncnZcSokY2BNbV2RVrPeX4T2d8iVE3o19fC0_A0
+

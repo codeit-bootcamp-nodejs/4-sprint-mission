@@ -1,0 +1,158 @@
+import prisma from '../lib/prisma.js';
+
+/**
+ * 모델 소유자(author)를 확인하는 범용 미들웨어 팩토리 함수
+ * @param {string} modelName 확인할 Prisma 모델 이름 (예: 'product', 'article', 'comment')
+ * @returns {function} Express 미들웨어 함수
+ */
+function checkOwner(modelName) {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const model = prisma[modelName];
+
+      if (!model || !model.findUnique) {
+        throw new Error(`Invalid model name: ${modelName}`);
+      }
+
+      const item = await model.findUnique({
+        where: { id },
+      });
+
+      // 아이템이 없는 경우
+      if (!item) {
+        const error = new Error(`${modelName} not found`);
+        error.status = 404;
+        throw error;
+      }
+
+      // 소유자가 아닌 경우
+      if (item.authorId !== req.user.id) {
+        const error = new Error('Forbidden');
+        error.status = 403;
+        throw error;
+      }
+      
+      // 검증 성공
+      return next();
+    } catch (error) {
+      return next(error);
+    }
+  };
+}
+
+export const checkProductOwner = checkOwner('product');
+export const checkArticleOwner = checkOwner('article');
+export const checkCommentOwner = checkOwner('comment');
+
+// tags가 널러블 한 경우 첫번째는 내가 만든 거, 아래는 ai가 알려주준거
+async function register(authorId, tags, data){
+  try{
+    if(tags=== null){
+      const newProdcut = await prisma.product.create({
+        data: {
+          authorId,
+          tags,
+          data
+        }
+      })
+      return newProdcut;
+    }
+    else{
+      const newProdcut = await prisma.product.create({ data })
+      return data;
+    }
+  } catch(error){
+    return error
+  }
+}
+
+async function register(authorId, tags, data){
+  const tagsData = (Array.isArray(tags) && tags.length > 0 ) ? tags: null;
+  const newProdcut = await prisma.product.create({
+    data: {
+      authorId,
+      tags: tagsData,
+      ...data,
+    }
+  })
+}
+
+
+
+
+////
+//    const updatedUser = await userService.updateUser(userId, data);
+// 닉네임, 이메일은 고유값 
+async function updateInfo(userId, data){
+  try{
+    if('email' in data){
+      const existedEmail = await prisma.user.findUnique({ id: data.nickname});
+      if('email' === existedEmail){
+        const error = new Error('Conflict');
+        error.code = 409;
+        throw error;
+      }
+    }
+
+    if('nickname' in data){
+      const existedNickanme = await prisma.user.findUnique({ id: data.nickname });
+      if('nickname' in data){
+        const error = new Error('Conflict');
+        error.code = 409;
+        throw error;
+      }
+    }
+
+    const updatedInfo = await prisma.user.update({
+      where: { id: userId },
+      data
+    })
+    
+    const {password, ...withoutPassword} = updatedInfo;
+    return withoutPassword;
+  } catch(error){
+    throw error;
+  }
+}
+
+
+// 
+async function updateInfo(userId, data){
+  try{
+    // 현재 사용자 정보를 조회하여 비교합니다.
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    // 이메일 업데이트 시, 새 이메일이 기존 이메일과 다를 경우에만 중복 검사
+    if (data.email && data.email !== currentUser.email) {
+      const existedEmail = await prisma.user.findUnique({ where: { email: data.email } });
+      if (existedEmail) {
+        const error = new Error('Conflict: Email already exists.');
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    // 닉네임 업데이트 시, 새 닉네임이 기존 닉네임과 다를 경우에만 중복 검사
+    if (data.nickname && data.nickname !== currentUser.nickname) {
+      const existedNickname = await prisma.user.findUnique({ where: { nickname: data.nickname } });
+      if (existedNickname) {
+        const error = new Error('Conflict: Nickname already exists.');
+        error.status = 409;
+        throw error;
+      }
+    }
+
+    const updatedInfo = await prisma.user.update({
+      where: { id: userId },
+      data
+    });
+    
+    const {password, ...withoutPassword} = updatedInfo;
+    return withoutPassword;
+  } catch(error){
+    throw error;
+  }
+}

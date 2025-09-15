@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../dev.db" //.. , . 
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  nickname     String        @unique
+  image        String?
+  password     String
+  refreshToken String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Article      Article[]
+  Product      Product[]
+  ProductLike  ProductLike[]
+  ArticleLike  ArticleLike[]
+}
+
+model Product {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String
+  price       Int
+  tags        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Comments    Comment[]
+  user        User          @relation(fields: [authorId], references: [id])
+  authorId    Int
+  ProductLike ProductLike[]
+}
+
+model Article {
+  id          Int           @id @default(autoincrement())
+  title       String
+  content     String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Comments    Comment[]
+  user        User          @relation(fields: [authorId], references: [id])
+  authorId    Int
+  ArticleLike ArticleLike[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductLike {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  @@unique([userId, productId]) // 한 유저가 한 상품에 한 번만 좋아요 누를 수 있도록 한다. 
+}
+
+model ArticleLike {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+
+  @@unique([userId, articleId]) // 한 유저가 한 게시물에 한 번만 좋아요 누를 수 있도록 한다.
+}
