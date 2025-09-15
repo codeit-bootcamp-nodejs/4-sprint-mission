@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: sprint-mission-4-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run deploy:full && npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sprint-mission-4-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+
+databases:
+  - name: sprint-mission-4-db
+    databaseName: sprint_mission_4
+    user: sprint_mission_4_user
+    plan: free
