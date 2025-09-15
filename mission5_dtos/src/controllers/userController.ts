@@ -2,14 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import status from "http-status";
 import { UserService } from "../services/userService";
 import { setTokenCookies, clearTokenCookies } from "../lib/cookieUtil";
+import { UserRegisterSchema, UserUpdateSchema, UserPasswordSchema, UserLoginSchema } from "../dtos/user.dto";
 
 const userService = new UserService();
 
 export class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
-    const { email, nickname, password } = req.body;
     try {
-      const result = await userService.register(email, nickname, password);
+      const parsed = UserRegisterSchema.parse(req.body);
+      const result = await userService.register(parsed);
       res.status(status.CREATED).json(result);
     } catch (err: any) {
       if (err.message === "EMAIL_EXISTS") {
@@ -44,7 +45,10 @@ export class UserController {
   async modifyInformation(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });
-      const updatedUser = await userService.updateInformation(req.user.id, req.body.nickname, req.body.image);
+
+      const parsed = UserUpdateSchema.parse(req.body); // DTO 검증
+      const updatedUser = await userService.updateInformation(req.user.id, parsed.nickname, parsed.image);
+
       res.status(status.OK).json({ message: "User information updated successfully", user: updatedUser });
     } catch (err: any) {
       if (err.message === "NO_DATA") return res.status(status.BAD_REQUEST).json({ message: "No update data provided" });
@@ -55,7 +59,10 @@ export class UserController {
   async modifyPassword(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });
-      const result = await userService.updatePassword(req.user.id, req.body.password);
+
+      const parsed = UserPasswordSchema.parse(req.body); // DTO 검증
+      const result = await userService.updatePassword(req.user.id, parsed);
+
       res.status(status.OK).json(result);
     } catch (err) {
       next(err);

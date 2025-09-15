@@ -1,14 +1,15 @@
 import { ProductRepository } from "../repositories/productRepository";
+import type { ProductCreateDTO, ProductUpdateDTO, ProductQueryDTO } from "../dtos/product.dto";
 import type { Prisma } from "@prisma/client";
 
 export class ProductService {
   private repo = new ProductRepository();
 
-  async create(userId: number, data: { name: string; description: string; price: number; tags: string }) {
+  async create(userId: number, data: ProductCreateDTO) {
     return this.repo.createProduct({ ...data, userId });
   }
 
-  async list(page: number, pageSize: number, keyword: string) {
+  async list({ page, pageSize, keyword }: ProductQueryDTO) {
     const where: Prisma.ProductWhereInput = keyword
       ? {
           OR: [

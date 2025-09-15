@@ -1,18 +1,19 @@
 import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/userRepository";
 import { generateTokens } from "../lib/token";
+import type { UserRegisterDTO, UserUpdateDTO, UserPasswordDTO } from "../dtos/user.dto";
 
 export class UserService {
   private userRepo = new UserRepository();
 
-  async register(email: string, nickname: string, password: string) {
-    const exists = await this.userRepo.findByEmail(email);
+  async register(data: UserRegisterDTO) {
+    const exists = await this.userRepo.findByEmail(data.email);
     if (exists) throw new Error("EMAIL_EXISTS");
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
 
-    await this.userRepo.createUser(email, nickname, hashedPassword);
+    await this.userRepo.createUser(data.email, data.nickname, hashedPassword);
     return { message: "User registered successfully" };
   }
 
@@ -30,9 +31,9 @@ export class UserService {
     return this.userRepo.updateUser(userId, updateData);
   }
 
-  async updatePassword(userId: number, password: string) {
+  async updatePassword(userId: number, data: UserPasswordDTO) {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(data.password, salt);
     await this.userRepo.updateUser(userId, { password: hashedPassword });
     return { message: "Password updated successfully" };
   }

@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma";
 import { Prisma } from "@prisma/client";
+import { ProductCreateDTO, ProductUpdateDTO, ProductQueryDTO } from "../dtos/product.dto";
 
 export class ProductRepository {
   async createProduct(data: { userId: number; name: string; description: string; price: number; tags: string }) {

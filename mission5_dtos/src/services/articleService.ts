@@ -1,14 +1,15 @@
 import { ArticleRepository } from "../repositories/articleRepository";
+import type { ArticleCreateDTO, ArticleUpdateDTO, ArticleQueryDTO } from "../dtos/article.dto";
 import type { Prisma } from "@prisma/client";
 
 export class ArticleService {
   private repo = new ArticleRepository();
 
-  async create(userId: number, data: { title: string; content: string }) {
+  async create(userId: number, data: ArticleCreateDTO) {
     return this.repo.createArticle({ ...data, userId });
   }
 
-  async list(page: number, pageSize: number, keyword: string) {
+  async list({ page, pageSize, keyword }: ArticleQueryDTO) {
     const where: Prisma.ArticleWhereInput = keyword
       ? {
           OR: [
@@ -17,6 +18,7 @@ export class ArticleService {
           ],
         }
       : {};
+
     return this.repo.findMany(where, (page - 1) * pageSize, pageSize);
   }
 
@@ -24,11 +26,7 @@ export class ArticleService {
     return this.repo.findById(id);
   }
 
-  async update(
-    userId: number,
-    articleId: number,
-    data: { title?: string; content?: string;  }
-  ) {
+  async update(userId: number, articleId: number, data: { title?: string; content?: string; }) {
     const article = await this.repo.findById(articleId);
     if (!article) throw new Error("NOT_FOUND");
     if (article.userId !== userId) throw new Error("FORBIDDEN");
