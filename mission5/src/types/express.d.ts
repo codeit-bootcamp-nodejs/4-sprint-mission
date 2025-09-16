@@ -8,4 +8,4 @@ declare global {
 }
 
 // 반드시 export {} 필요
-export {};
+export {}; 

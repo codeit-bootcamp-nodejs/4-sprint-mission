@@ -10,12 +10,8 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cookieParser());
 app.use(express.json());
-app.use(passport.initialize());
-app.use(router);
-app.use("/download", express.static("uploads"));
-
+app.use(cookieParser());
 const corsOptions = {
   //CORS 설정 및 whitelist로 'http://localhost:3000'을 설정
   origin: "http://localhost:3000",
@@ -23,6 +19,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(passport.initialize());
+app.use(router);
+app.use("/download", express.static("uploads"));
+
 
 app.use(errorHandler);
 
