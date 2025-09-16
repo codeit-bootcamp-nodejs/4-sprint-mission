@@ -24,5 +24,3 @@ export const patchSchema = z.object({
 export const contentSchema = z.object({
   content: z.enum(ContentType),
 });
-
-export type UserContentType = z.infer<typeof contentSchema>;
