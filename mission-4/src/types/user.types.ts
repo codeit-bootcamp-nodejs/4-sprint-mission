@@ -1,13 +1,7 @@
-import type { User, Comment } from '@prisma/client';
-import type { UserContentType } from '@validations/userSchema.js';
-import { ContentType } from '@validations/userSchema.js';
+import type { User, Comment, Product, Article } from '@prisma/client';
+import type { Content, UserId } from './shared.type.js';
 
-export type ContentTypeUnion = (typeof ContentType)[number];
-
-export interface EntityId {
-  id: number;
-}
-export interface PatchUserData extends EntityId {
+export interface PatchUserData extends UserId {
   data: {
     email?: string;
     nickname?: string;
@@ -16,13 +10,24 @@ export interface PatchUserData extends EntityId {
     image?: string;
   };
 }
-export interface getUserContent extends EntityId, UserContentType {}
+export interface GetUserContent extends UserId {
+  content: Content;
+}
 
-type ItemWithLikes = Omit<ContentTypeUnion, 'comments'> & {
+type ItemWithLikes = (Product | Article) & {
   _count: { likes: number };
   likes: { userId: number }[];
 };
 
 export type UserWithContent = User & {
-  [K in ContentTypeUnion]?: K extends 'comments' ? Comment[] : ItemWithLikes[];
+  [K in Content]?: K extends 'comments' ? Comment[] : ItemWithLikes[];
 };
+
+export type FilteredContent = Omit<ItemWithLikes, '_count' | 'likes'> & {
+  likeCount: number;
+  isLike: boolean;
+};
+
+export interface UserContentResponse {
+  data: FilteredContent[] | Comment[];
+}
