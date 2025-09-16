@@ -1,26 +1,28 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
-import productRouter from "./routes/products.js";
-import articleRouter from "./routes/articles.js";
-import imageRouter from "./routes/image.js";
+import cookieParser from "cookie-parser";
+import productRouter from "./routers/productsRouter.js";
+import articleRouter from "./routers/articlesRouter.js";
+import imageRouter from "./routers/imageRouter.js";
+import authRouter from "./routers/authRouter.js";
+import userRouter from "./routers/userRouter.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-
-dotenv.config();
+import { PORT } from "./lib/constants.js";
 
 const app = express();
 
 app.use(express.json());
-
+app.use(cookieParser());
 app.use(cors());
 
 app.use("/products", productRouter);
 app.use("/articles", articleRouter);
+app.use("/me", userRouter);
 app.use("/photos", imageRouter);
 app.use("/profile", express.static("/uploads"));
+app.use("/auth", authRouter);
 app.use(errorHandler);
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
