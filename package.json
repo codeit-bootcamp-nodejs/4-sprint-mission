@@ -1,20 +1,10 @@
 {
-  "dependencies": {
-    "@prisma/client": "^6.13.0",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "multer": "^2.0.2"
-  },
-  "devDependencies": {
-    "prisma": "^6.13.0"
-  },
-  "name": "3",
+  "name": "4",
   "version": "1.0.0",
-  "main": "article.js",
+  "main": "index.js",
   "type": "module",
   "scripts": {
-    "seed": "node prisma/seed.js",
+    "start": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -28,5 +18,16 @@
     "url": "https://github.com/ammgree/4-sprint-mission/issues"
   },
   "homepage": "https://github.com/ammgree/4-sprint-mission#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "path": "^0.12.7"
+  }
 }
