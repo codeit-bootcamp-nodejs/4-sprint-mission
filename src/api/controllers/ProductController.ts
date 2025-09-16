@@ -1,7 +1,7 @@
 import ProductService from "../services/ProductService.js";
 import jwt from "jsonwebtoken";
+import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { Request, Response, NextFunction } from "express";
-import env from "../config/env.js";
 import type { CustomError } from "src/api/types/error.js";
 import type { ProductDto } from "../types/dtos/product.dto.js";
 
@@ -20,7 +20,6 @@ const ProductController = {
 
   async findUniqueProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      //throw new Error("🔥에러 핸들러 테스트");
       const { id } = req.params;
       const productId = Number(id);
 
@@ -29,7 +28,7 @@ const ProductController = {
 
       if (token) {
         try {
-          const decoded = jwt.verify(token, env.JWT_SECRET);
+          const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
           if (typeof decoded === "string" || !decoded.id) {
             const error: CustomError = new Error("유효하지 않은 Token입니다.");
             error.statusCode = 403;

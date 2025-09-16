@@ -2,11 +2,17 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
+function getEnvVar(name: string): string {
+  const value = process.env[name];
+  if (value === undefined) {
+    throw new Error(`환경 변수 ${name}이(가) 설정되지 않았습니다.`);
+  }
+  return value;
+}
 
-const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
-const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
+export const ACCESS_TOKEN_SECRET = getEnvVar("ACCESS_TOKEN_SECRET");
+export const REFRESH_TOKEN_SECRET = getEnvVar("REFRESH_TOKEN_SECRET");
 
-export { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET };
+export const CLOUDINARY_CLOUD_NAME = getEnvVar("CLOUDINARY_CLOUD_NAME");
+export const CLOUDINARY_API_KEY = getEnvVar("CLOUDINARY_API_KEY");
+export const CLOUDINARY_API_SECRET = getEnvVar("CLOUDINARY_API_SECRET");

@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import prisma from "../libs/prismaClient.js";
 import type { Request, Response, NextFunction } from "express";
 import type { CustomError } from "src/api/types/error.js";
-import env from "../config/env.js";
+import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 
 export default async function authenticate(req: Request, res: Response, next: NextFunction) {
   const { accessToken } = req.cookies;
@@ -14,7 +14,7 @@ export default async function authenticate(req: Request, res: Response, next: Ne
   }
 
   try {
-    const decoded = jwt.verify(accessToken, env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
     if (typeof decoded === "string" || !decoded.id) {
       const error: CustomError = new Error("유효하지 않은 Access Token입니다.");
       error.statusCode = 403;

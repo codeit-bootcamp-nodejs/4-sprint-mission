@@ -1,7 +1,7 @@
 import ArticleService from "../services/ArticleService.js";
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
-import env from "../config/env.js";
+import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
 import type { ArticleDto } from "../types/dtos/article.dto.js";
 
@@ -28,7 +28,7 @@ const ArticleController = {
 
       if (token) {
         try {
-          const decoded = jwt.verify(token, env.JWT_SECRET);
+          const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
           if (typeof decoded === "string" || !decoded.id) {
             const error: CustomError = new Error("유효하지 않은 Token입니다.");
             error.statusCode = 403;

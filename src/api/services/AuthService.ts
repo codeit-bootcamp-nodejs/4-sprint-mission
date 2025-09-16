@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import env from "../config/env.js";
 import { hashing, compareWords } from "../libs/hashing.js";
 import { generateTokens } from "../libs/token.js";
+import { REFRESH_TOKEN_SECRET } from "../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
 import * as AuthRepository from "../repositories/AuthRepository.js";
 import type { SignupDto, LoginDto } from "../types/dtos/auth.dto.js";
@@ -72,7 +72,7 @@ const AuthService = {
 
     try {
       // 토큰 디코딩해서 토큰의 User 확인 및 변조 여부 확인
-      const decoded = jwt.verify(oldRefreshToken, env.REFRESH_TOKEN_SECRET);
+      const decoded = jwt.verify(oldRefreshToken, REFRESH_TOKEN_SECRET);
       if (typeof decoded === "string" || !decoded.id) {
         const error: CustomError = new Error("유효하지 않은 Refresh Token입니다.");
         error.statusCode = 403;
