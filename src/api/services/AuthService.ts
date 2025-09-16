@@ -62,6 +62,11 @@ const AuthService = {
     return { userWithoutPassword, accessToken, refreshToken };
   },
 
+  // 로그아웃
+  async logout(userId: number) {
+    return await AuthRepository.updateUserRefreshToken(userId, null);
+  },
+
   // AcessToken & RefreshToken을 재발급 받는 메서드
   async refreshAccessToken(oldRefreshToken: string) {
     if (!oldRefreshToken) {
