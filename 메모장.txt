@@ -1,0 +1,126 @@
+
+
+article-comment.service.dto.ts(정상출력)
+article.service.dto.ts(정상출력)
+product-comment.service.dto.ts(정상출력)
+product.service.dto.ts(정상출력)
+
+auth.service.dto.ts(파일만 생성되고 빈값)
+user.service.dto.ts(아예 파싱조차 안됨)
+
+
+auth 컨트롤러 {
+export const registerController  (validateLoginBody),
+export const loginController   (validateLoginBody),
+export const logoutController  (x),
+export const refreshTokensController  (x),
+export const googleCallback   (x)
+}
+
+user 컨트롤러 {
+export const getProfileController  (x),
+export const updateProfileController  (validateUpdateProfileBody),
+export const changePasswordController  (validateChangePasswordBody),
+export const deleteUserController   (x),
+export const getProductsController  (x),
+export const getLikedProductsController   (x),
+export const getLikedArticlesController   (x)
+}
+
+src/dto/request
+
+auth.request.dto.ts (존재)  
+{export interface LoginBodyDto,
+export interface RefreshTokenDto,
+export interface RegisterBodyDto}
+
+user.request.dto.ts (존재)
+{export interface ChangePasswordBodyDto,
+export interface UpdateProfileBodyDto,
+export interface UserQueryDto}
+
+
+
+ 
+컨트롤러: createArticleController 
+
+서비스: createArticle
+
+라우터: validateArticleBody, createArticleController
+
+req DTO: ArticleBodyDto, ArticleParamsDto, ArticleQueryDto
+
+serv DTO: listArticleDto, getArticleByIdDto, createArticleDto,
+ updateArticleDto, deleteArticleDto, toggleArticleLikeDto
+
+
+머지할 때
+req dto는 ArticleBodyDto (zod 스키마에서 따온 것이기때문에 재사용성 때문에 -**Schemas., +**BodyDto) 
+service DTO인 interface listArticleDto 가 생성되기 때문이다.(컨트롤러 함수명에서 따온거임)
+
+먼저는 article.request.dto.ts 얘를 파싱한다.(src/dto/request)
+ArticleBodyDto, ArticleParamsDto, ArticleQueryDto 얘들이(인터페이스) 파싱된다.
+articleRouter.ts (.request 앞의 단어들인 article를 읽고 카멜케이스 적용해서 Router.ts를 추가한 라우터 파일을 파싱한다. )(src/routes)
+
+router.post(
+  "/",
+  passport.authenticate("access-token", { session: false }),
+  validateArticleBody,
+  createArticleController
+);
+
+실제로 이 파일안에 여러 라우터들이 있지만이 이 라우터로 예를 들것임. 
+이 라우터에 검증미들웨어에 body가 포함되어있으면
+
+라우터에서 Body 미들웨어가 있으면, 해당 Request DTO(예: ArticleBodyDto)에서 실제 필드 읽음.
+
+Controller 함수명(createArticleController)과 직접 이름 매칭이 아니라, 
+Request DTO에서 body/params/query, DTO를 제거한 키 이름과 비교하여 포함 여부 확인.
+최종적으로 Controller별로 필요한 필드만 합쳐서 Service DTO 인터페이스 생성.
+이름(createArticleDto)은 Controller 기준이지만, 필드는 Request DTO 기반 → 이름과 필드의 불일치 문제는 해결됨.
+예시 문제: 스크립트는 validateLoginBody → LoginBodyDto 연결을 못 하고 있음.
+
+그러니까 머지 할 때 기준을 라우터별로 잡아야만 한다.
+LoginBodyDto연결을 못하는 문제를 보자면 
+
+router.post(
+  "/login",
+  validateLoginBody,
+  passport.authenticate("local", { session: false }),
+  loginController
+);
+
+라우터에서 컨트롤러 이름과 일치하는지를 조건으로 따져보면 해결된다.
+근데 이걸 라우터를 기준으로 service DTO를 뽑아야한다.(예를 들면 라우터 파일에 라우터가 1~7개인경우 7개까지 검증하면서 생성)
+request DTO 기준으로 뽑는게 아니다.
+
+바디, 파람, 쿼리등 다 조건비교해서 머지하면 된다.
+그럼 최종적으로 createArticleDTO 인터페이스가
+article.service.dto.ts 라는 파일에 생성된다.(src/dto/service)
+
+
+
+
+                                src/routes/*Router.ts
+  └── 라우터 정의
+       router.post("/login", validateLoginBody, loginController)
+       router.post("/register", validateRegisterBody, registerController)
+       router.get("/profile", validateUpdateProfileBody, getProfileController)
+
+src/dto/request/*.request.dto.ts
+  └── 인터페이스 정의
+       ├─ LoginBodyDto
+       ├─ RegisterBodyDto
+       ├─ UpdateProfileBodyDto
+       └─ ...
+
+Script (gen-service.dto.ts)
+  1. 라우터 파일 읽음
+  2. 각 라우터에서 validate 미들웨어와 Controller 함수 추출
+  3. validate 미들웨어 이름 → 정확한 Request DTO 이름 결정
+       예: validateLoginBody → LoginBodyDto
+  4. Request DTO에서 필드 가져오기
+  5. Controller 함수 이름 기반 Service DTO 생성
+       예: loginController → loginDto
+  6. body/params/query 모두 merge (중복 필드 optional 처리)
+  7. Service DTO를 src/dto/service/*.service.dto.ts에 작성

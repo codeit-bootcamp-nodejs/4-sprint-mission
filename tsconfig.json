@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    // Basics
+    "module": "nodenext",
+    "target": "es2024",
+    "lib": ["esnext"],
+
+    // Node typings
+    "types": [
+      "node",
+      "express",
+      "cookie-parser",
+      "cors",
+      "passport",
+      "ts-morph"
+    ],
+
+    // File Layout
+    "baseUrl": "./src",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
+
+    // Decorators
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Recommended Options
+    "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"]
+}
