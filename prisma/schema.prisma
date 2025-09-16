@@ -39,7 +39,7 @@ model User {
   email      String   @unique
   nickname   String   @unique
   password   String?
-  provider   String
+  provider   String?
   providerId String?  @unique // 구글 로그인 같은 경우 아이디 저장용
   image      String? // 프로필 사진 URL
   createdAt  DateTime @default(now())
@@ -51,6 +51,8 @@ model User {
   articleComments ArticleComment[]
   productLikes    ProductLike[]
   articleLikes    ArticleLike[]
+
+  @@unique([provider, providerId])
 }
 
 model ProductComment {
@@ -103,7 +105,8 @@ model ProductLike {
   productId Int
   createdAt DateTime @default(now())
 
-  @@unique([userId, productId]) // 중복 좋아요 방지
+  @@unique([userId, productId]) // 중복 방지 & 특정 사용자-게시글 조회
+  @@index([productId])          // 상품목록 기준 count 조회 최적화
 }
 
 model ArticleLike {
@@ -114,5 +117,16 @@ model ArticleLike {
   articleId Int
   createdAt DateTime @default(now())
 
-  @@unique([userId, articleId]) // 중복 좋아요 방지
+  @@unique([userId, articleId]) // 중복 방지 & 특정 사용자-게시글 조회
+  @@index([articleId])          // 게시글 기준 count 조회 최적화
+}
+
+model UploadLog {
+  id           Int      @id @default(autoincrement())
+  userId       Int?
+  filename     String
+  originalName String
+  mimetype     String
+  size         Int
+  createdAt    DateTime @default(now())
 }

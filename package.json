@@ -64,6 +64,7 @@
     "ipaddr.js": "^1.9.1",
     "is-promise": "^4.0.0",
     "jiti": "^2.5.1",
+    "jose": "^6.1.0",
     "js-tokens": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "lru-cache": "^10.4.3",
@@ -138,15 +139,18 @@
     "vary": "^1.1.2",
     "wrappy": "^1.0.2",
     "xtend": "^4.0.2",
-    "zod": "^4.0.17"
+    "zod": "3.25.76"
   },
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js",
-    "seed": "npx prisma db seed"
+    "build": "tsc",
+    "dev": "node --loader ts-node/esm src/app.ts",
+    "start": "node dist/app.js",
+    "seed": "ts-node --project tsconfig.seed.json prisma/seed.ts",
+    "gen-req:dto": "tsx scripts/gen-request.dto.ts",
+    "gen-service:dto": "tsx scripts/get-service.dto.ts"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "npm run seed"
   },
   "repository": {
     "type": "git",
@@ -159,6 +163,22 @@
   },
   "homepage": "https://github.com/raincode02/4-sprint-mission#readme",
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.3.1",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.16",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "nodemon": "^3.1.10",
+    "ts-morph": "^27.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "zod-to-ts": "^1.2.0"
   }
 }
