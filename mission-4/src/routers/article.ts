@@ -1,13 +1,12 @@
 import express from 'express';
 import commentRouter from './comment.js';
-import parentIdParser from '../middlewares/parnetIdParser.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import ArticleController from '../controllers/articleController.js';
-import { validatePatchBody, validatePostBody } from '../middlewares/validators/articleValidator.js';
-import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorization.js';
-import optionalAuthentication from '../middlewares/optionalAuthentication.js';
-import { validateGetListQuery, validateId } from '../middlewares/validators/sharedValidator.js';
+import parentIdParser from '@middlewares/parnetIdParser.js';
+import asyncHandler from '@middlewares/asyncHandler.js';
+import ArticleController from '@controllers/articleController.js';
+import { validatePatchBody, validatePostBody } from '@middlewares/validators/articleValidator.js';
+import authentication from '@middlewares/authentication.js';
+import optionalAuthentication from '@middlewares/optionalAuthentication.js';
+import { validateGetListQuery, validateId } from '@middlewares/validators/sharedValidator.js';
 
 const articleRouter = express.Router();
 
@@ -21,8 +20,8 @@ articleRouter.route('/')
 // prettier-ignore
 articleRouter.route("/:id")
   .get(optionalAuthentication(), validateId, asyncHandler(ArticleController.getArticle))
-  .patch(authentication(), validateId, validatePatchBody, authorization('article'), asyncHandler(ArticleController.patchArticle))
-  .delete(authentication(), validateId, authorization('article'), asyncHandler(ArticleController.deleteArticle));
+  .patch(authentication(), validateId, validatePatchBody, asyncHandler(ArticleController.patchArticle))
+  .delete(authentication(), validateId, asyncHandler(ArticleController.deleteArticle));
 
 // prettier-ignore
 articleRouter.route("/:id/likes")

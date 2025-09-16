@@ -1,11 +1,10 @@
 import express from 'express';
-import upload from '../lib/multer.js';
-import fileController from '../controllers/fileController.js';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import { validatePostFile } from '../middlewares/validators/fileValidator.js';
-import authentication from '../middlewares/authentication.js';
-import authorization from '../middlewares/authorization.js';
-import { validateId } from '../middlewares/validators/sharedValidator.js';
+import upload from '@lib/multer.js';
+import fileController from '@controllers/fileController.js';
+import asyncHandler from '@middlewares/asyncHandler.js';
+import { validatePostFile } from '@middlewares/validators/fileValidator.js';
+import authentication from '@middlewares/authentication.js';
+import { validateId } from '@middlewares/validators/sharedValidator.js';
 
 const fileRouter = express.Router();
 
@@ -15,6 +14,6 @@ fileRouter.route("/")
 
 // prettier-ignore
 fileRouter.route("/:id")
-    .delete(authentication(), validateId, authorization('image'), asyncHandler(fileController.deleteFile))
+    .delete(authentication(), validateId, asyncHandler(fileController.deleteFile))
 
 export default fileRouter;

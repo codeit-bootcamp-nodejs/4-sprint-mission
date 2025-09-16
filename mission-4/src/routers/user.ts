@@ -1,8 +1,11 @@
 import express from 'express';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import UserController from '../controllers/userController.js';
-import { validateGetUserContent, validatePatchUser } from '../middlewares/validators/userValidator.js';
-import authentication from '../middlewares/authentication.js';
+import asyncHandler from '@middlewares/asyncHandler.js';
+import UserController from '@controllers/userController.js';
+import {
+  validateGetUserContent,
+  validatePatchUser,
+} from '@middlewares/validators/userValidator.js';
+import authentication from '@middlewares/authentication.js';
 
 const userRouter = express.Router();
 

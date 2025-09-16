@@ -1,7 +1,8 @@
 import express from 'express';
-import asyncHandler from '../middlewares/asyncHandler.js';
-import AuthController from '../controllers/authController.js';
-import { validateLoginBody, validateSignupBody } from '../middlewares/validators/authValidator.js';
+import asyncHandler from '@middlewares/asyncHandler.js';
+import AuthController from '@controllers/authController.js';
+import { validateLoginBody, validateSignupBody } from '@middlewares/validators/authValidator.js';
+import authentication from '@/middlewares/authentication.js';
 
 const authRouter = express.Router();
 
@@ -13,7 +14,7 @@ authRouter.route('/login')
     .post(validateLoginBody, asyncHandler(AuthController.login))
 // prettier-ignore
 authRouter.route('/logout')
-    .post(asyncHandler(AuthController.logout))
+    .post(authentication(), asyncHandler(AuthController.logout))
 // prettier-ignore
 authRouter.route('/refresh')
     .post(asyncHandler(AuthController.refresh))
