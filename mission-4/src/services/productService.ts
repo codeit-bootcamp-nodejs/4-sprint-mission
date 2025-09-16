@@ -1,7 +1,17 @@
-import prisma from '../lib/prisma.js';
+import { ForbiddenError } from '@/lib/errors.js';
+import type { PatchProduct, PostProduct, ProductParams } from '@/types/product.types.js';
+import type { GetListParams } from '@/types/shared.type.js';
+import prisma from '@lib/prisma.js';
+
+async function authorization({ userId, productId }: ProductParams): Promise<boolean> {
+  const product = await prisma.product.findUniqueOrThrow({
+    where: { id: productId },
+  });
+  return product.userId === userId;
+}
 
 // prettier-ignore
-async function getProductListService({ keyword, page, pageSize, userId }) {
+async function getProductListService({ keyword, page, pageSize, userId }: GetListParams) {
   const products = await prisma.product.findMany({
     where: {
       OR: [
@@ -39,7 +49,7 @@ async function getProductListService({ keyword, page, pageSize, userId }) {
     },
   });
   const results = products.map((product) => {
-    const { likes, _count, ...filteredProduct } = product;
+    const { likes: _likes, _count, ...filteredProduct } = product;
     return {
       likeCount: product._count.likes,
       isLike: userId ? product.likes.length === 1 : false,
@@ -49,7 +59,7 @@ async function getProductListService({ keyword, page, pageSize, userId }) {
   return results;
 }
 
-async function postProductService({ userId, name, description, price, tags }) {
+async function postProductService({ userId, name, description, price, tags }: PostProduct) {
   const product = await prisma.product.create({
     data: {
       name,
@@ -62,7 +72,7 @@ async function postProductService({ userId, name, description, price, tags }) {
   return product;
 }
 
-async function getProductService({ productId, userId }) {
+async function getProductService({ productId, userId }: ProductParams) {
   const product = await prisma.product.findUniqueOrThrow({
     where: {
       id: productId,
@@ -93,7 +103,7 @@ async function getProductService({ productId, userId }) {
       },
     },
   });
-  const { likes, _count, ...filteredProduct } = product;
+  const { likes: _likes, _count, ...filteredProduct } = product;
   const result = {
     likeCount: product._count.likes,
     isLike: userId ? product.likes.length === 1 : false,
@@ -102,22 +112,30 @@ async function getProductService({ productId, userId }) {
   return result;
 }
 
-async function patchProductService({ id, data }) {
-  const product = await prisma.product.update({
-    where: id,
-    data,
-  });
-  return product;
+async function patchProductService({ userId, productId, data }: PatchProduct) {
+  if (await authorization({ userId, productId })) {
+    const product = await prisma.product.update({
+      where: { id: productId },
+      data,
+    });
+    return product;
+  } else {
+    throw new ForbiddenError('수정 권한이 없습니다.');
+  }
 }
 
-async function deleteProductService({ id }) {
-  const product = await prisma.product.delete({
-    where: id,
-  });
-  return product;
+async function deleteProductService({ userId, productId }: ProductParams) {
+  if (await authorization({ userId, productId })) {
+    const product = await prisma.product.delete({
+      where: { id: productId },
+    });
+    return product;
+  } else {
+    throw new ForbiddenError('삭제 권한이 없습니다.');
+  }
 }
 
-async function postProductLikeService({ userId, productId }) {
+async function postProductLikeService({ userId, productId }: ProductParams) {
   const product = await prisma.productLike.create({
     data: {
       userId,
@@ -130,7 +148,7 @@ async function postProductLikeService({ userId, productId }) {
   return product;
 }
 
-async function deleteProductLikeService({ userId, productId }) {
+async function deleteProductLikeService({ userId, productId }: ProductParams) {
   const product = await prisma.productLike.delete({
     where: {
       userId_productId: {

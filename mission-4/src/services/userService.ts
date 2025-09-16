@@ -3,16 +3,17 @@ import { validatePassword, passwordHashing } from '@lib/bcrypt.js';
 import { UnauthorizedError } from '@lib/errors.js';
 import prisma from '@lib/prisma.js';
 import type {
-  EntityId,
   PatchUserData,
+  UserContentResponse,
   UserWithContent,
-  getUserContent,
+  GetUserContent,
 } from '@/types/user.types.js';
+import type { UserId } from '@/types/shared.type.js';
 
-async function getUserService({ id }: EntityId) {
+async function getUserService({ userId }: UserId) {
   const result = await prisma.user.findUniqueOrThrow({
     where: {
-      id,
+      id: userId,
     },
     select: {
       id: true,
@@ -25,7 +26,7 @@ async function getUserService({ id }: EntityId) {
   });
   return result;
 }
-async function patchUserService({ id, data }: PatchUserData) {
+async function patchUserService({ userId, data }: PatchUserData) {
   const { changePassword, currentPassword, image, ...restData } = data;
   const updateData: Prisma.UserUpdateInput = { ...restData };
   if (image) {
@@ -39,7 +40,7 @@ async function patchUserService({ id, data }: PatchUserData) {
     // 비밀번호 변경시에만 실행
     const user = await prisma.user.findUniqueOrThrow({
       where: {
-        id,
+        id: userId,
       },
       select: {
         password: true,
@@ -53,7 +54,7 @@ async function patchUserService({ id, data }: PatchUserData) {
   }
   const result = await prisma.user.update({
     where: {
-      id,
+      id: userId,
     },
     select: {
       id: true,
@@ -67,10 +68,10 @@ async function patchUserService({ id, data }: PatchUserData) {
   });
   return result;
 }
-async function deleteUserService({ id }: EntityId) {
+async function deleteUserService({ userId }: UserId) {
   const result = await prisma.user.delete({
     where: {
-      id,
+      id: userId,
     },
     select: {
       id: true,
@@ -83,7 +84,7 @@ async function deleteUserService({ id }: EntityId) {
   });
   return result;
 }
-async function getUserContentListService({ id, content }: getUserContent) {
+async function getUserContentListService({ userId, content }: GetUserContent) {
   let options = {};
   if (content === 'comments') {
     options = {
@@ -97,7 +98,7 @@ async function getUserContentListService({ id, content }: getUserContent) {
         [content]: {
           include: {
             _count: { select: { likes: true } },
-            likes: { where: { userId: id } },
+            likes: { where: { userId } },
           },
         },
       },
@@ -105,34 +106,37 @@ async function getUserContentListService({ id, content }: getUserContent) {
   }
   const userContent = (await prisma.user.findUniqueOrThrow({
     where: {
-      id,
+      id: userId,
     },
     ...options,
   })) as UserWithContent;
-  let result = userContent;
+  let result: UserContentResponse;
   if (content === 'products' || content === 'articles') {
     const contentList = userContent[content] ?? [];
     const filteredContentList = contentList.map((content) => {
       const { likes: _likesNouse, _count: _countNoUse, ...filteredContent } = content;
       return {
         likeCount: content._count.likes,
-        isLike: id ? content.likes.length === 1 : false,
+        isLike: userId ? content.likes.length === 1 : false,
         ...filteredContent,
       };
     });
-    result = filteredContentList;
+    result = { data: filteredContentList };
+  } else {
+    result = { data: userContent.comments ?? [] };
   }
   return result;
 }
-async function getUserContentLikeListService({ id, content }: getUserContent) {
+async function getUserContentLikeListService({ userId, content }: GetUserContent) {
+  const singularContentType = content.endsWith('s') ? content.slice(0, -1) : content;
   const result = await prisma.user.findUniqueOrThrow({
     where: {
-      id,
+      id: userId,
     },
     select: {
-      [`${content}Likes`]: {
+      [`${singularContentType}Likes`]: {
         include: {
-          [content]: true,
+          [singularContentType]: true,
         },
       },
     },
