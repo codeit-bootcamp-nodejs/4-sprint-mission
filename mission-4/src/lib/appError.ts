@@ -1,8 +1,12 @@
-export abstract class AppError extends Error {
-  public statusCode?: number;
+import type { ErrorDetail } from '@/types/error.types.js';
 
-  constructor(message: string, statusCode: number) {
+export abstract class AppError extends Error {
+  public statusCode: number;
+  public details?: ErrorDetail[];
+
+  constructor(message: string, statusCode: number, details?: ErrorDetail[]) {
     super(message);
     this.statusCode = statusCode;
+    this.details = details ?? [];
   }
 }
