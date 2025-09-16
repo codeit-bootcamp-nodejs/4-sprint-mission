@@ -1,9 +1,11 @@
 import bcrypt from "bcrypt";
-import type { UserData } from "../types/user.js";
 import type { CustomError } from "../types/error.js";
 import * as MypageRepository from "../repositories/MypageRepository.js";
 import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
 import type { Prisma } from "@prisma/client";
+import { generateTokens } from "../libs/token.js";
+import { hashing } from "../libs/hashing.js";
+import * as AuthRepository from "../repositories/AuthRepository.js";
 
 const MypageService = {
   async getUser(userId: number) {
@@ -54,10 +56,16 @@ const MypageService = {
     }
 
     // 새로운 비밀번호 해시 처리
-    const salt = await bcrypt.genSalt(10);
-    const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+    const hashedNewPassword = await hashing(newPassword);
+    await MypageRepository.updatePassword(userId, hashedNewPassword);
 
-    return await MypageRepository.updatePassword(userId, hashedNewPassword);
+    // 새로운 토큰 발급 (Access, Refresh)
+    const { accessToken, refreshToken } = generateTokens(userId);
+
+    const hashedRefreshToken = await hashing(refreshToken);
+    await AuthRepository.updateUserRefreshToken(userId, hashedRefreshToken);
+
+    return { accessToken, refreshToken };
   },
 
   async getProducts(userId: number) {
@@ -69,7 +77,7 @@ const MypageService = {
   async getLikeProducts(userId: number) {
     const likedProducts = await MypageRepository.findLikedProductsByUserId(userId);
 
-    return likedProducts.map((like) => like.product);
+    return likedProducts.map((like: { product: any }) => like.product);
   },
 };
 

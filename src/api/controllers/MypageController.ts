@@ -30,8 +30,18 @@ const MypageController = {
       const { id: userId } = req.user;
       const updatePasswordData: UpdatePasswordDTO = req.body;
 
-      await MypageService.updatePassword(userId, updatePasswordData);
-      res.status(200).json("비밀번호 변경이 완료되었습니다.");
+      const { accessToken, refreshToken } = await MypageService.updatePassword(userId, updatePasswordData);
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        maxAge: 1 * 60 * 60 * 1000,
+      });
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.status(200).json("비밀번호 변경 및 토큰 재발급이 완료되었습니다.");
     } catch (err) {
       next(err);
     }
