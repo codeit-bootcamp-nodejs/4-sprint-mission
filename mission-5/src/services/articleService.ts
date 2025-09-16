@@ -1,7 +1,8 @@
+import { ForbiddenError } from '@/lib/errors.js';
+import type { ArticleParams, PatchArticle, PostArticle } from '@/types/article.types.js';
 import type { GetListParams } from '@/types/shared.type.js';
 import prisma from '../lib/prisma.js';
-import type { PatchArticle, PostArticle, ArticleParams } from '@/types/article.types.js';
-import { ForbiddenError } from '@/lib/errors.js';
+import ArticleRepository from '../repositories/articles.repository.js';
 
 async function authorization({ userId, articleId }: ArticleParams): Promise<boolean> {
   const article = await prisma.article.findUniqueOrThrow({
@@ -11,39 +12,7 @@ async function authorization({ userId, articleId }: ArticleParams): Promise<bool
 }
 
 async function getArticleListService({ keyword, page, pageSize, userId }: GetListParams) {
-  const articles = await prisma.article.findMany({
-    where: {
-      OR: [{ title: { contains: keyword } }, { content: { contains: keyword } }],
-    },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-      likes: {
-        where: {
-          userId,
-        },
-      },
-      _count: {
-        select: {
-          likes: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          nickname: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
+  const articles = await ArticleRepository.findMany({ keyword, page, pageSize, userId });
   const results = articles.map((article) => {
     const { likes: _likes, _count, ...filteredArticle } = article;
     return {
@@ -56,45 +25,12 @@ async function getArticleListService({ keyword, page, pageSize, userId }: GetLis
 }
 
 async function postArticleService({ userId, title, content }: PostArticle) {
-  const article = await prisma.article.create({
-    data: {
-      title,
-      content,
-      userId,
-    },
-  });
+  const article = await ArticleRepository.create({ userId, title, content });
   return article;
 }
 
 async function getArticleService({ articleId, userId }: ArticleParams) {
-  const article = await prisma.article.findUniqueOrThrow({
-    where: {
-      id: articleId,
-    },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-      likes: {
-        where: {
-          userId,
-        },
-      },
-      _count: {
-        select: {
-          likes: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          email: true,
-          nickname: true,
-        },
-      },
-    },
-  });
+  const article = await ArticleRepository.findById({ articleId, userId });
   const { likes: _likes, _count, ...filteredArticle } = article;
   const result = {
     likeCount: article._count.likes,
@@ -106,10 +42,7 @@ async function getArticleService({ articleId, userId }: ArticleParams) {
 
 async function patchArticleService({ articleId, userId, data }: PatchArticle) {
   if (await authorization({ userId, articleId })) {
-    const article = await prisma.article.update({
-      where: { id: articleId },
-      data,
-    });
+    const article = await ArticleRepository.update({ articleId, data });
     return article;
   } else {
     throw new ForbiddenError('수정 권한이 없습니다.');
@@ -118,47 +51,27 @@ async function patchArticleService({ articleId, userId, data }: PatchArticle) {
 
 async function deleteArticleService({ articleId, userId }: ArticleParams) {
   if (await authorization({ userId, articleId })) {
-    const article = await prisma.article.delete({
-      where: { id: articleId },
-    });
+    const article = await ArticleRepository.delete({ articleId });
     return article;
   } else {
     throw new ForbiddenError('삭제 권한이 없습니다.');
   }
 }
 async function postArticleLikeService({ userId, articleId }: ArticleParams) {
-  const article = await prisma.articleLike.create({
-    data: {
-      userId,
-      articleId,
-    },
-    select: {
-      article: true,
-    },
-  });
+  const article = await ArticleRepository.like({ userId, articleId });
   return article;
 }
 async function deleteArticleLikeService({ userId, articleId }: ArticleParams) {
-  const article = await prisma.articleLike.delete({
-    where: {
-      userId_articleId: {
-        userId,
-        articleId,
-      },
-    },
-    select: {
-      article: true,
-    },
-  });
+  const article = await ArticleRepository.unlike({ userId, articleId });
   return article;
 }
 
 export {
+  deleteArticleLikeService,
+  deleteArticleService,
   getArticleListService,
-  postArticleService,
   getArticleService,
   patchArticleService,
-  deleteArticleService,
   postArticleLikeService,
-  deleteArticleLikeService,
+  postArticleService,
 };
