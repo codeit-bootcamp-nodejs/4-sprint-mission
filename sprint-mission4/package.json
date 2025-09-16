@@ -1,0 +1,27 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "is-email": "^1.0.2",
+    "is-uuid": "^1.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "list": "^2.0.19",
+    "multer": "^2.0.2",
+    "node": "^20.19.5",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "prisma": "^6.15.0",
+    "zod": "^4.1.5"
+  },
+  "scripts": {
+    "seed": "node prisma/seed.js",
+    "dev": "nodemon app.js",
+    "start": "node app.js"
+  }
+}
