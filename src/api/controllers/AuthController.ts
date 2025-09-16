@@ -20,10 +20,13 @@ const AuthController = {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
         maxAge: 1 * 60 * 60 * 1000,
       });
 
@@ -62,10 +65,13 @@ const AuthController = {
       // 쿠키에 토큰 저장
       res.cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
       res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
         maxAge: 1 * 60 * 60 * 1000,
       });
 
