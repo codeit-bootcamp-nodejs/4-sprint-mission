@@ -6,6 +6,8 @@ node_modules
 /uploads
 .prettierrc
 /generated/prisma
+.vscode/
+/dist
 
 # Node.js 기본
 node_modules/
