@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String   @unique
+  image     String?
+  password  String
+  refreshToken  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //관계 필드
+  products Product[]
+  posts    Post[]
+  comments Comment[]
+  likes    Like[]
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //관계 필드
+  User     User      @relation(fields: [userId], references: [id])
+  userId   Int
+  comments Comment[]
+  likes    Like[]
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //관계 필드
+  User     User      @relation(fields: [userId], references: [id])
+  userId   Int
+  comments Comment[]
+  likes    Like[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //관계 필드
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  // 댓글은 product나 post 중 하나에 달릴 수 있음
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
+  Post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // 관계 필드
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
+  Post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
+
+  // 중복 좋아요 방지
+  @@unique([userId, productId])
+  @@unique([userId, postId])
+}
