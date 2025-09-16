@@ -58,6 +58,10 @@
     "esModuleInterop": true, // 'require'와 'import' 호환
     "resolveJsonModule": true // .json 확장자로 import된 모듈을 포함
   },
-  "include": ["src/**/*", "test"],
-  "exclude": ["node_modules", "eslint.config.ts", "tsconfig.json"] // 컴파일에서 제외할 목록
+  "include": ["src/**/*", "test", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "eslint.config.ts", "tsconfig.json"], // 컴파일에서 제외할 목록
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }
