@@ -6,6 +6,7 @@ import type { Prisma } from "@prisma/client";
 import { generateTokens } from "../libs/token.js";
 import { hashing } from "../libs/hashing.js";
 import * as AuthRepository from "../repositories/AuthRepository.js";
+import { log } from "console";
 
 const MypageService = {
   async getUser(userId: number) {
@@ -66,6 +67,18 @@ const MypageService = {
     await AuthRepository.updateUserRefreshToken(userId, hashedRefreshToken);
 
     return { accessToken, refreshToken };
+  },
+
+  async deleteUser(userId: number) {
+    const user = await MypageRepository.findUserProfile(userId);
+
+    if (!user) {
+      const error: CustomError = new Error("사용자를 찾을 수 없습니다.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    await MypageRepository.deleteUser(userId);
   },
 
   async getProducts(userId: number) {

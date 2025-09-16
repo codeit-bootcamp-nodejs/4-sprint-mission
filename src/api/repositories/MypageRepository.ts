@@ -32,6 +32,12 @@ export const updatePassword = async (userId: number, hashedNewPassword: string) 
   });
 };
 
+export const deleteUser = async (userId: number) => {
+  return await prisma.user.delete({
+    where: { id: userId },
+  });
+};
+
 export const findProductsByUserId = async (userId: number) => {
   return await prisma.product.findMany({
     where: { userId },

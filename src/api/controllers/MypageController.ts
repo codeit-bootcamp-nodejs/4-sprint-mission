@@ -47,6 +47,19 @@ const MypageController = {
     }
   },
 
+  async deleteUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id: userId } = req.user;
+
+      await MypageService.deleteUser(userId);
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      res.status(204).json("회원 탈퇴가 완료되었습니다.");
+    } catch (err) {
+      next(err);
+    }
+  },
+
   async getProducts(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
