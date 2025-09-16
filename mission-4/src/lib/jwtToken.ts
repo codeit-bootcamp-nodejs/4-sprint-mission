@@ -1,20 +1,20 @@
-import jwt from "jsonwebtoken";
-import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from "./constants.js";
+import jwt, { type JwtPayload } from 'jsonwebtoken';
+import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants.js';
 
-function generateToken(userid) {
-  const accessToken = jwt.sign({ id: userid }, JWT_ACCESS_TOKEN_SECRET, {
-    expiresIn: "1h",
+function generateToken(userId: number) {
+  const accessToken = jwt.sign({ userId }, JWT_ACCESS_TOKEN_SECRET, {
+    expiresIn: '1h',
   });
-  const refreshToken = jwt.sign({ id: userid }, JWT_REFRESH_TOKEN_SECRET, {
-    expiresIn: "24h",
+  const refreshToken = jwt.sign({ userId }, JWT_REFRESH_TOKEN_SECRET, {
+    expiresIn: '24h',
   });
   return { accessToken, refreshToken };
 }
 
-function verifyAccessToken(token) {
-  return jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+function verifyAccessToken(token: string) {
+  return jwt.verify(token, JWT_ACCESS_TOKEN_SECRET) as JwtPayload;
 }
-function verifyRefreshToken(token) {
-  return jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
+function verifyRefreshToken(token: string) {
+  return jwt.verify(token, JWT_REFRESH_TOKEN_SECRET) as JwtPayload;
 }
 export { generateToken, verifyAccessToken, verifyRefreshToken };
