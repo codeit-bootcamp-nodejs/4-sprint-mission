@@ -52,7 +52,7 @@ const ArticleController = {
       const { id } = req.params;
       const updateData: ArticleDto = req.body;
       const article = await ArticleService.updateArticle(Number(id), updateData, userId);
-      res.status(201).json(article);
+      res.status(200).json(article);
     } catch (err) {
       next(err);
     }
@@ -63,7 +63,7 @@ const ArticleController = {
       const { id: userId } = req.user;
       const { id } = req.params;
       await ArticleService.deleteArticle(Number(id), userId);
-      res.status(201).json({ success: "상품 삭제 성공" });
+      res.status(204).json({ success: "상품 삭제 성공" });
     } catch (err) {
       next(err);
     }

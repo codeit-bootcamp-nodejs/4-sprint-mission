@@ -29,7 +29,7 @@ const CommentController = {
       const updateData: CommentDto = req.body;
 
       const comment = await CommentService.updateComment(Number(id), updateData, userId);
-      res.status(201).json(comment);
+      res.status(200).json(comment);
     } catch (err) {
       if (err.code === "P2025") {
         res.status(404).json({ error: "해당 댓글이 존재하지 않음" });
@@ -43,7 +43,7 @@ const CommentController = {
       const { id: userId } = req.user;
       const { id } = req.params;
       await CommentService.deleteComment(Number(id), userId);
-      res.status(201).json({ success: "댓글 삭제" });
+      res.status(204).json({ success: "댓글 삭제" });
     } catch (err) {
       if (err.code === "P2025") {
         res.status(404).json({ error: "해당 댓글이 존재하지 않음" });

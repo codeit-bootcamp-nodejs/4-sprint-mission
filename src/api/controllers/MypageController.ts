@@ -19,7 +19,7 @@ const MypageController = {
       const { id: userId } = req.user;
       const updateData: UpdateUserDTO = req.body;
       const updatedUser = await MypageService.updateUser(userId, updateData);
-      res.status(201).json(updatedUser);
+      res.status(200).json(updatedUser);
     } catch (err) {
       next(err);
     }
@@ -31,7 +31,7 @@ const MypageController = {
       const updatePasswordData: UpdatePasswordDTO = req.body;
 
       await MypageService.updatePassword(userId, updatePasswordData);
-      res.status(201).json("비밀번호 변경이 완료되었습니다.");
+      res.status(200).json("비밀번호 변경이 완료되었습니다.");
     } catch (err) {
       next(err);
     }

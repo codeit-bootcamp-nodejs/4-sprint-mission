@@ -57,7 +57,7 @@ const ProductController = {
       if (!product) {
         return res.status(404).json({ error: "수정할 상품이 없음" });
       }
-      res.status(201).json(product);
+      res.status(200).json(product);
     } catch (err) {
       next(err);
     }
@@ -69,7 +69,7 @@ const ProductController = {
       const { id: userId } = req.user;
       await ProductService.deleteProduct(Number(id), userId);
 
-      res.status(201).json({ success: "상품 삭제 성공" });
+      res.status(204).json({ success: "상품 삭제 성공" });
     } catch (err) {
       next(err);
     }
