@@ -1,3 +1,4 @@
+import type { RequestHandler } from 'express';
 import {
   getUserService,
   patchUserService,
@@ -5,36 +6,54 @@ import {
   getUserContentListService,
   getUserContentLikeListService,
 } from '../services/userService.js';
+import type { JwtPayload } from 'jsonwebtoken';
+import { hasContent, hasTokenPayload } from '@/types/guard.js';
+import { BadRequestError, UnauthorizedError } from '@/lib/errors.js';
 
 class UserController {
-  async getUser(req, res) {
-    const { id } = req.tokenPayload;
-    const result = await getUserService({ id });
+  getUser: RequestHandler = async (req, res) => {
+    if (!hasTokenPayload(req)) {
+      throw new UnauthorizedError('인증 정보가 없습니다.');
+    }
+    const { userId }: JwtPayload = req.tokenPayload;
+    const result = await getUserService({ userId });
     return res.status(200).json(result);
-  }
-  async patchUser(req, res) {
-    const { id } = req.tokenPayload;
+  };
+  patchUser: RequestHandler = async (req, res) => {
+    if (!hasTokenPayload(req)) {
+      throw new UnauthorizedError('인증 정보가 없습니다.');
+    }
+    const { userId } = req.tokenPayload;
     const data = req.body;
-    const result = await patchUserService({ id, data });
+    const result = await patchUserService({ userId, data });
     return res.status(200).json(result);
-  }
-  async deleteUser(req, res) {
-    const { id } = req.tokenPayload;
-    const result = await deleteUserService({ id });
+  };
+  deleteUser: RequestHandler = async (req, res) => {
+    if (!hasTokenPayload(req)) {
+      throw new UnauthorizedError('인증 정보가 없습니다.');
+    }
+    const { userId } = req.tokenPayload;
+    const result = await deleteUserService({ userId });
     return res.status(200).json(result);
-  }
-  async getUserContentList(req, res) {
-    const { id } = req.tokenPayload;
+  };
+  getUserContentList: RequestHandler = async (req, res) => {
+    if (!hasContent(req)) {
+      throw new BadRequestError();
+    }
+    const { userId } = req.tokenPayload;
     const content = req.content;
-    const result = await getUserContentListService({ id, content });
+    const result = await getUserContentListService({ userId, content });
     return res.status(200).json(result);
-  }
-  async getUserContentLikeList(req, res) {
-    const { id } = req.tokenPayload;
+  };
+  getUserContentLikeList: RequestHandler = async (req, res) => {
+    if (!hasContent(req)) {
+      throw new BadRequestError();
+    }
+    const { userId } = req.tokenPayload;
     const content = req.content;
-    const result = await getUserContentLikeListService({ id, content });
+    const result = await getUserContentLikeListService({ userId, content });
     return res.status(200).json(result);
-  }
+  };
 }
 
 export default new UserController();
