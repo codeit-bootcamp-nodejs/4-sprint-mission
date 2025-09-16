@@ -1,11 +1,10 @@
 import { PrismaClient } from '@prisma/client';
-import articleSeed from './seeds/article.js';
 
 const prisma = new PrismaClient();
 
 async function main() {
   //   await productSeed();
-  await articleSeed();
+  // await articleSeed();
 }
 
 main()
