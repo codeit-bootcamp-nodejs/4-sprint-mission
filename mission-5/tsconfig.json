@@ -2,21 +2,21 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "rootDir": "./src",
     "outDir": "./dist",
 
     "paths": {
-      "@/*": ["*"],
+      "@/*": ["src/*"],
       // lib 폴더를 위한 별칭
-      "@lib/*": ["lib/*"],
+      "@lib/*": ["src/lib/*"],
       // services 폴더를 위한 별칭
-      "@services/*": ["services/*"],
+      "@services/*": ["src/services/*"],
       // controllers 폴더를 위한 별칭
-      "@controllers/*": ["controllers/*"],
-      "@validations/*": ["validations/*"],
-      "@routers/*": ["routers/*"],
-      "@middlewares/*": ["middlewares/*"]
+      "@controllers/*": ["src/controllers/*"],
+      "@validations/*": ["src/validations/*"],
+      "@routers/*": ["src/routers/*"],
+      "@middlewares/*": ["src/middlewares/*"]
     },
 
     // Environment Settings
@@ -61,7 +61,6 @@
   "include": ["src/**/*", "test", "src/**/*.d.ts"],
   "exclude": ["node_modules", "eslint.config.ts", "tsconfig.json"], // 컴파일에서 제외할 목록
   "ts-node": {
-    "esm": true,
-    "experimentalSpecifierResolution": "node"
+    "esm": true
   }
 }
