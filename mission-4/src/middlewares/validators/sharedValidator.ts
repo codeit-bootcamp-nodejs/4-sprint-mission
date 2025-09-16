@@ -1,4 +1,4 @@
-import { idSchema, getListSchema } from '../../validations/commonSchema.js';
+import { idSchema, getListSchema } from '../../validations/sharedSchema.js';
 import createValidator from '../validator.factory.js';
 
 export const validateId = createValidator((req) => {

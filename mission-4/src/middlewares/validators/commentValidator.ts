@@ -3,7 +3,7 @@ import { getCommentListSchema } from '../../validations/commentSchema.js';
 import createValidator from '../validator.factory.js';
 
 export const validateGetListQuery = createValidator((req) => {
-  req.parsedQuery = getCommentListSchema.parse(req.query);
+  req.parsedCursorQuery = getCommentListSchema.parse(req.query);
 });
 
 export const validatePostBody = createValidator((req) => {

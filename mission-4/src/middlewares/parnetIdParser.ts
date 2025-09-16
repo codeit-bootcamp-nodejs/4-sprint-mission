@@ -1,16 +1,18 @@
-import { idSchema } from '../validations/commonSchema.js';
+import type { RequestHandler } from 'express';
+import { idSchema } from '../validations/sharedSchema.js';
 
-export default function parentIdParser(req, res, next) {
+const parentIdParser: RequestHandler = (req, res, next) => {
   const url = req.baseUrl;
   const { id } = idSchema.parse(req.params);
   req.parentId = id;
 
   if (url.startsWith('/product')) {
-    req.parentType = 'product';
+    req.parentType = 'products';
   } else if (url.startsWith('/article')) {
-    req.parentType = 'article';
+    req.parentType = 'articles';
   } else {
     return res.status(400).json({ error: '올바르지 않은 부모 타입입니다.' });
   }
-  next();
-}
+  return next();
+};
+export default parentIdParser;
