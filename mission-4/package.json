@@ -5,9 +5,9 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
-    "start": "node -r tsconfig-paths/register dist/app.js",
-    "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/app.ts"
+    "build": "rimraf dist && tsc && tsc-alias",
+    "start": "node dist/app.js",
+    "dev": "nodemon --exec node --loader ts-node/esm src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
   "type": "module",
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/redis": "^4.0.10",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -24,7 +25,6 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
-    "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",
@@ -37,18 +37,24 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
+    "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^24.3.1",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
     "jiti": "^2.5.1",
+    "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0"
