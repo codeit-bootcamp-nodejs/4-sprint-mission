@@ -1,0 +1,125 @@
+import { Request, Response } from "express";
+import {
+  createArticleService,
+  deleteArticleService,
+  getArticleByIdService,
+  getArticleService,
+  updateArticleService,
+} from "../services/article_service";
+
+interface ArticleParam {
+  id: string;
+}
+
+interface ArticleQuery {
+  offset?: string;
+  limit?: string;
+  search?: string;
+}
+
+export async function createArticleController(
+  req: Request<{}, {}, Article.Create>,
+  res: Response
+) {
+  try {
+    const { title, content } = req.body;
+    const user = req.user;
+    if (!title || !content) {
+      return res.status(400).json({ message: "title과 content가 필요합니다." });
+    }
+    if (!user) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+    const result = await createArticleService({ title, content, user });
+    res.status(201).json(result);
+  } catch (e) {
+    res.status(500).json({ message: (e as Error).message });
+  }
+}
+
+export async function deleteArticleController(
+  req: Request<ArticleParam>,
+  res: Response
+) {
+  try {
+    const id = parseInt(req.params.id);
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+    await deleteArticleService({ id, user });
+    res.send("success");
+  } catch (e) {
+    if ((e as Error).message === "NOT_FOUND") {
+      res.status(404).json({ message: "존재하지 않는 게시물입니다." });
+    }
+    if ((e as Error).message === "FORBIDDEN") {
+      res.status(403).json({ message: "권한이 없습니다." });
+    }
+    res.json({ message: (e as Error).message });
+  }
+}
+
+export async function getArticleByIdController(
+  req: Request<ArticleParam>,
+  res: Response
+) {
+  try {
+    const id = parseInt(req.params.id);
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+    const result = await getArticleByIdService({ id, user });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ message: (e as Error).message });
+  }
+}
+
+export async function getArticleController(
+  req: Request<{}, {}, {}, ArticleQuery>,
+  res: Response
+) {
+  try {
+    const offset = parseInt(req.query.offset ?? "0");
+    const limit = parseInt(req.query.limit ?? "10");
+    const search = req.query.search?.toString() || "";
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+    const result = await getArticleService({ offset, limit, search, user });
+    res.json(result);
+  } catch (e) {
+    res.status(500).json({ message: (e as Error).message });
+  }
+}
+
+export async function updateArticleController(
+  req: Request<ArticleParam, {}, Article.Update["updateData"]>,
+  res: Response
+) {
+  try {
+    const id = parseInt(req.params.id);
+    const user = req.user;
+    const { title, content } = req.body;
+    const updateData: Article.Update["updateData"] = {};
+
+    if (title) updateData.title = title;
+    if (content) updateData.content = content;
+    if (!user) {
+      return res.status(401).json({ message: "로그인이 필요합니다." });
+    }
+    const result = await updateArticleService({ id, updateData, user });
+    res.send(result);
+  } catch (e) {
+    if ((e as Error).message === "NOT_FOUND") {
+      res.status(404).json({ message: "존재하지 않는 게시물입니다." });
+    }
+    if ((e as Error).message === "FORBIDDEN") {
+      res.status(403).json({ message: "권한이 없습니다." });
+    }
+    res.json({ message: (e as Error).message });
+  }
+}
