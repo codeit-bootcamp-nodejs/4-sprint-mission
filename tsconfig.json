@@ -44,5 +44,5 @@
 
     "esModuleInterop": true
   }, 
-  "include":["types.d.ts", "srpint4-Ts/**/*"]
+  "include":["types.d.ts", "srpint4-TS/**/*"]
 }

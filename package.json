@@ -4,7 +4,10 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "main": "node sprint3/main.js"
+    "main": "node sprint3/main.js",
+    "build": "tsc sprint4-TS/*",
+    "start": "node sprint4-TS/main.js",
+    "dev": "nodemon --watch sprint4-TS --exec ts-node sprint4-TS/main.ts"
   },
   "author": "SonJuneYoung",
   "license": "ISC",
@@ -22,7 +25,6 @@
     "image-resize": "^1.4.1",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
-    "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0"
@@ -36,7 +38,9 @@
     "@types/node": "^24.4.0",
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
+    "nodemon": "^3.1.10",
     "prisma": "^6.13.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   },
   "prisma": {

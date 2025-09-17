@@ -1,7 +1,7 @@
-import articleRouter from "./router/article-router.js";
-import productRouter from "./router/product-router.js";
-import userRouter from "./router/user-router.js";
-import fileRouter from "./file.js";
+import articleRouter from "./router/article-router";
+import productRouter from "./router/product-router";
+import userRouter from "./router/user-router";
+import fileRouter from "./file";
 
 import cookieParser from "cookie-parser";
 import cors from 'cors';
@@ -9,7 +9,7 @@ import express from 'express';
 import 'dotenv/config';
 import passport from "passport";
 
-import { refreshJwtStrategy, accessJwtStrategy } from "./lib/passport-lib.js";
+import { refreshJwtStrategy, accessJwtStrategy } from "./lib/passport-lib";
 
 import type { Errback, Request, Response, NextFunction } from 'express';
 
