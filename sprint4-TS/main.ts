@@ -10,6 +10,9 @@ import 'dotenv/config';
 import passport from "passport";
 
 import { refreshJwtStrategy, accessJwtStrategy } from "./lib/passport-lib.js";
+
+import type { Errback, Request, Response, NextFunction } from 'express';
+
 const app = express();
 
 app.use(cors());
@@ -26,7 +29,7 @@ app.use('/article', articleRouter);
 app.use('/product', productRouter);
 app.use('/upload',fileRouter);
 
-app.use((err, req, res, next) =>{
+app.use((err: Errback, req: Request, res: Response, next: NextFunction) =>{
     if (err){
         res.json( err.message|| "Server Error Occured");
     }

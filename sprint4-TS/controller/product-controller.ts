@@ -2,6 +2,7 @@
 import productService from '../service/product-service';
 import prisma from '../lib/prisma'
 import type { Request, Response, NextFunction } from 'express';
+import { userInfo } from 'os';
 
 export class ProductController{
     getProducts = async (req: Request,res: Response,next: NextFunction) =>{
@@ -49,7 +50,11 @@ export class ProductController{
 
     postProduct = async (req: Request,res: Response,next: NextFunction) =>{
         const {name,description, price, tags} = req.body;
-
+        const user:any = req.user;
+        if (!user){
+            throw Error("no user")
+        }
+        const userId = user.id;
         try{
             const Product = await prisma.product.create({
                 data:{
@@ -57,8 +62,9 @@ export class ProductController{
                     description,
                     price,
                     tags,
+                    user:{connect:{id: userId}}
                 }
-            });
+        });
             console.log("post success");
             return res.status(201).send(Product);
             
@@ -143,7 +149,10 @@ export class ProductController{
     postComment = async (req: Request,res: Response,next: NextFunction) =>{
         let id;
         id = Number(req.params.id) ;
-
+        const user:any = req.user;
+        if (!user){
+            throw Error("no user")
+        }
         try{
             const commentContent = req.body.commentContent;
             if(!commentContent || commentContent.length>1000){
@@ -154,7 +163,8 @@ export class ProductController{
             const newComment = await prisma.productComment.create({
                 data: {
                     commentContent,
-                    product:{connect: {id}}
+                    product:{connect:{id}},
+                    user:{connect: {id: user.id}}
                 }
             });
             res.status(201).send(newComment);

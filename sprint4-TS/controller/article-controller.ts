@@ -84,10 +84,15 @@ export class ArticleController{
 
     postArticle = async (req: Request,res: Response,next: NextFunction) =>{
         const {title, articleContent} = req.body;
-
+        const user: any =  req.user;
+        if (!user){
+            const err = new Error("login first");
+            // err.status = 500;
+            return next(err);
+        }
         try{
             let Article =  await prisma.article.create({
-                data: {title,articleContent}
+                data: {title,articleContent, userId:user.id}
             });
             console.log("post Article success");
             return res.status(201).send(Article);
@@ -140,8 +145,10 @@ export class ArticleController{
 
     getComments = async(req: Request,res: Response,next:NextFunction) =>{
         try{
-            let {take = '10',skip= '1',commentId = '1'} = req.query;
-            
+            let {take = 10, skip= 1, commentId = 1} = req.query;
+            take = Number(take);
+            skip = Number(skip);
+            commentId = Number(skip);
             const data = {take, skip, commentId}
             const articleComment =await ArticleService.getComment(data);
 
@@ -158,7 +165,7 @@ export class ArticleController{
     postComment = async (req: Request,res: Response,next:NextFunction) =>{
 
         const id = Number(req.params.id) ;
-
+        const user:any = req.user;
         const commentContent = req.body.commentContent;
         if (!commentContent|| commentContent.length>500){
             next(new Error("invalid body"))
@@ -170,8 +177,14 @@ export class ArticleController{
                 commentContent,
                 article: {
                     connect: {id: id}
+                },
+                user:{
+                    connect:{
+                        id:user.id
+                    }
                 }
-            }
+            },
+
             });
             return res.status(201).send(newComment);
         } catch(error){
@@ -213,7 +226,7 @@ export class ArticleController{
 
     deleteComment = async (req: Request,res: Response,next:NextFunction) =>{
         try{
-            const CommentId= req.params.commentId
+            const CommentId= Number(req.params.commentId)
             await prisma.articleComment.delete({
                 where:{id: CommentId}
             })

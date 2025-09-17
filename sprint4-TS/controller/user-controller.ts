@@ -64,7 +64,8 @@ export class UserController{
     patchUser = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {nickname, image} = req.body;
-            const userId = Number(req.user.id);
+            const user:any = req.user
+            const userId = Number(user.id);
             const patchUser = await prisma.user.update({
                 where:{id:userId},
                 data:{nickname,image}
@@ -80,7 +81,8 @@ export class UserController{
     patchPassword = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {password} = req.body;
-            const userId = Number(req.user.id);
+            const user:any = req.user
+            const userId = Number(user.id);
             const patchUser = await prisma.user.update({
                 where:{id:userId},
                 data:{password}
@@ -111,7 +113,7 @@ export class UserController{
     }
 
     getLikedProduct = async(req: Request,res: Response,next: NextFunction) => {
-        const user = req.user
+        const user:any = req.user
 
         //likeModels는 유저, product의 정보를 가진 좋아요 모델의 list 
         const likedModels = user.productLike;

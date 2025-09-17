@@ -2,16 +2,17 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    // "rootDir": "./sprint4-TS",
-    // "outDir": "./sprint4-JS",
+    "rootDir": "./sprint4-TS",
+    "outDir": "./sprint4-JS",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "commonjs",
-    "target": "esnext",
-    "types": [],
+    "module": "nodenext",
+    "target": "es2022",
+    "moduleResolution": "nodenext",
+    // "types": [],
     // For nodejs:
-    // "lib": ["esnext"],
+    "lib": ["es2022"],
     // "types": ["node"],
     // and npm install -D @types/node
 
@@ -41,6 +42,7 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
 
-    "esModuleInterop": true,
-  }
+    "esModuleInterop": true
+  }, 
+  "include":["types.d.ts", "srpint4-Ts/**/*"]
 }

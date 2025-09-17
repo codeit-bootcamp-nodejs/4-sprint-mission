@@ -13,10 +13,11 @@ interface User{
 
 class LikeController{
     ArticleLike = async(req: Request,res: Response,next: NextFunction) => {
-        const user = req.user
+        const user:any = req.user
         let userId;
-        if (user){
-            userId = Number(user.id);
+        userId = Number(user.id);
+        if (!user){
+            throw Error("no user");
         }
         
         const articleId = Number(req.params.id);
@@ -27,7 +28,8 @@ class LikeController{
     }
 
     ArticleDislike = async(req: Request,res: Response,next: NextFunction) => {
-        const userId = Number(req.user.id);
+        const user:any = req.user;
+        const userId = Number(user.id);
         const articleId = Number(req.params.id);
         const findedLike = await prisma.articleLike.findFirst({
             where:{userId,articleId}
@@ -43,23 +45,30 @@ class LikeController{
 
     ProductLike = async(req: Request,res: Response,next: NextFunction) => {
         let userId;
+        const user:any = req.user;
         if (req.user){
-            userId = Number(req.user.id);
+            userId = Number(user.id);
         }
         
         const productId = Number(req.params.id);
         const like = await prisma.productLike.create({
-            data:{userId,productId}
+            data:{
+                user:{connect:{id: userId}},
+                product:{connect:{id:productId}}}
         })
         return like
     }
 
     ProductDislike = async(req: Request,res: Response,next: NextFunction) => {
-        const userId = Number(req.user.id);
+        const user:any = req.user;
+        const userId = Number(user.id);
         const productId = Number(req.params.id);
         const findLike = await prisma.productLike.findFirst({
             where:{userId,productId}
         })
+        if (!findLike){
+            throw Error("there isn't like")
+        }
         await prisma.productLike.delete({
             where:{id: findLike.id}
         })
