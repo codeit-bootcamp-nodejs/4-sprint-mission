@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import {
   ArticleLikeService,
   ProductLikeService,
-} from "../services/like_service.js";
+} from "../services/like_service";
 
 interface LikeParam {
   id?: string;
@@ -13,7 +13,7 @@ export async function ArticleLikeController(
   res: Response
 ) {
   try {
-    const id = parseInt(req.params.id ?? "1");
+    const id = parseInt(req.params.id!);
     const user = req.user;
     if (!user) {
       return res.status(401).json({ message: "로그인이 필요합니다." });
@@ -30,7 +30,7 @@ export async function ProductLikeController(
   res: Response
 ) {
   try {
-    const id = parseInt(req.params.id ?? "1");
+    const id = parseInt(req.params.id!);
     const user = req.user;
     if (!user) {
       return res.status(401).json({ message: "로그인이 필요합니다." });

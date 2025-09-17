@@ -1,8 +1,5 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import {
-  JWT_ACCESS_TOKEN_SECRET,
-  JWT_REFRESH_TOKEN_SECRET,
-} from "./constants.js";
+import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from "./constants";
 
 function generateTokens(userId: number) {
   const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {
