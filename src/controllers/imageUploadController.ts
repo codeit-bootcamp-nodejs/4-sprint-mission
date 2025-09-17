@@ -6,26 +6,27 @@ import { makeAbsoluteUrl } from "../lib/utils.js";
 import multer from "multer";
 import path from "path";
 import type { FileRequest } from "../types/controller/FileRequest.controller.types.js";
-import type { NextFunction, Response } from "express";
+import type { RequestHandler } from "express";
+import type { ParamsDictionary } from "express-serve-static-core";
 
 const MAX_WIDTH = 2000; // 최대 이미지 가로 크기
 const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
 const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
-export type FileController<ResBody = unknown> = (
-  req: FileRequest<unknown, ResBody>,
-  res: Response<ResBody>,
-  next: NextFunction
-) => Promise<Response<ResBody> | void>;
+export type FileController<ResBody = unknown> = RequestHandler<
+  ParamsDictionary,
+  ResBody
+>;
 
 export const imageUploadController: FileController<
   { urls: string[] } | { error: string }
 > = async (req, res, next) => {
   // 1️⃣ 업로드 파일 배열 정리
-  const files: Express.Multer.File[] = Array.isArray(req.files)
-    ? req.files
-    : req.files
-    ? Object.values(req.files).flat()
+  const fileReq = req as FileRequest; // 타입 단언
+  const files = Array.isArray(fileReq.files)
+    ? fileReq.files
+    : fileReq.files
+    ? Object.values(fileReq.files).flat()
     : [];
 
   if (!files.length)
@@ -80,7 +81,7 @@ export const imageUploadController: FileController<
     }
 
     // 5️⃣ 절대 경로 변환
-    const imageUrls = images.map((img) => makeAbsoluteUrl(req, img.url) ?? "");
+    const imageUrls = images.map((img) => makeAbsoluteUrl(img.url, req) ?? "");
 
     res.status(200).json({ urls: imageUrls });
   } catch (error: any) {

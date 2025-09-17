@@ -19,9 +19,10 @@ import type { QueryGuard } from "../types/controller/queryGuard.controller.types
 // 프로필 조회
 export const getProfileController: QueryGuard = async (req, res, next) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
+
     const userId = req.user.id;
     const user = await getUserById({ userId });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -39,7 +40,7 @@ export const updateProfileController: UpdateProfileController = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -64,7 +65,7 @@ export const changePasswordController: ChangePasswordController = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -91,9 +92,10 @@ export const changePasswordController: ChangePasswordController = async (
 // 계정 삭제
 export const deleteUserController: QueryGuard = async (req, res, next) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
+
     const userId = req.user.id;
     await deleteUserById({ userId });
     clearTokenCookies(res);
@@ -111,9 +113,10 @@ export const deleteUserController: QueryGuard = async (req, res, next) => {
 // 유저가 등록한 상품 목록 조회
 export const getProductsController: QueryGuard = async (req, res, next) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
+
     const userId = req.user.id;
     const products = await getUserProducts({ userId });
     res.status(200).json({ data: products });
@@ -129,7 +132,7 @@ export const getLikedProductsController: QueryGuard = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -166,7 +169,7 @@ export const getLikedArticlesController: QueryGuard = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 

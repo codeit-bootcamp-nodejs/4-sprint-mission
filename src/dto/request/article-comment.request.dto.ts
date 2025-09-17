@@ -2,10 +2,10 @@ export interface ArticleCommentBodyDto {
   content: string;
 }
 export interface ArticleCommentParamsDto {
-  commentId?: number;
-  articleId: number;
+  commentId?: string;
+  articleId: string;
 }
 export interface ArticleCommentQueryDto {
-  cursor?: number;
-  limit?: number;
+  cursor?: string;
+  limit?: string;
 }

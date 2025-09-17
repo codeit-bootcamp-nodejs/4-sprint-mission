@@ -1,4 +1,22 @@
-export default function errorHandler(err, req, res, next) {
+import type {
+  Request,
+  Response,
+  NextFunction,
+  ErrorRequestHandler,
+} from "express";
+
+interface AppError extends Error {
+  statusCode?: number;
+  errors?: unknown; // ZodError 등 상세 정보용
+  name: string;
+}
+
+const errorHandler: ErrorRequestHandler = (
+  err: AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   // 기본 상태 코드와 메시지 설정
   const statusCode = err.statusCode || 500;
   const message = err.message || "서버 오류가 발생했습니다.";
@@ -30,4 +48,5 @@ export default function errorHandler(err, req, res, next) {
       ...(process.env.NODE_ENV !== "production" && { stack: err.stack }),
     },
   });
-}
+};
+export default errorHandler;

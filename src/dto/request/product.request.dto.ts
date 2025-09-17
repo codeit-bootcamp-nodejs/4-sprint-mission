@@ -1,14 +1,17 @@
+import type { ParsedQs } from "qs";
+
 export interface ProductBodyDto {
   name: string;
   description: string;
-  price: number;
+  price: string;
   tags?: string[];
 }
 export interface ProductParamsDto {
-  id: number;
+  id: string;
+  [key: string]: string;
 }
-export interface ProductQueryDto {
-  page?: number;
-  pageSize?: number;
+export interface ProductQueryDto extends ParsedQs {
+  page?: string;
+  pageSize?: string;
   keyword?: string[];
 }

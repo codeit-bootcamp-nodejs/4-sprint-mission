@@ -15,6 +15,7 @@ import {
   validateProductBodyAndParams,
 } from "../middlewares/productValidation.js";
 import { optionalAuth } from "../middlewares/optionalAuth.js";
+import { withTypedHandler } from "../lib/typedRequestHandler.js";
 
 const router = express.Router();
 

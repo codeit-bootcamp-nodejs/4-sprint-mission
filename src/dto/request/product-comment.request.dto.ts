@@ -2,10 +2,10 @@ export interface ProductCommentBodyDto {
   content: string;
 }
 export interface ProductCommentParamsDto {
-  commentId?: number;
-  productId: number;
+  commentId?: string;
+  productId: string;
 }
 export interface ProductCommentQueryDto {
-  cursor?: number;
-  limit?: number;
+  cursor?: string;
+  limit?: string;
 }

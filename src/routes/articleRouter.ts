@@ -15,35 +15,49 @@ import {
   validateArticleBodyAndParams,
 } from "../middlewares/articleValidation.js";
 import { optionalAuth } from "../middlewares/optionalAuth.js";
+import { withTypedHandler } from "../lib/typedRequestHandler.js";
+import type {
+  ArticleBodyDto,
+  ArticleParamsDto,
+  ArticleQueryDto,
+} from "../dto/request/article.request.dto.js";
 
 const router = express.Router();
 
-router.get("/", validateArticleQuery, listArticleController);
+router.get(
+  "/",
+  validateArticleQuery,
+  withTypedHandler<unknown, unknown, unknown, ArticleQueryDto>(
+    listArticleController
+  )
+);
 
 router.get(
   "/:id",
   optionalAuth,
   validateArticleParams,
-  getArticleByIdController
+  withTypedHandler<ArticleParamsDto>(getArticleByIdController)
 );
 
 router.post(
   "/",
   passport.authenticate("access-token", { session: false }),
   validateArticleBody,
-  createArticleController
+  withTypedHandler<unknown, unknown, ArticleBodyDto>(createArticleController)
 );
 router.patch(
   "/:id",
   passport.authenticate("access-token", { session: false }),
   validateArticleBodyAndParams,
-  updateArticleController
+  withTypedHandler<ArticleParamsDto, unknown, ArticleBodyDto>(
+    updateArticleController
+  )
 );
 router.delete(
   "/:id",
   passport.authenticate("access-token", { session: false }),
   validateArticleParams,
-  deleteArticleController
+  withTypedHandler<ArticleParamsDto>(deleteArticleController)
 );
 
 // 특정 게시글 좋아요 / 좋아요 취소
@@ -51,7 +65,7 @@ router.post(
   "/:id/like",
   passport.authenticate("access-token", { session: false }),
   validateArticleParams,
-  toggleArticleLikeController
+  withTypedHandler<ArticleParamsDto>(toggleArticleLikeController)
 );
 
 export default router;

@@ -14,38 +14,53 @@ import {
   validateArticleCommentParamsAndQuery,
   validateArticleCommentBodyAndParams,
 } from "../middlewares/articleCommentValidation.js";
+import { withTypedHandler } from "../lib/typedRequestHandler.js";
+import type {
+  ArticleCommentBodyDto,
+  ArticleCommentParamsDto,
+  ArticleCommentQueryDto,
+} from "../dto/request/article-comment.request.dto.js";
 
 const router = express.Router();
 
 //게시글
 router.get(
-  "/articles/:id/comments",
+  "/articles/:articleId/comments",
   validateArticleCommentParamsAndQuery,
-  listArticleCommentController
+  withTypedHandler<
+    ArticleCommentParamsDto,
+    unknown,
+    unknown,
+    ArticleCommentQueryDto
+  >(listArticleCommentController)
 );
 router.get(
-  "/articles/:id/comments/:commentId",
+  "/articles/:articleId/comments/:commentId",
   validateArticleCommentParams,
-  getArticleCommentByIdController
+  withTypedHandler<ArticleCommentParamsDto>(getArticleCommentByIdController)
 );
 
 router.post(
-  "/articles/:id/comments",
+  "/articles/:articleId/comments",
   passport.authenticate("access-token", { session: false }),
   validateArticleCommentBodyAndParams,
-  createArticleCommentController
+  withTypedHandler<ArticleCommentParamsDto, unknown, ArticleCommentBodyDto>(
+    createArticleCommentController
+  )
 );
 router.patch(
-  "/articles/:id/comments/:commentId",
+  "/articles/:articleId/comments/:commentId",
   passport.authenticate("access-token", { session: false }),
   validateArticleCommentBodyAndParams,
-  updateArticleCommentController
+  withTypedHandler<ArticleCommentParamsDto, unknown, ArticleCommentBodyDto>(
+    updateArticleCommentController
+  )
 );
 router.delete(
-  "/articles/:id/comments/:commentId",
+  "/articles/:articleId/comments/:commentId",
   passport.authenticate("access-token", { session: false }),
   validateArticleCommentParams,
-  deleteArticleCommentController
+  withTypedHandler<ArticleCommentParamsDto>(deleteArticleCommentController)
 );
 
 export default router;

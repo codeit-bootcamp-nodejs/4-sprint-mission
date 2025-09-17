@@ -48,7 +48,7 @@ export const registerController: RegisterController = async (
 export const loginController: LoginController = async (req, res, next) => {
   try {
     // Passport 등 미들웨어로 인증 완료된 사용자 정보 확인
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -109,8 +109,8 @@ export const refreshTokensController: QueryGuard = async (req, res, next) => {
 
 // 구글 OAuth 콜백 처리
 export const googleCallback: QueryGuard = async (req, res, next) => {
-  if (!req.user) {
-    return res.status(401).json({ error: "사용자 인증에 실패했습니다." });
+  if (!req.user?.id) {
+    return res.status(401).json({ error: "인증이 필요합니다." });
   }
 
   const userId = req.user.id;

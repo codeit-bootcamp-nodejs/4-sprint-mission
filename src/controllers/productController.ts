@@ -16,40 +16,40 @@ import type {
   ListProductController,
   ToggleProductLikeController,
 } from "../types/controller/product.controller.types.js";
-import type { FileRequest } from "../types/controller/FileRequest.controller.types.js";
-import type { ProductBodyDto } from "../dto/request/product.request.dto.js";
 
 export const createProductController: CreateProductController = async (
-  req: FileRequest<unknown, unknown, ProductBodyDto>,
+  req,
   res,
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
     const data = {
       name: req.body.name,
       description: req.body.description,
-      price: req.body.price,
+      price: Number(req.body.price),
       tags: req.body.tags ?? [],
       userId: req.user.id,
       files: req.files ?? [],
     };
 
     const newProduct = await createProduct(data);
-    if (!newProduct) return res.status(500).json({ error: "상품 생성 실패" });
+    if (!newProduct) {
+      return res.status(500).json({ error: "상품 생성 실패" });
+    }
 
     // ✅ 응답 변환
     const response = {
       ...newProduct,
       images: newProduct.productImages.map((pi) =>
-        makeAbsoluteUrl(req, pi.image.url)
+        makeAbsoluteUrl(pi.image.url, req)
       ),
     };
 
-    res.status(201).json(response);
+    return res.status(201).json(response);
   } catch (error) {
     next(error);
   }
@@ -61,7 +61,7 @@ export const getProductByIdController: GetProductByIdController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
     const product = await getProductById({ id });
     if (!product) {
@@ -82,7 +82,7 @@ export const getProductByIdController: GetProductByIdController = async (
       tags: product.tags,
       user: product.User,
       images: product.productImages.map((pi) =>
-        pi.image?.url ? makeAbsoluteUrl(req, pi.image.url) : null
+        pi.image?.url ? makeAbsoluteUrl(pi.image.url, req) : null
       ),
       createdAt: product.createdAt,
       likeCount: product._count.productLikes,
@@ -103,9 +103,9 @@ export const updateProductController: UpdateProductController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -124,7 +124,7 @@ export const updateProductController: UpdateProductController = async (
       id,
       name: req.body.name,
       description: req.body.description,
-      price: req.body.price,
+      price: Number(req.body.price),
       tags: req.body.tags ?? [],
     };
 
@@ -142,9 +142,9 @@ export const deleteProductController: DeleteProductController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -172,9 +172,9 @@ export const listProductController: ListProductController = async (
   next
 ) => {
   try {
-    const page = Math.max(req.query.page ?? DEFAULT_PAGE, DEFAULT_PAGE);
+    const page = Math.max(Number(req.query.page) ?? DEFAULT_PAGE, DEFAULT_PAGE);
     const pageSize = Math.min(
-      Math.max(req.query.pageSize ?? MIN_PAGESIZE, MIN_PAGESIZE),
+      Math.max(Number(req.query.pageSize) ?? MIN_PAGESIZE, MIN_PAGESIZE),
       MAX_PAGESIZE
     );
     const rawKeyword = req.query.keyword;
@@ -196,7 +196,7 @@ export const listProductController: ListProductController = async (
       data: result.data.map((p) => ({
         ...p,
         thumbnail: p.productImages[0]
-          ? makeAbsoluteUrl(req, p.productImages[0].image.url)
+          ? makeAbsoluteUrl(p.productImages[0].image.url, req)
           : null,
       })),
       meta: {
@@ -221,11 +221,11 @@ export const toggleProductLikeController: ToggleProductLikeController = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
-    const data = { userId: req.user.id, id: req.params.id };
+    const data = { userId: req.user.id, id: Number(req.params.id) };
 
     // 서비스 함수 호출: 이미 좋아요 상태면 삭제, 아니면 생성 및 최신 데이터 다시 가져오기 (좋아요 개수 + 내가 눌렀는지)
     const result = await toggleProductLike(data);

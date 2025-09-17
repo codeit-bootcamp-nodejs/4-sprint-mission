@@ -20,7 +20,7 @@ export const optionalAuth: optionalAuthController = (req, res, next) => {
     (err: Error | null, user: PassportUser | false) => {
       if (err) return next(err);
       if (user) {
-        req.user = { user };
+        req.user = user;
       } // 인증 성공했을 때만 req.user 세팅
       next(); // 실패해도 그냥 통과
     }

@@ -1,4 +1,4 @@
 export interface QueryGuardDto {
-  page?: number;
-  pageSize?: number;
+  page?: string;
+  pageSize?: string;
 }

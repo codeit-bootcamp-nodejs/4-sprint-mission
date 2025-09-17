@@ -16,13 +16,13 @@ import type {
 export const createProductCommentController: CreateProductCommentController =
   async (req, res, next) => {
     try {
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       const data = {
         content: req.body.content,
-        productId: req.params.productId,
+        productId: Number(req.params.productId),
       };
 
       const productComment = await createProductComment(data);
@@ -37,12 +37,12 @@ export const updateProductCommentController: UpdateProductCommentController =
     try {
       const commentId = Number(req.params.commentId);
 
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       // 기존 댓글 조회
-      const input = { commentId, productId: req.params.productId };
+      const input = { commentId, productId: Number(req.params.productId) };
       const comment = await getProductCommentById(input);
       if (!comment) {
         return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
@@ -56,7 +56,7 @@ export const updateProductCommentController: UpdateProductCommentController =
       const data = {
         content: req.body.content,
         commentId,
-        productId: req.params.productId,
+        productId: Number(req.params.productId),
       };
 
       const pdCommentPatched = await updateProductComment(data);
@@ -71,12 +71,12 @@ export const deleteProductCommentController: DeleteProductCommentController =
     try {
       const commentId = Number(req.params.commentId);
 
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       // 기존 댓글 조회
-      const input = { commentId, productId: req.params.productId };
+      const input = { commentId, productId: Number(req.params.productId) };
       const comment = await getProductCommentById(input);
       if (!comment) {
         return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
@@ -87,7 +87,7 @@ export const deleteProductCommentController: DeleteProductCommentController =
         return res.status(403).json({ error: "삭제 권한이 없습니다." });
       }
 
-      const data = { commentId, productId: req.params.productId };
+      const data = { commentId, productId: Number(req.params.productId) };
       await deleteProductComment(data);
       res.status(200).json({ message: "댓글이 삭제되었습니다." });
     } catch (error) {
@@ -98,7 +98,7 @@ export const deleteProductCommentController: DeleteProductCommentController =
 export const listProductCommentController: ListProductCommentController =
   async (req, res, next) => {
     try {
-      const productId = Number(req.params.productId);
+      const productId = Number(Number(req.params.productId));
 
       // cursor → Date 변환
       const cursor =
@@ -138,7 +138,7 @@ export const getProductCommentByIdController: GetProductCommentByIdController =
   async (req, res, next) => {
     try {
       const commentId = Number(req.params.commentId);
-      const data = { commentId, productId: req.params.productId };
+      const data = { commentId, productId: Number(req.params.productId) };
       const productComment = await getProductCommentById(data);
       if (!productComment) {
         return res

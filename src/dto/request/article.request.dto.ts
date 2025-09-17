@@ -1,12 +1,14 @@
+import type { ParsedQs } from "qs";
+
 export interface ArticleBodyDto {
   title: string;
   content: string;
 }
 export interface ArticleParamsDto {
-  id: number;
+  id: string;
 }
-export interface ArticleQueryDto {
-  page?: number;
-  pageSize?: number;
+export interface ArticleQueryDto extends ParsedQs {
+  page?: string;
+  pageSize?: string;
   keyword?: string[];
 }

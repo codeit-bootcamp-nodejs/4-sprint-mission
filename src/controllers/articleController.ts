@@ -22,7 +22,7 @@ export const createArticleController: CreateArticleController = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -44,11 +44,12 @@ export const getArticleByIdController: GetArticleByIdController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
+
     const userId = req.user.id;
 
     const article = await getArticleById({ id });
@@ -82,9 +83,9 @@ export const updateArticleController: UpdateArticleController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -113,9 +114,9 @@ export const deleteArticleController: DeleteArticleController = async (
   next
 ) => {
   try {
-    const id = req.params.id;
+    const id = Number(req.params.id);
 
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
@@ -143,9 +144,9 @@ export const listArticleController: ListArticleController = async (
   next
 ) => {
   try {
-    const page = Math.max(req.query.page ?? DEFAULT_PAGE, DEFAULT_PAGE);
+    const page = Math.max(Number(req.query.page) ?? DEFAULT_PAGE, DEFAULT_PAGE);
     const pageSize = Math.min(
-      Math.max(req.query.pageSize ?? MIN_PAGESIZE, MIN_PAGESIZE),
+      Math.max(Number(req.query.pageSize) ?? MIN_PAGESIZE, MIN_PAGESIZE),
       MAX_PAGESIZE
     );
     const rawKeyword = req.query.keyword;
@@ -186,11 +187,11 @@ export const toggleArticleLikeController: ToggleArticleLikeController = async (
   next
 ) => {
   try {
-    if (!req.user) {
+    if (!req.user?.id) {
       return res.status(401).json({ error: "인증이 필요합니다." });
     }
 
-    const data = { userId: req.user.id, id: req.params.id };
+    const data = { userId: req.user.id, id: Number(req.params.id) };
 
     // 서비스 함수 호출: 이미 좋아요 상태면 삭제, 아니면 생성 및 최신 데이터 다시 가져오기 (좋아요 개수 + 내가 눌렀는지)
     const result = await toggleArticleLike(data);

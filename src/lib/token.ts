@@ -9,7 +9,7 @@ export interface Tokens {
   refreshToken: string;
 }
 // Access Token 생성
-async function generateTokens(userId: number): Promise<Tokens> {
+export async function generateTokens(userId: number): Promise<Tokens> {
   const accessSecret = new TextEncoder().encode(JWT_ACCESS_TOKEN_SECRET);
   const refreshSecret = new TextEncoder().encode(JWT_REFRESH_TOKEN_SECRET);
 
@@ -27,7 +27,9 @@ async function generateTokens(userId: number): Promise<Tokens> {
 }
 
 // Access Token 검증
-async function verifyAccessToken(token: string): Promise<{ userId: number }> {
+export async function verifyAccessToken(
+  token: string
+): Promise<{ userId: number }> {
   const { payload } = await jose.jwtVerify(
     token,
     new TextEncoder().encode(JWT_ACCESS_TOKEN_SECRET)
@@ -36,12 +38,12 @@ async function verifyAccessToken(token: string): Promise<{ userId: number }> {
 }
 
 // Refresh Token 검증
-async function verifyRefreshToken(token: string): Promise<{ userId: number }> {
+export async function verifyRefreshToken(
+  token: string
+): Promise<{ userId: number }> {
   const { payload } = await jose.jwtVerify(
     token,
     new TextEncoder().encode(JWT_REFRESH_TOKEN_SECRET)
   );
   return { userId: Number(payload.sub) };
 }
-
-export { generateTokens, verifyAccessToken, verifyRefreshToken };

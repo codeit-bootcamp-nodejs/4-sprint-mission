@@ -14,6 +14,12 @@ import {
   validateProductCommentParamsAndQuery,
   validateProductCommentBodyAndParams,
 } from "../middlewares/productCommentValidation.js";
+import { withTypedHandler } from "../lib/typedRequestHandler.js";
+import type {
+  ProductCommentBodyDto,
+  ProductCommentParamsDto,
+  ProductCommentQueryDto,
+} from "../dto/request/product-comment.request.dto.js";
 
 const router = express.Router();
 
@@ -21,32 +27,41 @@ const router = express.Router();
 router.get(
   "/products/:productId/comments",
   validateProductCommentParamsAndQuery,
-  listProductCommentController
+  withTypedHandler<
+    ProductCommentParamsDto,
+    unknown,
+    unknown,
+    ProductCommentQueryDto
+  >(listProductCommentController)
 );
 
 router.get(
   "/products/:productId/comments/:commentId",
   validateProductCommentParams,
-  getProductCommentByIdController
+  withTypedHandler<ProductCommentParamsDto>(getProductCommentByIdController)
 );
 
 router.post(
   "/products/:productId/comments",
   passport.authenticate("access-token", { session: false }),
   validateProductCommentBodyAndParams,
-  createProductCommentController
+  withTypedHandler<ProductCommentParamsDto, unknown, ProductCommentBodyDto>(
+    createProductCommentController
+  )
 );
 router.patch(
   "/products/:productId/comments/:commentId",
   passport.authenticate("access-token", { session: false }),
   validateProductCommentBodyAndParams,
-  updateProductCommentController
+  withTypedHandler<ProductCommentParamsDto, unknown, ProductCommentBodyDto>(
+    updateProductCommentController
+  )
 );
 router.delete(
   "/products/:productId/comments/:commentId",
   passport.authenticate("access-token", { session: false }),
   validateProductCommentParams,
-  deleteProductCommentController
+  withTypedHandler<ProductCommentParamsDto>(deleteProductCommentController)
 );
 
 export default router;

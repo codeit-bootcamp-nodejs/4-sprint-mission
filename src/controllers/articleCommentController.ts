@@ -16,13 +16,13 @@ import type {
 export const createArticleCommentController: CreateArticleCommentController =
   async (req, res, next) => {
     try {
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       const data = {
         content: req.body.content,
-        articleId: req.params.articleId,
+        articleId: Number(Number(req.params.articleId)),
       };
       const articleComment = await createArticleComment(data);
       res.status(201).json(articleComment);
@@ -35,12 +35,12 @@ export const updateArticleCommentController: UpdateArticleCommentController =
   async (req, res, next) => {
     try {
       const commentId = Number(req.params.commentId);
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       // 기존 댓글 조회
-      const input = { commentId, articleId: req.params.articleId };
+      const input = { commentId, articleId: Number(req.params.articleId) };
       const comment = await getArticleCommentById(input);
       if (!comment) {
         return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
@@ -54,7 +54,7 @@ export const updateArticleCommentController: UpdateArticleCommentController =
       const data = {
         content: req.body.content,
         commentId,
-        articleId: req.params.articleId,
+        articleId: Number(req.params.articleId),
       };
 
       const atcCommentPatched = await updateArticleComment(data);
@@ -69,12 +69,12 @@ export const deleteArticleCommentController: DeleteArticleCommentController =
     try {
       const commentId = Number(req.params.commentId);
 
-      if (!req.user) {
+      if (!req.user?.id) {
         return res.status(401).json({ error: "인증이 필요합니다." });
       }
 
       // 기존 댓글 조회
-      const input = { commentId, articleId: req.params.articleId };
+      const input = { commentId, articleId: Number(req.params.articleId) };
       const comment = await getArticleCommentById(input);
       if (!comment) {
         return res.status(404).json({ error: "댓글을 찾을 수 없습니다." });
@@ -85,7 +85,7 @@ export const deleteArticleCommentController: DeleteArticleCommentController =
         return res.status(403).json({ error: "삭제 권한이 없습니다." });
       }
 
-      const data = { commentId, articleId: req.params.articleId };
+      const data = { commentId, articleId: Number(req.params.articleId) };
       await deleteArticleComment(data);
       res.status(200).json({ message: "댓글이 삭제되었습니다." });
     } catch (error) {
@@ -136,7 +136,7 @@ export const getArticleCommentByIdController: GetArticleCommentByIdController =
   async (req, res, next) => {
     try {
       const commentId = Number(req.params.commentId);
-      const data = { commentId, articleId: req.params.articleId };
+      const data = { commentId, articleId: Number(req.params.articleId) };
       const articleComment = await getArticleCommentById(data);
       if (!articleComment) {
         return res
