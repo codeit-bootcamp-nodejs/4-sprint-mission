@@ -1,4 +1,5 @@
 import * as articleRepo from "../repository/article_repository";
+import { AppError } from "../utils/error";
 
 export async function createArticleService({
   title,
@@ -15,15 +16,15 @@ export async function createArticleService({
 
 export async function deleteArticleService({ id, user }: Article.Delete) {
   const article = await articleRepo.findUniqueRepo(id);
-  if (!article) throw new Error("NOT_FOUND");
-  if (article.userId !== user.id) throw new Error("FORBIDDEN");
+  if (!article) throw new AppError("존재하지 않는 게시글입니다.", 404);
+  if (article.userId !== user.id) throw new AppError("권한이 없습니다.", 403);
   await articleRepo.deleteArticleRepo(id);
 }
 
 export async function getArticleByIdService({ id, user }: Article.Delete) {
   const article = await articleRepo.getArticleByIdRepo(id);
   if (!article) {
-    throw new Error("NOT_FOUND");
+    throw new AppError("존재하지 않는 게시글입니다.", 404);
   }
   const { _count, like, ...rest } = article;
   return {
@@ -58,10 +59,10 @@ export async function updateArticleService({
 }: Article.Update) {
   const article = await articleRepo.findUniqueRepo(id);
   if (!article) {
-    throw new Error("NOT_FOUND");
+    throw new AppError("존재하지 않는 게시글입니다.", 404);
   }
   if (article.userId !== user.id) {
-    throw new Error("FORBIDDEN");
+    throw new AppError("권한이 없습니다.", 403);
   }
   const updatedArticle = articleRepo.updateArticleRepo({
     id,

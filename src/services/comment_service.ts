@@ -1,4 +1,5 @@
 import * as commentRepo from "../repository/comment_repository";
+import { AppError } from "../utils/error";
 
 export async function createArticleCommentService({
   id,
@@ -32,8 +33,8 @@ export async function deleteCommentService({
 }: Comment.Delete) {
   const id = commentId;
   const comment = await commentRepo.findUniqueRepo(id);
-  if (!comment) throw new Error("NOT_FOUND");
-  if (comment.userId !== user.id) throw new Error("FORBIDDEN");
+  if (!comment) throw new AppError("존재하지 않는 댓글입니다.", 404);
+  if (comment.userId !== user.id) throw new AppError("권한이 없습니다.", 403);
   await commentRepo.deleteCommentRepo(id);
 }
 
@@ -62,8 +63,8 @@ export async function updateCommentService({
 }: Comment.Update) {
   const id = commentId;
   const comment = await commentRepo.findUniqueRepo(id);
-  if (!comment) throw new Error("NOT_FOUND");
-  if (comment.userId !== user.id) throw new Error("FORBIDDEN");
+  if (!comment) throw new AppError("존재하지 않는 댓글입니다.", 404);
+  if (comment.userId !== user.id) throw new AppError("권한이 없습니다.", 403);
   const updated = await commentRepo.updateCommentRepo({
     commentId,
     content,

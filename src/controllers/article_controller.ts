@@ -6,6 +6,7 @@ import {
   getArticleService,
   updateArticleService,
 } from "../services/article_service";
+import { AppError } from "../utils/error";
 
 interface ArticleParam {
   id: string;
@@ -50,13 +51,11 @@ export async function deleteArticleController(
     await deleteArticleService({ id, user });
     res.send("success");
   } catch (e) {
-    if ((e as Error).message === "NOT_FOUND") {
-      res.status(404).json({ message: "존재하지 않는 게시물입니다." });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
     }
-    if ((e as Error).message === "FORBIDDEN") {
-      res.status(403).json({ message: "권한이 없습니다." });
-    }
-    res.json({ message: (e as Error).message });
   }
 }
 
@@ -114,12 +113,10 @@ export async function updateArticleController(
     const result = await updateArticleService({ id, updateData, user });
     res.send(result);
   } catch (e) {
-    if ((e as Error).message === "NOT_FOUND") {
-      res.status(404).json({ message: "존재하지 않는 게시물입니다." });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
     }
-    if ((e as Error).message === "FORBIDDEN") {
-      res.status(403).json({ message: "권한이 없습니다." });
-    }
-    res.json({ message: (e as Error).message });
   }
 }

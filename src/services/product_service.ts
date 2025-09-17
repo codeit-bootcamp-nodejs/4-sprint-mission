@@ -1,4 +1,5 @@
 import * as productRepo from "../repository/product_repository";
+import { AppError } from "../utils/error";
 
 export async function createProductService({ data, user }: Product.Create) {
   const product = await productRepo.createProductRepo({ data, user });
@@ -7,15 +8,15 @@ export async function createProductService({ data, user }: Product.Create) {
 
 export async function deleteProductService({ id, user }: Product.Delete) {
   const product = await productRepo.findUniqueProduct(id);
-  if (!product) throw new Error("NOT_FOUND");
-  if (product.userId !== user.id) throw new Error("FORBIDDEN");
+  if (!product) throw new AppError("존재하지 않는 상품입니다.", 404);
+  if (product.userId !== user.id) throw new AppError("권한이 없습니다.", 403);
   await productRepo.deleteProduct(id);
 }
 
 export async function getProductByIdService({ id, user }: Product.Delete) {
   const product = await productRepo.getProductByIdRepo(id);
   if (!product) {
-    throw new Error("NOT_FOUND");
+    throw new AppError("존재하지 않는 상품입니다.", 404);
   }
   const { _count, like, ...rest } = product;
   return {
@@ -45,8 +46,8 @@ export async function updateProductService({
   user,
 }: Product.Update) {
   const product = await productRepo.findUniqueProduct(id);
-  if (!product) throw new Error("NOT_FOUND");
-  if (product.userId !== user.id) throw new Error("FORBIDDEN");
+  if (!product) throw new AppError("존재하지 않는 상품입니다.", 404);
+  if (product.userId !== user.id) throw new AppError("권한이 없습니다.", 403);
   const updatedProduct = await productRepo.updateProduct({
     id,
     updateData,

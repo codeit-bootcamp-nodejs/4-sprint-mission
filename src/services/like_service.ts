@@ -12,7 +12,6 @@ export async function ArticleLikeService({ id, user }: Article.Delete) {
 }
 
 export async function ProductLikeService({ id, user }: Article.Delete) {
-  const productId = id;
   const alreadyLike = await likeRepo.findUniqeProduct({ id, user });
   if (alreadyLike) {
     await likeRepo.deleteProductLikeRepo({ id, user });

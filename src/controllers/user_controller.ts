@@ -6,6 +6,7 @@ import {
   updateUserService,
 } from "../services/user_service";
 import bcrypt from "bcrypt";
+import { AppError } from "../utils/error";
 
 interface UserParam {
   id?: string;
@@ -27,9 +28,11 @@ export async function getUserByIdController(
     const result = await getUserByIdService(userId);
     return res.status(200).json(result);
   } catch (e) {
-    if ((e as Error).message == "NOT FOUND")
-      return res.status(404).json({ message: "회원이 없습니다." });
-    return res.status(500).json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -38,9 +41,11 @@ export async function getUserController(req: Request, res: Response) {
     const result = await getUserService();
     return res.status(200).json(result);
   } catch (e) {
-    if ((e as Error).message == "NOT FOUND")
-      return res.status(404).json({ message: "회원이 없습니다." });
-    return res.status(500).json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -88,9 +93,10 @@ export async function updateUserController(
     const result = await updateUserService({ id, updateData });
     return res.send(result);
   } catch (e) {
-    if ((e as Error).message === "NOT_FOUND") {
-      return res.status(404).json({ message: "존재하지 않는 게시물입니다." });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
     }
-    return res.json({ message: (e as Error).message });
   }
 }
