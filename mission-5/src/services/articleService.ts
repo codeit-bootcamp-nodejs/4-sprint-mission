@@ -2,9 +2,14 @@ import { ForbiddenError } from '@/lib/errors.js';
 import type { ArticleParams, PatchArticle, PostArticle } from '@/types/article.types.js';
 import type { GetListParams } from '@/types/shared.type.js';
 import type { ArticleRepository } from '@/repositories/articles.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ArticleService {
-  constructor(private readonly articleRepository: ArticleRepository) {}
+  constructor(
+    @inject(TYPES.ArticleRepository) private readonly articleRepository: ArticleRepository
+  ) {}
 
   async authorization({ userId, articleId }: ArticleParams): Promise<boolean> {
     const article = await this.articleRepository.findOwnerById({ articleId });

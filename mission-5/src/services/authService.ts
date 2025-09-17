@@ -6,9 +6,12 @@ import { REDIS_KEY } from '@lib/constants.js';
 import type { Login, Signup } from '@/types/auth.types.js';
 import { ForbiddenError, UnauthorizedError } from '@/lib/errors.js';
 import type { AuthRepository } from '@/repositories/auths.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(@inject(TYPES.AuthRepository) private readonly authRepository: AuthRepository) {}
   async signup({ email, nickname, password }: Signup) {
     const hashedPassword = await passwordHashing(password);
     const user = await this.authRepository.create({ email, nickname, hashedPassword });

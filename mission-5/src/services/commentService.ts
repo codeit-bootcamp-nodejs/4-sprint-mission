@@ -8,9 +8,14 @@ import type { Prisma } from '@prisma/client';
 import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
 import type { CommentRepository } from '@/repositories/comments.repository.js';
 import type { SingularContentType } from '@/types/shared.type.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class CommentService {
-  constructor(private readonly commentRepository: CommentRepository) {}
+  constructor(
+    @inject(TYPES.CommentRepository) private readonly commentRepository: CommentRepository
+  ) {}
 
   async authorization({ userId, commentId }: CommentParams): Promise<boolean> {
     const comment = await this.commentRepository.findOwnerById({ commentId });

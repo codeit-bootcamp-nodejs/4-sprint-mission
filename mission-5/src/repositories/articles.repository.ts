@@ -9,9 +9,12 @@ import type {
 } from '@/dto/articles.dto.js';
 import type { ArticleId } from '@/types/article.types.js';
 import type { PrismaClient } from '@prisma/client';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ArticleRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private readonly prisma: PrismaClient) {}
 
   async findOwnerById({ articleId }: ArticleId) {
     return await this.prisma.article.findUniqueOrThrow({

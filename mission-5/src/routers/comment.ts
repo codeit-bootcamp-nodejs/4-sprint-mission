@@ -7,9 +7,13 @@ import {
   validateGetListQuery,
 } from '@middlewares/validators/commentValidator.js';
 import { validateId } from '@middlewares/validators/sharedValidator.js';
-import { commentController } from '@lib/container.js';
+import container from '@lib/inversify.config.js';
+import type { CommentController } from '@controllers/commentController.js';
+import { TYPES } from '@/types/layer.types.js';
 
 const commentRouter = express.Router();
+
+const commentController = container.get<CommentController>(TYPES.CommentController);
 
 // prettier-ignore
 commentRouter.route('/')

@@ -9,9 +9,12 @@ import type {
 } from '@/dto/products.dto.js';
 import type { ProductId } from '@/types/product.types.js';
 import type { PrismaClient } from '@prisma/client';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ProductRepository {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private readonly prisma: PrismaClient) {}
 
   async findOwnerById({ productId }: ProductId) {
     return await this.prisma.product.findUniqueOrThrow({

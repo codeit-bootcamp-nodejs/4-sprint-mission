@@ -4,9 +4,12 @@ import { BadRequestError, UnauthorizedError } from '@lib/errors.js';
 import type { PatchUserData, UserContentResponse, GetUserContent } from '@/types/user.types.js';
 import type { Options, SingularContentType, UserId } from '@/types/shared.type.js';
 import type { UserRepository } from '@/repositories/users.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(@inject(TYPES.UserRepository) private readonly userRepository: UserRepository) {}
 
   async getUser({ userId }: UserId) {
     const result = await this.userRepository.findById({ userId });

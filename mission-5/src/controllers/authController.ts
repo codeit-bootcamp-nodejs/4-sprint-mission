@@ -1,9 +1,12 @@
 import type { RequestHandler } from 'express';
 import { AuthService } from '@/services/authService.js';
 import { UnauthorizedError } from '@/lib/errors.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@inject(TYPES.AuthService) private readonly authService: AuthService) {}
 
   signup: RequestHandler = async (req, res) => {
     const result = await this.authService.signup(req.body);

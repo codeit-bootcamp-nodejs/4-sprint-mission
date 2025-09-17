@@ -8,10 +8,13 @@ import {
   hasTokenPayload,
 } from '@/types/guard.js';
 import { BadRequestError } from '@lib/errors.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
 // prettier-ignore
+@injectable()
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(@inject(TYPES.CommentService) private readonly commentService: CommentService) {}
 
   getCommentList: RequestHandler = async (req, res) =>{
     if(!hasParent(req) || !hasCursorQuery(req)){

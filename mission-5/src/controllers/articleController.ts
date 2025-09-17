@@ -2,9 +2,12 @@ import { BadRequestError } from '@lib/errors.js';
 import { hasId, hasIdAndUserId, hasParsedQuery, hasTokenPayload } from '@/types/guard.js';
 import type { RequestHandler } from 'express';
 import type { ArticleService } from '@services/articleService.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ArticleController {
-  constructor(private readonly articleService: ArticleService) {}
+  constructor(@inject(TYPES.ArticleService) private readonly articleService: ArticleService) {}
 
   getArticle: RequestHandler = async (req, res) => {
     if (!hasId(req)) {

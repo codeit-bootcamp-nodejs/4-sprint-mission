@@ -5,9 +5,13 @@ import {
   validatePatchUser,
 } from '@middlewares/validators/userValidator.js';
 import authentication from '@middlewares/authentication.js';
-import { userController } from '@lib/container.js';
+import container from '@lib/inversify.config.js';
+import { TYPES } from '@/types/layer.types.js';
+import type { UserController } from '@controllers/userController.js';
 
 const userRouter = express.Router();
+
+const userController = container.get<UserController>(TYPES.UserController);
 
 // prettier-ignore
 userRouter.route("/")

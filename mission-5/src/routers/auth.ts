@@ -2,9 +2,13 @@ import express from 'express';
 import asyncHandler from '@middlewares/asyncHandler.js';
 import { validateLoginBody, validateSignupBody } from '@middlewares/validators/authValidator.js';
 import authentication from '@/middlewares/authentication.js';
-import { authController } from '@lib/container.js';
+import container from '@lib/inversify.config.js';
+import { AuthController } from '@controllers/authController.js';
+import { TYPES } from '@/types/layer.types.js';
 
 const authRouter = express.Router();
+
+const authController = container.get<AuthController>(TYPES.AuthController);
 
 // prettier-ignore
 authRouter.route('/signup')

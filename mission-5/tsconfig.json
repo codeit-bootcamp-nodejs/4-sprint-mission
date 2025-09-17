@@ -10,6 +10,7 @@
       "@/*": ["src/*"],
       // lib 폴더를 위한 별칭
       "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"],
       // services 폴더를 위한 별칭
       "@services/*": ["src/services/*"],
       // controllers 폴더를 위한 별칭
@@ -56,7 +57,11 @@
     "skipLibCheck": true, // 직접 설치한 라이브러리 타입 검사 건너뜀
 
     "esModuleInterop": true, // 'require'와 'import' 호환
-    "resolveJsonModule": true // .json 확장자로 import된 모듈을 포함
+    "resolveJsonModule": true, // .json 확장자로 import된 모듈을 포함
+
+    // inversify
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": ["src/**/*", "test", "src/**/*.d.ts"],
   "exclude": ["node_modules", "eslint.config.ts", "tsconfig.json"], // 컴파일에서 제외할 목록

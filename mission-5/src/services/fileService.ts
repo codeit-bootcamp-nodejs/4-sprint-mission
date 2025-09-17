@@ -4,9 +4,12 @@ import prisma from '../lib/prisma.js';
 import type { FileParams, PostImage } from '@/types/file.types.js';
 import { ForbiddenError } from '@/lib/errors.js';
 import type { FileRepository } from '@/repositories/files.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class FileService {
-  constructor(private readonly fileRepository: FileRepository) {}
+  constructor(@inject(TYPES.FileRepository) private readonly fileRepository: FileRepository) {}
 
   async authorization({ userId, id }: EntityId & UserId): Promise<boolean> {
     const image = await this.fileRepository.findById({ id });

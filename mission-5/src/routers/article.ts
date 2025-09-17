@@ -6,9 +6,13 @@ import { validatePatchBody, validatePostBody } from '@middlewares/validators/art
 import authentication from '@middlewares/authentication.js';
 import optionalAuthentication from '@middlewares/optionalAuthentication.js';
 import { validateGetListQuery, validateId } from '@middlewares/validators/sharedValidator.js';
-import { articleController } from '@lib/container.js';
+import container from '@lib/inversify.config.js';
+import { TYPES } from '@/types/layer.types.js';
+import type { ArticleController } from '@controllers/articleController.js';
 
 const articleRouter = express.Router();
+
+const articleController = container.get<ArticleController>(TYPES.ArticleController);
 
 articleRouter.use('/:id/comment', parentIdParser, commentRouter);
 

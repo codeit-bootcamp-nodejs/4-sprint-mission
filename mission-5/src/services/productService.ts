@@ -2,9 +2,14 @@ import { ForbiddenError } from '@/lib/errors.js';
 import type { PatchProduct, PostProduct, ProductParams } from '@/types/product.types.js';
 import type { GetListParams } from '@/types/shared.type.js';
 import type { ProductRepository } from '@/repositories/products.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ProductService {
-  constructor(private readonly productRepository: ProductRepository) {}
+  constructor(
+    @inject(TYPES.ProductRepository) private readonly productRepository: ProductRepository
+  ) {}
 
   async authorization({ userId, productId }: ProductParams): Promise<boolean> {
     const product = await this.productRepository.findOwnerById({ productId });

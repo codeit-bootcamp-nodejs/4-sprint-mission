@@ -3,9 +3,12 @@ import type { RequestHandler } from 'express';
 import { hasId, hasIdAndUserId, hasParsedQuery, hasTokenPayload } from '@/types/guard.js';
 import { BadRequestError } from '@/lib/errors.js';
 import type { ProductService } from '../services/productService.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
 
+@injectable()
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(@inject(TYPES.ProductService) private readonly productService: ProductService) {}
 
   getProduct: RequestHandler = async (req, res) => {
     if (!hasId(req)) {

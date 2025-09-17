@@ -4,9 +4,13 @@ import asyncHandler from '@middlewares/asyncHandler.js';
 import { validatePostFile } from '@middlewares/validators/fileValidator.js';
 import authentication from '@middlewares/authentication.js';
 import { validateId } from '@middlewares/validators/sharedValidator.js';
-import { fileController } from '@lib/container.js';
+import container from '@lib/inversify.config.js';
+import type { FileController } from '@controllers/fileController.js';
+import { TYPES } from '@/types/layer.types.js';
 
 const fileRouter = express.Router();
+
+const fileController = container.get<FileController>(TYPES.FileController);
 
 // prettier-ignore
 fileRouter.route("/")
