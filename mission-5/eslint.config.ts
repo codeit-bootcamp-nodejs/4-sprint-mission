@@ -3,6 +3,7 @@ import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended'
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import unusedImports from 'eslint-plugin-unused-imports';
 
 export default defineConfig([
   // 기본 및 TypeScript 규칙 적용
@@ -32,12 +33,17 @@ export default defineConfig([
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
+      'unused-imports': unusedImports,
     },
     rules: {
-      '@typescript-eslint/no-unused-vars': [
-        'warn', // 또는 'error'
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error', // 'error'로 설정해야 자동 수정됩니다.
+      'unused-imports/no-unused-vars': [
+        'warn',
         {
+          vars: 'all',
           varsIgnorePattern: '^_',
+          args: 'after-used',
           argsIgnorePattern: '^_',
         },
       ],
