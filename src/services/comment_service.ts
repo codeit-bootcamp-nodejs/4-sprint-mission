@@ -1,17 +1,14 @@
-import prisma from "./prisma";
+import * as commentRepo from "../repository/comment_repository";
 
 export async function createArticleCommentService({
   id,
   content,
   user,
 }: Comment.Create) {
-  const articleId = id;
-  const comment = await prisma.comment.create({
-    data: {
-      content,
-      userId: user.id,
-      articleId,
-    },
+  const comment = await commentRepo.createArticleCommentRepo({
+    id,
+    content,
+    user,
   });
   return comment;
 }
@@ -21,13 +18,10 @@ export async function createProductCommentService({
   content,
   user,
 }: Comment.Create) {
-  const productId: number = id;
-  const comment = await prisma.comment.create({
-    data: {
-      content,
-      userId: user.id,
-      productId,
-    },
+  const comment = await commentRepo.createProductCommentRepo({
+    id,
+    content,
+    user,
   });
   return comment;
 }
@@ -37,12 +31,10 @@ export async function deleteCommentService({
   user,
 }: Comment.Delete) {
   const id = commentId;
-  const comment = await prisma.comment.findUnique({ where: { id } });
+  const comment = await commentRepo.findUniqueRepo(id);
   if (!comment) throw new Error("NOT_FOUND");
   if (comment.userId !== user.id) throw new Error("FORBIDDEN");
-  await prisma.comment.delete({
-    where: { id },
-  });
+  await commentRepo.deleteCommentRepo(id);
 }
 
 export async function getArticleCommentService({
@@ -50,18 +42,7 @@ export async function getArticleCommentService({
   take,
   cursor,
 }: Comment.Get) {
-  const comment = await prisma.comment.findMany({
-    where: { articleId: id },
-    take,
-    skip: cursor ? 1 : 0,
-    ...(cursor && { cursor: { id: cursor } }),
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-    },
-  });
+  const comment = await commentRepo.getArticleRepo({ id, take, cursor });
   return comment;
 }
 
@@ -70,18 +51,7 @@ export async function getProductCommentService({
   take,
   cursor,
 }: Comment.Get) {
-  const comment = await prisma.comment.findMany({
-    where: { productId: id },
-    take,
-    skip: cursor ? 1 : 0,
-    ...(cursor && { cursor: { id: cursor } }),
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-    },
-  });
+  const comment = await commentRepo.getProductRepo({ id, take, cursor });
   return comment;
 }
 
@@ -91,12 +61,13 @@ export async function updateCommentService({
   user,
 }: Comment.Update) {
   const id = commentId;
-  const comment = await prisma.comment.findUnique({ where: { id } });
+  const comment = await commentRepo.findUniqueRepo(id);
   if (!comment) throw new Error("NOT_FOUND");
   if (comment.userId !== user.id) throw new Error("FORBIDDEN");
-  const updated = await prisma.comment.update({
-    where: { id },
-    data: { content, userId: user.id },
+  const updated = await commentRepo.updateCommentRepo({
+    commentId,
+    content,
+    user,
   });
   return updated;
 }

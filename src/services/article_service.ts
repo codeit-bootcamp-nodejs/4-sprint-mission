@@ -1,43 +1,27 @@
-import prisma from "./prisma";
+import * as articleRepo from "../repository/article_repository";
 
 export async function createArticleService({
   title,
   content,
   user,
 }: Article.Create) {
-  const article = await prisma.article.create({
-    data: { title, content, userId: user.id },
+  const article = await articleRepo.createArticleRepo({
+    title,
+    content,
+    user,
   });
   return article;
 }
 
 export async function deleteArticleService({ id, user }: Article.Delete) {
-  const article = await prisma.article.findUnique({ where: { id } });
+  const article = await articleRepo.findUniqueRepo(id);
   if (!article) throw new Error("NOT_FOUND");
   if (article.userId !== user.id) throw new Error("FORBIDDEN");
-  await prisma.article.delete({
-    where: { id },
-  });
+  await articleRepo.deleteArticleRepo(id);
 }
 
 export async function getArticleByIdService({ id, user }: Article.Delete) {
-  const article = await prisma.article.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-      comment: true,
-      userId: true,
-      _count: {
-        select: { like: true },
-      },
-      like: {
-        select: { userId: true },
-      },
-    },
-  });
+  const article = await articleRepo.getArticleByIdRepo(id);
   if (!article) {
     throw new Error("NOT_FOUND");
   }
@@ -56,31 +40,7 @@ export async function getArticleService({
   user,
 }: Article.Get) {
   try {
-    const article = await prisma.article.findMany({
-      where: {
-        OR: [
-          { title: { contains: search } },
-          { content: { contains: search } },
-        ],
-      },
-      skip: offset,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        content: true,
-        createdAt: true,
-        comment: true,
-        userId: true,
-        _count: {
-          select: { like: true },
-        },
-        like: {
-          select: { userId: true },
-        },
-      },
-    });
+    const article = await articleRepo.getArticleRepo(offset, limit, search);
     return article.map(({ _count, like, ...rest }) => ({
       ...rest,
       likeCount: _count.like,
@@ -96,17 +56,17 @@ export async function updateArticleService({
   updateData,
   user,
 }: Article.Update) {
-  const article = await prisma.article.findUnique({ where: { id } });
+  const article = await articleRepo.findUniqueRepo(id);
   if (!article) {
     throw new Error("NOT_FOUND");
   }
   if (article.userId !== user.id) {
     throw new Error("FORBIDDEN");
   }
-  const updatedArticle = await prisma.article.update({
-    where: { id },
-    data: { ...updateData, userId: user.id },
+  const updatedArticle = articleRepo.updateArticleRepo({
+    id,
+    updateData,
+    user,
   });
-
   return updatedArticle;
 }

@@ -1,15 +1,8 @@
 import { User } from "@prisma/client";
-import prisma from "./prisma";
+import * as UserRepo from "../repository/user_repository";
 
 export async function getUserByIdService(id: number) {
-  const user = await prisma.user.findUnique({
-    where: { id },
-    include: {
-      comment: true,
-      article: true,
-      product: true,
-    },
-  });
+  const user = await UserRepo.getUserById(id);
   if (!user) throw new Error("NOT FOUND");
 
   return user;
@@ -17,19 +10,13 @@ export async function getUserByIdService(id: number) {
 
 export async function getUserLikeService(user: User) {
   const userId = user.id;
-  const articles = await prisma.like.findMany({
-    where: { userId },
-    select: { article: true },
-  });
+  const articles = await UserRepo.getArticles(userId);
 
   const likeArticles = articles
     .map((l) => l.article)
     .filter((article) => article !== null);
 
-  const products = await prisma.like.findMany({
-    where: { userId },
-    select: { product: true },
-  });
+  const products = await UserRepo.getProducts(userId);
 
   const likeProducts = products
     .map((l) => l.product)
@@ -39,24 +26,15 @@ export async function getUserLikeService(user: User) {
 }
 
 export async function getUserService() {
-  const user = await prisma.user.findMany({
-    include: {
-      comment: true,
-      article: true,
-      product: true,
-    },
-  });
+  const user = await UserRepo.getUser();
   if (!user || user.length === 0) throw new Error("NOT FOUND");
 
   return user;
 }
 
 export async function updateUserService({ id, updateData }: Users.Update) {
-  const user = await prisma.user.findUnique({ where: { id } });
+  const user = await UserRepo.findUniqueUser(id);
   if (!user) throw new Error("NOT_FOUND");
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: updateData,
-  });
+  const updatedUser = await UserRepo.updateUser({ id, updateData });
   return updatedUser;
 }

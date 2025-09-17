@@ -1,7 +1,7 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
-import prisma from "../services/prisma";
+import prisma from "../repository/prisma";
 import { generateTokens, verifyRefreshToken } from "../lib/token";
 import {
   ACCESS_TOKEN_COOKIE_NAME,

@@ -1,4 +1,4 @@
-import prisma from "../services/prisma";
+import prisma from "../repository/prisma";
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../lib/token";
 import { ACCESS_TOKEN_COOKIE_NAME } from "../lib/constants";

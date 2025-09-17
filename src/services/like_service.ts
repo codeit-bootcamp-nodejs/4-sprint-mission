@@ -1,43 +1,24 @@
-import prisma from "./prisma";
+import * as likeRepo from "../repository/like_repository";
 
 export async function ArticleLikeService({ id, user }: Article.Delete) {
-  const articleId = id;
-  const alreadyLike = await prisma.like.findUnique({
-    where: { articleId_userId: { articleId, userId: user.id } },
-  });
+  const alreadyLike = await likeRepo.findUniqueArticle({ id, user });
   if (alreadyLike) {
-    await prisma.like.delete({
-      where: { articleId_userId: { articleId, userId: user.id } },
-    });
+    await likeRepo.deleteArticleLikeRepo({ id, user });
     return { message: "좋아요가 취소되었습니다." };
   } else {
-    const like = await prisma.like.create({
-      data: {
-        articleId,
-        userId: user.id,
-      },
-    });
+    await likeRepo.ArticleLikeRepo({ id, user });
     return { message: "좋아요 성공" };
   }
 }
 
 export async function ProductLikeService({ id, user }: Article.Delete) {
   const productId = id;
-  const alreadyLike = await prisma.like.findUnique({
-    where: { productId_userId: { productId, userId: user.id } },
-  });
+  const alreadyLike = await likeRepo.findUniqeProduct({ id, user });
   if (alreadyLike) {
-    await prisma.like.delete({
-      where: { productId_userId: { productId, userId: user.id } },
-    });
+    await likeRepo.deleteProductLikeRepo({ id, user });
     return { message: "좋아요가 취소되었습니다." };
   } else {
-    const like = await prisma.like.create({
-      data: {
-        productId,
-        userId: user.id,
-      },
-    });
+    await likeRepo.ProductLikeRepo({ id, user });
     return { message: "좋아요 성공" };
   }
 }
