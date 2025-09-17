@@ -1,4 +1,3 @@
-import prisma from '@lib/prisma.js';
 import type {
   CreateDTO,
   DeleteDTO,
@@ -9,16 +8,19 @@ import type {
   UpdateDTO,
 } from '@/dto/products.dto.js';
 import type { ProductId } from '@/types/product.types.js';
+import type { PrismaClient } from '@prisma/client';
 
-class ProductRepository {
+export class ProductRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
   async findOwnerById({ productId }: ProductId) {
-    return await prisma.product.findUniqueOrThrow({
+    return await this.prisma.product.findUniqueOrThrow({
       where: { id: productId },
       select: { userId: true },
     });
   }
   async create({ userId, name, description, price, tags }: CreateDTO) {
-    return await prisma.product.create({
+    return await this.prisma.product.create({
       data: {
         name,
         description,
@@ -29,7 +31,7 @@ class ProductRepository {
     });
   }
   async findById({ productId, userId }: FindByIdDTO) {
-    return await prisma.product.findUniqueOrThrow({
+    return await this.prisma.product.findUniqueOrThrow({
       where: {
         id: productId,
       },
@@ -61,7 +63,7 @@ class ProductRepository {
     });
   }
   async findMany({ keyword, page, pageSize, userId }: FindManyDTO) {
-    return await prisma.product.findMany({
+    return await this.prisma.product.findMany({
       where: {
         OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
       },
@@ -96,18 +98,18 @@ class ProductRepository {
     });
   }
   async update({ productId, data }: UpdateDTO) {
-    return await prisma.product.update({
+    return await this.prisma.product.update({
       where: { id: productId },
       data,
     });
   }
   async delete({ productId }: DeleteDTO) {
-    return await prisma.product.delete({
+    return await this.prisma.product.delete({
       where: { id: productId },
     });
   }
   async like({ userId, productId }: LikeDTO) {
-    return await prisma.productLike.create({
+    return await this.prisma.productLike.create({
       data: {
         userId,
         productId,
@@ -118,7 +120,7 @@ class ProductRepository {
     });
   }
   async unlike({ userId, productId }: UnlikeDTO) {
-    return await prisma.productLike.delete({
+    return await this.prisma.productLike.delete({
       where: {
         userId_productId: {
           userId,
@@ -131,5 +133,3 @@ class ProductRepository {
     });
   }
 }
-
-export default new ProductRepository();

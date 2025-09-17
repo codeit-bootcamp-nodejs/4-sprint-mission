@@ -1,20 +1,17 @@
 import type { RequestHandler } from 'express';
-import {
-  signupService,
-  loginService,
-  logoutService,
-  refreshService,
-} from '../services/authService.js';
+import { AuthService } from '@/services/authService.js';
 import { UnauthorizedError } from '@/lib/errors.js';
 
-class AuthController {
+export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   signup: RequestHandler = async (req, res) => {
-    const result = await signupService(req.body);
+    const result = await this.authService.signup(req.body);
     return res.status(201).json(result);
   };
   login: RequestHandler = async (req, res) => {
     const { email: received_email, password: received_password } = req.body;
-    const result = await loginService({ received_email, received_password });
+    const result = await this.authService.login({ received_email, received_password });
     return res.status(200).json(result);
   };
   logout: RequestHandler = async (req, res) => {
@@ -27,7 +24,7 @@ class AuthController {
     if (!token) {
       throw new UnauthorizedError('토큰 형식이 올바르지 않습니다.');
     }
-    const result = await logoutService(token);
+    const result = await this.authService.logout(token);
     return res.status(200).json(result);
   };
   refresh: RequestHandler = async (req, res) => {
@@ -41,8 +38,7 @@ class AuthController {
     if (!refreshToken) {
       throw new UnauthorizedError('인증이 유효하지 않습니다.');
     }
-    const result = await refreshService(refreshToken);
+    const result = await this.authService.refresh(refreshToken);
     return res.status(200).json(result);
   };
 }
-export default new AuthController();

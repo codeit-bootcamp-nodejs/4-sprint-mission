@@ -1,9 +1,11 @@
-import prisma from '@lib/prisma.js';
 import type { findByEmailDTO, FindByIdDTO, SignupDTO, UpdateDTO } from '@/dto/auths.dto.js';
+import type { PrismaClient } from '@prisma/client';
 
-class AuthRepository {
+export class AuthRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
   async create({ email, nickname, hashedPassword }: SignupDTO) {
-    return await prisma.user.create({
+    return await this.prisma.user.create({
       data: {
         email,
         nickname,
@@ -12,12 +14,12 @@ class AuthRepository {
     });
   }
   async findByEmail({ received_email }: findByEmailDTO) {
-    return await prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUniqueOrThrow({
       where: { email: received_email },
     });
   }
   async update({ tx, userId, refreshToken }: UpdateDTO) {
-    const client = tx || prisma;
+    const client = tx || this.prisma;
     return await client.user.update({
       where: {
         id: userId,
@@ -28,7 +30,7 @@ class AuthRepository {
     });
   }
   async findById({ tx, userId }: FindByIdDTO) {
-    const client = tx || prisma;
+    const client = tx || this.prisma;
     return await client.user.findUniqueOrThrow({
       where: {
         id: userId,
@@ -41,4 +43,3 @@ class AuthRepository {
     });
   }
 }
-export default new AuthRepository();

@@ -1,4 +1,3 @@
-import prisma from '@/lib/prisma.js';
 import type {
   DeleteDTO,
   FindByIdDTO,
@@ -7,10 +6,13 @@ import type {
   UpdateDTO,
 } from '@/dto/users.dto.js';
 import type { UserWithContent } from '../types/user.types.js';
+import type { PrismaClient } from '@prisma/client';
 
-class UserRepository {
+export class UserRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
   async findById({ userId }: FindByIdDTO) {
-    return await prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
       },
@@ -25,7 +27,7 @@ class UserRepository {
     });
   }
   async findPasswordById({ userId }: FindByIdDTO) {
-    return await prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
       },
@@ -36,7 +38,7 @@ class UserRepository {
   }
 
   async update({ userId, updateData }: UpdateDTO) {
-    return await prisma.user.update({
+    return await this.prisma.user.update({
       where: {
         id: userId,
       },
@@ -53,7 +55,7 @@ class UserRepository {
   }
 
   async delete({ userId }: DeleteDTO) {
-    return await prisma.user.delete({
+    return await this.prisma.user.delete({
       where: {
         id: userId,
       },
@@ -68,7 +70,7 @@ class UserRepository {
     });
   }
   async findManyContent({ userId, options }: findManyContentDTO): Promise<UserWithContent> {
-    return await prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
       },
@@ -76,7 +78,7 @@ class UserRepository {
     });
   }
   async findManyLikeContent({ userId, singularContentType }: findManyLikeContentDTO) {
-    return await prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
       },
@@ -90,5 +92,3 @@ class UserRepository {
     });
   }
 }
-
-export default new UserRepository();

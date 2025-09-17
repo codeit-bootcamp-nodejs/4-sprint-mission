@@ -1,77 +1,71 @@
 import { ForbiddenError } from '@/lib/errors.js';
 import type { PatchProduct, PostProduct, ProductParams } from '@/types/product.types.js';
 import type { GetListParams } from '@/types/shared.type.js';
-import ProductRepository from '@/repositories/products.repository.js';
+import type { ProductRepository } from '@/repositories/products.repository.js';
 
-async function authorization({ userId, productId }: ProductParams): Promise<boolean> {
-  const product = await ProductRepository.findOwnerById({ productId });
-  return product.userId === userId;
-}
+export class ProductService {
+  constructor(private readonly productRepository: ProductRepository) {}
 
-// prettier-ignore
-async function getProductListService({ keyword, page, pageSize, userId }: GetListParams) {
-  const products = await ProductRepository.findMany({ keyword, page, pageSize, userId })
-  const results = products.map((product) => {
+  async authorization({ userId, productId }: ProductParams): Promise<boolean> {
+    const product = await this.productRepository.findOwnerById({ productId });
+    return product.userId === userId;
+  }
+
+  // prettier-ignore
+  async getProductList({ keyword, page, pageSize, userId }: GetListParams) {
+      const products = await this.productRepository.findMany({ keyword, page, pageSize, userId })
+      const results = products.map((product) => {
+        const { likes: _likes, _count, ...filteredProduct } = product;
+        return {
+          likeCount: product._count.likes,
+          isLike: userId ? product.likes.length === 1 : false,
+          ...filteredProduct,
+        };
+      });
+      return results;
+  }
+
+  async postProduct({ userId, name, description, price, tags }: PostProduct) {
+    const product = await this.productRepository.create({ userId, name, description, price, tags });
+    return product;
+  }
+
+  async getProduct({ productId, userId }: ProductParams) {
+    const product = await this.productRepository.findById({ productId, userId });
     const { likes: _likes, _count, ...filteredProduct } = product;
-    return {
+    const result = {
       likeCount: product._count.likes,
       isLike: userId ? product.likes.length === 1 : false,
       ...filteredProduct,
     };
-  });
-  return results;
-}
+    return result;
+  }
 
-async function postProductService({ userId, name, description, price, tags }: PostProduct) {
-  const product = await ProductRepository.create({ userId, name, description, price, tags });
-  return product;
-}
+  async patchProduct({ userId, productId, data }: PatchProduct) {
+    if (await this.authorization({ userId, productId })) {
+      const product = await this.productRepository.update({ productId, data });
+      return product;
+    } else {
+      throw new ForbiddenError('수정 권한이 없습니다.');
+    }
+  }
 
-async function getProductService({ productId, userId }: ProductParams) {
-  const product = await ProductRepository.findById({ productId, userId });
-  const { likes: _likes, _count, ...filteredProduct } = product;
-  const result = {
-    likeCount: product._count.likes,
-    isLike: userId ? product.likes.length === 1 : false,
-    ...filteredProduct,
-  };
-  return result;
-}
+  async deleteProduct({ userId, productId }: ProductParams) {
+    if (await this.authorization({ userId, productId })) {
+      const product = await this.productRepository.delete({ productId });
+      return product;
+    } else {
+      throw new ForbiddenError('삭제 권한이 없습니다.');
+    }
+  }
 
-async function patchProductService({ userId, productId, data }: PatchProduct) {
-  if (await authorization({ userId, productId })) {
-    const product = await ProductRepository.update({ productId, data });
+  async postProductLike({ userId, productId }: ProductParams) {
+    const product = await this.productRepository.like({ userId, productId });
     return product;
-  } else {
-    throw new ForbiddenError('수정 권한이 없습니다.');
+  }
+
+  async deleteProductLike({ userId, productId }: ProductParams) {
+    const product = await this.productRepository.unlike({ userId, productId });
+    return product;
   }
 }
-
-async function deleteProductService({ userId, productId }: ProductParams) {
-  if (await authorization({ userId, productId })) {
-    const product = await ProductRepository.delete({ productId });
-    return product;
-  } else {
-    throw new ForbiddenError('삭제 권한이 없습니다.');
-  }
-}
-
-async function postProductLikeService({ userId, productId }: ProductParams) {
-  const product = await ProductRepository.like({ userId, productId });
-  return product;
-}
-
-async function deleteProductLikeService({ userId, productId }: ProductParams) {
-  const product = await ProductRepository.unlike({ userId, productId });
-  return product;
-}
-
-export {
-  getProductListService,
-  postProductService,
-  getProductService,
-  patchProductService,
-  deleteProductService,
-  postProductLikeService,
-  deleteProductLikeService,
-};

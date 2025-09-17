@@ -7,19 +7,20 @@ import type {
   UnlikeDTO,
   UpdateDTO,
 } from '@/dto/articles.dto.js';
-import prisma from '@/lib/prisma.js';
 import type { ArticleId } from '@/types/article.types.js';
+import type { PrismaClient } from '@prisma/client';
 
-class ArticleRepository {
+export class ArticleRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
   async findOwnerById({ articleId }: ArticleId) {
-    return await prisma.article.findUniqueOrThrow({
+    return await this.prisma.article.findUniqueOrThrow({
       where: { id: articleId },
       select: { userId: true },
     });
   }
   async create({ title, userId, content }: CreateDTO) {
-    console.log('Repository: DB에 새 게시글 저장');
-    return await prisma.article.create({
+    return await this.prisma.article.create({
       data: {
         title,
         userId,
@@ -28,8 +29,7 @@ class ArticleRepository {
     });
   }
   async findById({ articleId, userId }: FindByIdDTO) {
-    console.log(`Repository: id ${articleId} 게시글 조회`);
-    return await prisma.article.findUniqueOrThrow({
+    return await this.prisma.article.findUniqueOrThrow({
       where: {
         id: articleId,
       },
@@ -59,8 +59,7 @@ class ArticleRepository {
     });
   }
   async findMany({ keyword, page, pageSize, userId }: FindManyDTO) {
-    console.log(`Repository: 게시글 목록 조회`);
-    return await prisma.article.findMany({
+    return await this.prisma.article.findMany({
       where: {
         OR: [{ title: { contains: keyword } }, { content: { contains: keyword } }],
       },
@@ -95,21 +94,18 @@ class ArticleRepository {
     });
   }
   async update({ articleId, data }: UpdateDTO) {
-    console.log(`Repository: id ${articleId} 게시글 업데이트`);
-    return await prisma.article.update({
+    return await this.prisma.article.update({
       where: { id: articleId },
       data,
     });
   }
   async delete({ articleId }: DeleteDTO) {
-    console.log(`Repository: id ${articleId} 게시글 삭제`);
-    return await await prisma.article.delete({
+    return await this.prisma.article.delete({
       where: { id: articleId },
     });
   }
   async like({ userId, articleId }: LikeDTO) {
-    console.log(`Repository: id ${articleId} 게시글 좋아요`);
-    return await prisma.articleLike.create({
+    return await this.prisma.articleLike.create({
       data: {
         userId,
         articleId,
@@ -120,8 +116,7 @@ class ArticleRepository {
     });
   }
   async unlike({ userId, articleId }: UnlikeDTO) {
-    console.log(`Repository: id ${articleId} 게시글 좋아요 취소`);
-    return await prisma.articleLike.delete({
+    return await this.prisma.articleLike.delete({
       where: {
         userId_articleId: {
           userId,
@@ -134,5 +129,3 @@ class ArticleRepository {
     });
   }
 }
-
-export default new ArticleRepository();

@@ -1,4 +1,3 @@
-import prisma from '@lib/prisma.js';
 import type {
   CreateDTO,
   DeleteDTO,
@@ -6,16 +5,19 @@ import type {
   FindManyDTO,
   UpdateDTO,
 } from '@/dto/comments.dto.js';
+import type { PrismaClient } from '@prisma/client';
 
-class CommentRepository {
+export class CommentRepository {
+  constructor(private readonly prisma: PrismaClient) {}
+
   async findOwnerById({ commentId }: FindByIdDTO) {
-    return await prisma.comment.findUniqueOrThrow({
+    return await this.prisma.comment.findUniqueOrThrow({
       where: { id: commentId },
       select: { userId: true },
     });
   }
   async create({ userId, parentId, singularParentType, content }: CreateDTO) {
-    return await prisma.comment.create({
+    return await this.prisma.comment.create({
       data: {
         content,
         [`${singularParentType}Id`]: parentId,
@@ -27,18 +29,17 @@ class CommentRepository {
     });
   }
   async findMany({ query }: FindManyDTO) {
-    return await prisma.comment.findMany(query);
+    return await this.prisma.comment.findMany(query);
   }
   async update({ commentId, content }: UpdateDTO) {
-    return await prisma.comment.update({
+    return await this.prisma.comment.update({
       where: { id: commentId },
       data: { content },
     });
   }
   async delete({ commentId }: DeleteDTO) {
-    return await prisma.comment.delete({
+    return await this.prisma.comment.delete({
       where: { id: commentId },
     });
   }
 }
-export default new CommentRepository();

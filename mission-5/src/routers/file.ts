@@ -1,10 +1,10 @@
 import express from 'express';
 import upload from '@lib/multer.js';
-import fileController from '@controllers/fileController.js';
 import asyncHandler from '@middlewares/asyncHandler.js';
 import { validatePostFile } from '@middlewares/validators/fileValidator.js';
 import authentication from '@middlewares/authentication.js';
 import { validateId } from '@middlewares/validators/sharedValidator.js';
+import { fileController } from '@lib/container.js';
 
 const fileRouter = express.Router();
 
