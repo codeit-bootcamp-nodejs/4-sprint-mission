@@ -1,18 +1,64 @@
-import express from 'express';
-import productController from '../controllers/productController';
-import productValidation from '../middleware/productValidation';
+import express from "express";
+import passport from "../lib/passport/index.js";
+import {
+  createProductController,
+  getProductByIdController,
+  updateProductController,
+  deleteProductController,
+  listProductController,
+  toggleProductLikeController,
+} from "../controllers/productController.js";
+import {
+  validateProductBody,
+  validateProductParams,
+  validateProductQuery,
+} from "../middleware/productValidation.js";
+import { optionalAuth } from "../middleware/optionalAuth.js";
 
 const router = express.Router();
 
-router
-  .route('/')
-  .post(productValidation, productController.createProduct)
-  .get(productController.listProduct);
+// 상품 목록 조회
+router.get("/", validateProductQuery, listProductController);
 
-router
-  .route('/:id')
-  .get(productController.getProductById)
-  .patch(productValidation, productController.updateProduct)
-  .delete(productController.deleteProduct);
+// 상품 상세 조회
+router.get(
+  "/:id",
+  optionalAuth,
+  validateProductParams,
+  getProductByIdController
+);
+
+// 상품등록
+router.post(
+  "/",
+  passport.authenticate("access-token", { session: false }),
+  validateProductBody,
+  createProductController
+);
+
+// 상품수정
+router.patch(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  validateProductBody,
+  validateProductParams,
+  updateProductController
+);
+
+// 상품삭제
+router.delete(
+  "/:id",
+  passport.authenticate("access-token", { session: false }),
+  validateProductParams,
+  deleteProductController
+);
+
+// 특정 상품 좋아요 및 좋아요 취소
+router.post(
+  "/:id/like",
+  passport.authenticate("access-token", { session: false }),
+  validateProductParams,
+  toggleProductLikeController
+);
 
 export default router;
