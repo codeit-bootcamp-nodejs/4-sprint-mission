@@ -17,7 +17,7 @@ export async function signupController(req, res, next) {
     const { email, nickname, password } = req.body;
 
     // 서비스 로직
-    const newUser = await signupService(email, nickname, password);
+    const newUser = await signupService.signup(email, nickname, password);
 
     // 응답
     return res.status(201).json({
@@ -36,7 +36,7 @@ export async function loginController(req, res, next) {
     const { email, password } = req.body;
 
     // 서비스 로직
-    const { safeuser, accessToken, refreshToken } = await loginService(
+    const { safeuser, accessToken, refreshToken } = await loginService.login(
       email,
       password
     );
@@ -60,7 +60,7 @@ export async function inquiryController(req, res, next) {
     const userId = req.user.userId;
 
     // 서비스 로직
-    const inquiryUser = await inquiryService(req.user.userId);
+    const inquiryUser = await inquiryService.inquiry(req.user.userId);
 
     // 응답
     res.status(200).json({
@@ -81,7 +81,7 @@ export async function editUserController(req, res, next) {
     const { password, nickname, email, image } = req.body || {};
 
     // 서비스 로직
-    const updatedUser = await editUserService(userId, {
+    const updatedUser = await editUserService.editUser(userId, {
       password,
       nickname,
       email,
@@ -106,7 +106,7 @@ export async function editPasswordController(req, res, next) {
     const { currentPassword, newPassword } = req.body;
 
     // 서비스 로직
-    const updatedPassword = await editPasswordService(userId, {
+    const updatedPassword = await editPasswordService.editPassword(userId, {
       currentPassword,
       newPassword,
     });
@@ -127,7 +127,7 @@ export async function refreshController(req, res, next) {
     const { refreshToken } = req.body;
 
     // 서비스 로직
-    const newAccessToken = await refreshService(refreshToken);
+    const newAccessToken = await refreshService.refresh(refreshToken);
 
     res.status(200).json({
       message: "토큰 재발급 성공",
@@ -145,7 +145,7 @@ export async function listupController(req, res, next) {
     const userId = req.user.userId;
 
     // 서비스 로직
-    const listup = await listupService(userId);
+    const listup = await listupService.listup(userId);
 
     // 응답
     res.status(200).json({

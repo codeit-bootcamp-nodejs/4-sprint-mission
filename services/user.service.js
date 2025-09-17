@@ -76,7 +76,7 @@ export async function loginService(email, password) {
   }
 
   // 응답 전 비밀번호 제거
-  const { password: hashedPassword, ...safeuser } = user;
+  const { password: hashedPassword, refreshToken: oldRefreshToken, ...safeuser } = user;    // login시 이전 refreshToken이 떠서 삭제
 
   // 토큰 기반 인증: 로그인에 성공하면 Access Token 발급하는 기능
   const accessToken = jwt.sign(
@@ -93,12 +93,12 @@ export async function loginService(email, password) {
   );
 
   // DB에 Refresh Token 저장
-  const saveRfreshToken = await prisma.user.update({
+  const saveRefreshToken = await prisma.user.update({               // 오타 수정 했고 saveRefreshToken도 return을 해줘야 하는지 궁금합니다.
     where: { id: user.id },
     data: { refreshToken },
   });
 
-  return { safeuser, accessToken, refreshToken , saveRfreshToken};
+  return { safeuser, accessToken, refreshToken , saveRefreshToken};
 }
 
 

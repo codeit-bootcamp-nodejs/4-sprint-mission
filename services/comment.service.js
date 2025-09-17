@@ -2,7 +2,7 @@ import prisma from '../prisma/prisma.js';
 
 
 // 댓글 목록 조회
-export async function CommentListService(userId){
+export async function commentListService(userId){
   const listup = await prisma.comment.findMany({
     where: { userId: userId},
     select: {
@@ -12,7 +12,7 @@ export async function CommentListService(userId){
       updatedAt: true
     }
   });
-  if (listup === 0) {
+  if (listup.length === 0) {
     const error = new Error("등록한 댓글이 없습니다")
     error.status = 404;
     throw error;
@@ -20,7 +20,7 @@ export async function CommentListService(userId){
   return listup;
 }
 // 로그인한 유저만 상품에 댓글을 등록할 수 있습니다.
-export async function CommentRegisterProductService(userId, productId, content) {
+export async function commentRegisterProductService(userId, productId, content) {
   // 유효성 검사
   if (!content) {
     const error = new Error("내용을 입력해주세요")
@@ -29,7 +29,7 @@ export async function CommentRegisterProductService(userId, productId, content) 
   };
 
   // 댓글 생성
-  const CreatedComment = await prisma.comment.create({
+  const createdComment = await prisma.comment.create({
     data: {
       content,
       userId,
@@ -42,12 +42,12 @@ export async function CommentRegisterProductService(userId, productId, content) 
       updatedAt: true,
     }
   });
-  return CreatedComment;
+  return createdComment;
 }
 
 
 // 로그인한 유저만 게시글에 댓글을 등록할 수 있습니다.
-export async function CommentRegisterPostService(userId, postId, content) {
+export async function commentRegisterPostService(userId, postId, content) {
   // 유효성 검사
   if (!content) {
     const error = new Error("내용을 입력해주세요")
@@ -75,7 +75,7 @@ export async function CommentRegisterPostService(userId, postId, content) {
 
 
 // 댓글을 단 유저만 해당 댓글을 수정할 수 있습니다.
-export async function CommentPutService(userId, commentId, content) {
+export async function commentPutService(userId, commentId, content) {
   // DB에서 댓글 정보 가져오기
   const comment = await prisma.comment.findUnique({ where: { id : Number(commentId)} });
     
@@ -109,7 +109,7 @@ export async function CommentPutService(userId, commentId, content) {
 
 
 // 댓글을 단 유저만 해당 댓글을 삭제할 수 있습니다.
-export async function CommentDeleteService(userId, commentId) {
+export async function commentDeleteService(userId, commentId) {
   // 댓글 DB 가져오기
   const comment = await prisma.comment.findUnique({ where: { id : Number(commentId)} });
 

@@ -2,7 +2,7 @@ import prisma from '../prisma/prisma.js';
 
 
 // 게시글 목록 조회
-export async function PostListService(userId) {
+export async function postListService(userId) {
   const listup = await prisma.post.findMany({
     where: { userId: userId },
     select: {
@@ -13,15 +13,15 @@ export async function PostListService(userId) {
       updatedAt: true
     }
   })
-  if ( listup === 0) {
+  if (listup.length === 0) {
     const error = new Error("등록한 게시글이 없습니다.")
-    error.status == 404;
+    error.status = 404;
     throw error;
   }
   return listup;
 }
 // 로그인한 유저만 게시글 등록 가능
-export async function PostRegisterService(userId, title, content) {
+export async function postRegisterService(userId, title, content) {
   // 유효성 검사
   if (!title || !content) {
     const error = new Error("제목과 내용을 입력해주세요")
@@ -49,7 +49,7 @@ export async function PostRegisterService(userId, title, content) {
 
 
 // 게시글을 등록한 유저만 해당 글을 수정할 수 있음
-export async function PostPutService(userId, postId, title, content) {
+export async function postPutService(userId, postId, title, content) {
   // DB에서 게시글 정보 가져오기
   const post = await prisma.post.findUnique({
     where: { id: Number(postId) },
@@ -88,7 +88,7 @@ export async function PostPutService(userId, postId, title, content) {
 
 
 // 게시글을 등록한 유저만 해당 글을 삭제할 수 있음
-export async function PostDeleteService(userId, postId) {
+export async function postDeleteService(userId, postId) {
   // 게시글 DB 가져오기
   const post = await prisma.post.findUnique({
     where: { id: Number(postId) },

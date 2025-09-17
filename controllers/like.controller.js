@@ -13,13 +13,8 @@ export async function likeProductController(req, res, next) {
     const userId = req.user.userId;
     const productId = Number(req.params.productId);
 
-    if (!productId || isNaN(productId)) {
-    const error = new Error("상품 ID가 필요합니다.");
-    error.status = 400;
-    throw error;
-}
     // 서비스 로직
-    const createdLike = await likeProductService(userId, productId);
+    const createdLike = await likeProductService.likeProduct(userId, productId);
 
     const isAdded = createdLike.message === "좋아요 추가";
 
@@ -39,7 +34,7 @@ export async function likePostController(req, res, next) {
     const postId = Number(req.params.postId);
 
     // 서비스 로직
-    const createdLikePost = await likePostService(userId, postId);
+    const createdLikePost = await likePostService.likePost(userId, postId);
 
     const isAdded = createdLikePost.message === "좋아요 추가";
 
@@ -60,7 +55,7 @@ export async function guessLikedProductController(req, res, next) {
     const productId = Number(req.params.productId);
 
     // 서비스 로직
-    const { listup, isLiked } = await guessLikedProductService(
+    const { listup, isLiked } = await guessLikedProductService.guessLikedProduct(
       userId,
       productId
     );
@@ -81,7 +76,7 @@ export async function guessLikedPostController(req, res, next) {
     const postId = Number(req.params.postId);
 
     // 서비스 로직
-    const { listup, isLiked } = await guessLikedPostService(userId, postId);
+    const { listup, isLiked } = await guessLikedPostService.guessLikedPost(userId, postId);
 
     res.status(200).json({
       message: "게시글을 불러왔습니다",
@@ -99,7 +94,7 @@ export async function likeProductListController(req, res, next) {
     const userId = req.user.userId;
 
     // 서비스 로직
-    const list = await likeProductListService(userId);
+    const list = await likeProductListService.likeProductList(userId);
 
     res.status(200).json({
       message: "좋아요한 상품을 불러왔습니다.",
