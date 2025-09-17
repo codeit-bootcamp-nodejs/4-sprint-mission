@@ -30,3 +30,20 @@ export async function findUniqeProduct({ id, user }: Article.Delete) {
     where: { productId_userId: { productId, userId: user.id } },
   });
 }
+
+export async function deleteProductLikeRepo({ id, user }: Article.Delete) {
+  const productId = id;
+  await prisma.like.delete({
+    where: { productId_userId: { productId, userId: user.id } },
+  });
+}
+
+export async function ProductLikeRepo({ id, user }: Article.Delete) {
+  const productId = id;
+  await prisma.like.create({
+    data: {
+      productId,
+      userId: user.id,
+    },
+  });
+}
