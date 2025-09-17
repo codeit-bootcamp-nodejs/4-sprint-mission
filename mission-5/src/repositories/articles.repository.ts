@@ -8,8 +8,15 @@ import type {
   UpdateDTO,
 } from '@/dto/articles.dto.js';
 import prisma from '@/lib/prisma.js';
+import type { ArticleId } from '@/types/article.types.js';
 
 class ArticleRepository {
+  async findOwnerById({ articleId }: ArticleId) {
+    return await prisma.article.findUniqueOrThrow({
+      where: { id: articleId },
+      select: { userId: true },
+    });
+  }
   async create({ title, userId, content }: CreateDTO) {
     console.log('Repository: DB에 새 게시글 저장');
     return await prisma.article.create({

@@ -1,13 +1,10 @@
 import { ForbiddenError } from '@/lib/errors.js';
 import type { ArticleParams, PatchArticle, PostArticle } from '@/types/article.types.js';
 import type { GetListParams } from '@/types/shared.type.js';
-import prisma from '../lib/prisma.js';
-import ArticleRepository from '../repositories/articles.repository.js';
+import ArticleRepository from '@/repositories/articles.repository.js';
 
 async function authorization({ userId, articleId }: ArticleParams): Promise<boolean> {
-  const article = await prisma.article.findUniqueOrThrow({
-    where: { id: articleId },
-  });
+  const article = await ArticleRepository.findOwnerById({ articleId });
   return article.userId === userId;
 }
 

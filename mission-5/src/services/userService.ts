@@ -1,29 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { validatePassword, passwordHashing } from '@lib/bcrypt.js';
-import { UnauthorizedError } from '@lib/errors.js';
-import prisma from '@lib/prisma.js';
-import type {
-  PatchUserData,
-  UserContentResponse,
-  UserWithContent,
-  GetUserContent,
-} from '@/types/user.types.js';
-import type { UserId } from '@/types/shared.type.js';
+import { BadRequestError, UnauthorizedError } from '@lib/errors.js';
+import type { PatchUserData, UserContentResponse, GetUserContent } from '@/types/user.types.js';
+import type { Options, SingularContentType, UserId } from '@/types/shared.type.js';
+import UserRepository from '@/repositories/users.repository.js';
 
 async function getUserService({ userId }: UserId) {
-  const result = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      nickname: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  const result = await UserRepository.findById({ userId });
   return result;
 }
 async function patchUserService({ userId, data }: PatchUserData) {
@@ -38,54 +21,22 @@ async function patchUserService({ userId, data }: PatchUserData) {
   }
   if (changePassword && currentPassword) {
     // 비밀번호 변경시에만 실행
-    const user = await prisma.user.findUniqueOrThrow({
-      where: {
-        id: userId,
-      },
-      select: {
-        password: true,
-      },
-    });
+    const user = await UserRepository.findPasswordById({ userId });
     if (await validatePassword(currentPassword, user.password)) {
       updateData['password'] = await passwordHashing(changePassword);
     } else {
       throw new UnauthorizedError('현재 비밀번호가 일치하지 않습니다.');
     }
   }
-  const result = await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      nickname: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-    data: updateData,
-  });
+  const result = await UserRepository.update({ userId, updateData });
   return result;
 }
 async function deleteUserService({ userId }: UserId) {
-  const result = await prisma.user.delete({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      nickname: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  const result = await UserRepository.delete({ userId });
   return result;
 }
 async function getUserContentListService({ userId, content }: GetUserContent) {
-  let options = {};
+  let options: Options = {};
   if (content === 'comments') {
     options = {
       select: {
@@ -104,12 +55,10 @@ async function getUserContentListService({ userId, content }: GetUserContent) {
       },
     };
   }
-  const userContent = (await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
-    ...options,
-  })) as UserWithContent;
+  const userContent = await UserRepository.findManyContent({
+    userId,
+    options,
+  });
   let result: UserContentResponse;
   if (content === 'products' || content === 'articles') {
     const contentList = userContent[content] ?? [];
@@ -128,19 +77,18 @@ async function getUserContentListService({ userId, content }: GetUserContent) {
   return result;
 }
 async function getUserContentLikeListService({ userId, content }: GetUserContent) {
-  const singularContentType = content.endsWith('s') ? content.slice(0, -1) : content;
-  const result = await prisma.user.findUniqueOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      [`${singularContentType}Likes`]: {
-        include: {
-          [singularContentType]: true,
-        },
-      },
-    },
-  });
+  let singularContentType: SingularContentType;
+  switch (content) {
+    case 'products':
+      singularContentType = 'product';
+      break;
+    case 'articles':
+      singularContentType = 'article';
+      break;
+    default:
+      throw new BadRequestError(`'${content}' 타입의 좋아요 목록은 조회할 수 없습니다.`);
+  }
+  const result = await UserRepository.findManyLikeContent({ userId, singularContentType });
   return result;
 }
 

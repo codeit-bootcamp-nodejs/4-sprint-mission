@@ -4,14 +4,13 @@ import type {
   PatchComment,
   PostComment,
 } from '@/types/comment.typs.js';
-import prisma from '../lib/prisma.js';
 import type { Prisma } from '@prisma/client';
-import { ForbiddenError } from '@/lib/errors.js';
+import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
+import CommentRepository from '@/repositories/comments.repository.js';
+import type { SingularContentType } from '@/types/shared.type.js';
 
 async function authorization({ userId, commentId }: CommentParams): Promise<boolean> {
-  const comment = await prisma.comment.findUniqueOrThrow({
-    where: { id: commentId },
-  });
+  const comment = await CommentRepository.findOwnerById({ commentId });
   return comment.userId === userId;
 }
 
@@ -38,33 +37,29 @@ async function getCommentListService({ cursorId, pageSize, parentType }: GetComm
     query['cursor'] = { id: cursorId };
     query['skip'] = 1;
   }
-  const comment = await prisma.comment.findMany(query);
+  const comment = await CommentRepository.findMany({ query });
   return comment;
 }
 
 async function postCommentService({ userId, parentId, parentType, content }: PostComment) {
-  const singularParentType = parentType.endsWith('s') ? parentType.slice(0, -1) : parentType;
-  const comment = await prisma.comment.create({
-    data: {
-      content,
-      [`${singularParentType}Id`]: parentId,
-      userId,
-    },
-    include: {
-      [singularParentType]: true,
-    },
-  });
+  let singularParentType: SingularContentType;
+  switch (parentType) {
+    case 'products':
+      singularParentType = 'product';
+      break;
+    case 'articles':
+      singularParentType = 'article';
+      break;
+    default:
+      throw new BadRequestError();
+  }
+  const comment = await CommentRepository.create({ userId, parentId, singularParentType, content });
   return comment;
 }
 
 async function patchCommentService({ commentId, userId, content }: PatchComment) {
   if (await authorization({ userId, commentId })) {
-    const comment = await prisma.comment.update({
-      where: { id: commentId },
-      data: {
-        content,
-      },
-    });
+    const comment = await CommentRepository.update({ commentId, content });
     return comment;
   } else {
     throw new ForbiddenError('수정 권한이 없습니다.');
@@ -73,9 +68,7 @@ async function patchCommentService({ commentId, userId, content }: PatchComment)
 
 async function deleteCommentService({ commentId, userId }: CommentParams) {
   if (await authorization({ userId, commentId })) {
-    const comment = await prisma.comment.delete({
-      where: { id: commentId },
-    });
+    const comment = await CommentRepository.delete({ commentId });
     return comment;
   } else {
     throw new ForbiddenError('삭제 권한이 없습니다.');

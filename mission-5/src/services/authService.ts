@@ -5,37 +5,23 @@ import { redisClient } from '@lib/redis.js';
 import { REDIS_KEY } from '@lib/constants.js';
 import type { Login, Signup } from '@/types/auth.types.js';
 import { ForbiddenError, UnauthorizedError } from '@/lib/errors.js';
+import AuthRepository from '@/repositories/auths.repository.js';
 
 async function signupService({ email, nickname, password }: Signup) {
   const hashedPassword = await passwordHashing(password);
-  const user = await prisma.user.create({
-    data: {
-      email,
-      nickname,
-      password: hashedPassword,
-    },
-  });
+  const user = await AuthRepository.create({ email, nickname, hashedPassword });
   const { password: _, ...userWithoutPassword } = user;
   return userWithoutPassword;
 }
 
 async function loginService({ received_email, received_password }: Login) {
-  const { id, password } = await prisma.user.findUniqueOrThrow({
-    where: { email: received_email },
-  });
+  const { id, password } = await AuthRepository.findByEmail({ received_email });
   const isPasswordValid = await validatePassword(received_password, password);
   if (!isPasswordValid) {
     throw new UnauthorizedError('비밀번호가 일치하지 않습니다.');
   }
   const { accessToken, refreshToken } = generateToken(id);
-  await prisma.user.update({
-    where: {
-      id: id,
-    },
-    data: {
-      refreshToken,
-    },
-  });
+  await AuthRepository.update({ userId: id, refreshToken });
   return { accessToken, refreshToken };
 }
 
@@ -61,28 +47,12 @@ async function refreshService(received_refreshToken: string) {
   return prisma.$transaction(async (tx) => {
     // 토큰 검증, 유효성 확인, 재발급, db 업데이트를 트랜잭션으로 묶기
     const result = verifyRefreshToken(received_refreshToken);
-    const { id, refreshToken } = await tx.user.findUniqueOrThrow({
-      where: {
-        id: result['userId'],
-      },
-      select: {
-        id: true,
-        email: true,
-        refreshToken: true,
-      },
-    });
+    const { id, refreshToken } = await AuthRepository.findById({ tx, userId: result['userId'] });
     if (!refreshToken || refreshToken !== received_refreshToken) {
       throw new ForbiddenError('유효하지 않은 리프레시 토큰입니다.');
     }
     const { accessToken, refreshToken: newRefreshToken } = generateToken(id);
-    await tx.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        refreshToken: newRefreshToken,
-      },
-    });
+    await AuthRepository.update({ tx, userId: id, refreshToken });
     if (typeof result.exp !== 'number') {
       throw new UnauthorizedError('유효하지 않은 토큰입니다 (만료 시간 없음).');
     }

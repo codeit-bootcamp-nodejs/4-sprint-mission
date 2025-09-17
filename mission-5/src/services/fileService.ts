@@ -3,27 +3,16 @@ import { cloudinaryUpload, deleteCloudinaryFile } from '../lib/cloudinary.js';
 import prisma from '../lib/prisma.js';
 import type { FileParams, PostImage } from '@/types/file.types.js';
 import { ForbiddenError } from '@/lib/errors.js';
+import FileRepository from '@/repositories/files.repository.js';
 
 async function authorization({ userId, id }: EntityId & UserId): Promise<boolean> {
-  const image = await prisma.image.findUniqueOrThrow({
-    where: { id: id },
-  });
+  const image = await FileRepository.findById({ id });
   return image.userId === userId;
 }
 
 async function postFileService({ path, userId }: PostImage) {
-  const result = await cloudinaryUpload(path);
-  const newImage = await prisma.image.create({
-    data: {
-      url: result.secure_url,
-      publicId: result.public_id,
-      userId,
-    },
-    select: {
-      url: true,
-      id: true,
-    },
-  });
+  const { secure_url, public_id } = await cloudinaryUpload(path);
+  const newImage = await FileRepository.create({ secure_url, public_id, userId });
   return { id: newImage.id, imageUrl: newImage.url }; // prettier-ignore
 }
 
@@ -32,13 +21,9 @@ async function deleteFileService({ id, userId }: FileParams) {
     return await prisma.$transaction(async (tx) => {
       // 트랜잭션으로 묶어도 외부 api에 관련된 내용은 롤백 불가
       // 추가로 고민해봐야할 문제
-      const imageToDelete = await tx.image.findUniqueOrThrow({
-        where: { id },
-      });
+      const imageToDelete = await FileRepository.findById({ tx, id });
       await deleteCloudinaryFile(imageToDelete.publicId);
-      await tx.image.delete({
-        where: { id },
-      });
+      await FileRepository.delete({ tx, id });
       return imageToDelete;
     });
   } else {

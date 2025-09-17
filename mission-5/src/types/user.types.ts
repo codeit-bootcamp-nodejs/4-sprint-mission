@@ -14,7 +14,7 @@ export interface GetUserContent extends UserId {
   content: Content;
 }
 
-type ItemWithLikes = (Product | Article) & {
+export type ItemWithLikes = (Product | Article) & {
   _count: { likes: number };
   likes: { userId: number }[];
 };
