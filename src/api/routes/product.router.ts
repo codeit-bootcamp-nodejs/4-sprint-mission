@@ -1,5 +1,5 @@
 import express from "express";
-import ProductController from "../controllers/ProductController.js";
+import ProductController from "../controllers/product.controller.js";
 import authenticate from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
 import { ProductSchema } from "../types/dtos/product.dto.js";

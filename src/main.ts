@@ -1,12 +1,12 @@
 import express from "express";
-import ProductRouter from "./api/routes/ProductRouter.js";
-import ArticleRouter from "./api/routes/ArticleRouter.js";
-import CommentRouter from "./api/routes/CommentRouter.js";
+import ProductRouter from "./api/routes/product.router.js";
+import ArticleRouter from "./api/routes/article.router.js";
+import CommentRouter from "./api/routes/comment.router.js";
 import errorHandler from "./api/middlewares/errorHandler.js";
-import imageRouter from "./api/routes/ImageRouter.js";
-import AuthRouter from "./api/routes/AuthRouter.js";
-import MypageRouter from "./api/routes/MypageRouter.js";
-import LikeRouter from "./api/routes/LikeRouter.js";
+import imageRouter from "./api/routes/image.router.js";
+import AuthRouter from "./api/routes/auth.router.js";
+import MypageRouter from "./api/routes/mypage.router.js";
+import LikeRouter from "./api/routes/like.router.js";
 import cookieParser from "cookie-parser";
 
 // import { testAllArticleService } from "./external/tests/testArticleService.js";

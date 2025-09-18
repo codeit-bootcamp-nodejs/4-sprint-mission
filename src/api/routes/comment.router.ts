@@ -1,5 +1,5 @@
 import express from "express";
-import CommentController from "../controllers/CommentController.js";
+import CommentController from "../controllers/comment.controller.js";
 import authenticate from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
 import { commentSchema } from "../types/dtos/comment.dto.js";

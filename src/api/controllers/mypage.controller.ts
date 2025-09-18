@@ -1,4 +1,4 @@
-import MypageService from "../services/mypage/MypageService.js";
+import MypageService from "../services/mypage/mypage.service.js";
 import type { Request, Response, NextFunction } from "express";
 import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
 

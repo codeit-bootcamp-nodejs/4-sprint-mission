@@ -1,6 +1,6 @@
 import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../../types/article.js";
 import type { CustomError } from "../../types/error.js";
-import * as ArticleRepository from "../../repositories/ArticleRepository.js";
+import * as ArticleRepository from "../../repositories/article.repository.js";
 import type { ArticleDto } from "../../types/dtos/article.dto.js";
 
 const ArticleService = {

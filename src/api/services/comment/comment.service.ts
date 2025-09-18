@@ -1,6 +1,6 @@
 import type { CustomError } from "../../types/error.js";
 import type { FindManyCommentParams } from "../../types/comment.js";
-import * as CommentRepository from "../../repositories/CommentRepository.js";
+import * as CommentRepository from "../../repositories/comment.repository.js";
 import type { CommentDto } from "../../types/dtos/comment.dto.js";
 
 const CommentService = {

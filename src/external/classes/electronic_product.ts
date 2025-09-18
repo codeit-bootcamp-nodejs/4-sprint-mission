@@ -1,4 +1,4 @@
-import { Product } from "./Product.js";
+import { Product } from "./product.js";
 
 export class ElectronicProduct extends Product {
   manufacturer: string;

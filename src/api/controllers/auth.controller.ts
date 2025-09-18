@@ -1,4 +1,4 @@
-import AuthService from "../services/auth/AuthService.js";
+import AuthService from "../services/auth/auth.service.js";
 import type { Request, Response, NextFunction } from "express";
 import type { SignupDto, LoginDto } from "../types/dtos/auth.dto.js";
 

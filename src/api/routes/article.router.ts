@@ -1,5 +1,5 @@
 import express from "express";
-import ArticleController from "../controllers/ArticleController.js";
+import ArticleController from "../controllers/article.controller.js";
 import authenticate from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
 import { ArticleSchema } from "../types/dtos/article.dto.js";

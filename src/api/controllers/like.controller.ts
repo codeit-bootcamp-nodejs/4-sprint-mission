@@ -1,4 +1,4 @@
-import LikeService from "../services/like/LikeService.js";
+import LikeService from "../services/like/like.service.js";
 import type { Request, Response, NextFunction } from "express";
 
 const LikeController = {

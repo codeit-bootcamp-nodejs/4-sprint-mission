@@ -1,27 +1,27 @@
-import ProductService from "../services/product/ProductService.js";
+import ArticleService from "../services/article/article.service.js";
 import jwt from "jsonwebtoken";
-import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { Request, Response, NextFunction } from "express";
+import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
-import type { ProductDto } from "../types/dtos/product.dto.js";
+import type { ArticleDto } from "../types/dtos/article.dto.js";
 
-const ProductController = {
-  async createProduct(req: Request, res: Response, next: NextFunction) {
+const ArticleController = {
+  async createArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const productData: ProductDto = req.body;
-      const newProduct = await ProductService.createProduct(productData, userId);
+      const articleData: ArticleDto = req.body;
+      const newArticle = await ArticleService.createArticle(articleData, userId);
 
-      res.status(201).json(newProduct);
+      res.status(201).json(newArticle);
     } catch (err) {
       next(err);
     }
   },
 
-  async findUniqueProduct(req: Request, res: Response, next: NextFunction) {
+  async findUniqueArticle(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const productId = Number(id);
+      const articleId = Number(id);
 
       let userId = null;
       const token = req.cookies.accessToken;
@@ -39,62 +39,56 @@ const ProductController = {
           console.error("토큰 검증 오류:", err);
         }
       }
-
-      const product = await ProductService.findUniqueProduct(productId, userId);
-      res.status(200).json(product);
+      const article = await ArticleService.findUniqueArticle(articleId, userId);
+      res.status(200).json(article);
     } catch (err) {
       next(err);
     }
   },
 
-  async patchProduct(req: Request, res: Response, next: NextFunction) {
+  async updateArticle(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
       const { id: userId } = req.user;
-      const updateData: ProductDto = req.body;
-
-      const product = await ProductService.patchProduct(Number(id), updateData, userId);
-      if (!product) {
-        return res.status(404).json({ error: "수정할 상품이 없음" });
-      }
-      res.status(200).json(product);
+      const { id } = req.params;
+      const updateData: ArticleDto = req.body;
+      const article = await ArticleService.updateArticle(Number(id), updateData, userId);
+      res.status(200).json(article);
     } catch (err) {
       next(err);
     }
   },
 
-  async deleteProduct(req: Request, res: Response, next: NextFunction) {
+  async deleteArticle(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params;
       const { id: userId } = req.user;
-      await ProductService.deleteProduct(Number(id), userId);
-
+      const { id } = req.params;
+      await ArticleService.deleteArticle(Number(id), userId);
       res.status(204).json({ success: "상품 삭제 성공" });
     } catch (err) {
       next(err);
     }
   },
 
-  async findManyProduct(req: Request, res: Response, next: NextFunction) {
+  async findManyArticle(req: Request, res: Response, next: NextFunction) {
     try {
-      const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
+      const { offset = 0, limit = 10, order, keyword } = req.query;
 
       const finalOffset = Number(offset) || 0;
       const finalLimit = Number(limit) || 10;
       const finalOrder = typeof order === "string" ? order : "recent";
       const finalKeyword = typeof keyword === "string" ? keyword : undefined;
 
-      const products = await ProductService.findManyProduct({
+      const articles = await ArticleService.findManyArticle({
         offset: finalOffset,
         limit: finalLimit,
         order: finalOrder,
         ...(finalKeyword && { keyword: finalKeyword }),
       });
-      res.status(200).json(products);
+      res.status(200).json(articles);
     } catch (err) {
       next(err);
     }
   },
 };
 
-export default ProductController;
+export default ArticleController;
