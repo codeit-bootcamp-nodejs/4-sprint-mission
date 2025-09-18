@@ -1,4 +1,4 @@
-import ArticleService from "../services/ArticleService.js";
+import ArticleService from "../services/article/ArticleService.js";
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";

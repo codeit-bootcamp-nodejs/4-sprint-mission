@@ -1,5 +1,5 @@
-import type { LikeData } from "../types/like.js";
-import * as LikeRepository from "../repositories/LikeRepository.js";
+import type { LikeData } from "../../types/like.js";
+import * as LikeRepository from "../../repositories/LikeRepository.js";
 import type { Prisma } from "@prisma/client";
 
 const LikeService = {

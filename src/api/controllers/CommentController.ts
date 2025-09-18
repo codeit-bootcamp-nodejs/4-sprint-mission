@@ -1,4 +1,4 @@
-import CommentService from "../services/CommentService.js";
+import CommentService from "../services/comment/CommentService.js";
 import type { Request, Response, NextFunction } from "express";
 import type { CommentDto } from "../types/dtos/comment.dto.js";
 

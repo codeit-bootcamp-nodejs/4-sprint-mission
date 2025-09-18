@@ -1,7 +1,7 @@
-import type { CustomError } from "../types/error.js";
-import type { FindManyCommentParams } from "../types/comment.js";
-import * as CommentRepository from "../repositories/CommentRepository.js";
-import type { CommentDto } from "../types/dtos/comment.dto.js";
+import type { CustomError } from "../../types/error.js";
+import type { FindManyCommentParams } from "../../types/comment.js";
+import * as CommentRepository from "../../repositories/CommentRepository.js";
+import type { CommentDto } from "../../types/dtos/comment.dto.js";
 
 const CommentService = {
   async createComment(data: CommentDto & { userId: number }) {

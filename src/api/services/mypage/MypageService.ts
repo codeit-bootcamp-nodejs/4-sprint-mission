@@ -1,11 +1,11 @@
 import bcrypt from "bcrypt";
-import type { CustomError } from "../types/error.js";
-import * as MypageRepository from "../repositories/MypageRepository.js";
-import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
+import type { CustomError } from "../../types/error.js";
+import * as MypageRepository from "../../repositories/MypageRepository.js";
+import type { UpdateUserDTO, UpdatePasswordDTO } from "../../types/dtos/mypage.dto.js";
 import type { Prisma } from "@prisma/client";
-import { generateTokens } from "../libs/token.js";
-import { hashing } from "../libs/hashing.js";
-import * as AuthRepository from "../repositories/AuthRepository.js";
+import { generateTokens } from "../../libs/token.js";
+import { hashing } from "../../libs/hashing.js";
+import * as AuthRepository from "../../repositories/AuthRepository.js";
 import { log } from "console";
 
 const MypageService = {

@@ -1,7 +1,7 @@
-import type { CustomError } from "../types/error.js";
-import type { CreateProductData, UpdateProductData, FindManyProductParams } from "../types/product.js";
-import * as ProductRepository from "../repositories/ProductRepository.js";
-import type { ProductDto } from "../types/dtos/product.dto.js";
+import type { CustomError } from "../../types/error.js";
+import type { CreateProductData, UpdateProductData, FindManyProductParams } from "../../types/product.js";
+import * as ProductRepository from "../../repositories/ProductRepository.js";
+import type { ProductDto } from "../../types/dtos/product.dto.js";
 
 const ProductService = {
   async createProduct(productData: ProductDto, userId: number) {

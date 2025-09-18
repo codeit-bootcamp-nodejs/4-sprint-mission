@@ -1,4 +1,4 @@
-import ProductService from "../services/ProductService.js";
+import ProductService from "../services/product/ProductService.js";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { Request, Response, NextFunction } from "express";

@@ -1,7 +1,7 @@
-import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../types/article.js";
-import type { CustomError } from "../types/error.js";
-import * as ArticleRepository from "../repositories/ArticleRepository.js";
-import type { ArticleDto } from "../types/dtos/article.dto.js";
+import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../../types/article.js";
+import type { CustomError } from "../../types/error.js";
+import * as ArticleRepository from "../../repositories/ArticleRepository.js";
+import type { ArticleDto } from "../../types/dtos/article.dto.js";
 
 const ArticleService = {
   async createArticle(articleData: ArticleDto, userId: number) {

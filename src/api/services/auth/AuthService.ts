@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import { hashing, compareWords } from "../libs/hashing.js";
-import { generateTokens } from "../libs/token.js";
-import { REFRESH_TOKEN_SECRET } from "../libs/constants.js";
+import { hashing, compareWords } from "../../libs/hashing.js";
+import { generateTokens } from "../../libs/token.js";
+import { REFRESH_TOKEN_SECRET } from "../../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
-import * as AuthRepository from "../repositories/AuthRepository.js";
-import type { SignupDto, LoginDto } from "../types/dtos/auth.dto.js";
+import * as AuthRepository from "../../repositories/AuthRepository.js";
+import type { SignupDto, LoginDto } from "../../types/dtos/auth.dto.js";
 
 const AuthService = {
   async signup(signupData: SignupDto) {
