@@ -1,47 +1,57 @@
 -- # 초급 문제
 
 -- 1. `orders` 테이블에서 모든 주문을 조회하세요.
+
 SELECT * FROM orders;
 
 -- 2. `orders`테이블에서 `id` 가 `423`인 주문을 조회하세요.
+
 SELECT * FROM orders WHERE id = 432;
 
 -- 3. `orders` 테이블에서 총 주문 건수를 `total_orders`라는 이름으로 구하세요.
+
 SELECT COUNT(id) AS total_orders FROM orders;
 
 -- 4. `orders` 테이블에서 최신 순으로 주문을 조회하세요. (`date`, `time` 컬럼이 분리되어 있다는 점에 주의)
+
 SELECT * FROM orders 
 ORDER BY
 (date, time) DESC;
 
 -- 5. `orders` 테이블에서 오프셋 기반 페이지네이션된 목록을 조회합니다. 페이지 크기가 10이고 최신순일 때, 첫 번째 페이지를 조회하세요.
+
 SELECT * FROM orders
 ORDER BY (date, time) DESC
 LIMIT 10;
 
 -- 6. `orders` 테이블에서 오프셋 기반 페이지네이션된 목록을 조회합니다. 페이지 크기가 10이고 최신순일 때 5번째 페이지를 조회하세요.
+
 SELECT * FROM orders
 ORDER BY (date, time) DESC
 LIMIT 10
 OFFSET 50;
 
 -- 7. `orders` 테이블에서 커서 페이지네이션된 목록을 조회합니다. 페이지 크기가 10이고 최신순일때, `id` 값을 기준으로 커서를 사용합시다. 커서의 값이 `42`일 때 다음 페이지를 조회하세요.
+
 SELECT * FROM orders
 WHERE ID > 42
 ORDER BY (date, time) DESC
 LIMIT 10;
 
 -- 8. `orders` 테이블에서 2025년 3월에 주문된 내역만 조회하세요.
+
 SELECT * FROM orders
 WHERE date >= '2025-03-01'
 AND date < '2025-04-01';
 
 -- 9. `orders` 테이블에서 2025년 3월 12일 오전에 주문된 내역만 조회하세요.
+
 SELECT * FROM orders
 WHERE date = '2025-03-12'
 AND time <= '12:00:00';
 
 -- 10. `pizza_types` 테이블에서 이름에 'Cheese' 혹은 'Chicken'이 포함된 피자 종류를 조회하세요. (대소문자를 구분합니다)
+
 SELECT * FROM pizza_types
 WHERE name LIKE '%Cheese%'
 OR name LIKE '%Chicken%';
@@ -50,6 +60,7 @@ OR name LIKE '%Chicken%';
 -- # 중급 문제
 
 -- 1. `order_details` 테이블에서 각 피자(`pizza_id`)별로 주문된 건 수(`order_id`)를 보여주세요.
+
 SELECT
 pizza_id,
 COUNT(order_id)
@@ -57,6 +68,7 @@ FROM order_details
 GROUP BY pizza_id;
 
 -- 2. `order_details` 테이블에서 각 피자(`pizza_id`)별로 총 주문 수량을 구하세요.
+
 SELECT
 pizza_id,
 SUM(quantity) AS PIZZA_COUNT
@@ -64,6 +76,7 @@ FROM order_details
 GROUP BY pizza_id;
 
 -- 3. `pizzas` 테이블에서 `price`의 크기가 20보다 큰 피자의 종류만 `order_details` 테이블에서 조회하세요. (힌트: 서브쿼리)
+
 SELECT
 P.id,
 P.price
@@ -72,6 +85,7 @@ LEFT JOIN order_details AS OD ON P.id = OD.pizza_id
 WHERE P.price > 20;
 
 -- 4. `orders` 테이블에서 각 날짜별 총 주문 건수를 `order_count` 라는 이름으로 계산하고, 하루 총 주문 건수가 80건 이상인 날짜만 조회한 뒤, 주문 건수가 많은 순서대로 정렬하세요.
+
 SELECT
 O.date,
 COUNT (OD.order_id) AS ORDER_COUNT
@@ -82,6 +96,7 @@ HAVING COUNT(*) >= 80
 ORDER BY ORDER_COUNT DESC;
 
 -- 5. `order_details` 테이블에서 피자별(`pizza_id`) 총 주문 수량이 10개 이상인 피자만 조회하고, 총 주문 수량 기준으로 내림차순 정렬하세요.
+
 SELECT
 pizza_id,
 SUM(quantity) AS COUNT_PIZZA
@@ -91,6 +106,7 @@ HAVING SUM(quantity) >= 10
 ORDER BY COUNT_PIZZA ASC;
 
 -- 6. `order_details` 테이블에서 피자별 총 수익을 `total_revenue` 라는 이름으로 구하세요. (수익 = `quantity * price`)
+
 SELECT
 TOTAL_PIZZA.pizza_id,
 TOTAL_PIZZA.COUNT_PIZZA * P.price AS TOTAL_REVENUE
@@ -105,6 +121,7 @@ LEFT JOIN pizzas AS P
 ON TOTAL_PIZZA.pizza_id = P.ID;
 
 -- 7. 날짜별로 피자 주문 건수(`order_count`)와 총 주문 수량(`total_quantity`)을 구하세요.
+
 SELECT
 O.date,
 COUNT(OD.order_id) AS ORDER_COUNT,
@@ -134,6 +151,7 @@ ORDER BY date DESC;
             bbq_ckn_m     | bbq_ckn     | M    | 16.75 |            956
         ```
 */
+
 SELECT
 P.id,
 P.type_id,
@@ -160,6 +178,7 @@ LIMIT 10;
         2025-03-05 |           64 |  2350.650005340576
         ```
 */
+
 SELECT
 DATE_ORDERS.date,
 COUNT(DATE_ORDERS.order_id) AS TOTAL_ORDERS,
@@ -197,6 +216,7 @@ ORDER BY DATE ASC;
         The Four Cheese Pizza       | L          |       17.95 |        1 | 17.950000762939453
         ```
 */
+
 SELECT
 PT.name AS PIZZA_NAME,
 P.size AS PIZZA_SIZE,
@@ -232,6 +252,7 @@ WHERE PIZZA_ORDERS.order_id = 78;
         XXL  | 1006.6000213623047
         ```
 */
+
 SELECT
 P.size,
 SUM(TOTAL_PIZZA.PIZZA_AMOUNT * P.price) AS SIZE_AMOUNT
@@ -264,6 +285,7 @@ ORDER BY size ASC;
         The Italian Supreme Pizza                  |           33476.75
         ```
 */
+
 SELECT
 PT.name AS PIZZA_KIND,
 SUM(PIZZA_AMOUNT.TOTAL_PIZZA * P.price) AS KIND_AMOUNT
