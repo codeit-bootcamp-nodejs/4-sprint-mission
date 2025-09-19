@@ -172,7 +172,8 @@ OD.order_id,
 OD.pizza_id,
 OD.quantity
 FROM order_details AS OD
-LEFT JOIN orders AS O ON OD.order_id = O.id
+LEFT JOIN orders AS O 
+ON OD.order_id = O.id
 ) AS DATE_ORDERS
 LEFT JOIN pizzas AS P
 ON DATE_ORDERS.pizza_id = P.id
@@ -213,7 +214,8 @@ FROM
 order_details AS OD
 ) AS PIZZA_ORDERS
 ON P.ID = PIZZA_ORDERS.pizza_id
-INNER JOIN pizza_types AS PT ON P.type_id = PT.id 
+INNER JOIN pizza_types AS PT
+ON P.type_id = PT.id 
 WHERE PIZZA_ORDERS.order_id = 78;
 
 
@@ -232,7 +234,7 @@ WHERE PIZZA_ORDERS.order_id = 78;
 */
 SELECT
 P.size,
-SUM(TOTAL_PIZZA.PIZZA_AMOUNT * P.price) AS PIZZA_VALUE
+SUM(TOTAL_PIZZA.PIZZA_AMOUNT * P.price) AS SIZE_AMOUNT
 FROM pizzas AS P
 LEFT JOIN
 (
@@ -263,18 +265,19 @@ ORDER BY size ASC;
         ```
 */
 SELECT
-PT.name,
-SUM(TOTAL_PIZZA.PIZZA_AMOUNT * P.price) AS AMOUNT
+PT.name AS PIZZA_KIND,
+SUM(PIZZA_AMOUNT.TOTAL_PIZZA * P.price) AS KIND_AMOUNT
 FROM pizzas AS P
 INNER JOIN
 (
 SELECT
 pizza_id,
-SUM(quantity) AS PIZZA_AMOUNT
+SUM(quantity) AS TOTAL_PIZZA
 FROM order_details
 GROUP BY pizza_id
-) AS TOTAL_PIZZA
-ON P.id = TOTAL_PIZZA.pizza_id
-INNER JOIN pizza_types AS PT ON P.type_id = PT.id
+) AS PIZZA_AMOUNT
+ON P.id = PIZZA_AMOUNT.pizza_id
+INNER JOIN pizza_types AS PT
+ON P.type_id = PT.id
 GROUP BY PT.name
-ORDER BY AMOUNT DESC;
+ORDER BY KIND_AMOUNT DESC;
