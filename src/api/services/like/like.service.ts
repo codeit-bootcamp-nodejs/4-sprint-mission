@@ -1,17 +1,28 @@
-import type { LikeData } from "../../types/like.js";
 import * as LikeRepository from "../../repositories/like.repository.js";
+import * as ArticleRepository from "../../repositories/article.repository.js";
+import * as ProductRepository from "../../repositories/product.repository.js";
 import type { Prisma } from "@prisma/client";
+import type { CustomError } from "../../types/error.js";
 
 const LikeService = {
   async toggleLike(userId: number, type: string, contentId: number) {
-    const user: LikeData = { userId };
-    if (type === "article") {
-      user.articleId = contentId;
+    const article = await ArticleRepository.findById(contentId);
+
+    if (!article) {
+      const error: CustomError = new Error("존재하지 않는 게시글입니다.");
+      error.statusCode = 404;
+      throw error;
     } else {
-      user.productId = contentId;
+      const product = await ProductRepository.findById(contentId);
+      if (!product) {
+        const error: CustomError = new Error("존재하지 않는 상품입니다.");
+        error.statusCode = 404;
+        throw error;
+      }
     }
 
-    const existingLike = await LikeRepository.findFirst(user);
+    const where = type === "article" ? { userId, articleId: contentId } : { userId, productId: contentId };
+    const existingLike = await LikeRepository.findFirst(where);
 
     if (existingLike) {
       await LikeRepository.remove(existingLike.id);

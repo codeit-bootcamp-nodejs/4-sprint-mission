@@ -1,7 +1,7 @@
 import type { CustomError } from "../../types/error.js";
-import type { CreateProductData, UpdateProductData, FindManyProductParams } from "../../types/product.js";
+import type { FindManyParams } from "../../types/express.d.ts";
 import * as ProductRepository from "../../repositories/product.repository.js";
-import type { ProductDto } from "../../types/dtos/product.dto.js";
+import type { ProductDto } from "./product.dto.js";
 
 const ProductService = {
   async createProduct(productData: ProductDto, userId: number) {
@@ -57,8 +57,9 @@ const ProductService = {
     return await ProductRepository.remove(id);
   },
 
-  async findManyProduct(params: FindManyProductParams) {
-    return await ProductRepository.findMany(params);
+  async findManyProduct(params: FindManyParams) {
+    const products = await ProductRepository.findMany(params);
+    return products;
   },
 };
 

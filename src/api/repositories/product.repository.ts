@@ -1,5 +1,5 @@
 import prisma from "../libs/prismaClient.js";
-import type { FindManyProductParams } from "../types/product.js";
+import type { FindManyParams } from "../types/express.d.ts";
 import { Prisma } from "@prisma/client";
 
 export const create = async (data: Prisma.ProductCreateInput) => {
@@ -31,7 +31,7 @@ export const remove = async (id: number) => {
   });
 };
 
-export const findMany = async ({ offset, limit, order, keyword }: FindManyProductParams) => {
+export const findMany = async ({ offset = 0, limit = 10, order = "recent", keyword }: FindManyParams) => {
   let orderBy: Prisma.ProductOrderByWithRelationInput;
   switch (order) {
     case "oldest":

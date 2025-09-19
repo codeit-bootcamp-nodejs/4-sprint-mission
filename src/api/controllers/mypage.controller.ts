@@ -1,6 +1,7 @@
 import MypageService from "../services/mypage/mypage.service.js";
 import type { Request, Response, NextFunction } from "express";
-import type { UpdateUserDTO, UpdatePasswordDTO } from "../types/dtos/mypage.dto.js";
+import type { RequestWithDto } from "../types/express.d.ts";
+import type { UpdateUserDto, UpdatePasswordDto } from "../services/mypage/mypage.dto.js";
 
 const MypageController = {
   async getUser(req: Request, res: Response, next: NextFunction) {
@@ -14,23 +15,23 @@ const MypageController = {
     }
   },
 
-  async updateUser(req: Request, res: Response, next: NextFunction) {
+  async updateUser(req: RequestWithDto<UpdateUserDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const updateData: UpdateUserDTO = req.body;
-      const updatedUser = await MypageService.updateUser(userId, updateData);
+      const updateUserDTO = req.body;
+      const updatedUser = await MypageService.updateUser(userId, updateUserDTO);
       res.status(200).json(updatedUser);
     } catch (err) {
       next(err);
     }
   },
 
-  async updatePassword(req: Request, res: Response, next: NextFunction) {
+  async updatePassword(req: RequestWithDto<UpdatePasswordDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const updatePasswordData: UpdatePasswordDTO = req.body;
+      const updatePasswordDTO = req.body;
 
-      const { accessToken, refreshToken } = await MypageService.updatePassword(userId, updatePasswordData);
+      const { accessToken, refreshToken } = await MypageService.updatePassword(userId, updatePasswordDTO);
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         maxAge: 1 * 60 * 60 * 1000,

@@ -2,15 +2,17 @@ import ProductService from "../services/product/product.service.js";
 import jwt from "jsonwebtoken";
 import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { Request, Response, NextFunction } from "express";
+import type { RequestWithDto } from "../types/express.d.ts";
+import { ProductDto } from "../services/product/product.dto.js";
+import { FindManyParamsDto } from "../types/dto.js";
 import type { CustomError } from "src/api/types/error.js";
-import type { ProductDto } from "../types/dtos/product.dto.js";
 
 const ProductController = {
-  async createProduct(req: Request, res: Response, next: NextFunction) {
+  async createProduct(req: RequestWithDto<ProductDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const productData: ProductDto = req.body;
-      const newProduct = await ProductService.createProduct(productData, userId);
+      const productDto = req.body;
+      const newProduct = await ProductService.createProduct(productDto, userId);
 
       res.status(201).json(newProduct);
     } catch (err) {
@@ -47,13 +49,13 @@ const ProductController = {
     }
   },
 
-  async patchProduct(req: Request, res: Response, next: NextFunction) {
+  async patchProduct(req: RequestWithDto<ProductDto>, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const { id: userId } = req.user;
-      const updateData: ProductDto = req.body;
+      const productDto = req.body;
 
-      const product = await ProductService.patchProduct(Number(id), updateData, userId);
+      const product = await ProductService.patchProduct(Number(id), productDto, userId);
       if (!product) {
         return res.status(404).json({ error: "수정할 상품이 없음" });
       }
@@ -77,19 +79,9 @@ const ProductController = {
 
   async findManyProduct(req: Request, res: Response, next: NextFunction) {
     try {
-      const { offset = 0, limit = 10, order = "recent", keyword } = req.query;
+      const params = FindManyParamsDto.from(req.query);
 
-      const finalOffset = Number(offset) || 0;
-      const finalLimit = Number(limit) || 10;
-      const finalOrder = typeof order === "string" ? order : "recent";
-      const finalKeyword = typeof keyword === "string" ? keyword : undefined;
-
-      const products = await ProductService.findManyProduct({
-        offset: finalOffset,
-        limit: finalLimit,
-        order: finalOrder,
-        ...(finalKeyword && { keyword: finalKeyword }),
-      });
+      const products = await ProductService.findManyProduct(params);
       res.status(200).json(products);
     } catch (err) {
       next(err);

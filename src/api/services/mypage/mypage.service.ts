@@ -1,12 +1,11 @@
 import bcrypt from "bcrypt";
 import type { CustomError } from "../../types/error.js";
 import * as MypageRepository from "../../repositories/mypage.repository.js";
-import type { UpdateUserDTO, UpdatePasswordDTO } from "../../types/dtos/mypage.dto.js";
 import type { Prisma } from "@prisma/client";
 import { generateTokens } from "../../libs/token.js";
 import { hashing } from "../../libs/hashing.js";
 import * as AuthRepository from "../../repositories/auth.repository.js";
-import { log } from "console";
+import { UpdateUserDto, UpdatePasswordDto } from "./mypage.dto.js";
 
 const MypageService = {
   async getUser(userId: number) {
@@ -21,24 +20,29 @@ const MypageService = {
     return user;
   },
 
-  async updateUser(userId: number, updateData: UpdateUserDTO) {
-    const dataToUpdate: Prisma.UserUpdateInput = {};
+  async updateUser(userId: number, updateData: UpdateUserDto) {
+    const { nickname, image } = updateData;
 
-    if (updateData.nickname !== undefined) {
-      dataToUpdate.nickname = updateData.nickname;
+    if (!nickname && !image) {
+      const error: CustomError = new Error("수정할 내용을 하나 이상 입력해주세요.");
+      error.statusCode = 400;
+      throw error;
     }
 
-    if (updateData.image !== undefined) {
-      dataToUpdate.nickname = updateData.image;
+    const dataToUpdate: Prisma.UserUpdateInput = {};
+    if (nickname) {
+      dataToUpdate.nickname = nickname;
+    }
+    if (image) {
+      dataToUpdate.image = image;
     }
 
     const updatedUser = await MypageRepository.update(userId, dataToUpdate);
-
     const { password, refreshToken, ...UserData } = updatedUser;
     return UserData;
   },
 
-  async updatePassword(userId: number, updatePasswordDTO: UpdatePasswordDTO) {
+  async updatePassword(userId: number, updatePasswordDTO: UpdatePasswordDto) {
     const { oldPassword, newPassword } = updatePasswordDTO;
     const user = await MypageRepository.findUserForAuth(userId);
 

@@ -1,15 +1,22 @@
 import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import authenticate from "../middlewares/authenticate.js";
-import validate from "../middlewares/validate.js";
-import { ProductSchema } from "../services/product/product.validator.js";
+import { validateDto, validateParams } from "../middlewares/validator.js";
+import { ProductDto } from "../services/product/product.dto.js";
+import { ProductIdParamDto } from "../services/product/product-params.dto.js";
 
 const router = express.Router();
 
-router.post("/", authenticate, validate(ProductSchema), ProductController.createProduct);
-router.get("/:id", ProductController.findUniqueProduct);
-router.patch("/:id", authenticate, validate(ProductSchema), ProductController.patchProduct);
-router.delete("/:id", authenticate, ProductController.deleteProduct);
+router.post("/", authenticate, validateDto(ProductDto), ProductController.createProduct);
+router.get("/:id", validateParams(ProductIdParamDto), ProductController.findUniqueProduct);
+router.patch(
+  "/:id",
+  authenticate,
+  validateParams(ProductIdParamDto),
+  validateDto(ProductDto),
+  ProductController.patchProduct
+);
+router.delete("/:id", authenticate, validateParams(ProductIdParamDto), ProductController.deleteProduct);
 router.get("/", ProductController.findManyProduct);
 
 export default router;

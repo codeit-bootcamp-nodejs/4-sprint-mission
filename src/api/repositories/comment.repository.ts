@@ -1,6 +1,6 @@
 import prisma from "../libs/prismaClient.js";
-import type { FindManyCommentParams } from "../types/comment.js";
 import { Prisma } from "@prisma/client";
+import type { FindManyCommentsQuery } from "../services/comment/comment-findmany.dto.js";
 
 export const create = async (data: Prisma.CommentCreateInput) => {
   return await prisma.comment.create({ data });
@@ -23,7 +23,7 @@ export const remove = async (id: number) => {
   return await prisma.comment.delete({ where: { id } });
 };
 
-export const findMany = async ({ productId, articleId, cursor, limit }: FindManyCommentParams) => {
+export const findMany = async ({ productId, articleId, cursor, limit = 10 }: FindManyCommentsQuery) => {
   let where: Prisma.CommentWhereInput = {};
 
   if (productId) {
