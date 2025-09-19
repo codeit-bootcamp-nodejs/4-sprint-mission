@@ -7,7 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node prisma/seed.js",
-    "start": "node sprint3/app.js"
+    "build": "tsc && cp -r prisma/dist/",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node-dev --respawn --transpile-only --loader ts-node/esm' sprint5/app.ts",
+    "start": "ts-node --esm sprint5/app.ts"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -24,10 +26,33 @@
   },
   "homepage": "https://github.com/codeit-bootcamp-nodejs/4-sprint-mission#readme",
   "dependencies": {
-    "@prisma/client": "^6.13.0",
+    "@prisma/client": "^6.16.2",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.5.1",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/passport-local": "^1.0.38",
+    "bcryptjs": "^3.0.2",
+    "nodemon": "^3.1.10",
+    "passport": "^0.7.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.2"
   }
 }
