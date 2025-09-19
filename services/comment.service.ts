@@ -38,7 +38,7 @@ export async function commentRegisterProductService(userId: number, productId: n
   };
 
   // 댓글 생성
-  const CreatedComment = await prisma.comment.create({
+  const createdComment = await prisma.comment.create({
     data: {
       content,
       userId,
@@ -51,7 +51,7 @@ export async function commentRegisterProductService(userId: number, productId: n
       updatedAt: true,
     }
   });
-  return CreatedComment;
+  return createdComment;
 }
 
 

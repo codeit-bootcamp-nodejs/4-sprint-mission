@@ -9,12 +9,18 @@ export async function likeProductService(userId: number, productId: number): Pro
   // 좋아요가 이미 있는지 확인
   const existingLike = await prisma.like.findUnique({
      where: {
-    userId_productId: { // 복합 키 사용
+      userId_productId: { // 복합 키 사용
       userId,
       productId,
+      },
     },
-  },
   });
+  
+  if (!productId || isNaN(productId)) {
+    const error = new Error("상품 ID가 필요합니다.");
+    error.status = 400;
+    throw error;
+  }
 
   if (existingLike) {
     await prisma.like.delete({

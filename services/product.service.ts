@@ -83,7 +83,7 @@ export async function productPutService(userId: number, productId: number, title
   }
   
   // 상품 정보 수정하기
-  const updatedProduct = await prisma.product.update({
+  return await prisma.product.update({
     where: { id: Number(productId) },
     data: {
       title,
@@ -97,8 +97,6 @@ export async function productPutService(userId: number, productId: number, title
       updatedAt: true,
     },
   });
-
-  return updatedProduct;
 }
 
 
