@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import express from 'express';
 import fs from 'fs';
 import usersRouter from "./src/routes/users.router.js";
@@ -12,13 +13,13 @@ if (!fs.existsSync(dir)) {
 }
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json()); //body-parser middleware
 app.use('/api', [usersRouter, productsRouter, articlesRouter, commentsRouter]);
 
-app.use((err, req, res, next) => {
-    console.error(err);
+app.use((err, req, res, _next) => {
+    console.error(`[${req.method}] ${req.originalUrl} :`, err);
     res.status(500).json({ message: "서버 내부 오류 발생"});
 });
 

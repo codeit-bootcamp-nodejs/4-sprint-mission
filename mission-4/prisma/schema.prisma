@@ -17,7 +17,6 @@ model User {
   nickname  String   @unique
   image     String?
   password  String
-  refreshToken String?  @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -26,6 +25,8 @@ model User {
   comments      Comment[]
   productLikes  ProductLike[]
   articleLikes  ArticleLike[]
+  refreshTokens RefreshToken[]
+
   @@map("users")
 }
 
@@ -97,4 +98,16 @@ model ArticleLike {
 
   @@id([userId, articleId])
   @@map("article_likes")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
 }

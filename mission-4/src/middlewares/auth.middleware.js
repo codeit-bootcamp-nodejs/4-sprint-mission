@@ -14,11 +14,11 @@ export default async function(req, res, next) {
             return res.status(401).json( { message: "지원하지 않는 토큰 형식입니다."});
         }
         // 서버에서 발급한 JWT 맞는지 검증
-        const decodedToken = jwt.verify(token, 'custom-secret-key');
+        const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);
         const userId = decodedToken.userId;
 
         // 사용자 조회(JWT의 userId)
-        const user = await prisma.user.findFirst({
+        const user = await prisma.user.findUnique({
             where: { id: userId },
         });
         if(!user) {
