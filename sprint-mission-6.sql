@@ -172,14 +172,7 @@ SELECT p.size AS pizza_size, sum(od.quantity * p.price) AS total_revenue
 FROM order_details AS od
 INNER JOIN pizzas AS p ON od.pizza_id = p.id
 GROUP BY pizza_size
-ORDER BY
-  CASE p.size
-    WHEN 'L' THEN 1
-    WHEN 'M' THEN 2
-    WHEN 'S' THEN 3
-    WHEN 'XL' THEN 4
-    WHEN 'XXL' THEN 5
-  END;
+ORDER BY total_revenue DESC;
 /*    
     5. `order_details`, `pizzas`, `pizza_types` 테이블을 JOIN해서 각 피자 종류의 총 수익을 계산하고, 수익이 높은 순서대로 출력하세요.
         
