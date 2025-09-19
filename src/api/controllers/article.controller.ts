@@ -3,14 +3,16 @@ import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import { ACCESS_TOKEN_SECRET } from "../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
-import type { ArticleDto } from "../types/dtos/article.dto.js";
+import type { RequestWithDto } from "../types/express.d.ts";
+import type { ArticleDto } from "../services/article/article.dto.js";
+import { FindManyParamsDto } from "../types/dto.js";
 
 const ArticleController = {
-  async createArticle(req: Request, res: Response, next: NextFunction) {
+  async createArticle(req: RequestWithDto<ArticleDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
-      const articleData: ArticleDto = req.body;
-      const newArticle = await ArticleService.createArticle(articleData, userId);
+      const articleDto = req.body;
+      const newArticle = await ArticleService.createArticle(articleDto, userId);
 
       res.status(201).json(newArticle);
     } catch (err) {
@@ -46,12 +48,13 @@ const ArticleController = {
     }
   },
 
-  async updateArticle(req: Request, res: Response, next: NextFunction) {
+  async updateArticle(req: RequestWithDto<ArticleDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
-      const updateData: ArticleDto = req.body;
-      const article = await ArticleService.updateArticle(Number(id), updateData, userId);
+      const articleDto = req.body;
+
+      const article = await ArticleService.updateArticle(Number(id), articleDto, userId);
       res.status(200).json(article);
     } catch (err) {
       next(err);
@@ -71,19 +74,9 @@ const ArticleController = {
 
   async findManyArticle(req: Request, res: Response, next: NextFunction) {
     try {
-      const { offset = 0, limit = 10, order, keyword } = req.query;
+      const params = FindManyParamsDto.from(req.query);
 
-      const finalOffset = Number(offset) || 0;
-      const finalLimit = Number(limit) || 10;
-      const finalOrder = typeof order === "string" ? order : "recent";
-      const finalKeyword = typeof keyword === "string" ? keyword : undefined;
-
-      const articles = await ArticleService.findManyArticle({
-        offset: finalOffset,
-        limit: finalLimit,
-        order: finalOrder,
-        ...(finalKeyword && { keyword: finalKeyword }),
-      });
+      const articles = await ArticleService.findManyArticle(params);
       res.status(200).json(articles);
     } catch (err) {
       next(err);

@@ -1,6 +1,6 @@
 import prisma from "../libs/prismaClient.js";
 import { Prisma } from "@prisma/client";
-import type { FindManyArticleParams } from "../types/article.js";
+import type { FindManyParams } from "../types/express.d.ts";
 
 // 게시글 생성
 export const create = async (data: Prisma.ArticleCreateInput) => {
@@ -13,7 +13,7 @@ export const findById = async (id: number) => {
 };
 
 // 여러 게시글 조회
-export const findMany = async ({ offset, limit, order, keyword }: FindManyArticleParams) => {
+export const findMany = async ({ offset = 0, limit = 10, order = "recent", keyword }: FindManyParams) => {
   let orderBy: Prisma.ArticleOrderByWithRelationInput;
   switch (order) {
     case "oldest":

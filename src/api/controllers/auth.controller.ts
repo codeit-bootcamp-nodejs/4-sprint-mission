@@ -1,22 +1,24 @@
 import AuthService from "../services/auth/auth.service.js";
 import type { Request, Response, NextFunction } from "express";
-import type { SignupDto, LoginDto } from "../types/dtos/auth.dto.js";
+import type { SignupDto, LoginDto } from "../services/auth/auth.dto.js";
+import type { RequestWithDto } from "../types/express.d.ts";
 
 const AuthController = {
-  async signup(req: Request, res: Response, next: NextFunction) {
+  async signup(req: RequestWithDto<SignupDto>, res: Response, next: NextFunction) {
     try {
-      const signupData: SignupDto = req.body;
-      const newUser = await AuthService.signup(signupData);
+      const signupDto = req.body;
+      const newUser = await AuthService.signup(signupDto);
+
       res.status(201).json(newUser);
     } catch (err) {
       next(err);
     }
   },
 
-  async login(req: Request, res: Response, next: NextFunction) {
+  async login(req: RequestWithDto<LoginDto>, res: Response, next: NextFunction) {
     try {
-      const loginData: LoginDto = req.body;
-      const { userWithoutPassword: user, accessToken, refreshToken } = await AuthService.login(loginData);
+      const loginDto = req.body;
+      const { userWithoutPassword: user, accessToken, refreshToken } = await AuthService.login(loginDto);
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,

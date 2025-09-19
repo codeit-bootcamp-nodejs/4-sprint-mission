@@ -4,7 +4,7 @@ import { generateTokens } from "../../libs/token.js";
 import { REFRESH_TOKEN_SECRET } from "../../libs/constants.js";
 import type { CustomError } from "src/api/types/error.js";
 import * as AuthRepository from "../../repositories/auth.repository.js";
-import type { SignupDto, LoginDto } from "../../types/dtos/auth.dto.js";
+import type { SignupDto, LoginDto } from "./auth.dto.js";
 
 const AuthService = {
   async signup(signupData: SignupDto) {

@@ -1,7 +1,7 @@
-import type { CreateArticleData, UpdateArticleData, FindManyArticleParams } from "../../types/article.js";
 import type { CustomError } from "../../types/error.js";
 import * as ArticleRepository from "../../repositories/article.repository.js";
-import type { ArticleDto } from "../../types/dtos/article.dto.js";
+import type { ArticleDto } from "./article.dto.js";
+import type { FindManyParams } from "../../types/express.d.ts";
 
 const ArticleService = {
   async createArticle(articleData: ArticleDto, userId: number) {
@@ -65,7 +65,7 @@ const ArticleService = {
     await ArticleRepository.remove(id);
   },
 
-  async findManyArticle(params: FindManyArticleParams) {
+  async findManyArticle(params: FindManyParams) {
     const articles = await ArticleRepository.findMany(params);
     return articles;
   },

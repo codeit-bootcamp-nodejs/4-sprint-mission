@@ -1,15 +1,22 @@
 import express from "express";
 import ArticleController from "../controllers/article.controller.js";
 import authenticate from "../middlewares/authenticate.js";
-import validate from "../middlewares/validate.js";
-import { ArticleSchema } from "../services/article/article.validator.js";
+import { validateDto, validateParams } from "../middlewares/validator.js";
+import { ArticleDto } from "../services/article/article.dto.js";
+import { ArticleIdParamDto } from "../services/article/article-param.dto.js";
 
 const router = express.Router();
 
-router.post("/", authenticate, validate(ArticleSchema), ArticleController.createArticle);
-router.get("/:id", ArticleController.findUniqueArticle);
-router.patch("/:id", authenticate, validate(ArticleSchema), ArticleController.updateArticle);
-router.delete("/:id", authenticate, ArticleController.deleteArticle);
+router.post("/", authenticate, validateDto(ArticleDto), ArticleController.createArticle);
+router.get("/:id", validateParams(ArticleIdParamDto), ArticleController.findUniqueArticle);
+router.patch(
+  "/:id",
+  authenticate,
+  validateParams(ArticleIdParamDto),
+  validateDto(ArticleDto),
+  ArticleController.updateArticle
+);
+router.delete("/:id", authenticate, validateParams(ArticleIdParamDto), ArticleController.deleteArticle);
 router.get("/", ArticleController.findManyArticle);
 
 export default router;
