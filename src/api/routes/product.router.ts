@@ -2,7 +2,7 @@ import express from "express";
 import ProductController from "../controllers/product.controller.js";
 import authenticate from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
-import { ProductSchema } from "../types/dtos/product.dto.js";
+import { ProductSchema } from "../services/product/product.validator.js";
 
 const router = express.Router();
 

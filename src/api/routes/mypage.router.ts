@@ -2,7 +2,7 @@ import express from "express";
 import authenticate from "../middlewares/authenticate.js";
 import MypageController from "../controllers/mypage.controller.js";
 import validate from "../middlewares/validate.js";
-import { updateUserSchema, updatePasswordSchema } from "../types/dtos/mypage.dto.js";
+import { updateUserSchema, updatePasswordSchema } from "../services/mypage/mypage.validator.js";
 
 const router = express.Router();
 
