@@ -1,8 +1,14 @@
 import prisma from '../prisma/prisma.js';
-
-
+import { HttpError } from "../middlewares/errorHandler.middleware.js";
+import type { Post } from "@prisma/client";
 // 게시글 목록 조회
-export async function PostListService(userId) {
+export async function postListService(userId: number): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}[]> {
   const listup = await prisma.post.findMany({
     where: { userId: userId },
     select: {
@@ -13,20 +19,21 @@ export async function PostListService(userId) {
       updatedAt: true
     }
   })
-  if ( listup === 0) {
-    const error = new Error("등록한 게시글이 없습니다.")
-    error.status == 404;
-    throw error;
+  if ( listup.length === 0)  {
+    throw new HttpError("등록한 게시글이 없습니다.", 404);
   }
   return listup;
 }
 // 로그인한 유저만 게시글 등록 가능
-export async function PostRegisterService(userId, title, content) {
+export async function postRegisterService(userId: number, title: string, content: string): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  createdAt: Date;
+}> {
   // 유효성 검사
   if (!title || !content) {
-    const error = new Error("제목과 내용을 입력해주세요")
-    error.status = 404;
-    throw error;
+    throw new HttpError("제목과 내용을 입력해주세요.", 404);
   };
   // 게시글 생성
   const CreatePost = await prisma.post.create({
@@ -47,25 +54,26 @@ export async function PostRegisterService(userId, title, content) {
   return CreatePost;
 }
 
-
 // 게시글을 등록한 유저만 해당 글을 수정할 수 있음
-export async function PostPutService(userId, postId, title, content) {
+export async function postPutService(userId: number, postId: number, title: string, content: string): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}> {
   // DB에서 게시글 정보 가져오기
   const post = await prisma.post.findUnique({
     where: { id: Number(postId) },
   });
   
   if (!post) {
-    const error = new Error("게시글을 찾을 수 없습니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("게시글을 찾을 수 없습니다.", 404);
   }
   
   // 게시글이 사용자가 게시한 글인지 확인
   if (post.userId !== userId) {
-    const error = new Error("게시글은 작성자만 수정할 수 있습니다.")
-    error.status = 403;
-    throw error;
+    throw new HttpError("게시글은 작성자만 수정할 수 있습니다.", 403);
   };
   
   // 게시글 수정
@@ -88,23 +96,19 @@ export async function PostPutService(userId, postId, title, content) {
 
 
 // 게시글을 등록한 유저만 해당 글을 삭제할 수 있음
-export async function PostDeleteService(userId, postId) {
+export async function postDeleteService(userId: number, postId: number): Promise<Post> {
   // 게시글 DB 가져오기
   const post = await prisma.post.findUnique({
     where: { id: Number(postId) },
   });
 
   if (!post) {
-    const error = new Error("게시글을 찾을 수 없습니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("게시글을 찾을 수 없습니다..", 404);
   }
 
   // 게시글 작성자인지 확인하기
   if (post.userId !== userId) {
-    const error = new Error("게시글은 작성자만 삭제할 수 있습니다.")
-    error.status = 403;
-    throw error;
+    throw new HttpError("게시글은 작성자만 삭제할 수 있습니다.", 403);
   }
 
   // 게시글 삭제

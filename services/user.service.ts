@@ -1,21 +1,29 @@
 import jwt from "jsonwebtoken";
-import prisma from "../prisma/prisma.js";
+import prisma from "../prisma/prisma.js"
 import bcrypt from "bcrypt";
-
+import { HttpError } from "../middlewares/errorHandler.middleware.js";
+import dotenv from "dotenv";
+import type { User } from "@prisma/client"
+import type { Product } from "@prisma/client";
+dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
+
 
 if (!JWT_SECRET || !REFRESH_SECRET) {
   throw new Error("❌ JWT_SECRET 또는 REFRESH_SECRET 환경변수가 설정되지 않았습니다.");
 }
 
 // 회원가입
-export async function signupService(email, nickname, password) {
+export async function signupService(email: string, nickname: string, password: string): Promise<{
+  id: number;
+  email: string;
+  nickname: string;
+  createdAt: Date;
+}> {
   // 유효성 검사
   if (!email || !nickname || !password) {
-    const error = new Error("이메일과 닉네임과 패스워드는 필수입니다.");
-    error.status = 404;
-    throw error;
+    throw new HttpError("이메일과 닉네임과 패스워드는 필수입니다.", 404);
   }
 
   // 중복 이메일//닉네임 검사
@@ -23,9 +31,7 @@ export async function signupService(email, nickname, password) {
     where: { OR: [{ email }, { nickname }] },
   });
   if (existingUser) {
-      const error = new Error("이미 존재하는 이메일 또는 닉네임 입니다.");
-      error.status = 409;
-      throw error;
+    throw new HttpError("이미 존재하는 이메일 또는 닉네임 입니다.", 409);
   }
 
   //비밀번호 해싱
@@ -51,32 +57,31 @@ export async function signupService(email, nickname, password) {
 
 
 // 로그인
-export async function loginService(email, password) {
+export async function loginService(email: string, password: string): Promise<{
+  safeuser: Omit<User, "password" | "refreshToken">;
+  accessToken: string;
+  refreshToken: string;
+  saveRefreshToken: User;
+}> {
   // 유효성 검사
   if (!email || !password) {
-    const error = new Error("이메일과 비밀번호는 필수입니다.")
-    error.status = 400;
-    throw error;
+    throw new HttpError("이메일과 비밀번호는 필수입니다.", 400);
   }
 
   // 이메일로 유저 찾기
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    const error = new Error("존재하지 않는 이메일입니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("존재하지 않는 이메일입니다.", 404);
   }
 
   // 비밀번호 검증
   const verify = await bcrypt.compare(password, user.password);
   if (!verify) {
-    const error = new Error("비밀번호가 일치하지 않습니다.")
-    error.status = 401;
-    throw error;
+    throw new HttpError("비밀번호가 일치하지 않습니다.", 401);
   }
 
   // 응답 전 비밀번호 제거
-  const { password: hashedPassword, ...safeuser } = user;
+  const { password: hashedPassword, refreshToken: oldRefreshToken, ...safeuser } = user;
 
   // 토큰 기반 인증: 로그인에 성공하면 Access Token 발급하는 기능
   const accessToken = jwt.sign(
@@ -93,21 +98,26 @@ export async function loginService(email, password) {
   );
 
   // DB에 Refresh Token 저장
-  const saveRfreshToken = await prisma.user.update({
+  const saveRefreshToken = await prisma.user.update({
     where: { id: user.id },
     data: { refreshToken },
   });
 
-  return { safeuser, accessToken, refreshToken , saveRfreshToken};
+  return { safeuser, accessToken, refreshToken , saveRefreshToken };
 }
 
 
 // 내 정보 조회
-export async function inquiryService(userId) {
+export async function inquiryService(userId: number): Promise<{
+  id: number;
+  email: string;
+  nickname: string;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}> {
   if (!userId) {
-    const error = new Error("사용자를 찾을 수 없습니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("사용자를 찾을 수 없습니다.", 404);
   }
 
   // 토큰에서 정보 찾아서 셀렉
@@ -124,9 +134,7 @@ export async function inquiryService(userId) {
   });
 
   if (!inquiryUser) {
-    const error = new Error("유저를 찾을 수 없습니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("유저를 찾을 수 없습니다.", 404);
   }
 
   // 성공하면 조회된 사용자 객체 반환
@@ -135,29 +143,35 @@ export async function inquiryService(userId) {
 
 
 // 내 정보 수정
-export async function editUserService(userId, data = {} ) {
-  const { password, nickname, email, image} = data;
+export async function editUserService(userId: number, data = {} ): Promise<{
+  id: number;
+  email: string;
+  nickname: string;
+  image: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}> {
+  const { password, nickname, email, image} = data as {
+    password: string;
+    nickname: string;
+    email: string;
+    image: string | null ;
+  };
   if (!password) {
-    const error = new Error("비밀번호는 필수입니다.");
-    error.status = 400;
-    throw error;
+    throw new HttpError("비밀번호는 필수입니다.", 400);
   }
 
   // DB에서 내 유저 정보 찾기 (비밀번호 일치하는지 확인용)
   const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
   
   if (!user) {
-    const error = new Error("유저를 찾을 수 없습니다.")
-    error.status = 404;
-    throw error;
+    throw new HttpError("유저를 찾을 수 없습니다.", 404);
   }
 
   // 비밀번호 일치하는지 확인
   const correctpassword = await bcrypt.compare(password, user.password);
   if (!correctpassword) {
-    const error = new Error("비밀번호가 일치하지 않습니다.")
-    error.status = 400;
-    throw error;
+    throw new HttpError("비밀번호가 일치하지 않습니다.", 400);
   }
 
   // 정보 수정 과정
@@ -183,11 +197,9 @@ export async function editUserService(userId, data = {} ) {
 
 
 // 내 비밀번호 수정
-export async function editPasswordService(userId, { currentPassword, newPassword }) {
+export async function editPasswordService(userId: number,  currentPassword: string, newPassword: string ): Promise<User> {
   if (!currentPassword || !newPassword) {
-    const error = new Error("현재 비밀번호와 새 비밀번호 모두 입력하세요.");
-    error.status = 400;
-    throw error;
+    throw new HttpError("현재 비밀번호와 새 비밀번호 모두 입력하세요.", 400);
   }
 
   // DB에서 내 유저 정보 찾기
@@ -197,29 +209,23 @@ export async function editPasswordService(userId, { currentPassword, newPassword
   });
 
   if (!user) {
-    const error = new Error(" 유저를 찾을 수 없습니다.");
-    error.status = 404;
-    throw error;
+    throw new HttpError("유저를 찾을 수 없습니다.", 404);
   }
 
   // 현재 비밀번호와 비교
   const isMatch = await bcrypt.compare(currentPassword, user.password);
   if (!isMatch) {
-    const error = new Error("현재 비밀번호가 일치하지 않습니다.");
-    error.status = 401;
-    throw error;
+    throw new HttpError("현재 비밀번호가 일치하지 않습니다.", 401);
   }
 
   // 새 비밀번호 비교
   const isSameOld = await bcrypt.compare(newPassword, user.password);
   if (isSameOld) {
-    const error = new Error("새 비밀번호는 현재 비밀번호와 달라야 합니다");
-    error.status = 400;
-    throw error;
+    throw new HttpError("새 비밀번호는 현재 비밀번호와 달라야 합니다", 400);
   }
 
   // 새 비밀번호 해싱
-  const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 10;
+  const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS!, 10) || 10;
   const hashedNew = await bcrypt.hash(newPassword, SALT_ROUNDS);
 
   // DB에 비밀번호 업데이트
@@ -233,19 +239,15 @@ export async function editPasswordService(userId, { currentPassword, newPassword
 
 
 // Refresh Token을 이용해 Access Token 재발급
-export async function refreshService(refreshToken) {
+export async function refreshService(refreshToken: any): Promise<string>  {
   if (!refreshToken) {
-    const error = new Error("리프레쉬 토큰이 필요합니다.");
-    error.status = 401;
-    throw error;
+    throw new HttpError("리프레쉬 토큰이 필요합니다.", 401);
   }
 
   // DB에 저장된 Refresh Token과 일치하는지 확인
   const user = await prisma.user.findFirst({ where: { refreshToken } });
   if (!user) {
-    const error = new Error("유효하지 않은 리프레쉬 토큰입니다.");
-    error.status = 403;
-    throw error;
+    throw new HttpError("유효하지 않은 리프레쉬 토큰입니다.", 403);
   }
 
   // Refresh Token 검증
@@ -253,9 +255,7 @@ export async function refreshService(refreshToken) {
   try {
     decoded = jwt.verify(refreshToken, REFRESH_SECRET);
   } catch (err) {
-    const error = new Error("리프레쉬 토큰이 만료되었거나 유효하지 않습니다.");
-    error.status = 403;
-    throw error;
+    throw new HttpError("리프레쉬 토큰이 만료되었거나 유효하지 않습니다.", 403);
   }
 
   // 새로운 Access Token 발급
@@ -270,26 +270,21 @@ export async function refreshService(refreshToken) {
 
 
 // 등록한 상품의 목록 조회 기능
-export async function listupService(userId) {
+export async function listupService(userId: number): Promise<Pick<Product, 'id' | 'title' | 'content' | 'createdAt'>[]> {
   // 해당 유저가 등록한 상품 목록 가져오기
   const listup = await prisma.product.findMany({
     where: { userId: userId },
     select: {
-    id: true,
-    title: true,
-    content: true,
-    createdAt: true,
+      id: true,
+      title: true,
+      content: true,
+      createdAt: true,
     },
   });
 
   if (!listup || listup.length === 0) {
-    const error = new Error("등록한 상품이 없습니다.");
-    error.status = 404;
-    throw error;
+    throw new HttpError("등록한 상품이 없습니다.", 404);
     };
 
   return listup;
 };
-
-  
-
