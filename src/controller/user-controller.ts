@@ -1,13 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { UserService } from '../service/user-service';
+import {
+  ChangePasswordDto,
+  SignInDto,
+  SignUpDto,
+  UpdateUserInfoDto,
+} from '../types/dto';
 
 export class UserController {
   constructor(private userService: UserService) {}
 
   signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, nickname, password } = req.body;
-      const newUser = await this.userService.signUp(email, nickname, password);
+      const signUpDto: SignUpDto = req.body;
+      const newUser = await this.userService.signUp(signUpDto);
       res.status(201).json({ data: newUser });
     } catch (error) {
       next(error);
@@ -16,8 +22,8 @@ export class UserController {
 
   signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = req.body;
-      const tokens = await this.userService.signIn(email, password);
+      const signInDto: SignInDto = req.body;
+      const tokens = await this.userService.signIn(signInDto);
       res.status(200).json({
         message: '로그인에 성공했습니다.',
         data: tokens,
@@ -45,7 +51,7 @@ export class UserController {
 
   signOut = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       await this.userService.signOut(userId);
       res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
     } catch (error) {
@@ -55,7 +61,7 @@ export class UserController {
 
   getMyInfo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const userInfo = await this.userService.getUserInfo(userId);
       res.status(200).json({ data: userInfo });
     } catch (error) {
@@ -65,11 +71,11 @@ export class UserController {
 
   updateMyInfo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
-      const userInfoData = req.body;
+      const userId = req.user!.id;
+      const updateUserInfoDto: UpdateUserInfoDto = req.body;
       const updatedUser = await this.userService.updateUserInfo(
         userId,
-        userInfoData,
+        updateUserInfoDto,
       );
       res.status(200).json({
         message: '사용자 정보가 성공적으로 수정되었습니다.',
@@ -86,20 +92,16 @@ export class UserController {
     next: NextFunction,
   ) => {
     try {
-      const { id: userId } = (req as any).user;
-      const { currentPassword, newPassword } = req.body;
+      const userId = req.user!.id;
+      const changePasswordDto: ChangePasswordDto = req.body;
 
-      if (!currentPassword || !newPassword) {
+      if (!changePasswordDto.currentPassword || !changePasswordDto.newPassword) {
         return res.status(400).json({
           message: '현재 비밀번호와 새 비밀번호를 모두 입력해주세요.',
         });
       }
 
-      await this.userService.changePassword(
-        userId,
-        currentPassword,
-        newPassword,
-      );
+      await this.userService.changePassword(userId, changePasswordDto);
       res
         .status(200)
         .json({ message: '비밀번호가 성공적으로 변경되었습니다.' });
@@ -110,7 +112,7 @@ export class UserController {
 
   getMyProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const products = await this.userService.getMyProducts(userId);
       res.status(200).json({ data: products });
     } catch (error) {
@@ -124,7 +126,7 @@ export class UserController {
     next: NextFunction,
   ) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const products = await this.userService.getLikedProducts(userId);
       res.status(200).json({ data: products });
     } catch (error) {
@@ -138,7 +140,7 @@ export class UserController {
     next: NextFunction,
   ) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const articles = await this.userService.getLikedArticles(userId);
       res.status(200).json({ data: articles });
     } catch (error) {

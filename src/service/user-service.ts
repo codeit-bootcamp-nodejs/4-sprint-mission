@@ -2,6 +2,12 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repository/user-repository';
 import { ProductRepository } from '../repository/product-repository';
+import {
+  ChangePasswordDto,
+  SignInDto,
+  SignUpDto,
+  UpdateUserInfoDto,
+} from '../types/dto';
 
 export class UserService {
   constructor(
@@ -9,7 +15,12 @@ export class UserService {
     private productRepository: ProductRepository,
   ) {}
 
-  signUp = async (email, nickname, password) => {
+  signUp = async (signUpDto: SignUpDto) => {
+    const { email, nickname, password } = signUpDto;
+    if (!email || !nickname || !password) {
+      throw new Error('필수 정보가 누락되었습니다.');
+    }
+
     const existingUser = await this.userRepository.findUserByEmail(email);
     if (existingUser) {
       throw new Error('이미 사용 중인 이메일입니다.');
@@ -22,11 +33,16 @@ export class UserService {
       hashedPassword,
     );
 
-    delete (newUser as any).password;
-    return newUser;
+    const { password: _, ...userWithoutPassword } = newUser;
+    return userWithoutPassword;
   };
 
-  signIn = async (email, password) => {
+  signIn = async (signInDto: SignInDto) => {
+    const { email, password } = signInDto;
+    if (!email || !password) {
+      throw new Error('이메일과 비밀번호를 모두 입력해주세요.');
+    }
+
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
@@ -96,16 +112,16 @@ export class UserService {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
 
-    delete (user as any).password;
-    return user;
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
   };
 
   updateUserInfo = async (
     userId: number,
-    userInfoData: { nickname?: string; image?: string },
+    updateUserInfoDto: UpdateUserInfoDto,
   ) => {
-    const { nickname, image } = userInfoData;
-    const dataToUpdate: any = {};
+    const { nickname, image } = updateUserInfoDto;
+    const dataToUpdate: UpdateUserInfoDto = {};
 
     if (nickname) dataToUpdate.nickname = nickname;
     if (image) dataToUpdate.image = image;
@@ -118,15 +134,19 @@ export class UserService {
       userId,
       dataToUpdate,
     );
-    delete (updatedUser as any).password;
-    return updatedUser;
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
   };
 
   changePassword = async (
     userId: number,
-    currentPassword,
-    newPassword,
+    changePasswordDto: ChangePasswordDto,
   ) => {
+    const { currentPassword, newPassword } = changePasswordDto;
+    if (!currentPassword || !newPassword) {
+      throw new Error('현재 비밀번호와 새 비밀번호를 모두 입력해주세요.');
+    }
+
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
