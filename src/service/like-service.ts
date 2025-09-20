@@ -1,6 +1,7 @@
 import { LikeRepository } from '../repository/like-repository';
 import { ProductRepository } from '../repository/product-repository';
 import { ArticleRepository } from '../repository/article-repository';
+import { LikeResponseDto } from '../types/dto';
 
 export class LikeService {
   constructor(
@@ -9,7 +10,10 @@ export class LikeService {
     private articleRepository: ArticleRepository,
   ) {}
 
-  toggleProductLike = async (userId: number, productId: number) => {
+  toggleProductLike = async (
+    userId: number,
+    productId: number,
+  ): Promise<LikeResponseDto> => {
     const product = await this.productRepository.findProductById(
       String(productId),
     );
@@ -31,7 +35,10 @@ export class LikeService {
     }
   };
 
-  toggleArticleLike = async (userId: number, articleId: number) => {
+  toggleArticleLike = async (
+    userId: number,
+    articleId: number,
+  ): Promise<LikeResponseDto> => {
     const article = await this.articleRepository.findArticleById(
       String(articleId),
     );
