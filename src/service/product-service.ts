@@ -1,15 +1,11 @@
 import { ProductRepository } from '../repository/product-repository';
+import { CreateProductDto, UpdateProductDto } from '../types/dto';
 
 export class ProductService {
   constructor(private productRepository: ProductRepository) {}
 
-  createProduct = async (
-    userId: number,
-    name: string,
-    description: string,
-    price: number,
-    tags: string[],
-  ) => {
+  createProduct = async (userId: number, createProductDto: CreateProductDto) => {
+    const { name, description, price, tags } = createProductDto;
     return await this.productRepository.createProduct(
       userId,
       name,
@@ -65,12 +61,7 @@ export class ProductService {
   updateProduct = async (
     userId: number,
     productId: string,
-    productData: {
-      name?: string;
-      description?: string;
-      price?: number;
-      tags?: string[];
-    },
+    updateProductDto: UpdateProductDto,
   ) => {
     const product = await this.productRepository.findProductById(productId);
     if (!product) {
@@ -80,14 +71,10 @@ export class ProductService {
       throw new Error('상품을 수정할 권한이 없습니다.');
     }
 
-    const { name, description, price, tags } = productData;
-    const dataToUpdate: any = {};
-    if (name !== undefined) dataToUpdate.name = name;
-    if (description !== undefined) dataToUpdate.description = description;
-    if (price !== undefined) dataToUpdate.price = price;
-    if (tags !== undefined) dataToUpdate.tags = tags;
-
-    return await this.productRepository.updateProduct(productId, dataToUpdate);
+    return await this.productRepository.updateProduct(
+      productId,
+      updateProductDto,
+    );
   };
 
   deleteProduct = async (userId: number, productId: string) => {

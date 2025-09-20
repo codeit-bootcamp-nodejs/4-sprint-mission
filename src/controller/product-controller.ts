@@ -1,26 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { ProductService } from '../service/product-service';
 import { LikeService } from '../service/like-service';
+import { CreateProductDto, UpdateProductDto } from '../types/dto';
 
 export class ProductController {
-  productService: ProductService;
-  likeService: LikeService;
-
-  constructor(productService: ProductService, likeService: LikeService) {
-    this.productService = productService;
-    this.likeService = likeService;
-  }
+  constructor(
+    private productService: ProductService,
+    private likeService: LikeService,
+  ) {}
 
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
-      const { name, description, price, tags } = req.body;
+      const userId = req.user!.id;
+      const createProductDto: CreateProductDto = req.body;
       const newProduct = await this.productService.createProduct(
         userId,
-        name,
-        description,
-        price,
-        tags,
+        createProductDto,
       );
       res.status(201).json(newProduct);
     } catch (error) {
@@ -32,8 +27,8 @@ export class ProductController {
     try {
       const page = parseInt((req.query.page as string) || '1');
       const limit = parseInt((req.query.limit as string) || '10');
-      const search = req.query.search as string;
-      const userId = (req as any).user?.id;
+      const search = req.query.search as string | undefined;
+      const userId = req.user?.id;
       const result = await this.productService.getProducts(
         page,
         limit,
@@ -48,7 +43,7 @@ export class ProductController {
 
   getProductById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
       const { id } = req.params;
       const result = await this.productService.getProductById(id, userId);
       res.status(200).json(result);
@@ -59,13 +54,13 @@ export class ProductController {
 
   updateProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id } = req.params;
-      const productData = req.body;
+      const updateProductDto: UpdateProductDto = req.body;
       const updatedProduct = await this.productService.updateProduct(
         userId,
         id,
-        productData,
+        updateProductDto,
       );
       res.status(200).json(updatedProduct);
     } catch (error) {
@@ -75,7 +70,7 @@ export class ProductController {
 
   deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id } = req.params;
       await this.productService.deleteProduct(userId, id);
       res.status(204).send();
@@ -86,7 +81,7 @@ export class ProductController {
 
   toggleLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id: productId } = req.params;
       const result = await this.likeService.toggleProductLike(
         userId,
