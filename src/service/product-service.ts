@@ -1,11 +1,19 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { ProductRepository } from '../repository/product-repository';
-import { CreateProductDto, UpdateProductDto } from '../types/dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  ProductListResponseDto,
+  ProductDetailResponseDto,
+} from '../types/dto';
 
 export class ProductService {
   constructor(private productRepository: ProductRepository) {}
 
-  createProduct = async (userId: number, createProductDto: CreateProductDto) => {
+  createProduct = async (
+    userId: number,
+    createProductDto: CreateProductDto,
+  ): Promise<Product> => {
     const { name, description, price, tags } = createProductDto;
     return await this.productRepository.createProduct(
       userId,
@@ -21,7 +29,7 @@ export class ProductService {
     limit: number,
     search: string | undefined,
     userId: number | undefined,
-  ) => {
+  ): Promise<ProductListResponseDto> => {
     const whereCondition: Prisma.ProductWhereInput = search
       ? {
           OR: [
@@ -48,7 +56,10 @@ export class ProductService {
     };
   };
 
-  getProductById = async (productId: string, userId: number | undefined) => {
+  getProductById = async (
+    productId: string,
+    userId: number | undefined,
+  ): Promise<ProductDetailResponseDto> => {
     const product = await this.productRepository.findProductById(
       productId,
       userId,
@@ -63,7 +74,7 @@ export class ProductService {
     userId: number,
     productId: string,
     updateProductDto: UpdateProductDto,
-  ) => {
+  ): Promise<Product> => {
     const product = await this.productRepository.findProductById(productId);
     if (!product) {
       throw new Error('상품을 찾을 수 없습니다.');
@@ -78,7 +89,7 @@ export class ProductService {
     );
   };
 
-  deleteProduct = async (userId: number, productId: string) => {
+  deleteProduct = async (userId: number, productId: string): Promise<void> => {
     const product = await this.productRepository.findProductById(productId);
     if (!product) {
       throw new Error('상품을 찾을 수 없습니다.');
