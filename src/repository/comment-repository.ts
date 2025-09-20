@@ -1,16 +1,14 @@
-export class CommentRepository {
-  constructor(prisma) {
-    this.prisma = prisma;
-  }
+import { PrismaClient } from '@prisma/client';
 
-  /**
-   * 새로운 댓글을 생성
-   * @param {string} content - 댓글 내용
-   * @param {number|undefined} productId - 연결될 상품 ID
-   * @param {number|undefined} articleId - 연결될 게시글 ID
-   * @returns {Promise<object>} 생성된 댓글 객체
-   */
-  createComment = async (userId, content, productId, articleId) => {
+export class CommentRepository {
+  constructor(private prisma: PrismaClient) {}
+
+  createComment = async (
+    userId: number,
+    content: string,
+    productId: string | undefined,
+    articleId: string | undefined,
+  ) => {
     return await this.prisma.comment.create({
       data: {
         userId,
@@ -21,14 +19,11 @@ export class CommentRepository {
     });
   };
 
-  /**
-   * 특정 상품 또는 게시글의 댓글 목록을 조회
-   * @param {object} where - Prisma 조회 조건
-   * @param {number} limit - 페이지당 아이템 수
-   * @param {number|undefined} cursor - 커서 ID
-   * @returns {Promise<Array<object>>} 댓글 목록
-   */
-  findManyComments = async (where, limit, cursor) => {
+  findManyComments = async (
+    where: any,
+    limit: number,
+    cursor: number | undefined,
+  ) => {
     return await this.prisma.comment.findMany({
       where,
       take: limit,
@@ -41,36 +36,20 @@ export class CommentRepository {
     });
   };
 
-  /**
-   * ID로 특정 댓글을 조회
-   * @param {number} commentId - 댓글 ID
-   * @returns {Promise<object|null>} 조회된 댓글 객체
-   */
-  findCommentById = async (commentId) => {
+  findCommentById = async (commentId: string) => {
     return await this.prisma.comment.findUnique({
       where: { id: parseInt(commentId) },
     });
   };
 
-  /**
-   * 특정 댓글의 내용을 수정
-   * @param {number} commentId - 댓글 ID
-   * @param {string} content - 수정할 내용
-   * @returns {Promise<object>} 수정된 댓글 객체
-   */
-  updateComment = async (commentId, content) => {
+  updateComment = async (commentId: string, content: string) => {
     return await this.prisma.comment.update({
       where: { id: parseInt(commentId) },
       data: { content },
     });
   };
 
-  /**
-   * 특정 댓글을 삭제
-   * @param {number} commentId - 댓글 ID
-   * @returns {Promise<void>}
-   */
-  deleteComment = async (commentId) => {
+  deleteComment = async (commentId: string) => {
     await this.prisma.comment.delete({
       where: { id: parseInt(commentId) },
     });

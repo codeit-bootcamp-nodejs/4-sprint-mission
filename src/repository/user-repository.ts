@@ -1,20 +1,17 @@
-export class UserRepository {
-  constructor(prisma) {
-    this.prisma = prisma;
-  }
+import { PrismaClient } from '@prisma/client';
 
-  // 이메일로 사용자 찾기
-  findUserByEmail = async (email) => {
+export class UserRepository {
+  constructor(private prisma: PrismaClient) {}
+
+  findUserByEmail = async (email: string) => {
     return await this.prisma.user.findUnique({ where: { email } });
   };
 
-  // ID로 사용자 찾기
-  findUserById = async (userId) => {
+  findUserById = async (userId: number) => {
     return await this.prisma.user.findUnique({ where: { id: userId } });
   };
 
-  // 사용자 생성
-  createUser = async (email, nickname, hashedPassword) => {
+  createUser = async (email: string, nickname: string, hashedPassword) => {
     return await this.prisma.user.create({
       data: {
         email,
@@ -24,16 +21,14 @@ export class UserRepository {
     });
   };
 
-  // 사용자 정보 수정
-  updateUser = async (userId, dataToUpdate) => {
+  updateUser = async (userId: number, dataToUpdate: any) => {
     return await this.prisma.user.update({
       where: { id: userId },
       data: dataToUpdate,
     });
   };
 
-  // 좋아요한 상품 목록 조회
-  findLikedProductsByUserId = async (userId) => {
+  findLikedProductsByUserId = async (userId: number) => {
     const userWithLikes = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -47,11 +42,10 @@ export class UserRepository {
         },
       },
     });
-    return userWithLikes.productLikes.map((like) => like.product);
+    return userWithLikes!.productLikes.map((like) => like.product);
   };
 
-  // 좋아요한 게시글 목록 조회
-  findLikedArticlesByUserId = async (userId) => {
+  findLikedArticlesByUserId = async (userId: number) => {
     const userWithLikes = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -65,6 +59,6 @@ export class UserRepository {
         },
       },
     });
-    return userWithLikes.articleLikes.map((like) => like.article);
+    return userWithLikes!.articleLikes.map((like) => like.article);
   };
 }

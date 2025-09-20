@@ -1,29 +1,21 @@
-export class ArticleRepository {
-  constructor(prisma) {
-    this.prisma = prisma;
-  }
+import { PrismaClient } from '@prisma/client';
 
-  /**
-   * 새로운 게시글을 생성합
-   * @param {string} title - 게시글 제목
-   * @param {string} content - 게시글 내용
-   * @returns {Promise<object>} 생성된 게시글 객체
-   */
-  createArticle = async (userId, title, content) => {
+export class ArticleRepository {
+  constructor(private prisma: PrismaClient) {}
+
+  createArticle = async (userId: number, title: string, content: string) => {
     return await this.prisma.article.create({
       data: { userId, title, content },
     });
   };
 
-  /**
-   * 조건에 맞는 게시글 목록을 조회.
-   * @param {object} whereCondition - Prisma 조회 조건
-   * @param {number} offset - 페이지네이션 offset
-   * @param {number} limit - 페이지당 아이템 수
-   * @param {object} [tx] - (선택) 트랜잭션용 Prisma 클라이언트
-   * @returns {Promise<Array<object>>} 게시글 목록
-   */
-  findManyArticles = async (whereCondition, offset, limit, userId, tx) => {
+  findManyArticles = async (
+    whereCondition: any,
+    offset: number,
+    limit: number,
+    userId: number | undefined,
+    tx?: any,
+  ) => {
     const prismaClient = tx || this.prisma;
     const articles = await prismaClient.article.findMany({
       where: whereCondition,
@@ -41,20 +33,12 @@ export class ArticleRepository {
 
     if (userId && articles.length > 0) {
       const articleIds = articles.map((a) => a.id);
-
       const likes = await this.prisma.articleLike.findMany({
-        where: {
-          userId: userId,
-          articleId: { in: articleIds },
-        },
-        select: {
-          articleId: true,
-        },
+        where: { userId, articleId: { in: articleIds } },
+        select: { articleId: true },
       });
-
       const likedArticleIds = new Set(likes.map((like) => like.articleId));
-
-      articles.forEach((article) => {
+      (articles as any[]).forEach((article) => {
         article.isLiked = likedArticleIds.has(article.id);
       });
     }
@@ -62,23 +46,15 @@ export class ArticleRepository {
     return articles;
   };
 
-  /**
-   * 조건에 맞는 게시글의 전체 개수를 조회
-   * @param {object} whereCondition - Prisma 조회 조건
-   * @param {object} [tx] - (선택) 트랜잭션용 Prisma 클라이언트
-   * @returns {Promise<number>} 게시글 전체 개수
-   */
-  countArticles = async (whereCondition, tx) => {
+  countArticles = async (whereCondition: any, tx?: any) => {
     const prismaClient = tx || this.prisma;
     return await prismaClient.article.count({ where: whereCondition });
   };
 
-  /**
-   * ID로 특정 게시글을 조회
-   * @param {number} articleId - 게시글 ID
-   * @returns {Promise<object|null>} 조회된 게시글 객체
-   */
-  findArticleById = async (articleId, userId) => {
+  findArticleById = async (
+    articleId: string,
+    userId?: number | undefined,
+  ) => {
     const article = await this.prisma.article.findUnique({
       where: { id: parseInt(articleId) },
       include: {
@@ -88,32 +64,23 @@ export class ArticleRepository {
 
     if (article && userId) {
       const like = await this.prisma.articleLike.findUnique({
-        where: { userId_articleId: { userId, articleId: parseInt(articleId) } },
+        where: {
+          userId_articleId: { userId, articleId: parseInt(articleId) },
+        },
       });
-      article.isLiked = !!like;
+      (article as any).isLiked = !!like;
     }
     return article;
   };
 
-  /**
-   * 특정 게시글의 정보를 수정
-   * @param {number} articleId - 게시글 ID
-   * @param {object} dataToUpdate - 수정할 데이터
-   * @returns {Promise<object>} 수정된 게시글 객체
-   */
-  updateArticle = async (articleId, dataToUpdate) => {
+  updateArticle = async (articleId: string, dataToUpdate: any) => {
     return await this.prisma.article.update({
       where: { id: parseInt(articleId) },
       data: dataToUpdate,
     });
   };
 
-  /**
-   * 특정 게시글을 삭제합
-   * @param {number} articleId - 게시글 ID
-   * @returns {Promise<void>}
-   */
-  deleteArticle = async (articleId) => {
+  deleteArticle = async (articleId: string) => {
     await this.prisma.article.delete({
       where: { id: parseInt(articleId) },
     });
