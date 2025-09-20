@@ -1,5 +1,10 @@
 import { CommentRepository } from '../repository/comment-repository';
-import { CreateCommentDto, UpdateCommentDto } from '../types/dto';
+import {
+  CreateCommentDto,
+  UpdateCommentDto,
+  CommentListResponseDto,
+} from '../types/dto';
+import { Comment, Prisma } from '@prisma/client';
 
 export class CommentService {
   constructor(private commentRepository: CommentRepository) {}
@@ -9,7 +14,7 @@ export class CommentService {
     createCommentDto: CreateCommentDto,
     productId: string | undefined,
     articleId: string | undefined,
-  ) => {
+  ): Promise<Comment> => {
     const { content } = createCommentDto;
     return await this.commentRepository.createComment(
       userId,
@@ -24,8 +29,8 @@ export class CommentService {
     articleId: string | undefined,
     limit: number,
     cursor: number | undefined,
-  ) => {
-    const where = {
+  ): Promise<CommentListResponseDto> => {
+    const where: Prisma.CommentWhereInput = {
       productId: productId ? parseInt(productId) : undefined,
       articleId: articleId ? parseInt(articleId) : undefined,
     };
@@ -46,7 +51,7 @@ export class CommentService {
     userId: number,
     commentId: string,
     updateCommentDto: UpdateCommentDto,
-  ) => {
+  ): Promise<Comment> => {
     const { content } = updateCommentDto;
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
@@ -58,7 +63,7 @@ export class CommentService {
     return await this.commentRepository.updateComment(commentId, content);
   };
 
-  deleteComment = async (userId: number, commentId: string) => {
+  deleteComment = async (userId: number, commentId: string): Promise<void> => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
@@ -69,7 +74,7 @@ export class CommentService {
     await this.commentRepository.deleteComment(commentId);
   };
 
-  getCommentById = async (commentId: string) => {
+  getCommentById = async (commentId: string): Promise<Comment> => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
