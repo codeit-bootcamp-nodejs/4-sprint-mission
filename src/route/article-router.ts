@@ -1,11 +1,14 @@
 import express from 'express';
-import commentRouter from './comment.route.js';
-import { authMiddleware, authOptionalMiddleware } from '../middleware/index.js';
+import commentRouter from './comment-router';
+import { authMiddleware, authOptionalMiddleware } from '../middleware';
+import { ArticleController } from '../controller/article-controller';
+import { CommentController } from '../controller/comment-controller';
+import { ValidationMiddleware } from '../middleware/validation-middleware';
 
 const articleRouter = (
-  articleController,
-  commentController,
-  validationMiddleware,
+  articleController: ArticleController,
+  commentController: CommentController,
+  validationMiddleware: ValidationMiddleware,
 ) => {
   const router = express.Router();
 

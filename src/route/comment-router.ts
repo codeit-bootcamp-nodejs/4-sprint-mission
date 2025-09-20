@@ -1,7 +1,12 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/index.js';
+import { authMiddleware } from '../middleware';
+import { CommentController } from '../controller/comment-controller';
+import { ValidationMiddleware } from '../middleware/validation-middleware';
 
-const commentRouter = (commentController, validationMiddleware) => {
+const commentRouter = (
+  commentController: CommentController,
+  validationMiddleware: ValidationMiddleware,
+) => {
   const router = express.Router({ mergeParams: true });
 
   router

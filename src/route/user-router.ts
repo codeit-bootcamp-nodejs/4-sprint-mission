@@ -1,7 +1,8 @@
 import express from 'express';
-import { authMiddleware } from '../middleware/index.js';
+import { authMiddleware } from '../middleware';
+import { UserController } from '../controller/user-controller';
 
-const userRouter = (userController) => {
+const userRouter = (userController: UserController) => {
   const router = express.Router();
 
   router.post('/signup', userController.signUp);
@@ -9,11 +10,10 @@ const userRouter = (userController) => {
   router.post('/token/refresh', userController.refresh);
   router.post('/signout', authMiddleware, userController.signOut);
 
-  // '내 정보' 관련 라우트 추가
   router
     .route('/me')
-    .get(authMiddleware, userController.getMyInfo) // 내 정보 조회
-    .patch(authMiddleware, userController.updateMyInfo); // 내 정보 수정
+    .get(authMiddleware, userController.getMyInfo)
+    .patch(authMiddleware, userController.updateMyInfo);
 
   router.patch('/me/password', authMiddleware, userController.changeMyPassword);
   router.get('/me/products', authMiddleware, userController.getMyProducts);

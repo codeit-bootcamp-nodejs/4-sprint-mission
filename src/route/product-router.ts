@@ -1,11 +1,14 @@
 import express from 'express';
-import commentRouter from './comment.route.js';
-import { authMiddleware, authOptionalMiddleware } from '../middleware/index.js';
+import { authMiddleware, authOptionalMiddleware } from '../middleware';
+import { ProductController } from '../controller/product-controller';
+import { CommentController } from '../controller/comment-controller';
+import { ValidationMiddleware } from '../middleware/validation-middleware';
+import commentRouter from './comment-router';
 
 const productRouter = (
-  productController,
-  commentController, // 댓글 컨트롤러 추가
-  validationMiddleware,
+  productController: ProductController,
+  commentController: CommentController,
+  validationMiddleware: ValidationMiddleware,
 ) => {
   const router = express.Router();
 
