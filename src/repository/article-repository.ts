@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export class ArticleRepository {
   constructor(private prisma: PrismaClient) {}
@@ -10,11 +10,11 @@ export class ArticleRepository {
   };
 
   findManyArticles = async (
-    whereCondition: any,
+    whereCondition: Prisma.ArticleWhereInput,
     offset: number,
     limit: number,
     userId: number | undefined,
-    tx?: any,
+    tx?: Prisma.TransactionClient,
   ) => {
     const prismaClient = tx || this.prisma;
     const articles = await prismaClient.article.findMany({
@@ -38,15 +38,19 @@ export class ArticleRepository {
         select: { articleId: true },
       });
       const likedArticleIds = new Set(likes.map((like) => like.articleId));
-      (articles as any[]).forEach((article) => {
-        article.isLiked = likedArticleIds.has(article.id);
-      });
+      return articles.map((article) => ({
+        ...article,
+        isLiked: likedArticleIds.has(article.id),
+      }));
     }
 
-    return articles;
+    return articles.map((article) => ({ ...article, isLiked: false }));
   };
 
-  countArticles = async (whereCondition: any, tx?: any) => {
+  countArticles = async (
+    whereCondition: Prisma.ArticleWhereInput,
+    tx?: Prisma.TransactionClient,
+  ) => {
     const prismaClient = tx || this.prisma;
     return await prismaClient.article.count({ where: whereCondition });
   };
@@ -68,12 +72,20 @@ export class ArticleRepository {
           userId_articleId: { userId, articleId: parseInt(articleId) },
         },
       });
-      (article as any).isLiked = !!like;
+      return { ...article, isLiked: !!like };
     }
-    return article;
+
+    if (article) {
+      return { ...article, isLiked: false };
+    }
+
+    return null;
   };
 
-  updateArticle = async (articleId: string, dataToUpdate: any) => {
+  updateArticle = async (
+    articleId: string,
+    dataToUpdate: Prisma.ArticleUpdateInput,
+  ) => {
     return await this.prisma.article.update({
       where: { id: parseInt(articleId) },
       data: dataToUpdate,
