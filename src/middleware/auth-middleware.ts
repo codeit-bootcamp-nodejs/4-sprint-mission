@@ -23,6 +23,7 @@ export const authMiddleware = async (
       tokenValue,
       process.env.JWT_SECRET!,
     ) as jwt.JwtPayload;
+
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
@@ -31,8 +32,8 @@ export const authMiddleware = async (
       throw new Error('인증 정보와 일치하는 사용자가 없습니다.');
     }
 
-    delete (user as any).password;
-    (req as any).user = user;
+    const { password, ...userWithoutPassword } = user;
+    req.user = userWithoutPassword; // 타입 오류 없이 할당 가능
 
     next();
   } catch (error: any) {

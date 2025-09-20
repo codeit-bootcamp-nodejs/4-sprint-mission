@@ -22,8 +22,8 @@ export const authOptionalMiddleware = async (
         });
 
         if (user) {
-          delete (user as any).password;
-          (req as any).user = user;
+          const { password, ...userWithoutPassword } = user;
+          req.user = userWithoutPassword; // 타입 오류 없이 할당 가능
         }
       }
     }
