@@ -5,7 +5,7 @@ import {
   CommentController,
   ImageController,
   UserController,
-} from './controller/index.js';
+} from './controller/index';
 
 import {
   ProductService,
@@ -13,7 +13,7 @@ import {
   CommentService,
   UserService,
   LikeService,
-} from './service/index.js';
+} from './service/index';
 
 import {
   ProductRepository,
@@ -21,12 +21,12 @@ import {
   CommentRepository,
   UserRepository,
   LikeRepository,
-} from './repository/index.js';
+} from './repository/index';
 
 import {
   ValidationMiddleware,
   ImageMiddleware,
-} from './middleware/validation-middleware.js';
+} from './middleware/index';
 
 const prisma = new PrismaClient();
 
