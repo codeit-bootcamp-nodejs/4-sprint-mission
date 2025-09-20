@@ -23,7 +23,7 @@
 #### Layered Architecture 적용하기
 
 - [x] Controller, Service, Repository로 나누어 코드를 리팩토링해 주세요
-- [] 필요하다면 계층 사이에서 데이터를 주고 받을 때 DTO를 활용해 주세요
+- [ ] 필요하다면 계층 사이에서 데이터를 주고 받을 때 DTO를 활용해 주세요
 
 ## 멘토에게
 
