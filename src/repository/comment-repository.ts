@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export class CommentRepository {
   constructor(private prisma: PrismaClient) {}
@@ -20,7 +20,7 @@ export class CommentRepository {
   };
 
   findManyComments = async (
-    where: any,
+    where: Prisma.CommentWhereInput,
     limit: number,
     cursor: number | undefined,
   ) => {
