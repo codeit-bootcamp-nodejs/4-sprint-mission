@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import express from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 
 import container from './container';
@@ -7,11 +7,11 @@ import productRouter from './route/product-router';
 import articleRouter from './route/article-router';
 import imageRouter from './route/image-router';
 import userRouter from './route/user-router';
-import { errorHandler } from './middleware/error-handler-middleware';
+import { errorHandler } from './middleware';
 
 dotenv.config();
 
-const app = express();
+const app: Express = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
