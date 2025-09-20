@@ -1,6 +1,11 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, Article } from '@prisma/client';
 import { ArticleRepository } from '../repository/article-repository';
-import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
+import {
+  CreateArticleDto,
+  UpdateArticleDto,
+  ArticleListResponseDto,
+  ArticleDetailResponseDto,
+} from '../types/dto';
 
 export class ArticleService {
   constructor(
@@ -8,7 +13,10 @@ export class ArticleService {
     private prisma: PrismaClient,
   ) {}
 
-  createArticle = async (userId: number, createArticleDto: CreateArticleDto) => {
+  createArticle = async (
+    userId: number,
+    createArticleDto: CreateArticleDto,
+  ): Promise<Article> => {
     const { title, content } = createArticleDto;
     return await this.articleRepository.createArticle(userId, title, content);
   };
@@ -18,7 +26,7 @@ export class ArticleService {
     limit: number,
     search: string | undefined,
     userId: number | undefined,
-  ) => {
+  ): Promise<ArticleListResponseDto> => {
     const whereCondition: Prisma.ArticleWhereInput = search
       ? {
           OR: [
@@ -29,22 +37,20 @@ export class ArticleService {
       : {};
     const offset = (page - 1) * limit;
 
-    const [articles, totalCount] = await this.prisma.$transaction(
-      async (tx) => {
-        const articles = await this.articleRepository.findManyArticles(
-          whereCondition,
-          offset,
-          limit,
-          userId,
-          tx,
-        );
-        const totalCount = await this.articleRepository.countArticles(
-          whereCondition,
-          tx,
-        );
-        return [articles, totalCount];
-      },
-    );
+    const [articles, totalCount] = await this.prisma.$transaction(async (tx) => {
+      const articles = await this.articleRepository.findManyArticles(
+        whereCondition,
+        offset,
+        limit,
+        userId,
+        tx,
+      );
+      const totalCount = await this.articleRepository.countArticles(
+        whereCondition,
+        tx,
+      );
+      return [articles, totalCount];
+    });
 
     const totalPages = Math.ceil(totalCount / limit);
     return {
@@ -53,7 +59,10 @@ export class ArticleService {
     };
   };
 
-  getArticleById = async (articleId: string, userId: number | undefined) => {
+  getArticleById = async (
+    articleId: string,
+    userId: number | undefined,
+  ): Promise<ArticleDetailResponseDto> => {
     const article = await this.articleRepository.findArticleById(
       articleId,
       userId,
@@ -68,7 +77,7 @@ export class ArticleService {
     userId: number,
     articleId: string,
     updateArticleDto: UpdateArticleDto,
-  ) => {
+  ): Promise<Article> => {
     const article = await this.articleRepository.findArticleById(articleId);
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');
@@ -83,7 +92,10 @@ export class ArticleService {
     );
   };
 
-  deleteArticle = async (userId: number, articleId: string) => {
+  deleteArticle = async (
+    userId: number,
+    articleId: string,
+  ): Promise<void> => {
     const article = await this.articleRepository.findArticleById(articleId);
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');
