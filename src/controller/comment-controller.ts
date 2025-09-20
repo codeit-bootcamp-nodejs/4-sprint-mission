@@ -1,17 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { CommentService } from '../service/comment-service';
+import { CreateCommentDto, UpdateCommentDto } from '../types/dto';
 
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
   createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
-      const { content } = req.body;
+      const userId = req.user!.id;
+      const createCommentDto: CreateCommentDto = req.body;
       const { productId, articleId } = req.params;
       const newComment = await this.commentService.createComment(
         userId,
-        content,
+        createCommentDto,
         productId,
         articleId,
       );
@@ -43,13 +44,13 @@ export class CommentController {
 
   updateComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { commentId } = req.params;
-      const { content } = req.body;
+      const updateCommentDto: UpdateCommentDto = req.body;
       const updatedComment = await this.commentService.updateComment(
         userId,
         commentId,
-        content,
+        updateCommentDto,
       );
       res.status(200).json(updatedComment);
     } catch (error) {
@@ -59,7 +60,7 @@ export class CommentController {
 
   deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { commentId } = req.params;
       await this.commentService.deleteComment(userId, commentId);
       res.status(204).send();

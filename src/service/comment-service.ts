@@ -1,14 +1,16 @@
 import { CommentRepository } from '../repository/comment-repository';
+import { CreateCommentDto, UpdateCommentDto } from '../types/dto';
 
 export class CommentService {
   constructor(private commentRepository: CommentRepository) {}
 
   createComment = async (
     userId: number,
-    content: string,
+    createCommentDto: CreateCommentDto,
     productId: string | undefined,
     articleId: string | undefined,
   ) => {
+    const { content } = createCommentDto;
     return await this.commentRepository.createComment(
       userId,
       content,
@@ -43,8 +45,9 @@ export class CommentService {
   updateComment = async (
     userId: number,
     commentId: string,
-    content: string,
+    updateCommentDto: UpdateCommentDto,
   ) => {
+    const { content } = updateCommentDto;
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
