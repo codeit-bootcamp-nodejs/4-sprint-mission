@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { ArticleRepository } from '../repository/article-repository';
+import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
 
 export class ArticleService {
   constructor(
@@ -7,7 +8,8 @@ export class ArticleService {
     private prisma: PrismaClient,
   ) {}
 
-  createArticle = async (userId: number, title: string, content: string) => {
+  createArticle = async (userId: number, createArticleDto: CreateArticleDto) => {
+    const { title, content } = createArticleDto;
     return await this.articleRepository.createArticle(userId, title, content);
   };
 
@@ -65,7 +67,7 @@ export class ArticleService {
   updateArticle = async (
     userId: number,
     articleId: string,
-    articleData: { title?: string; content?: string },
+    updateArticleDto: UpdateArticleDto,
   ) => {
     const article = await this.articleRepository.findArticleById(articleId);
     if (!article) {
@@ -75,14 +77,9 @@ export class ArticleService {
       throw new Error('게시글을 수정할 권한이 없습니다.');
     }
 
-    const { title, content } = articleData;
-    const dataToUpdate: any = {};
-    if (title !== undefined) dataToUpdate.title = title;
-    if (content !== undefined) dataToUpdate.content = content;
-
     return await this.articleRepository.updateArticle(
       articleId,
-      dataToUpdate,
+      updateArticleDto,
     );
   };
 

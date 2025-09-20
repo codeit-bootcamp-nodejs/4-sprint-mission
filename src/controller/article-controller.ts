@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ArticleService } from '../service/article-service';
 import { LikeService } from '../service/like-service';
+import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
 
 export class ArticleController {
   constructor(
@@ -10,12 +11,11 @@ export class ArticleController {
 
   createArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
-      const { title, content } = req.body;
+      const userId = req.user!.id;
+      const createArticleDto: CreateArticleDto = req.body;
       const newArticle = await this.articleService.createArticle(
         userId,
-        title,
-        content,
+        createArticleDto,
       );
       res.status(201).json(newArticle);
     } catch (error) {
@@ -27,8 +27,8 @@ export class ArticleController {
     try {
       const page = parseInt((req.query.page as string) || '1');
       const limit = parseInt((req.query.limit as string) || '10');
-      const search = req.query.search as string;
-      const userId = (req as any).user?.id;
+      const search = req.query.search as string | undefined;
+      const userId = req.user?.id;
       const result = await this.articleService.getArticles(
         page,
         limit,
@@ -43,7 +43,7 @@ export class ArticleController {
 
   getArticleById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (req as any).user?.id;
+      const userId = req.user?.id;
       const { id } = req.params;
       const result = await this.articleService.getArticleById(id, userId);
       res.status(200).json(result);
@@ -54,13 +54,13 @@ export class ArticleController {
 
   updateArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id } = req.params;
-      const articleData = req.body;
+      const updateArticleDto: UpdateArticleDto = req.body;
       const updatedArticle = await this.articleService.updateArticle(
         userId,
         id,
-        articleData,
+        updateArticleDto,
       );
       res.status(200).json(updatedArticle);
     } catch (error) {
@@ -70,7 +70,7 @@ export class ArticleController {
 
   deleteArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id } = req.params;
       await this.articleService.deleteArticle(userId, id);
       res.status(204).send();
@@ -81,7 +81,7 @@ export class ArticleController {
 
   toggleLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = (req as any).user;
+      const userId = req.user!.id;
       const { id: articleId } = req.params;
       const result = await this.likeService.toggleArticleLike(
         userId,
