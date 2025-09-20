@@ -5,7 +5,7 @@ import {
   CommentController,
   ImageController,
   UserController,
-} from './controller/index';
+} from './controller';
 
 import {
   ProductService,
@@ -13,7 +13,7 @@ import {
   CommentService,
   UserService,
   LikeService,
-} from './service/index';
+} from './service';
 
 import {
   ProductRepository,
@@ -21,16 +21,12 @@ import {
   CommentRepository,
   UserRepository,
   LikeRepository,
-} from './repository/index';
+} from './repository';
 
-import {
-  ValidationMiddleware,
-  ImageMiddleware,
-} from './middleware/index';
+import { ValidationMiddleware } from './middleware/validation-middleware';
+import { ImageMiddleware } from './middleware/image-middleware';
 
 const prisma = new PrismaClient();
-
-// 계층별 인스턴스 생성 및 조립
 
 // Repository
 const productRepository = new ProductRepository(prisma);
@@ -40,24 +36,24 @@ const userRepository = new UserRepository(prisma);
 const likeRepository = new LikeRepository(prisma);
 
 // Service
-const productService = new ProductService(productRepository, prisma);
+const productService = new ProductService(productRepository);
 const articleService = new ArticleService(articleRepository, prisma);
-const commentService = new CommentService(commentRepository, prisma);
-const userService = new UserService(userRepository, productRepository, prisma);
+const commentService = new CommentService(commentRepository);
+const userService = new UserService(userRepository, productRepository);
 const likeService = new LikeService(
   likeRepository,
   productRepository,
   articleRepository,
 );
 
-// controller
+// Controller
 const productController = new ProductController(productService, likeService);
 const articleController = new ArticleController(articleService, likeService);
 const commentController = new CommentController(commentService);
 const imageController = new ImageController();
 const userController = new UserController(userService);
 
-// middleware
+// Middleware
 const validationMiddleware = new ValidationMiddleware();
 const imageMiddleware = new ImageMiddleware();
 
