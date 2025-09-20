@@ -11,7 +11,12 @@ export class UserRepository {
     return await this.prisma.user.findUnique({ where: { id: userId } });
   };
 
-  createUser = async (email: string, nickname: string, hashedPassword) => {
+  // hashedPassword의 타입을 string으로 명시적으로 지정
+  createUser = async (
+    email: string,
+    nickname: string,
+    hashedPassword: string,
+  ) => {
     return await this.prisma.user.create({
       data: {
         email,
