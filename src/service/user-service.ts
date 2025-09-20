@@ -1,13 +1,14 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { UserRepository } from '../repository/user-repository';
+import { ProductRepository } from '../repository/product-repository';
 
 export class UserService {
-  constructor(userRepository, productRepository) {
-    this.userRepository = userRepository;
-    this.productRepository = productRepository;
-  }
+  constructor(
+    private userRepository: UserRepository,
+    private productRepository: ProductRepository,
+  ) {}
 
-  // 회원가입
   signUp = async (email, nickname, password) => {
     const existingUser = await this.userRepository.findUserByEmail(email);
     if (existingUser) {
@@ -21,12 +22,10 @@ export class UserService {
       hashedPassword,
     );
 
-    // 보안을 위해 password 필드 제거 후 반환
-    delete newUser.password;
+    delete (newUser as any).password;
     return newUser;
   };
 
-  // 로그인
   signIn = async (email, password) => {
     const user = await this.userRepository.findUserByEmail(email);
     if (!user) {
@@ -38,11 +37,11 @@ export class UserService {
       throw new Error('비밀번호가 일치하지 않습니다.');
     }
 
-    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
       expiresIn: '1h',
     });
 
-    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
       expiresIn: '7d',
     });
 
@@ -54,9 +53,11 @@ export class UserService {
     return { accessToken, refreshToken };
   };
 
-  // 토근 재발급
-  refreshToken = async (refreshToken) => {
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+  refreshToken = async (refreshToken: string) => {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_SECRET!,
+    ) as jwt.JwtPayload;
     const userId = decoded.userId;
 
     const user = await this.userRepository.findUserById(userId);
@@ -74,7 +75,7 @@ export class UserService {
 
     const newAccessToken = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
       {
         expiresIn: '1h',
       },
@@ -83,27 +84,28 @@ export class UserService {
     return newAccessToken;
   };
 
-  signOut = async (userId) => {
+  signOut = async (userId: number) => {
     await this.userRepository.updateUser(userId, {
       currentHashedRefreshToken: null,
     });
   };
 
-  // 내 정보 조회
-  getUserInfo = async (userId) => {
+  getUserInfo = async (userId: number) => {
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
 
-    delete user.password;
+    delete (user as any).password;
     return user;
   };
 
-  // 내 정보 수정
-  updateUserInfo = async (userId, userInfoData) => {
+  updateUserInfo = async (
+    userId: number,
+    userInfoData: { nickname?: string; image?: string },
+  ) => {
     const { nickname, image } = userInfoData;
-    const dataToUpdate = {};
+    const dataToUpdate: any = {};
 
     if (nickname) dataToUpdate.nickname = nickname;
     if (image) dataToUpdate.image = image;
@@ -116,17 +118,20 @@ export class UserService {
       userId,
       dataToUpdate,
     );
-    delete updatedUser.password;
+    delete (updatedUser as any).password;
     return updatedUser;
   };
 
-  changePassword = async (userId, currentPassword, newPassword) => {
+  changePassword = async (
+    userId: number,
+    currentPassword,
+    newPassword,
+  ) => {
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
 
-    // 현재 비밀번호가 맞는지 확인
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password,
@@ -135,26 +140,22 @@ export class UserService {
       throw new Error('현재 비밀번호가 일치하지 않습니다.');
     }
 
-    // 새로운 비밀번호를 해싱
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
-    // 데이터베이스에 새로운 비밀번호로 업데이트
     await this.userRepository.updateUser(userId, {
       password: hashedNewPassword,
     });
   };
 
-  // 내가 등록한 상품 목록 조회
-  getMyProducts = async (userId) => {
-    const products = await this.productRepository.findProductsByUserId(userId);
-    return products;
+  getMyProducts = async (userId: number) => {
+    return await this.productRepository.findProductsByUserId(userId);
   };
 
-  getLikedProducts = async (userId) => {
+  getLikedProducts = async (userId: number) => {
     return await this.userRepository.findLikedProductsByUserId(userId);
   };
 
-  getLikedArticles = async (userId) => {
+  getLikedArticles = async (userId: number) => {
     return await this.userRepository.findLikedArticlesByUserId(userId);
   };
 }

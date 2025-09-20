@@ -1,18 +1,22 @@
+import { PrismaClient } from '@prisma/client';
+import { ArticleRepository } from '../repository/article-repository';
+
 export class ArticleService {
-  constructor(articleRepository, prisma) {
-    this.articleRepository = articleRepository;
-    this.prisma = prisma;
-  }
+  constructor(
+    private articleRepository: ArticleRepository,
+    private prisma: PrismaClient,
+  ) {}
 
-  // 게시글 생성
-
-  createArticle = async (userId, title, content) => {
+  createArticle = async (userId: number, title: string, content: string) => {
     return await this.articleRepository.createArticle(userId, title, content);
   };
 
-  // 게시글 목록 조회
-  getArticles = async (page, limit, search, userId) => {
-    // userId 파라미터 추가
+  getArticles = async (
+    page: number,
+    limit: number,
+    search: string | undefined,
+    userId: number | undefined,
+  ) => {
     const whereCondition = search
       ? {
           OR: [
@@ -25,7 +29,6 @@ export class ArticleService {
 
     const [articles, totalCount] = await this.prisma.$transaction(
       async (tx) => {
-        // 레포지토리로 userId 전달
         const articles = await this.articleRepository.findManyArticles(
           whereCondition,
           offset,
@@ -48,21 +51,22 @@ export class ArticleService {
     };
   };
 
-  // 게시글 상세 조회
-  getArticleById = async (articleId, userId) => {
-    // userId 파라미터 추가
+  getArticleById = async (articleId: string, userId: number | undefined) => {
     const article = await this.articleRepository.findArticleById(
       articleId,
       userId,
-    ); // 레포지토리로 userId 전달
+    );
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');
     }
     return article;
   };
 
-  // 게시글 수정
-  updateArticle = async (userId, articleId, articleData) => {
+  updateArticle = async (
+    userId: number,
+    articleId: string,
+    articleData: { title?: string; content?: string },
+  ) => {
     const article = await this.articleRepository.findArticleById(articleId);
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');
@@ -72,15 +76,17 @@ export class ArticleService {
     }
 
     const { title, content } = articleData;
-    const dataToUpdate = {};
+    const dataToUpdate: any = {};
     if (title !== undefined) dataToUpdate.title = title;
     if (content !== undefined) dataToUpdate.content = content;
 
-    return await this.articleRepository.updateArticle(articleId, dataToUpdate);
+    return await this.articleRepository.updateArticle(
+      articleId,
+      dataToUpdate,
+    );
   };
 
-  // 게시글 삭제
-  deleteArticle = async (userId, articleId) => {
+  deleteArticle = async (userId: number, articleId: string) => {
     const article = await this.articleRepository.findArticleById(articleId);
     if (!article) {
       throw new Error('게시글을 찾을 수 없습니다.');

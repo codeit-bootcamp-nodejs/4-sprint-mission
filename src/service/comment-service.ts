@@ -1,11 +1,14 @@
-export class CommentService {
-  constructor(commentRepository, prisma) {
-    this.commentRepository = commentRepository;
-    this.prisma = prisma;
-  }
+import { CommentRepository } from '../repository/comment-repository';
 
-  // 댓글 생성
-  createComment = async (userId, content, productId, articleId) => {
+export class CommentService {
+  constructor(private commentRepository: CommentRepository) {}
+
+  createComment = async (
+    userId: number,
+    content: string,
+    productId: string | undefined,
+    articleId: string | undefined,
+  ) => {
     return await this.commentRepository.createComment(
       userId,
       content,
@@ -14,8 +17,12 @@ export class CommentService {
     );
   };
 
-  // 댓글 목록 조회
-  getComments = async (productId, articleId, limit, cursor) => {
+  getComments = async (
+    productId: string | undefined,
+    articleId: string | undefined,
+    limit: number,
+    cursor: number | undefined,
+  ) => {
     const where = {
       productId: productId ? parseInt(productId) : undefined,
       articleId: articleId ? parseInt(articleId) : undefined,
@@ -33,8 +40,11 @@ export class CommentService {
     return { data: comments, nextCursor };
   };
 
-  // 댓글 수정
-  updateComment = async (userId, commentId, content) => {
+  updateComment = async (
+    userId: number,
+    commentId: string,
+    content: string,
+  ) => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
@@ -45,8 +55,7 @@ export class CommentService {
     return await this.commentRepository.updateComment(commentId, content);
   };
 
-  // 댓글 삭제
-  deleteComment = async (userId, commentId) => {
+  deleteComment = async (userId: number, commentId: string) => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
@@ -57,8 +66,7 @@ export class CommentService {
     await this.commentRepository.deleteComment(commentId);
   };
 
-  // 댓글 상세 조회
-  getCommentById = async (commentId) => {
+  getCommentById = async (commentId: string) => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
       throw new Error('댓글을 찾을 수 없습니다.');
