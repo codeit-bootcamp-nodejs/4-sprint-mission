@@ -25,9 +25,7 @@ export async function createArticleController(
   try {
     const { title, content } = req.body;
     const user = req.user;
-    if (!title || !content) {
-      return res.status(400).json({ message: "title과 content가 필요합니다." });
-    }
+
     if (!user) {
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }

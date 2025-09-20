@@ -1,46 +1,66 @@
 import { Request, Response, NextFunction } from "express";
+import { validate } from "class-validator";
+import { plainToInstance } from "class-transformer";
+import { ArticleDto, ProductDto, CommentDto } from "../utils/dto";
 
 interface Param {
   id: number;
 }
 
-export function validateArticle(
+export async function validateArticle(
   req: Request<{}, {}, Article.Article>,
   res: Response,
   next: NextFunction
 ) {
-  const { title, content } = req.body;
-  if (!title || !content) {
-    return res.status(400).json({ error: "제목과 내용은 필수입니다." });
+  const dto = plainToInstance(ArticleDto, req.body);
+  const errors = await validate(dto);
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      errors: errors.map((err) => ({
+        field: err.property,
+        messages: Object.values(err.constraints ?? {}),
+      })),
+    });
   }
+
   next();
 }
 
-export function validateProduct(
+export async function validateProduct(
   req: Request<{}, {}, Product.Create["data"]>,
   res: Response,
   next: NextFunction
 ) {
-  const { name, description, price, tags } = req.body;
-  if (!name || !description || price === undefined || !tags) {
-    return res
-      .status(400)
-      .json({ error: "이름, 설명, 가격, 태그는 필수입니다." });
-  }
-  if (typeof price !== "number" || price < 0 || !Number.isInteger(price)) {
-    return res.status(400).json({ error: "가격은 0 이상의 정수여야 합니다." });
+  const dto = plainToInstance(ProductDto, req.body);
+  const errors = await validate(dto);
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      errors: errors.map((err) => ({
+        field: err.property,
+        messages: Object.values(err.constraints ?? {}),
+      })),
+    });
   }
   next();
 }
 
-export function validateContent(
+export async function validateContent(
   req: Request<{}, {}, Comment.Comment>,
   res: Response,
   next: NextFunction
 ) {
-  const { content } = req.body;
-  if (!content || content.trim() === "") {
-    return res.status(400).json({ error: "댓글 내용은 필수입니다." });
+  const dto = plainToInstance(CommentDto, req.body);
+  const errors = await validate(dto);
+
+  if (errors.length > 0) {
+    return res.status(400).json({
+      errors: errors.map((err) => ({
+        field: err.property,
+        messages: Object.values(err.constraints ?? {}),
+      })),
+    });
   }
   next();
 }
