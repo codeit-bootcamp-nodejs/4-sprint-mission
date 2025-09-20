@@ -1,8 +1,13 @@
+import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-export const authMiddleware = async (req, res, next) => {
+export const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { authorization } = req.headers;
     if (!authorization) {
@@ -14,7 +19,10 @@ export const authMiddleware = async (req, res, next) => {
       throw new Error('지원하지 않는 인증 방식입니다.');
     }
 
-    const decoded = jwt.verify(tokenValue, process.env.JWT_SECRET);
+    const decoded = jwt.verify(
+      tokenValue,
+      process.env.JWT_SECRET!,
+    ) as jwt.JwtPayload;
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
@@ -23,12 +31,11 @@ export const authMiddleware = async (req, res, next) => {
       throw new Error('인증 정보와 일치하는 사용자가 없습니다.');
     }
 
-    delete user.password; // 보안을 위해 비밀번호 정보 제거
-    req.user = user; // req 객체에 사용자 정보 추가
+    delete (user as any).password;
+    (req as any).user = user;
 
     next();
-  } catch (error) {
-    // 토큰 만료 또는 검증 실패 시 에러 처리
+  } catch (error: any) {
     if (
       error.name === 'TokenExpiredError' ||
       error.name === 'JsonWebTokenError'

@@ -1,20 +1,18 @@
+import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
 import sharp from 'sharp';
 import path from 'path';
 import fs from 'fs';
 
 export class ImageMiddleware {
-  constructor() {
-    this.uploadDir = 'uploads';
-    this.resizeDir = 'resized';
+  public upload: multer.Multer;
+  private uploadDir = 'uploads';
+  private resizeDir = 'resized';
 
+  constructor() {
     if (!fs.existsSync(this.uploadDir)) fs.mkdirSync(this.uploadDir);
     if (!fs.existsSync(this.resizeDir)) fs.mkdirSync(this.resizeDir);
 
-    this._initializeMulter();
-  }
-
-  _initializeMulter() {
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
         cb(null, this.uploadDir);
@@ -24,10 +22,10 @@ export class ImageMiddleware {
       },
     });
 
-    this.upload = multer({ storage: storage });
+    this.upload = multer({ storage });
   }
 
-  resize = async (req, res, next) => {
+  resize = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.file) {
       return next();
     }
@@ -41,7 +39,6 @@ export class ImageMiddleware {
         .toFile(resizedPath);
 
       req.file.path = resizedPath;
-
       next();
     } catch (error) {
       next(error);

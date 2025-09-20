@@ -1,6 +1,7 @@
+import { Request, Response, NextFunction } from 'express';
+
 export class ValidationMiddleware {
-  // 상품 유효성 검사
-  validateProduct = (req, res, next) => {
+  validateProduct = (req: Request, res: Response, next: NextFunction) => {
     const { name, description, price, tags } = req.body;
 
     if (typeof name !== 'string' || name.trim() === '') {
@@ -20,8 +21,7 @@ export class ValidationMiddleware {
     next();
   };
 
-  // 게시글 유효성 검사
-  validateArticle = (req, res, next) => {
+  validateArticle = (req: Request, res: Response, next: NextFunction) => {
     const { title, content } = req.body;
 
     if (typeof title !== 'string' || title.trim() === '') {
@@ -33,11 +33,8 @@ export class ValidationMiddleware {
     next();
   };
 
-  // ID 파라미터 유효성 검사
-  validateId = (req, res, next) => {
-    // commentId, articleId, productId 등 모든 id 파라미터를 검사합니다.
+  validateId = (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id || req.params.commentId;
-
     if (!id || isNaN(parseInt(id))) {
       return res.status(400).json({ error: '유효하지 않은 ID 형식입니다.' });
     }
