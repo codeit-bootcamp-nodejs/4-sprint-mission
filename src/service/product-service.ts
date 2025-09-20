@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { ProductRepository } from '../repository/product-repository';
 import { CreateProductDto, UpdateProductDto } from '../types/dto';
 
@@ -21,11 +22,11 @@ export class ProductService {
     search: string | undefined,
     userId: number | undefined,
   ) => {
-    const whereCondition = search
+    const whereCondition: Prisma.ProductWhereInput = search
       ? {
           OR: [
-            { name: { contains: search } },
-            { description: { contains: search } },
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
           ],
         }
       : {};
