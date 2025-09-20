@@ -1,12 +1,12 @@
-export class CommentController {
-  constructor(commentService) {
-    this.commentService = commentService;
-  }
+import { Request, Response, NextFunction } from 'express';
+import { CommentService } from '../service/comment-service';
 
-  // 댓글 생성
-  createComment = async (req, res, next) => {
+export class CommentController {
+  constructor(private commentService: CommentService) {}
+
+  createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { content } = req.body;
       const { productId, articleId } = req.params;
       const newComment = await this.commentService.createComment(
@@ -21,12 +21,13 @@ export class CommentController {
     }
   };
 
-  // 댓글 목록 조회
-  getComments = async (req, res, next) => {
+  getComments = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { productId, articleId } = req.params;
-      const limit = parseInt(req.query.limit || '10');
-      const cursor = req.query.cursor ? parseInt(req.query.cursor) : undefined;
+      const limit = parseInt((req.query.limit as string) || '10');
+      const cursor = req.query.cursor
+        ? parseInt(req.query.cursor as string)
+        : undefined;
 
       const comments = await this.commentService.getComments(
         productId,
@@ -40,10 +41,9 @@ export class CommentController {
     }
   };
 
-  // 댓글 수정
-  updateComment = async (req, res, next) => {
+  updateComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { commentId } = req.params;
       const { content } = req.body;
       const updatedComment = await this.commentService.updateComment(
@@ -57,10 +57,9 @@ export class CommentController {
     }
   };
 
-  // 댓글 삭제
-  deleteComment = async (req, res, next) => {
+  deleteComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { commentId } = req.params;
       await this.commentService.deleteComment(userId, commentId);
       res.status(204).send();

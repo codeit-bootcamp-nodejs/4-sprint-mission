@@ -1,15 +1,22 @@
+import { Request, Response, NextFunction } from 'express';
+import { ProductService } from '../service/product-service';
+import { LikeService } from '../service/like-service';
+
 export class ProductController {
-  constructor(productService) {
+  productService: ProductService;
+  likeService: LikeService;
+
+  constructor(productService: ProductService, likeService: LikeService) {
     this.productService = productService;
+    this.likeService = likeService;
   }
 
-  // 상품 등록
-  createProduct = async (req, res, next) => {
+  createProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user; // req.user에서 userId 추출
+      const { id: userId } = (req as any).user;
       const { name, description, price, tags } = req.body;
       const newProduct = await this.productService.createProduct(
-        userId, // userId 전달
+        userId,
         name,
         description,
         price,
@@ -21,13 +28,12 @@ export class ProductController {
     }
   };
 
-  // 상품 목록 조회
-  getProducts = async (req, res, next) => {
+  getProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt(req.query.page || '1');
-      const limit = parseInt(req.query.limit || '10');
-      const search = req.query.search;
-      const userId = req.user?.id;
+      const page = parseInt((req.query.page as string) || '1');
+      const limit = parseInt((req.query.limit as string) || '10');
+      const search = req.query.search as string;
+      const userId = (req as any).user?.id;
       const result = await this.productService.getProducts(
         page,
         limit,
@@ -40,10 +46,9 @@ export class ProductController {
     }
   };
 
-  //  상품 상세 조회
-  getProductById = async (req, res, next) => {
+  getProductById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id;
+      const userId = (req as any).user?.id;
       const { id } = req.params;
       const result = await this.productService.getProductById(id, userId);
       res.status(200).json(result);
@@ -52,10 +57,9 @@ export class ProductController {
     }
   };
 
-  // 상품 수정
-  updateProduct = async (req, res, next) => {
+  updateProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { id } = req.params;
       const productData = req.body;
       const updatedProduct = await this.productService.updateProduct(
@@ -69,10 +73,9 @@ export class ProductController {
     }
   };
 
-  // 상품 삭제
-  deleteProduct = async (req, res, next) => {
+  deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { id } = req.params;
       await this.productService.deleteProduct(userId, id);
       res.status(204).send();
@@ -81,9 +84,9 @@ export class ProductController {
     }
   };
 
-  toggleLike = async (req, res, next) => {
+  toggleLike = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { id: productId } = req.params;
       const result = await this.likeService.toggleProductLike(
         userId,

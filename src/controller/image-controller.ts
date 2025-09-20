@@ -1,5 +1,7 @@
+import { Request, Response, NextFunction } from 'express';
+
 export class ImageController {
-  uploadImage = (req, res, next) => {
+  uploadImage = (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.file) {
         throw new Error('이미지 파일이 필요합니다.');

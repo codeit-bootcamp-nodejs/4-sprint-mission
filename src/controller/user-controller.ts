@@ -1,10 +1,10 @@
-export class UserController {
-  constructor(userService) {
-    this.userService = userService;
-  }
+import { Request, Response, NextFunction } from 'express';
+import { UserService } from '../service/user-service';
 
-  // 회원가입
-  signUp = async (req, res, next) => {
+export class UserController {
+  constructor(private userService: UserService) {}
+
+  signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, nickname, password } = req.body;
       const newUser = await this.userService.signUp(email, nickname, password);
@@ -14,22 +14,20 @@ export class UserController {
     }
   };
 
-  // 로그인
-  signIn = async (req, res, next) => {
+  signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
       const tokens = await this.userService.signIn(email, password);
       res.status(200).json({
         message: '로그인에 성공했습니다.',
-        data: tokens, // accessToken과 refreshToken을 모두 반환
+        data: tokens,
       });
     } catch (error) {
       next(error);
     }
   };
 
-  // 토큰 재발급
-  refresh = async (req, res, next) => {
+  refresh = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { refreshToken } = req.body;
       if (!refreshToken) {
@@ -45,10 +43,9 @@ export class UserController {
     }
   };
 
-  // 로그아웃
-  signOut = async (req, res, next) => {
+  signOut = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       await this.userService.signOut(userId);
       res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
     } catch (error) {
@@ -56,10 +53,9 @@ export class UserController {
     }
   };
 
-  // 내 정보 조회
-  getMyInfo = async (req, res, next) => {
+  getMyInfo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const userInfo = await this.userService.getUserInfo(userId);
       res.status(200).json({ data: userInfo });
     } catch (error) {
@@ -67,10 +63,9 @@ export class UserController {
     }
   };
 
-  // 내 정보 수정
-  updateMyInfo = async (req, res, next) => {
+  updateMyInfo = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const userInfoData = req.body;
       const updatedUser = await this.userService.updateUserInfo(
         userId,
@@ -85,13 +80,15 @@ export class UserController {
     }
   };
 
-  // 비밀번호 변경
-  changeMyPassword = async (req, res, next) => {
+  changeMyPassword = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const { currentPassword, newPassword } = req.body;
 
-      // 필수 값 확인
       if (!currentPassword || !newPassword) {
         return res.status(400).json({
           message: '현재 비밀번호와 새 비밀번호를 모두 입력해주세요.',
@@ -111,10 +108,9 @@ export class UserController {
     }
   };
 
-  // 등록한 상품 조회
-  getMyProducts = async (req, res, next) => {
+  getMyProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const products = await this.userService.getMyProducts(userId);
       res.status(200).json({ data: products });
     } catch (error) {
@@ -122,9 +118,13 @@ export class UserController {
     }
   };
 
-  getLikedProducts = async (req, res, next) => {
+  getLikedProducts = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const products = await this.userService.getLikedProducts(userId);
       res.status(200).json({ data: products });
     } catch (error) {
@@ -132,9 +132,13 @@ export class UserController {
     }
   };
 
-  getLikedArticles = async (req, res, next) => {
+  getLikedArticles = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const { id: userId } = req.user;
+      const { id: userId } = (req as any).user;
       const articles = await this.userService.getLikedArticles(userId);
       res.status(200).json({ data: articles });
     } catch (error) {
