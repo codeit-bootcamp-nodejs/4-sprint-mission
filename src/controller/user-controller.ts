@@ -42,7 +42,7 @@ export class UserController {
       const newAccessToken = await this.userService.refreshToken(refreshToken);
       res.status(200).json({
         message: '토큰이 성공적으로 재발급되었습니다.',
-        data: { accessToken: newAccessToken },
+        data: newAccessToken,
       });
     } catch (error) {
       next(error);
