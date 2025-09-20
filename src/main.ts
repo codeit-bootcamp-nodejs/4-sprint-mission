@@ -2,12 +2,12 @@ import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 
-import container from './src/container.js';
-import productRouter from './src/routes/product.route.js';
-import articleRouter from './src/routes/article.route.js';
-import imageRouter from './src/routes/image.route.js';
-import userRouter from './src/route/user-router.js';
-import { errorHandler } from './src/middleware/index.js';
+import container from './container';
+import productRouter from './route/product-router';
+import articleRouter from './route/article-router';
+import imageRouter from './route/image-router';
+import userRouter from './route/user-router';
+import { errorHandler } from './middleware/error-handler-middleware';
 
 dotenv.config();
 
