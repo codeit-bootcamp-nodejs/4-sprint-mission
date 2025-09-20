@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { ArticleRepository } from '../repository/article-repository';
 import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
 
@@ -19,11 +19,11 @@ export class ArticleService {
     search: string | undefined,
     userId: number | undefined,
   ) => {
-    const whereCondition = search
+    const whereCondition: Prisma.ArticleWhereInput = search
       ? {
           OR: [
-            { title: { contains: search } },
-            { content: { contains: search } },
+            { title: { contains: search, mode: 'insensitive' } },
+            { content: { contains: search, mode: 'insensitive' } },
           ],
         }
       : {};
