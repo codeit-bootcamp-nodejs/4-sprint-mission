@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 export class ProductRepository {
   constructor(private prisma: PrismaClient) {}
@@ -16,7 +16,7 @@ export class ProductRepository {
   };
 
   findManyProducts = async (
-    whereCondition: any,
+    whereCondition: Prisma.ProductWhereInput,
     offset: number,
     limit: number,
     userId: number | undefined,
@@ -42,15 +42,20 @@ export class ProductRepository {
         select: { productId: true },
       });
       const likedProductIds = new Set(likes.map((like) => like.productId));
-      (products as any[]).forEach((product) => {
-        product.isLiked = likedProductIds.has(product.id);
-      });
+      // isLiked 속성을 추가하기 위해 타입 단언 사용
+      return products.map((product) => ({
+        ...product,
+        isLiked: likedProductIds.has(product.id),
+      }));
     }
 
-    return products;
+    return products.map((product) => ({ ...product, isLiked: false }));
   };
 
-  countProducts = async (whereCondition: any, tx?: any) => {
+  countProducts = async (
+    whereCondition: Prisma.ProductWhereInput,
+    tx?: Prisma.TransactionClient,
+  ) => {
     const prismaClient = tx || this.prisma;
     return await prismaClient.product.count({ where: whereCondition });
   };
@@ -72,12 +77,19 @@ export class ProductRepository {
           userId_productId: { userId, productId: parseInt(productId) },
         },
       });
-      (product as any).isLiked = !!like;
+      // isLiked 속성을 추가하기 위해 타입 단언 사용
+      return { ...product, isLiked: !!like };
     }
-    return product;
+    if (product) {
+      return { ...product, isLiked: false };
+    }
+    return null;
   };
 
-  updateProduct = async (productId: string, dataToUpdate: any) => {
+  updateProduct = async (
+    productId: string,
+    dataToUpdate: Prisma.ProductUpdateInput,
+  ) => {
     return await this.prisma.product.update({
       where: { id: parseInt(productId) },
       data: dataToUpdate,
