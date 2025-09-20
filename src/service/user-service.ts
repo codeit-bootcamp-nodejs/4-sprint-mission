@@ -6,8 +6,12 @@ import {
   ChangePasswordDto,
   SignInDto,
   SignUpDto,
+  TokensResponseDto,
   UpdateUserInfoDto,
+  UserResponseDto,
+  RefreshTokenResponseDto,
 } from '../types/dto';
+import { Product, Article } from '@prisma/client';
 
 export class UserService {
   constructor(
@@ -15,7 +19,7 @@ export class UserService {
     private productRepository: ProductRepository,
   ) {}
 
-  signUp = async (signUpDto: SignUpDto) => {
+  signUp = async (signUpDto: SignUpDto): Promise<UserResponseDto> => {
     const { email, nickname, password } = signUpDto;
     if (!email || !nickname || !password) {
       throw new Error('필수 정보가 누락되었습니다.');
@@ -37,7 +41,7 @@ export class UserService {
     return userWithoutPassword;
   };
 
-  signIn = async (signInDto: SignInDto) => {
+  signIn = async (signInDto: SignInDto): Promise<TokensResponseDto> => {
     const { email, password } = signInDto;
     if (!email || !password) {
       throw new Error('이메일과 비밀번호를 모두 입력해주세요.');
@@ -69,7 +73,9 @@ export class UserService {
     return { accessToken, refreshToken };
   };
 
-  refreshToken = async (refreshToken: string) => {
+  refreshToken = async (
+    refreshToken: string,
+  ): Promise<RefreshTokenResponseDto> => {
     const decoded = jwt.verify(
       refreshToken,
       process.env.JWT_SECRET!,
@@ -97,16 +103,16 @@ export class UserService {
       },
     );
 
-    return newAccessToken;
+    return { accessToken: newAccessToken };
   };
 
-  signOut = async (userId: number) => {
+  signOut = async (userId: number): Promise<void> => {
     await this.userRepository.updateUser(userId, {
       currentHashedRefreshToken: null,
     });
   };
 
-  getUserInfo = async (userId: number) => {
+  getUserInfo = async (userId: number): Promise<UserResponseDto> => {
     const user = await this.userRepository.findUserById(userId);
     if (!user) {
       throw new Error('사용자를 찾을 수 없습니다.');
@@ -119,7 +125,7 @@ export class UserService {
   updateUserInfo = async (
     userId: number,
     updateUserInfoDto: UpdateUserInfoDto,
-  ) => {
+  ): Promise<UserResponseDto> => {
     const { nickname, image } = updateUserInfoDto;
     const dataToUpdate: UpdateUserInfoDto = {};
 
@@ -141,7 +147,7 @@ export class UserService {
   changePassword = async (
     userId: number,
     changePasswordDto: ChangePasswordDto,
-  ) => {
+  ): Promise<void> => {
     const { currentPassword, newPassword } = changePasswordDto;
     if (!currentPassword || !newPassword) {
       throw new Error('현재 비밀번호와 새 비밀번호를 모두 입력해주세요.');
@@ -167,15 +173,15 @@ export class UserService {
     });
   };
 
-  getMyProducts = async (userId: number) => {
+  getMyProducts = async (userId: number): Promise<Partial<Product>[]> => {
     return await this.productRepository.findProductsByUserId(userId);
   };
 
-  getLikedProducts = async (userId: number) => {
+  getLikedProducts = async (userId: number): Promise<Partial<Product>[]> => {
     return await this.userRepository.findLikedProductsByUserId(userId);
   };
 
-  getLikedArticles = async (userId: number) => {
+  getLikedArticles = async (userId: number): Promise<Partial<Article>[]> => {
     return await this.userRepository.findLikedArticlesByUserId(userId);
   };
 }
