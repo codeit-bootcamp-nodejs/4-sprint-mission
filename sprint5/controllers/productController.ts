@@ -4,7 +4,7 @@ import type {
   GetProductListQuery,
   ProductId,
   ProductBody,
-} from "sprint5/types/dto.js";
+} from "../types/dto.js";
 
 export const productController = {
   getProductList: async (
