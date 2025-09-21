@@ -1,0 +1,12 @@
+POST http://localhost:3000/products
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1NzkxMzg2NSwiZXhwIjoxNzU3OTE3NDY1fQ.l7saZu_gfEaEdmkVtc1sjzJidrrPYNGBPMoFosZaU0o
+
+{
+    "name" : "의자",
+    "description": "앉는것",
+    "price" : 15000,
+    "tags": ["나무","편한"]
+}
+
+
