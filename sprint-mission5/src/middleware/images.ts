@@ -20,7 +20,7 @@ const uploads = multer({ storage });
 router.route('/images')
   .post(uploads.array('files'), (req, res) => {
   try {
-    const files = req.files;
+    const files = req.files ? req.files as Express.Multer.File[] : null;
     if (!files || files.length === 0) {
       return res.status(400).json({ message: '파일이 없습니다.' });
     }

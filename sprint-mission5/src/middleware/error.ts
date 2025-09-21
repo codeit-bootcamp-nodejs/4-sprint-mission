@@ -1,7 +1,9 @@
 import { ZodError } from 'zod';
+import type { Request, Response, NextFunction } from 'express';
+import { Prisma } from '@prisma/client';
 
-function errorHandler(handler) {
-  return async function (req, res, next) {
+function errorHandler(handler: (req: Request, res: Response, next: NextFunction) => Promise<void>) {
+  return async function (req: Request, res: Response, next: NextFunction) {
     try {
       await handler(req, res, next);
     }
