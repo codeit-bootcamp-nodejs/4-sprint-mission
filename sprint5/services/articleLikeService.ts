@@ -15,7 +15,7 @@ export const toggleArticleLike = async (
 
     if (!article) {
       const error: HttpError = new Error("존재하지 않는 게시글입니다.");
-      error.status = 400;
+      error.status = 404;
       throw error;
     }
 
