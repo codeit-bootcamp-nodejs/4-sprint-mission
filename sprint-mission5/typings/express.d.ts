@@ -15,3 +15,10 @@ declare global {
         }
     }
 }
+
+declare global {
+  interface Error {
+    code?: string;
+    issues?: unknown;
+  }
+}
