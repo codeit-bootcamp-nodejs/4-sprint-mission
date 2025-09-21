@@ -1,11 +1,5 @@
-import {
-  productRepository,
-  type Product,
-} from "../repositories/productRepository.js";
-
-interface ProductWithLike extends Product {
-  isLiked: boolean;
-}
+import { productRepository } from "../repositories/productRepository.js";
+import type { Product, ProductWithLike } from "../types/dto.js";
 
 export const productService = {
   getProducts: async (

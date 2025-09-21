@@ -1,11 +1,5 @@
 import prisma from "../lib/prisma.js";
-
-export interface ProductComment {
-  id: number;
-  content: string;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+import type { ProductComment } from "../types/dto.js";
 
 export const productCommentsRepository = {
   getProductsComments: async (

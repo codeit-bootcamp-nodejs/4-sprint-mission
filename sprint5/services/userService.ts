@@ -3,11 +3,8 @@ import { userRepository } from "../repositories/userReposioty.js";
 import type {
   UpdateUserData,
   UserProduct,
-} from "../repositories/userReposioty.js";
-
-interface UserProductWithLike extends UserProduct {
-  isLiked: boolean;
-}
+  UserProductWithLike,
+} from "../types/dto.js";
 
 export const userService = {
   findUser: async (id: number): Promise<Express.User | null> => {

@@ -37,5 +37,6 @@
     "moduleResolution": "nodenext",
     "esModuleInterop": true
   },
-  "include": ["sprint5/**/*.ts", "sprint5/**/*.d.ts"]
+  "include": ["sprint5/**/*.ts", "sprint5/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

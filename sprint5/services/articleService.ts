@@ -1,9 +1,5 @@
 import { articleRepository } from "../repositories/articleRepository.js";
-import type { Article } from "../repositories/articleRepository.js";
-
-interface ArticleWithLike extends Article {
-  isLiked: boolean;
-}
+import type { Article, ArticleWithLike } from "../types/dto.js";
 
 export const articleService = {
   getArticles: async (

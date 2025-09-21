@@ -1,19 +1,5 @@
-import { create } from "node:domain";
 import prisma from "../lib/prisma.js";
-
-export interface UpdateUserData {
-  email?: string;
-  nickname?: string;
-  image?: string;
-}
-
-export interface UserProduct {
-  id: number;
-  name: string;
-  description: string | null;
-  price: number;
-  createdAt: Date;
-}
+import type { UserProduct, UpdateUserData } from "../types/dto.js";
 
 export const userRepository = {
   findUser: async (id: number): Promise<Express.User | null> => {

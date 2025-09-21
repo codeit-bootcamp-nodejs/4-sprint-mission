@@ -1,11 +1,7 @@
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../lib/token.js";
 import { findUserByEmail, createUser } from "../repositories/authRepository.js";
-
-interface Tokens {
-  accessToken: string;
-  refreshToken: string;
-}
+import type { Tokens } from "../types/dto.js";
 
 export const registerUser = async (
   email: string,

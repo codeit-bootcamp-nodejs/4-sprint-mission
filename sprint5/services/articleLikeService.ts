@@ -1,10 +1,6 @@
 import { aritcleLikeReposioty } from "../repositories/articleLikeRepository.js";
 import { articleRepository } from "../repositories/articleRepository.js";
-
-interface Like {
-  userId: number;
-  articleId: number | null;
-}
+import type { Like } from "../types/dto.js";
 
 export const toggleArticleLike = async (
   userId: number,

@@ -1,6 +1,6 @@
 import { articleRepository } from "../repositories/articleRepository.js";
 import { articleCommentsRepository } from "../repositories/articleCommentsRepository.js";
-import type { ArticleComment } from "../repositories/articleCommentsRepository.js";
+import type { ArticleComment } from "../types/dto.js";
 
 export const articleCommentsService = {
   getArticleComments: async (

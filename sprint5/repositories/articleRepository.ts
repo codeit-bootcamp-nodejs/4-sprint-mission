@@ -1,13 +1,5 @@
 import prisma from "../lib/prisma.js";
-
-export interface Article {
-  id: number;
-  title: string;
-  content: string;
-  createdAt: Date;
-  updatedAt?: Date;
-  userId?: number;
-}
+import type { Article } from "../types/dto.js";
 
 export const articleRepository = {
   getArticles: async (

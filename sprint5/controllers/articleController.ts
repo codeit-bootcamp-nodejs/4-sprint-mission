@@ -1,21 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 import { articleService } from "../services/articleService.js";
-
-interface GetArticleListQuery {
-  offset?: string;
-  limit?: string;
-  title?: string;
-  content?: string;
-}
-
-interface ArticleId {
-  id: string;
-}
-
-interface ArticleBody {
-  title?: string;
-  content?: string;
-}
+import type {
+  GetArticleListQuery,
+  ArticleId,
+  ArticleBody,
+} from "../types/dto.js";
 
 export const articleController = {
   getArticleList: async (

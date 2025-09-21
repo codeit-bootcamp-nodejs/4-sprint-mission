@@ -1,10 +1,6 @@
 import { productLikeReposioty } from "../repositories/productLikeRepository.js";
 import { productRepository } from "../repositories/productRepository.js";
-
-interface Like {
-  userId: number;
-  productId: number | null;
-}
+import type { Like } from "../types/dto.js";
 
 export const toggleProductLike = async (
   userId: number,

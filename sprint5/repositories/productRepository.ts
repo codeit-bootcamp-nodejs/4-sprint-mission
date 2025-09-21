@@ -1,15 +1,5 @@
 import prisma from "../lib/prisma.js";
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string | null;
-  price: number;
-  tag?: [];
-  createdAt: Date;
-  updatedAt?: Date;
-  userId?: number;
-}
+import type { Product } from "../types/dto.js";
 
 export const productRepository = {
   getProducts: async (

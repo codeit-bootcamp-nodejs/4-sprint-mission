@@ -1,23 +1,10 @@
 import type { Request, Response, NextFunction } from "express";
 import { productService } from "../services/productService.js";
-
-interface GetProductListQuery {
-  offset?: string;
-  limit?: string;
-  name?: string;
-  description?: string;
-}
-
-interface ProductId {
-  id: string;
-}
-
-interface ProductBody {
-  name: string;
-  description: string;
-  price: number;
-  tags: string[];
-}
+import type {
+  GetProductListQuery,
+  ProductId,
+  ProductBody,
+} from "sprint5/types/dto.js";
 
 export const productController = {
   getProductList: async (
