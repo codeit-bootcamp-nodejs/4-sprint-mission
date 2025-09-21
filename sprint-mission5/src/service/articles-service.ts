@@ -1,18 +1,13 @@
 import { PrismaClient } from '@prisma/client';
+import type { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
-const getArticles = async(req, res) => {
-  const { offset = '0', limit = '10', order = 'newest', search } = req.query;
-  let orderBy;
-  switch (order) {
-    case 'oldest':
-      orderBy = { createdAt: 'asc' };
-      break;
-    case 'newest':
-    default:
-      orderBy = {createdAt: 'desc'};
-  }
+const getArticles = async(req: Request, res: Response) => {
+  const offset = typeof req.query.offset === 'string' ? req.query.offset : '0';
+  const limit = typeof req.query.limit === 'string' ? req.query.limit : '10';
+  const order = req.query.order === 'newest' ? 'asc' : 'desc';
+  const search = req.query.search;
   const where = search ? {
     OR: [{ title: { contains: String(search), mode: 'insensitive' } },
     { content: { contains: String(search), mode: 'insensitive' } }
@@ -20,7 +15,7 @@ const getArticles = async(req, res) => {
   } : {};
   const articles = await prisma.article.findMany({
     where,
-    orderBy,
+    order,
     skip: parseInt(offset, 10),
     take: parseInt(limit, 10),
     select: {
@@ -33,7 +28,7 @@ const getArticles = async(req, res) => {
   res.status(200).send(articles);
 };
 
-const createArticles = async(req, res) => {
+const createArticles = async(req: Request, res: Response) => {
   const userId = req.user.userId;
   const { title, content } = req.body;
   const articleData = {
@@ -47,7 +42,7 @@ const createArticles = async(req, res) => {
   res.status(201).send(article);
 };
 
-const getArticleById = async(req, res) => {
+const getArticleById = async(req: Request, res: Response) => {
   const articleId = Number(req.params.articleId)
   const article = await prisma.article.findUnique({
     where: { id: Number(req.params.articleId) },
@@ -67,7 +62,7 @@ const getArticleById = async(req, res) => {
   });
 };
 
-const updateArticles = async(req, res) => {
+const updateArticles = async(req: Request, res: Response) => {
   const article = await prisma.article.update({
     where: { id: Number(req.params.articleId) },
     data: req.body,
@@ -75,23 +70,23 @@ const updateArticles = async(req, res) => {
   res.status(200).send(article);
 }
 
-const deleteArticles = async(req, res) => {
+const deleteArticles = async(req: Request, res: Response) => {
   await prisma.article.delete({
     where: { id: Number(req.params.articleId) },
   });
   res.status(204).send();
 }
 
-const getArticleComments = async(req, res) => {
+const getArticleComments = async(req: Request, res: Response) => {
   const articleComments = await prisma.articleComment.findMany({
     where: { articleId: Number(req.params.articleId) },
   });
   res.status(200).send(articleComments);
 }
 
-const createArticleComment = async(req, res) => {
+const createArticleComment = async(req: Request, res: Response) => {
   const userId = req.user.userId;
-  const articleId = parseInt(req.params.articleId, 10);
+  const articleId = req.params.articleId ? parseInt(req.params.articleId, 10) : undefined;
   const articleComments = await prisma.articleComment.create({
     data: {
       content: req.body.content,
@@ -102,7 +97,7 @@ const createArticleComment = async(req, res) => {
   res.status(201).send(articleComments);
 }
 
-const updateArticleComment = async(req, res) => {
+const updateArticleComment = async(req: Request, res: Response) => {
   const articleComments = await prisma.articleComment.update({
     where: { id: Number(req.params.articleCommentId) },
     data: req.body,
@@ -110,7 +105,7 @@ const updateArticleComment = async(req, res) => {
   res.status(200).send(articleComments);
 }
 
-const deleteArticleComment = async(req, res) => {
+const deleteArticleComment = async(req: Request, res: Response) => {
   const articleComments = await prisma.articleComment.delete({
     where: { id: Number(req.params.articleCommentId) },
   });
