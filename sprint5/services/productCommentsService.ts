@@ -1,141 +1,125 @@
-import prisma from "../lib/prisma.js";
+import { productRepository } from "../repositories/productRepository.js";
+import { productCommentsRepository } from "../repositories/productCommentsRepository.js";
+import type { ProductComment } from "../repositories/productCommentsRepository.js";
 
-interface ProductComment {
-  id: number;
-  content: string;
-  createdAt: Date;
-  updatedAt?: Date;
-}
+export const productCommentsService = {
+  getProductsComments: async (
+    productId: number,
+    cursor: number | undefined,
+    limit: number
+  ): Promise<ProductComment[]> => {
+    try {
+      let skip = 0;
+      if (cursor) {
+        skip = 1;
+      }
 
-export const findProductsComments = async (
-  productId: number,
-  cursor: number | undefined,
-  limit: number
-): Promise<ProductComment[]> => {
-  try {
-    let skip = 0;
-    if (cursor) {
-      skip = 1;
+      const productComments =
+        await productCommentsRepository.getProductsComments(
+          productId,
+          limit,
+          skip,
+          cursor
+        );
+
+      if (productComments.length === 0) {
+        const error: HttpError = new Error(
+          "선택한 범위 내 댓글을 찾을 수 없습니다."
+        );
+        error.status = 404;
+        throw error;
+      }
+      return productComments;
+    } catch (err) {
+      throw err;
     }
+  },
 
-    const productComments = await prisma.comment.findMany({
-      where: { productId },
-      take: limit,
-      skip,
-      ...(cursor ? { cursor: { id: cursor } } : {}),
-      orderBy: { id: "desc" },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-      },
-    });
+  createProductComment: async (
+    productId: number,
+    content: string,
+    userId: number
+  ): Promise<ProductComment> => {
+    try {
+      const product = await productRepository.getProductById(productId);
 
-    return productComments;
-  } catch (err) {
-    throw err;
-  }
-};
+      if (!product) {
+        const error: HttpError = new Error("상품을 찾을 수 없습니다.");
+        error.status = 404;
+        throw error;
+      }
 
-export const createProductComment = async (
-  productId: number,
-  content: string,
-  userId: number
-): Promise<ProductComment> => {
-  try {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-    });
-
-    if (!product) {
-      const error: HttpError = new Error("상품을 찾을 수 없습니다.");
-      error.status = 404;
-      throw error;
-    }
-
-    const comment = await prisma.comment.create({
-      data: {
+      return await productCommentsRepository.createProductComment(
+        productId,
         content,
-        productId: productId,
-        userId,
-      },
-    });
-
-    return comment;
-  } catch (err) {
-    throw err;
-  }
-};
-
-export const updateProductComment = async (
-  productId: number,
-  commentId: number,
-  content: string,
-  userId: number
-): Promise<ProductComment> => {
-  try {
-    const comment = await prisma.comment.findFirst({
-      where: {
-        id: commentId,
-        productId: productId,
-      },
-    });
-
-    if (!comment) {
-      const error: HttpError = new Error("댓글을 찾을 수 없습니다.");
-      error.status = 404;
-      throw error;
+        userId
+      );
+    } catch (err) {
+      throw err;
     }
+  },
 
-    if (comment.userId !== userId) {
-      const error: HttpError = new Error("댓글을 수정할 권한이 없습니다.");
-      error.status = 403;
-      throw error;
+  updateProductComment: async (
+    productId: number,
+    commentId: number,
+    content: string,
+    userId: number
+  ): Promise<ProductComment> => {
+    try {
+      const comment =
+        await productCommentsRepository.getCommentByIdAndProductId(
+          commentId,
+          productId
+        );
+
+      if (!comment) {
+        const error: HttpError = new Error("댓글을 찾을 수 없습니다.");
+        error.status = 404;
+        throw error;
+      }
+
+      if (comment.userId !== userId) {
+        const error: HttpError = new Error("댓글을 수정할 권한이 없습니다.");
+        error.status = 403;
+        throw error;
+      }
+
+      return await productCommentsRepository.updateProductComment(
+        commentId,
+        content
+      );
+    } catch (err) {
+      throw err;
     }
+  },
 
-    const updatedProductComment = await prisma.comment.update({
-      where: { id: commentId },
-      data: { content },
-    });
+  deleteProductComment: async (
+    commentId: number,
+    productId: number,
+    userId: number
+  ): Promise<void> => {
+    try {
+      const comment =
+        await productCommentsRepository.getCommentByIdAndProductId(
+          commentId,
+          productId
+        );
 
-    return updatedProductComment;
-  } catch (err) {
-    throw err;
-  }
-};
+      if (!comment) {
+        const error: HttpError = new Error("댓글을 찾을 수 없습니다.");
+        error.status = 404;
+        throw error;
+      }
 
-export const removeProductComment = async (
-  commentId: number,
-  productId: number,
-  userId: number
-): Promise<void> => {
-  try {
-    const comment = await prisma.comment.findFirst({
-      where: {
-        id: commentId,
-        productId: productId,
-      },
-    });
+      if (comment.userId !== userId) {
+        const error: HttpError = new Error("댓글을 삭제할 권한이 없습니다.");
+        error.status = 403;
+        throw error;
+      }
 
-    if (!comment) {
-      const error: HttpError = new Error("댓글을 찾을 수 없습니다.");
-      error.status = 404;
-      throw error;
+      await productCommentsRepository.deleteProductComment(commentId);
+    } catch (err) {
+      throw err;
     }
-
-    if (comment.userId !== userId) {
-      const error: HttpError = new Error("댓글을 삭제할 권한이 없습니다.");
-      error.status = 403;
-      throw error;
-    }
-
-    await prisma.comment.delete({
-      where: {
-        id: commentId,
-        productId: productId,
-      },
-    });
-  } catch (err) {
-    throw err;
-  }
+  },
 };

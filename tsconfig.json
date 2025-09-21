@@ -1,21 +1,41 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ES2020",
+    "module": "nodenext",
+    "target": "es2024",
     "lib": ["esnext"],
+
     "types": ["node"], // 필요에 따라 다른 타입만 포함
     "typeRoots": ["./node_modules/@types"], // node_modules의 타입만 사용
-    "esModuleInterop": true,
+
     "baseUrl": "./",
     "rootDir": "./sprint5",
     "outDir": "./dist",
-    "moduleResolution": "node",
+
     "sourceMap": true,
     "declaration": true,
+    "declarationMap": true,
     "removeComments": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+
+    "incremental": true,
+    "skipLibCheck": true,
     "strict": true,
-    "skipLibCheck": true // 라이브러리 타입 검사 건너뛰기
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true
   },
-  "include": ["sprint5/**/*.ts", "types/**/*.d.ts"],
-  "exclude": ["node_modules"]
+  "include": ["sprint5/**/*.ts", "sprint5/**/*.d.ts"]
 }

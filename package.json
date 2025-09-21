@@ -7,9 +7,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "seed": "node prisma/seed.js",
-    "build": "tsc && cp -r prisma/dist/",
-    "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node-dev --respawn --transpile-only --loader ts-node/esm' sprint5/app.ts",
-    "start": "ts-node --esm sprint5/app.ts"
+    "build": "tsc",
+    "dev": "nodemon --watch 'sprint5/**/*.ts' --exec 'node --loader ts-node/esm' sprint5/app.ts",
+    "start": "node dist/app.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
@@ -53,6 +53,7 @@
     "passport": "^0.7.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.20.5",
     "typescript": "^5.9.2"
   }
 }

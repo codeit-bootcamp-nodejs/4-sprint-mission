@@ -1,12 +1,6 @@
 import express from "express";
 import passport from "../lib/passport/index.js";
-import {
-  getLikedProducts,
-  getUser,
-  getUserProduct,
-  patchPassword,
-  patchUser,
-} from "../controllers/userController.js";
+import { userController } from "../controllers/userController.js";
 import { authenticateUser } from "../middlewares/validate.js";
 
 const router = express.Router();
@@ -16,12 +10,12 @@ router
   .get(
     passport.authenticate("access-token", { session: false }),
     authenticateUser,
-    getUser
+    userController.getUser
   )
   .patch(
     passport.authenticate("access-token", { session: false }),
     authenticateUser,
-    patchUser
+    userController.patchUser
   );
 
 router
@@ -29,7 +23,7 @@ router
   .patch(
     passport.authenticate("access-token", { session: false }),
     authenticateUser,
-    patchPassword
+    userController.patchPassword
   );
 
 router
@@ -37,7 +31,7 @@ router
   .get(
     passport.authenticate("access-token", { session: false }),
     authenticateUser,
-    getUserProduct
+    userController.getUserProduct
   );
 
 router
@@ -45,7 +39,7 @@ router
   .get(
     passport.authenticate("access-token", { session: false }),
     authenticateUser,
-    getLikedProducts
+    userController.getLikedProducts
   );
 
 export default router;

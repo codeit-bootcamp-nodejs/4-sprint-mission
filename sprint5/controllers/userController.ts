@@ -1,85 +1,61 @@
 import type { Request, Response, NextFunction } from "express";
-import {
-  findLikedProducts,
-  findUser,
-  findUserProduct,
-  updatePassword,
-  updateUser,
-} from "../services/userService.js";
+import { userService } from "../services/userService.js";
 
-export const getUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const user = await findUser(req.user!.id);
+export const userController = {
+  getUser: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = await userService.findUser(req.user!.id);
 
-    if (!user) {
-      return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
+      if (!user) {
+        return res.status(404).json({ error: "유저를 찾을 수 없습니다." });
+      }
+
+      res.status(200).json(user);
+    } catch (err) {
+      next(err);
     }
+  },
 
-    res.status(200).json(user);
-  } catch (err) {
-    next(err);
-  }
-};
+  patchUser: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const data = req.body;
+      const user = await userService.updateUser(req.user!.id, data);
 
-export const patchUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const data = req.body;
-    const user = await updateUser(req.user!.id, data);
+      res.status(200).json(user);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    res.status(200).json(user);
-  } catch (err) {
-    next(err);
-  }
-};
+  patchPassword: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { password } = req.body;
 
-export const patchPassword = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const { password } = req.body;
+      await userService.updatePassword(req.user!.id, password);
 
-    await updatePassword(req.user!.id, password);
+      res.status(200).json({ message: "비밀번호 변경 완료" });
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    res.status(200).json({ message: "비밀번호 변경 완료" });
-  } catch (err) {
-    next(err);
-  }
-};
+  getUserProduct: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const userProduct = await userService.findUserProduct(req.user!.id);
 
-export const getUserProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const userProduct = await findUserProduct(req.user!.id);
+      res.status(200).json(userProduct);
+    } catch (err) {
+      next(err);
+    }
+  },
 
-    res.status(200).json(userProduct);
-  } catch (err) {
-    next(err);
-  }
-};
+  getLikedProducts: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const products = await userService.findLikedProducts(req.user!.id);
 
-export const getLikedProducts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const products = await findLikedProducts(req.user!.id);
-
-    res.status(200).json(products);
-  } catch (err) {
-    next(err);
-  }
+      res.status(200).json(products);
+    } catch (err) {
+      next(err);
+    }
+  },
 };

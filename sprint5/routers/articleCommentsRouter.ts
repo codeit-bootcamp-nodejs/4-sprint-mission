@@ -1,10 +1,5 @@
 import express from "express";
-import {
-  deleteArticleComment,
-  getArticleComments,
-  patchArticleComment,
-  postArticleComment,
-} from "../controllers/articleCommentsController.js";
+import { aritcleCommentsController } from "../controllers/articleCommentsController.js";
 import {
   validateNewComment,
   validateCommentUpdate,
@@ -16,11 +11,11 @@ const articleCommentRouter = express.Router({ mergeParams: true });
 
 articleCommentRouter
   .route("/")
-  .get(getArticleComments)
+  .get(aritcleCommentsController.getArticleComments)
   .post(
     validateNewComment,
     passport.authenticate("access-token", { session: false }),
-    postArticleComment
+    aritcleCommentsController.createArticleComment
   );
 
 articleCommentRouter
@@ -28,12 +23,12 @@ articleCommentRouter
   .patch(
     validateCommentUpdate,
     passport.authenticate("access-token", { session: false }),
-    patchArticleComment
+    aritcleCommentsController.updateArticleComment
   )
   .delete(
     validateId,
     passport.authenticate("access-token", { session: false }),
-    deleteArticleComment
+    aritcleCommentsController.deleteArticleComment
   );
 
 export default articleCommentRouter;

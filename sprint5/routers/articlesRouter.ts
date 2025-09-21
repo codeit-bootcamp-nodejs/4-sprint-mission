@@ -1,11 +1,5 @@
 import express from "express";
-import {
-  postArticle,
-  getArticleList,
-  getArticleById,
-  patchArticle,
-  deleteArticle,
-} from "../controllers/articleController.js";
+import { articleController } from "../controllers/articleController.js";
 import {
   validateArticleCreate,
   validateId,
@@ -20,25 +14,25 @@ const articleRouter = express.Router();
 
 articleRouter
   .route("/")
-  .get(validateArticleQuery, optionalAuth, getArticleList)
+  .get(validateArticleQuery, optionalAuth, articleController.getArticleList)
   .post(
     validateArticleCreate,
     passport.authenticate("access-token", { session: false }),
-    postArticle
+    articleController.postArticle
   );
 
 articleRouter
   .route("/:id")
-  .get(validateId, optionalAuth, getArticleById)
+  .get(validateId, optionalAuth, articleController.getArticleById)
   .patch(
     validateId,
     passport.authenticate("access-token", { session: false }),
-    patchArticle
+    articleController.patchArticle
   )
   .delete(
     validateId,
     passport.authenticate("access-token", { session: false }),
-    deleteArticle
+    articleController.deleteArticle
   );
 
 articleRouter.use("/:articleId/comments", articleCommentRouter);

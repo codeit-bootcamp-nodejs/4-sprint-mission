@@ -1,13 +1,17 @@
-import prisma from "../lib/prisma.js";
+import { aritcleLikeReposioty } from "../repositories/articleLikeRepository.js";
+import { articleRepository } from "../repositories/articleRepository.js";
+
+interface Like {
+  userId: number;
+  articleId: number | null;
+}
 
 export const toggleArticleLike = async (
   userId: number,
   articleId: number
-): Promise<{ liked: boolean }> => {
+): Promise<{ liked: boolean; like: Like | null }> => {
   try {
-    const article = await prisma.article.findUnique({
-      where: { id: articleId },
-    });
+    const article = await articleRepository.getArticleById(articleId);
 
     if (!article) {
       const error: HttpError = new Error("존재하지 않는 게시글입니다.");
@@ -15,36 +19,16 @@ export const toggleArticleLike = async (
       throw error;
     }
 
-    const existingLike = await prisma.like.findUnique({
-      where: {
-        userId_articleId: {
-          userId,
-          articleId,
-        },
-      },
-    });
+    const existingLike = await aritcleLikeReposioty.findLike(userId, articleId);
 
     if (existingLike) {
-      await prisma.like.delete({
-        where: {
-          userId_articleId: {
-            userId,
-            articleId,
-          },
-        },
-      });
+      await aritcleLikeReposioty.deleteLike(userId, articleId);
 
-      return { liked: false };
+      return { liked: false, like: null };
     } else {
-      await prisma.like.create({
-        data: {
-          userId,
-          articleId,
-          like: true,
-        },
-      });
+      const like = await aritcleLikeReposioty.createLike(userId, articleId);
 
-      return { liked: true };
+      return { liked: true, like };
     }
   } catch (err) {
     throw err;

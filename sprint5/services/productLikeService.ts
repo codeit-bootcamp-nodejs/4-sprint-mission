@@ -1,50 +1,34 @@
-import prisma from "../lib/prisma.js";
+import { productLikeReposioty } from "../repositories/productLikeRepository.js";
+import { productRepository } from "../repositories/productRepository.js";
+
+interface Like {
+  userId: number;
+  productId: number | null;
+}
 
 export const toggleProductLike = async (
   userId: number,
   productId: number
-): Promise<{ liked: boolean }> => {
+): Promise<{ liked: boolean; like: Like | null }> => {
   try {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
-    });
+    const product = await productRepository.getProductById(productId);
 
     if (!product) {
-      const error: HttpError = new Error("존재하지 않는 게시글입니다.");
+      const error: HttpError = new Error("존재하지 않는 상품입니다.");
       error.status = 400;
       throw error;
     }
 
-    const existingLike = await prisma.like.findUnique({
-      where: {
-        userId_productId: {
-          userId,
-          productId,
-        },
-      },
-    });
+    const existingLike = await productLikeReposioty.findLike(userId, productId);
 
     if (existingLike) {
-      await prisma.like.delete({
-        where: {
-          userId_productId: {
-            userId,
-            productId,
-          },
-        },
-      });
+      await productLikeReposioty.deleteLike(userId, productId);
 
-      return { liked: false };
+      return { liked: false, like: null };
     } else {
-      await prisma.like.create({
-        data: {
-          userId,
-          productId,
-          like: true,
-        },
-      });
+      const like = await productLikeReposioty.createLike(userId, productId);
 
-      return { liked: true };
+      return { liked: true, like };
     }
   } catch (err) {
     throw err;

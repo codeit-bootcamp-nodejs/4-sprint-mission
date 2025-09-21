@@ -1,6 +1,6 @@
-import prisma from "../lib/prisma.js";
 import bcrypt from "bcryptjs";
 import { generateTokens } from "../lib/token.js";
+import { findUserByEmail, createUser } from "../repositories/authRepository.js";
 
 interface Tokens {
   accessToken: string;
@@ -11,26 +11,20 @@ export const registerUser = async (
   email: string,
   nickname: string,
   password: string
-): Promise<Express.User> => {
-  try {
-    const checkUser = await prisma.user.findUnique({ where: { email } });
-
-    if (checkUser) {
-      const error: HttpError = new Error("이미 가입된 이메일입니다.");
-      error.status = 409;
-      throw error;
-    }
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = await prisma.user.create({
-      data: { email, nickname, password: hashedPassword },
-    });
-
-    return user;
-  } catch (err) {
-    throw err;
+) => {
+  const existingUser = await findUserByEmail(email);
+  if (existingUser) {
+    const error: HttpError = new Error("이미 가입된 이메일입니다.");
+    error.status = 409;
+    throw error;
   }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await createUser(email, nickname, hashedPassword);
+
+  // 비밀번호 제외하고 반환
+  const { password: _, ...userWithoutPassword } = user;
+  return userWithoutPassword;
 };
 
 export const loginUser = async (user: Express.User): Promise<Tokens> => {

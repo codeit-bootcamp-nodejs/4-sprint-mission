@@ -4,23 +4,18 @@ import {
   validateCommentUpdate,
   validateId,
 } from "../middlewares/validate.js";
-import {
-  deleteProductComment,
-  getProductsComments,
-  patchProductComment,
-  postProductComment,
-} from "../controllers/productCommentsController.js";
+import { productCommentsController } from "../controllers/productCommentsController.js";
 import passport from "../lib/passport/index.js";
 
 const productCommentRouter = express.Router({ mergeParams: true });
 
 productCommentRouter
   .route("/")
-  .get(getProductsComments)
+  .get(productCommentsController.getProductsComments)
   .post(
     validateNewComment,
     passport.authenticate("access-token", { session: false }),
-    postProductComment
+    productCommentsController.createProductComment
   );
 
 productCommentRouter
@@ -28,12 +23,12 @@ productCommentRouter
   .patch(
     validateCommentUpdate,
     passport.authenticate("access-token", { session: false }),
-    patchProductComment
+    productCommentsController.updateProductComment
   )
   .delete(
     validateId,
     passport.authenticate("access-token", { session: false }),
-    deleteProductComment
+    productCommentsController.deleteProductComment
   );
 
 export default productCommentRouter;
