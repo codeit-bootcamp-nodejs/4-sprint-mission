@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { expressjwt } from 'express-jwt';
 import { PrismaClient } from '@prisma/client';
 
-import UserService from '../service/user-service.js'
+import UserService from '../service/user-service.ts'
 const prisma = new PrismaClient();
 
 // 비밀번호 검증 함수

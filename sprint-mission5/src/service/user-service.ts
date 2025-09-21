@@ -1,3 +1,4 @@
+import type { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import auth from '../middleware/auth.js';
@@ -9,7 +10,7 @@ dotenv.config();
 const prisma = new PrismaClient();
 
 // 유저 조회
-const getUserById = async(req, res) => {
+const getUserById = async(req: Request, res: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: Number(req.params.userId) },
     select: {
@@ -25,7 +26,7 @@ const getUserById = async(req, res) => {
 };
 
 // 유저 생성 (회원가입)
-const createUsers = async(req, res) => {
+const createUsers = async(req: Request, res: Response) => {
   const existUser = await prisma.user.findUnique({
     where: { email: req.body.email }
   });
@@ -45,7 +46,7 @@ const createUsers = async(req, res) => {
 };
 
 // 유저 수정 (회원정보 수정)
-const updateUsers = async(req, res) => {
+const updateUsers = async(req: Request, res: Response) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
   const user = await prisma.user.update({
@@ -61,7 +62,7 @@ const updateUsers = async(req, res) => {
 };
 
 // 로그인
-const login = async(req, res) => {
+const login = async(req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await prisma.user.findUnique({
     where: { email },
@@ -78,7 +79,7 @@ const login = async(req, res) => {
     return res.json({ accessToken });
 };
 
-const getProductsByUserId = async(req, res) => {
+const getProductsByUserId = async(req: Request, res: Response) => {
   const products = await prisma.product.findMany({
     where: { userId: Number(req.params.userId) },
     select: {
@@ -94,8 +95,8 @@ const getProductsByUserId = async(req, res) => {
   res.status(200).send(products);
 }
 
-const getLikeByUserId = async(req, res) => {
-  const userId = req.user.userId
+const getLikeByUserId = async(req: Request, res: Response) => {
+  const userId = req.user.userId;
   const likeproducts = await prisma.productLike.findMany({
     where: { userId: userId },
     select: {
@@ -105,18 +106,22 @@ const getLikeByUserId = async(req, res) => {
   res.status(200).send(likeproducts);
 }
 
-const refreshToken = async (req, res, next) => {
+interface CustomError extends Error {
+  code?: number;
+}
+
+const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   const { refreshToken } = req.cookies
   const userId = req.user.userId;
   const user = await prisma.user.findUnique({
     where: { id: userId }
   })
   if (!user || user.refreshToken !== refreshToken) {
-    const error = new Error("Unauthorized");
+    const error = new Error("Unauthorized") as CustomError;
     error.code = 401;
     throw error;
   }
-  const newAccessToken = createToken(user, "access");
+  const newAccessToken = await token.createToken(user);
   return res.json({ accessToken: newAccessToken });
 }
 
