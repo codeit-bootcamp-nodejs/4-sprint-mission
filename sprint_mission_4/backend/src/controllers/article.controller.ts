@@ -1,18 +1,13 @@
-// src/controllers/article.controller.js
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/client.js';
 import { CreateArticleRequest, UpdateArticleRequest } from '../types/index.js';
+import { AuthRequest } from '../types/auth.js';
+import { ArticleWithCounts, ArticleWithLikeStatus } from '../types/article.js';
 
-interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    nickname: string;
-  };
-}
+interface AuthRequestExtended extends Request, AuthRequest {}
 
 // Article 생성 API
-export const createArticle = async (req: AuthRequest & Request<{}, {}, CreateArticleRequest>, res: Response, next: NextFunction): Promise<void> => {
+export const createArticle = async (req: AuthRequestExtended & Request<{}, {}, CreateArticleRequest>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { title, content } = req.body;
     const article = await prisma.article.create({
@@ -29,7 +24,7 @@ export const createArticle = async (req: AuthRequest & Request<{}, {}, CreateArt
 };
 
 // Article 목록 조회 API
-export const getAllArticles = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getAllArticles = async (req: AuthRequestExtended, res: Response, next: NextFunction): Promise<void> => {
   try {
     const offset = Math.max(0, parseInt((req.query['offset'] as string) ?? '0', 10) || 0);
     const limitRaw = parseInt((req.query['limit'] as string) ?? '10', 10);
@@ -48,46 +43,41 @@ export const getAllArticles = async (req: AuthRequest, res: Response, next: Next
 
     const orderBy = sort === 'recent' ? { createdAt: 'desc' as const } : undefined;
 
-    const findManyParams: any = {
+    const findManyParams = {
       skip: offset,
       take: limit,
-      select: { 
-        id: true, 
-        title: true, 
-        content: true, 
+      select: {
+        id: true,
+        title: true,
+        content: true,
         createdAt: true,
         _count: {
           select: { likes: true, comments: true }
         }
       },
+      ...(where && { where }),
+      ...(orderBy && { orderBy })
     };
     
-    if (where) {
-      findManyParams.where = where;
-    }
-    
-    if (orderBy) {
-      findManyParams.orderBy = orderBy;
-    }
-    
-    const articles = await prisma.article.findMany(findManyParams);
+    const articles = await prisma.article.findMany(findManyParams) as ArticleWithCounts[];
 
-    const articlesWithLikeStatus = await Promise.all(
-      articles.map(async (article: any) => {
-        const isLiked = req.user
-          ? await prisma.like.findFirst({
-              where: { userId: req.user.id, articleId: article.id }
-            })
-          : null;
+    const userLikes = req.user
+      ? await prisma.like.findMany({
+          where: {
+            userId: req.user.id,
+            articleId: { in: articles.map(a => a.id) }
+          }
+        })
+      : [];
 
-        return {
-          ...article,
-          likeCount: article._count.likes,
-          commentCount: article._count.comments,
-          isLiked: !!isLiked,
-        };
-      })
-    );
+    const likedArticleIds = new Set(userLikes.map(like => like.articleId));
+
+    const articlesWithLikeStatus: ArticleWithLikeStatus[] = articles.map(article => ({
+      ...article,
+      likeCount: article._count.likes,
+      commentCount: article._count.comments,
+      isLiked: likedArticleIds.has(article.id),
+    }));
 
     res.json(articlesWithLikeStatus);
   } catch (err) {
@@ -96,7 +86,7 @@ export const getAllArticles = async (req: AuthRequest, res: Response, next: Next
 };
 
 // Article 상세 조회 API
-export const getArticleById = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const getArticleById = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
@@ -132,10 +122,11 @@ export const getArticleById = async (req: AuthRequest & Request<{ id: string }>,
         })
       : null;
 
+    const articleWithCounts = article as ArticleWithCounts;
     res.json({
-      ...article,
-      likeCount: (article as any)._count.likes,
-      commentCount: (article as any)._count.comments,
+      ...articleWithCounts,
+      likeCount: articleWithCounts._count.likes,
+      commentCount: articleWithCounts._count.comments,
       isLiked: !!isLiked,
     });
   } catch (err) {
@@ -144,7 +135,7 @@ export const getArticleById = async (req: AuthRequest & Request<{ id: string }>,
 };
 
 // Article 수정 API
-export const updateArticle = async (req: AuthRequest & Request<{ id: string }, {}, UpdateArticleRequest>, res: Response, next: NextFunction): Promise<void> => {
+export const updateArticle = async (req: AuthRequestExtended & Request<{ id: string }, {}, UpdateArticleRequest>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
@@ -168,7 +159,7 @@ export const updateArticle = async (req: AuthRequest & Request<{ id: string }, {
     }
 
     const { title, content } = req.body;
-    const data: any = {};
+    const data: Partial<{ title: string; content: string }> = {};
     if (title !== undefined) data.title = title;
     if (content !== undefined) data.content = content;
 
@@ -190,7 +181,7 @@ export const updateArticle = async (req: AuthRequest & Request<{ id: string }, {
 };
 
 // Article 삭제 API
-export const deleteArticle = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const deleteArticle = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     
@@ -221,7 +212,7 @@ export const deleteArticle = async (req: AuthRequest & Request<{ id: string }>, 
 };
 
 // Article 좋아요 토글 API
-export const toggleArticleLike = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const toggleArticleLike = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const articleId = parseInt(req.params.id);
     const userId = req.user!.id;

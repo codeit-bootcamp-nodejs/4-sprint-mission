@@ -2,14 +2,10 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma/client.js';
+import { JWT_SECRET, JWT_REFRESH_SECRET, JWT_CONFIG } from '../config/constants.js';
+import { JWTPayload, AuthRequest } from '../types/auth.js';
 
-interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    nickname: string;
-  };
-}
+interface AuthRequestExtended extends Request, AuthRequest {}
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -74,14 +70,14 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
     const accessToken = jwt.sign(
       { userId: user.id },
-      process.env['JWT_SECRET']!,
-      { expiresIn: '1h' }
+      JWT_SECRET,
+      { expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN }
     );
 
     const refreshToken = jwt.sign(
       { userId: user.id },
-      process.env['JWT_REFRESH_SECRET']!,
-      { expiresIn: '7d' }
+      JWT_REFRESH_SECRET,
+      { expiresIn: JWT_CONFIG.REFRESH_TOKEN_EXPIRES_IN }
     );
 
     await prisma.user.update({
@@ -114,7 +110,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const decoded = jwt.verify(refreshToken, process.env['JWT_REFRESH_SECRET']!) as any;
+    const decoded = jwt.verify(refreshToken, JWT_REFRESH_SECRET) as JWTPayload;
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId }
     });
@@ -126,8 +122,8 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
 
     const newAccessToken = jwt.sign(
       { userId: user.id },
-      process.env['JWT_SECRET']!,
-      { expiresIn: '1h' }
+      JWT_SECRET,
+      { expiresIn: JWT_CONFIG.ACCESS_TOKEN_EXPIRES_IN }
     );
 
     res.json({ accessToken: newAccessToken });
@@ -136,7 +132,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-export const getProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getProfile = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.user!.id },
@@ -157,7 +153,7 @@ export const getProfile = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+export const updateProfile = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const { nickname, image } = req.body;
 
@@ -184,7 +180,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+export const changePassword = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const { currentPassword, newPassword } = req.body;
 
@@ -216,7 +212,7 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-export const getMyProducts = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getMyProducts = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const products = await prisma.product.findMany({
       where: { userId: req.user!.id },
@@ -235,7 +231,7 @@ export const getMyProducts = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-export const getMyLikedProducts = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getMyLikedProducts = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const likedProducts = await prisma.like.findMany({
       where: { 
@@ -262,7 +258,7 @@ export const getMyLikedProducts = async (req: AuthRequest, res: Response): Promi
   }
 };
 
-export const getMyArticles = async (req: AuthRequest, res: Response): Promise<void> => {
+export const getMyArticles = async (req: AuthRequestExtended, res: Response): Promise<void> => {
   try {
     const articles = await prisma.article.findMany({
       where: { userId: req.user!.id },

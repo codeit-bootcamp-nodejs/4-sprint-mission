@@ -1,18 +1,13 @@
-// src/controllers/product.controller.js
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../prisma/client.js';
 import { CreateProductRequest } from '../types/index.js';
+import { AuthRequest } from '../types/auth.js';
+import { ProductWithCounts, ProductWithLikeStatus } from '../types/product.js';
 
-interface AuthRequest extends Request {
-  user?: {
-    id: number;
-    email: string;
-    nickname: string;
-  };
-}
+interface AuthRequestExtended extends Request, AuthRequest {}
 
 // 상품 생성 API
-export const createProduct = async (req: AuthRequest & Request<{}, {}, CreateProductRequest>, res: Response, next: NextFunction): Promise<void> => {
+export const createProduct = async (req: AuthRequestExtended & Request<{}, {}, CreateProductRequest>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { name, description, price, tags, imageUrl } = req.body;
     const product = await prisma.product.create({
@@ -32,7 +27,7 @@ export const createProduct = async (req: AuthRequest & Request<{}, {}, CreatePro
 };
 
 // 상품 목록 조회 API
-export const getAllProducts = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+export const getAllProducts = async (req: AuthRequestExtended, res: Response, next: NextFunction): Promise<void> => {
   try {
     const offset = Math.max(0, parseInt(req.query['offset'] as string ?? '0', 10) || 0);
     const limitRaw = parseInt(req.query['limit'] as string ?? '10', 10);
@@ -56,33 +51,34 @@ export const getAllProducts = async (req: AuthRequest, res: Response, next: Next
       take: limit,
       where,
       ...(Object.keys(orderBy).length > 0 && { orderBy }),
-      select: { 
-        id: true, 
-        name: true, 
-        price: true, 
+      select: {
+        id: true,
+        name: true,
+        price: true,
         createdAt: true,
         _count: {
           select: { likes: true, comments: true }
         }
       },
-    });
+    }) as ProductWithCounts[];
 
-    const productsWithLikeStatus = await Promise.all(
-      products.map(async (product) => {
-        const isLiked = req.user
-          ? await prisma.like.findFirst({
-              where: { userId: req.user.id, productId: product.id }
-            })
-          : null;
+    const userLikes = req.user
+      ? await prisma.like.findMany({
+          where: {
+            userId: req.user.id,
+            productId: { in: products.map(p => p.id) }
+          }
+        })
+      : [];
 
-        return {
-          ...product,
-          likeCount: product._count.likes,
-          commentCount: product._count.comments,
-          isLiked: !!isLiked,
-        };
-      })
-    );
+    const likedProductIds = new Set(userLikes.map(like => like.productId));
+
+    const productsWithLikeStatus: ProductWithLikeStatus[] = products.map(product => ({
+      ...product,
+      likeCount: product._count.likes,
+      commentCount: product._count.comments,
+      isLiked: likedProductIds.has(product.id),
+    }));
 
     res.json(productsWithLikeStatus);
   } catch (err) {
@@ -91,7 +87,7 @@ export const getAllProducts = async (req: AuthRequest, res: Response, next: Next
 };
 
 // 상품 상세 조회 API
-export const getProductById = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const getProductById = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
@@ -137,7 +133,7 @@ export const getProductById = async (req: AuthRequest & Request<{ id: string }>,
 };
 
 // 상품 수정 API
-export const updateProduct = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const updateProduct = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const productId = parseInt(req.params.id);
     
@@ -171,7 +167,7 @@ export const updateProduct = async (req: AuthRequest & Request<{ id: string }>, 
 };
 
 // 상품 삭제 API
-export const deleteProduct = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const deleteProduct = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const productId = parseInt(req.params.id);
     
@@ -202,7 +198,7 @@ export const deleteProduct = async (req: AuthRequest & Request<{ id: string }>, 
 };
 
 // 상품 좋아요 토글 API
-export const toggleProductLike = async (req: AuthRequest & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+export const toggleProductLike = async (req: AuthRequestExtended & Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
   try {
     const productId = parseInt(req.params.id);
     const userId = req.user!.id;
