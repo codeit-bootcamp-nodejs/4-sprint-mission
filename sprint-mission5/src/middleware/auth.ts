@@ -1,12 +1,13 @@
 import bcrypt from 'bcrypt';
 import { expressjwt } from 'express-jwt';
 import { PrismaClient } from '@prisma/client';
+import type { Request, Response, NextFunction } from 'express';
 
-import UserService from '../service/user-service.ts'
+import UserService from '../service/user-service.js'
 const prisma = new PrismaClient();
 
 // 비밀번호 검증 함수
-async function verifyPassword(inputPassword, password) {
+async function verifyPassword(inputPassword: string, password: string) {
   try {
     return await bcrypt.compare(inputPassword, password);
   } catch (error) {
@@ -16,13 +17,13 @@ async function verifyPassword(inputPassword, password) {
 
 // JWT 토큰 검증 미들웨어 (인증 미들웨어)
 const verifyAccessToken = expressjwt({
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET!,
   algorithms: ['HS256'],
   requestProperty: 'user'
 });
 
 // 등록 user 권한 (인가)
-const verifyUserRole = async(req, res, next) => {
+const verifyUserRole = async(req: Request, res: Response, next: NextFunction) => {
   let review = null;
   if (req.params.articleId) {
     review = await prisma.article.findUnique({ where: { id: Number(req.params.articleId) } });
@@ -45,7 +46,7 @@ const verifyUserRole = async(req, res, next) => {
 
 //refresh token 재발급
 const verifyRefreshToken = expressjwt({
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET!,
   algorithms: ['HS256'],
   getToken: (req) => req.cookies.refreshToken,
 });
