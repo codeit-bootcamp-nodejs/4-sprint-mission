@@ -1,5 +1,5 @@
 import { articleRepository } from "../repositories/articleRepository.js";
-import type { Article, ArticleWithLike } from "../types/dto.js";
+import type { Article, ArticleWithLike, Like } from "../types/dto.js";
 
 export const articleService = {
   getArticles: async (
@@ -26,7 +26,7 @@ export const articleService = {
         return articles.map((article) => ({ ...article, isLiked: false }));
       }
 
-      const likedArticles = await articleRepository.findLikedArticles(
+      const likedArticles: Like[] = await articleRepository.findLikedArticles(
         userId,
         articles.map((article) => article.id)
       );

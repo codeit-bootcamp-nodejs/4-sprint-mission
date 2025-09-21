@@ -1,5 +1,5 @@
 import { productRepository } from "../repositories/productRepository.js";
-import type { Product, ProductWithLike } from "../types/dto.js";
+import type { Like, Product, ProductWithLike } from "../types/dto.js";
 
 export const productService = {
   getProducts: async (
@@ -26,7 +26,7 @@ export const productService = {
         return products.map((products) => ({ ...products, isLiked: false }));
       }
 
-      const likedProducts = await productRepository.findLikedProducts(
+      const likedProducts: Like[] = await productRepository.findLikedProducts(
         userId,
         products.map((product) => product.id)
       );

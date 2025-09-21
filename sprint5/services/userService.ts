@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { userRepository } from "../repositories/userReposioty.js";
 import type {
+  Product,
   UpdateUserData,
   UserProduct,
   UserProductWithLike,
@@ -63,7 +64,7 @@ export const userService = {
   findLikedProducts: async (userId: number): Promise<UserProductWithLike[]> => {
     const products = await userRepository.findLikedProducts(userId);
 
-    return products.map((product) => ({
+    return products.map((product: Product) => ({
       ...product,
       isLiked: true,
     }));
