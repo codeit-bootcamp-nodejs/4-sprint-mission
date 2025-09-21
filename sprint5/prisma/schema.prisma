@@ -35,7 +35,7 @@ model Article {
   updatedAt   DateTime  @updatedAt
   comments    Comment[]
   userId      Int
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id])
   like        Like[]
 }
 
