@@ -1,18 +1,12 @@
 import { PrismaClient } from '@prisma/client';
+import type { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
-const getProducts = async(req, res) => {
-  const { offset = '0', limit = '10', order = 'newest'} = req.query;
-  let orderBy;
-  switch (order) {
-    case 'oldest':
-      orderBy = { createdAt: 'asc' };
-      break;
-    case 'newest':
-    default:
-      orderBy = {createdAt: 'desc'};
-  }
+const getProducts = async(req: Request, res: Response): Promise<void> => {
+  const offset = typeof req.query.offset === 'string' ? req.query.offset : '0';
+  const limit = typeof req.query.limit === 'string' ? req.query.limit : '10';
+  const order = req.query.order === 'newest' ? 'asc' : 'desc';
   const search = req.query.search;
   const where = search ? {
     OR: [{ name: { contains: String(search), mode: 'insensitive' } },
@@ -21,7 +15,7 @@ const getProducts = async(req, res) => {
   } : {};
   const products = await prisma.product.findMany({
     where,
-    orderBy,
+    order,
     skip: parseInt(offset, 10),
     take: parseInt(limit, 10),
     select: {
@@ -34,7 +28,7 @@ const getProducts = async(req, res) => {
   res.status(200).send(products);
 };
 
-const createProducts = async(req, res) =>  {
+const createProducts = async(req: Request, res: Response): Promise<void> =>  {
   const userId = req.user.userId;
   const { name, price } = req.body;
   const productData = {
@@ -48,7 +42,7 @@ const createProducts = async(req, res) =>  {
   res.status(201).send(products);
 };
 
-const getProductsById = async(req, res) => {
+const getProductsById = async(req: Request, res: Response): Promise<void> => {
   const productId = Number(req.params.productId)
   const products = await prisma.product.findUnique({
     where: { id: Number(req.params.productId) },
@@ -70,7 +64,7 @@ const getProductsById = async(req, res) => {
   });
 };
 
-const updateProducts = async(req, res) => {
+const updateProducts = async(req: Request, res: Response): Promise<void> => {
   const product = await prisma.product.update({
     where: { id: Number(req.params.productId) },
     data: req.body,
@@ -79,23 +73,23 @@ const updateProducts = async(req, res) => {
 }
 
 
-const deleteProducts = async(req, res) => {
+const deleteProducts = async(req: Request, res: Response): Promise<void> => {
   await prisma.product.delete({
     where: { id: Number(req.params.productId) },
   });
   res.status(204).send();
 }
 
-const getProductComments = async(req, res) => {
+const getProductComments = async(req: Request, res: Response): Promise<void> => {
   const productComments = await prisma.productComment.findMany({
-    where: { productId: parseInt(req.params.productId, 10) },
+    where: { productId: req.params.productId ? parseInt(req.params.productId, 10) : undefined },
   });
   res.status(200).send(productComments);
 }
 
-const createProductComment = async(req, res) => {
+const createProductComment = async(req: Request, res: Response): Promise<void> => {
   const userId = req.user.userId;
-  const productId = parseInt(req.params.productId, 10);
+  const productId = req.params.productId ? parseInt(req.params.productId, 10) : undefined;
   const productComments = await prisma.productComment.create({
     data: {
       content: req.body.content,
@@ -106,7 +100,7 @@ const createProductComment = async(req, res) => {
   res.status(201).send(productComments);
 }
 
-const updateProductComment = async(req, res) => {
+const updateProductComment = async(req: Request, res: Response): Promise<void> => {
   const productComments = await prisma.productComment.update({
     where: { id: Number(req.params.productCommentId) },
     data: req.body,
@@ -114,7 +108,7 @@ const updateProductComment = async(req, res) => {
   res.status(200).send(productComments);
 }
 
-const deleteProductComment = async(req, res) => {
+const deleteProductComment = async(req: Request, res: Response): Promise<void> => {
   const productComments = await prisma.productComment.delete({
     where: { id: Number(req.params.productCommentId) },
   });

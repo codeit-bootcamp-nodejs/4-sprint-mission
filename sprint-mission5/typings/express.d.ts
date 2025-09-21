@@ -5,7 +5,13 @@ declare global {
         interface Request {
             user: {
                 userId: number;
-            };
+            },
+            query: {
+                offset?: string;
+                limit?: string;
+                order?: 'asc' | 'desc';
+                search?: string;
+            }
         }
     }
 }
