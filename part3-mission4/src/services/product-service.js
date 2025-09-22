@@ -201,29 +201,58 @@ class ProductService {
     return likedProducts;
   }
 
-  // 상품 좋아요
-  async productLike(userId, productId) {
-    const productLiked = await prisma.product.update({
-      where: { id: parseInt(productId) },
-      data: {
-        likedBy: { connect: { id: parseInt(userId) } },
-        likeCount: { increment: 1 },
-      },
-    });
-    return productLiked;
+// 상품 좋아요
+async productLike(userId, productId) {
+  const alreadyLiked = await prisma.product.findFirst({
+    where: {
+      id: parseInt(productId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
+
+  if (alreadyLiked) {
+    throw new AppError('이미 좋아요한 상품입니다.', 400);
   }
 
-  // 상품 좋아요 취소
-  async productUnlike(userId, productId) {
-    const productUnliked = await prisma.product.update({
+  const [updated] = await prisma.$transaction([
+    prisma.product.update({
       where: { id: parseInt(productId) },
-      data: {
-        likedBy: { disconnect: { id: parseInt(userId) } },
-        likeCount: { decrement: 1 },
-      },
-    });
-    return productUnliked;
+      data: { likedBy: { connect: { id: parseInt(userId) } } },
+    }),
+    prisma.product.update({
+      where: { id: parseInt(productId) },
+      data: { likeCount: { increment: 1 } },
+    }),
+  ]);
+
+  return updated;
+}
+
+// 상품 좋아요 취소
+async productUnlike(userId, productId) {
+  const alreadyLiked = await prisma.product.findFirst({
+    where: {
+      id: parseInt(productId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
+
+  if (!alreadyLiked) {
+    throw new AppError('좋아요한 기록이 없습니다.', 400);
   }
+
+  const [updated] = await prisma.$transaction([
+    prisma.product.update({
+      where: { id: parseInt(productId) },
+      data: { likedBy: { disconnect: { id: parseInt(userId) } } },
+    }),
+    prisma.product.update({
+      where: { id: parseInt(productId) },
+      data: { likeCount: { decrement: 1 } },
+    }),
+  ]);
+
+  return updated;
 }
 
 export const productService = new ProductService();
