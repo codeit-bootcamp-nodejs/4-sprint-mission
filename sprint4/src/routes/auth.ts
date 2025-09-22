@@ -1,8 +1,7 @@
-//src/routes/auth.js
-
-const express = require('express');
-const authController = require('../controllers/authController');
-const authMiddleware = require('../middleware/auth');
+// src/routes/auth.ts
+import express from 'express';
+import * as authController from '../controllers/authController';
+import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
@@ -17,4 +16,4 @@ router.get('/me', authMiddleware, authController.getMyInfo);
 router.put('/me', authMiddleware, authController.updateMyInfo);
 router.put('/me/password', authMiddleware, authController.changePassword);
 
-module.exports = router;
+export default router;

@@ -1,8 +1,7 @@
-// src/routes/products.js
-
-const express = require('express');
-const productController = require('../controllers/productController');
-const authMiddleware = require('../middleware/auth');
+// src/routes/products.ts
+import express, { Request, Response, NextFunction } from 'express';
+import * as productController from '../controllers/productController';
+import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
@@ -46,4 +45,4 @@ router.post('/:id/like', productController.likeProduct);
 // 상품 좋아요 취소
 router.delete('/:id/like', productController.unlikeProduct);
 
-module.exports = router;
+export default router;

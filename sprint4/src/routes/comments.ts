@@ -1,6 +1,7 @@
-const express = require('express');
-const commentController = require('../controllers/commentController');
-const authMiddleware = require('../middleware/auth');
+// src/routes/comments.ts
+import express from 'express';
+import * as commentController from '../controllers/commentController';
+import authMiddleware from '../middleware/auth';
 
 const router = express.Router();
 
@@ -19,4 +20,4 @@ router.put('/:id', commentController.updateComment);
 // 댓글 삭제
 router.delete('/:id', commentController.deleteComment);
 
-module.exports = router;
+export default router;

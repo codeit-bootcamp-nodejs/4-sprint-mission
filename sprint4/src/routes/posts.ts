@@ -1,8 +1,8 @@
-//src/routes/posts.js
-
-const express = require('express');
-const postController = require('../controllers/postController');
-const authMiddleware = require('../middleware/auth');
+// src/routes/posts.ts
+import express, { Request, Response, NextFunction } from 'express';
+import * as postController from '../controllers/postController';
+import authMiddleware from '../middleware/auth';
+import { AuthRequest } from '../types';
 
 const router = express.Router();
 
@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', postController.getPosts);
 
 // 게시글 상세 조회 (인증 불필요하지만, 좋아요 상태 확인을 위해 선택적 인증)
-router.get('/:id', (req, res, next) => {
+router.get('/:id', (req: AuthRequest, res: Response, next: NextFunction) => {
   // 인증 헤더가 있으면 인증 처리, 없으면 바로 다음으로 넘어감
   if (req.headers.authorization) {
     authMiddleware(req, res, next);
@@ -37,4 +37,4 @@ router.post('/:id/like', postController.likePost);
 // 게시글 좋아요 취소
 router.delete('/:id/like', postController.unlikePost);
 
-module.exports = router;
+export default router;
