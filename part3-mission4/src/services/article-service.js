@@ -183,7 +183,7 @@ class ArticleService {
 
   // 좋아요한 게시글 조회
   async getUserLikedArticles(userId) {
-    const likedArticles = await prisma.product.findMany({
+    const likedArticles = await prisma.article.findMany({
       where: { likedBy: { some: { id: parseInt(userId) } } },
     });
     return likedArticles;
