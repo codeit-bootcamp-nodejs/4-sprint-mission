@@ -1,59 +1,32 @@
 import { Request, Response, NextFunction } from "express";
+import { UsersService } from "../services/users.service.js";
+// getMyProducts, getLikedProducts는 아직 리팩토링 전이라 prisma가 필요합니다.
 import { prisma } from "../utils/prisma.util.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 
 export class UsersController {
+  usersService = new UsersService();
+
   // 회원가입
   signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { password, confirmPassword } = req.body;
-      const email = req.body.email?.trim();
-      const nickname = req.body.nickname?.trim();
+      const { password, confirmPassword, email, nickname } = req.body;
 
-      // 유효성 검사
       if (!email || !password || !confirmPassword || !nickname) {
         return res.status(400).json({ message: "모든 필드 입력해주세요." });
       }
       if (password.length < 6) {
-        return res
-          .status(400)
-          .json({ message: "비밀번호는 6자리 이상이어야 합니다." });
+        return res.status(400).json({ message: "비밀번호는 6자리 이상이어야 합니다." });
       }
       if (password !== confirmPassword) {
         return res.status(400).json({ message: "비밀번호를 확인해주세요" });
       }
 
-      // 이메일, 닉네임 중복 확인
-      const isExistUser = await prisma.user.findFirst({
-        where: {
-          OR: [{ email }, { nickname }],
-        },
-      });
-      if (isExistUser) {
-        return res
-          .status(409)
-          .json({ message: "이미 사용중인 이메일 또는 닉네임 입니다." });
+      const newUser = await this.usersService.signUp(email, password, nickname);
+      return res.status(201).json({ data: newUser });
+    } catch (err: any) {
+      if (err.name === "ConflictError") {
+        return res.status(409).json({ message: err.message });
       }
-      // 비밀번호 해싱
-      const hashedPassword = await bcrypt.hash(password, 10);
-      // 사용자 생성
-
-      const user = await prisma.user.create({
-        data: {
-          email,
-          nickname,
-          password: hashedPassword,
-        },
-      });
-
-      return res.status(201).json({
-        id: user.id,
-        email: user.email,
-        nickname: user.nickname,
-        createdAt: user.createdAt,
-      });
-    } catch (err) {
       next(err);
     }
   };
@@ -61,63 +34,19 @@ export class UsersController {
   // 로그인
   signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { password } = req.body;
-      const email = req.body.email?.trim();
-
+      const { email, password } = req.body;
       if (!email || !password) {
-        return res
-          .status(400)
-          .json({ message: "이메일과 비밀번호를 모두 입력해주세요." });
+        return res.status(400).json({ message: "이메일과 비밀번호를 모두 입력해주세요." });
       }
-
-      const user = await prisma.user.findFirst({ where: { email } });
-      if (!user) {
-        return res
-          .status(401)
-          .json({ message: "인증 정보가 유효하지 않습니다." });
+      const tokens = await this.usersService.signIn(email, password);
+      return res.status(200).json({ data: tokens });
+    } catch (err: any) {
+      if (err.name === "UnauthorizedError") {
+        return res.status(401).json({ message: err.message });
       }
-
-      const isPasswordMatched = await bcrypt.compare(password, user.password);
-      if (!isPasswordMatched) {
-        return res
-          .status(401)
-          .json({ message: "인증 정보가 유효하지 않습니다." });
+       if (err.name === "ServerError") {
+        return res.status(500).json({ message: err.message });
       }
-
-      const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET_KEY;
-      const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET_KEY;
-      if (!accessTokenSecret || !refreshTokenSecret) {
-        return res.status(500).json({ message: "서버에 토큰 시크릿 키가 설정되지 않았습니다." });
-      }
-
-      // --- 토큰 생성 로직 변경 ---
-
-      // 1. Access Token 생성 (유효기간: 1시간)
-      const accessToken = jwt.sign({ userId: user.id }, accessTokenSecret, {
-        expiresIn: "1h",
-      });
-
-      // 2. Refresh Token 생성 (유효기간: 7일)
-      const refreshToken = jwt.sign(
-        { userId: user.id },
-        refreshTokenSecret,
-        { expiresIn: "7d" }
-      );
-
-      // 3. Refresh Token을 데이터베이스에 저장
-      await prisma.refreshToken.create({
-        data: {
-          token: refreshToken,
-          userId: user.id,
-        },
-      });
-
-      // 4. 클라이언트에게 두 토큰 모두 전달
-      return res.status(200).json({
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
-    } catch (err) {
       next(err);
     }
   };
@@ -125,14 +54,10 @@ export class UsersController {
   // 내 정보 조회
   getMe = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      //인증 미들웨어에서 req.user에 할당한 사용자 정보 사용
       const user = req.user;
-
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      
-      // 비밀번호 제외
       return res.status(200).json({
         id: user.id,
         email: user.email,
@@ -152,50 +77,16 @@ export class UsersController {
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const userId = user.id;
-
-      const { image } = req.body;
-      const nickname = req.body.nickname?.trim();
-
-      // 수정할 정보가 하나도 없는 경우
+      const { image, nickname } = req.body;
       if (!nickname && !image) {
         return res.status(400).json({ message: "수정할 정보를 입력해주세요." });
       }
-
-      // 닉네임 수정할 때, 닉네임이 DB에 중복 되는지 확인
-      if (nickname) {
-        const isExistNickname = await prisma.user.findFirst({
-          where: {
-            nickname,
-            // 자기 자신의 닉네임 중복 검사에서 제외
-            id: { not: userId },
-          },
-        });
-        if (isExistNickname) {
-          return res
-            .status(409)
-            .json({ message: "이미 사용중인 닉네임입니다." });
-        }
-      }
-      const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: {
-          ...(nickname && { nickname }),
-          ...(image && { image }),
-        },
-        // 비밀번호를 제외한 사용자 정보 수정
-        select: {
-          id: true,
-          email: true,
-          nickname: true,
-          image: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-
+      const updatedUser = await this.usersService.updateMe(user.id, nickname, image);
       return res.status(200).json({ data: updatedUser });
-    } catch (err) {
+    } catch (err: any) {
+      if (err.name === "ConflictError") {
+        return res.status(409).json({ message: err.message });
+      }
       next(err);
     }
   };
@@ -203,71 +94,82 @@ export class UsersController {
   // 비밀번호 변경
   updatePassword = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const authUser = req.user;
-      if (!authUser) {
+      const user = req.user;
+      if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const userId = authUser.id;
-
       const { currentPassword, newPassword, confirmNewPassword } = req.body;
-
-      // 유효성 검사
       if (!currentPassword || !newPassword || !confirmNewPassword) {
         return res.status(400).json({ message: "모든 필드 입력해주세요" });
       }
       if (newPassword.length < 6) {
-        return res
-          .status(400)
-          .json({ message: "새로운 비밀번호는 6자 이상 작성해야합니다." });
+        return res.status(400).json({ message: "새로운 비밀번호는 6자 이상 작성해야합니다." });
       }
       if (newPassword !== confirmNewPassword) {
-        return res
-          .status(400)
-          .json({ message: "새로운 비밀번호 일치하지 않습니다." });
+        return res.status(400).json({ message: "새로운 비밀번호 일치하지 않습니다." });
       }
-      // 현재 비밀번호 확인
-      const user = await prisma.user.findUnique({ where: { id: userId } });
+      await this.usersService.updatePassword(user.id, currentPassword, newPassword);
+      return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다." });
+    } catch (err: any) {
+      if (err.name === "NotFoundError") {
+        return res.status(404).json({ message: err.message });
+      }
+      if (err.name === "UnauthorizedError") {
+        return res.status(401).json({ message: err.message });
+      }
+      if (err.name === "BadRequestError") {
+        return res.status(400).json({ message: err.message });
+      }
+      next(err);
+    }
+  };
+
+  // Access Token 재발급
+  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { authorization } = req.headers;
+      if (!authorization) {
+        return res.status(401).json({ message: "Refresh Token이 필요합니다." });
+      }
+      const [tokenType, token] = authorization.split(" ");
+      if (tokenType !== "Bearer" || !token) {
+        return res.status(401).json({ message: "지원하지 않는 토큰 형식입니다." });
+      }
+      const result = await this.usersService.refreshToken(token);
+      return res.status(200).json({ accessToken: result.accessToken });
+    } catch (err: any) {
+      if (err.name === "UnauthorizedError") {
+        return res.status(401).json({ message: err.message });
+      }
+       if (err.name === "ServerError") {
+        return res.status(500).json({ message: err.message });
+      }
+      next(err);
+    }
+  };
+
+  // 프로필 이미지 업로드
+  updateProfileImage = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = req.user;
       if (!user) {
-        return res.status(401).json({ message: "사용자 정보를 찾을 수 없습니다." });
+        return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-
-      const isPasswordMatched = await bcrypt.compare(
-        currentPassword,
-        user.password
-      );
-
-      if (!isPasswordMatched) {
-        return res
-          .status(401)
-          .json({ message: "현재 비밀번호가 일치하지 않습니다." });
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ message: "이미지 파일 업로드해주세요" });
       }
-
-      // 새로운 비밀번호와 현재 비밀번호 중복 확인
-      if (currentPassword === newPassword) {
-        return res
-          .status(400)
-          .json({ message: "새로운 비밀번호와 현재 비밀번호가 같습니다." });
-      }
-      // 새로운 비밀번호 해싱 및 업데이트
-      const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-      await prisma.user.update({
-        where: { id: userId },
-        data: { password: hashedNewPassword },
+      const updatedUser = await this.usersService.updateProfileImage(user.id, file.path);
+      return res.status(200).json({
+        message: "프로필 이미지가 성공적으로 변경되었습니다.",
+        data: updatedUser,
       });
-
-      // 보안: 비밀번호 변경 시, 해당 유저의 모든 리프레시 토큰 삭제
-      await prisma.refreshToken.deleteMany({
-        where: { userId: userId },
-      });
-
-      return res
-        .status(200)
-        .json({ message: "비밀번호가 성공적으로 변경되었습니다." });
     } catch (err) {
       next(err);
     }
   };
 
+  // --- Products-related methods to be refactored later ---
   // 특정 유저가 등록한 상품 목록 조회
   getMyProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -275,13 +177,9 @@ export class UsersController {
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const userId = user.id;
-
       const products = await prisma.product.findMany({
-        where: { authorId: userId },
-        orderBy: {
-          createdAt: "desc", // 최신순
-        },
+        where: { authorId: user.id },
+        orderBy: { createdAt: "desc" },
       });
       return res.status(200).json({ data: products });
     } catch (err) {
@@ -296,133 +194,19 @@ export class UsersController {
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const userId = user.id;
-
       const likedProducts = await prisma.product.findMany({
-        where: {
-          likes: {
-            some: {
-              userId: userId,
-            },
-          },
-        },
+        where: { likes: { some: { userId: user.id } } },
         select: {
           id: true,
           name: true,
           content: true,
           createdAt: true,
           updatedAt: true,
-          author: {
-            select: {
-              nickname: true,
-            },
-          },
+          author: { select: { nickname: true } },
         },
-        orderBy: {
-          createdAt: "desc",
-        },
+        orderBy: { createdAt: "desc" },
       });
-
       return res.status(200).json({ data: likedProducts });
-    } catch (err) {
-      next(err);
-    }
-  };
-
-  // Access Token 재발급
-  refreshToken = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { authorization } = req.headers;
-      if (!authorization) {
-        return res
-          .status(401)
-          .json({ message: "Refresh Token이 필요합니다." });
-      }
-
-      const [tokenType, refreshToken] = authorization.split(" ");
-      if (tokenType !== "Bearer") {
-        return res
-          .status(401)
-          .json({ message: "지원하지 않는 토큰 형식입니다." });
-      }
-
-      const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET_KEY;
-      const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET_KEY;
-      if (!refreshTokenSecret || !accessTokenSecret) {
-        return res.status(500).json({ message: "서버에 토큰 시크릿 키가 설정되지 않았습니다." });
-      }
-
-      // 1. Refresh Token 검증 (시그니처, 만료 여부)
-      const decodedToken = jwt.verify(refreshToken, refreshTokenSecret);
-      
-      if (typeof decodedToken !== 'object' || decodedToken === null || !('userId' in decodedToken)) {
-        return res.status(401).json({ message: "유효하지 않은 Refresh Token입니다." });
-      }
-
-      // 2. 데이터베이스에서 Refresh Token 조회
-      const storedToken = await prisma.refreshToken.findUnique({
-        where: { token: refreshToken },
-        include: { user: true },
-      });
-
-      if (!storedToken) {
-        return res.status(401).json({ message: "유효하지 않은 Refresh Token입니다." });
-      }
-
-      // 3. 새로운 Access Token 생성
-      const user = storedToken.user;
-      if (!user) {
-        return res.status(401).json({ message: "토큰에 해당하는 사용자를 찾을 수 없습니다." });
-      }
-      const newAccessToken = jwt.sign({ userId: user.id }, accessTokenSecret, {
-        expiresIn: "1h",
-      });
-
-      // 4. 새로운 Access Token 발급
-      return res.status(200).json({ accessToken: newAccessToken });
-    } catch (err: any) {
-      // Refresh Token이 만료되었거나, 형식이 잘못된 경우 등
-      if (err.name === "TokenExpiredError" || err.name === "JsonWebTokenError") {
-        return res
-          .status(401)
-          .json({ message: "Refresh Token이 유효하지 않습니다." });
-      }
-      next(err);
-    }
-  };
-
-  // 프로필 이미지 업로드
-  updateProfileImage = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
-      }
-      const userId = user.id;
-
-      const file = req.file;
-      if (!file) {
-        return res.status(400).json({ message: "이미지 파일 업로드해주세요" });
-      }
-
-      const imageUrl = file.path;
-
-      const updatedUser = await prisma.user.update({
-        where: { id: userId },
-        data: { image: imageUrl },
-        select: {
-          id: true,
-          email: true,
-          nickname: true,
-          image: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-      return res.status(200).json({
-        message: "프로필 이미지가 성공적으로 변경되었습니다.",
-        data: updatedUser,
-      });
     } catch (err) {
       next(err);
     }
