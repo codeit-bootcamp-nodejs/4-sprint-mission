@@ -37,7 +37,7 @@ class ArticleController {
     const { id } = req.params;
     const userId = req.user.id;
     const result = await articleService.deleteArticle(id, userId);
-    res.status(200).json(result);
+    res.status(204).send();
   }
 
   async likeArticle(req, res) {
