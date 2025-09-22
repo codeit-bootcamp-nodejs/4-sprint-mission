@@ -17,6 +17,7 @@ app.use(
       process.env.CORS_ORIGIN || 'http://localhost:3001',
       'https://codeit-mission3.com',
     ],
+    credentials: true,
   })
 );
 
