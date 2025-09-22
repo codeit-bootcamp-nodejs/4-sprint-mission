@@ -26,7 +26,7 @@ router
   .get(
     authenticate,
     isUserSelf,
-    validation.validateParam('id', validation.idSchema),
+    validation.validateParam('userId', validation.idSchema),
     userController.getUserProfile
   )
   .patch(
