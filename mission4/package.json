@@ -1,15 +1,15 @@
 {
   "name": "mission4",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": "node dist/app.js",
+    "dev": "nodemon --watch src src/app.ts",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "description": "",
-  "type": "module",
   "dependencies": {
     "@prisma/client": "^6.16.0",
     "bcrypt": "^6.0.0",
@@ -21,7 +21,13 @@
     "passport-jwt": "^4.0.1"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
     "nodemon": "^3.1.10",
-    "prisma": "^6.16.0"
+    "prisma": "^6.16.0",
+    "ts-node": "^10.9.2"
   }
 }

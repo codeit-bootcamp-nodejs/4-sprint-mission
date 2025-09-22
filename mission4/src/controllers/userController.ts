@@ -1,5 +1,5 @@
 import express from "express";
-import userService from "../services/userService.js";
+import userService from "../services/userService";
 
 const userController = express.Router();
 //-------------------- 회원가입 API를 만들어 주세요.-------------------------------------
@@ -22,12 +22,12 @@ userController.post("/users", async (req, res, next) => {
   }
 });
 
-//------------------------------------------------------------------------
-userController.post('/login', async (req, res, next) => {
+//--------------------// 토큰 기반 인증: 로그인에 성공하면 Access Token을 발급하는 기능을 구현합니다.--------------------------------
+userController.post("/login", async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const user = await userService.getUser(email, password);
-    const accessToken = userService.createToken(user);
+    const accessToken = userService.createToken( user as { id: number; email: string; nickname: string } );
     return res.json({ accessToken });
   } catch (error) {
     next(error);
@@ -35,7 +35,6 @@ userController.post('/login', async (req, res, next) => {
 });
 
 
-// 토큰 기반 인증: 로그인에 성공하면 Access Token을 발급하는 기능을 구현합니다.
 
 //회원가입 API
 export default userController;
