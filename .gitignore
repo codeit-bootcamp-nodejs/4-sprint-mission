@@ -1,0 +1,15 @@
+# Dependencies
+/node_modules
+
+# Build output
+/dist
+
+# Env
+.env
+
+# Uploads (keep folder, ignore files)
+/uploads/*
+!uploads/.gitkeep
+
+# Prisma generated client
+/generated/
