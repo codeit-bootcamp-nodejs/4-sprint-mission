@@ -9,7 +9,7 @@ function generateTokens(userId) {
     expiresIn: '1h',
   });
   const refreshToken = jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET, {
-    expiresIn: '1d',
+    expiresIn: '7d',
   });
   return {
     accessToken,
