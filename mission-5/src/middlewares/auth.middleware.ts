@@ -37,7 +37,10 @@ export default async function(req: Request, res: Response, next: NextFunction) {
         req.user = user;
         next();
     } catch(err: any){
-        if(err.name === "TokenExpiredError") {
+        if(err instanceof SyntaxError) {
+            return res.status(401).json( { message: "인증 정보가 유효하지 않습니다."});
+        }
+        else if(err.name === "TokenExpiredError") {
             return res.status(401).json( { message: "인증 정보 만료"});
         }
         else if( err.name === "JsonWebTokenError") {
