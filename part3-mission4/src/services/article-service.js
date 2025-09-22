@@ -191,7 +191,7 @@ class ArticleService {
 
   // 게시글 좋아요
   async articleLike(userId, articleId) {
-    const articleLiked = await prisma.product.update({
+    const articleLiked = await prisma.article.update({
       where: { id: parseInt(articleId) },
       data: {
         likedBy: { connect: { id: parseInt(userId) } },
@@ -203,7 +203,7 @@ class ArticleService {
 
   // 게시글 좋아요 취소
   async articleUnlike(userId, articleId) {
-    const articleUnliked = await prisma.product.update({
+    const articleUnliked = await prisma.article.update({
       where: { id: parseInt(articleId) },
       data: {
         likedBy: { disconnect: { id: parseInt(userId) } },
