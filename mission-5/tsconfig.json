@@ -49,7 +49,6 @@
 
     // Recommended Options
     "strict": true,
-    "jsx": "react-jsx",
     "verbatimModuleSyntax": true, // 타입정보 컴파일 이후 삭제
     "isolatedModules": true, // 각 파일 모듈처럼
     "noUncheckedSideEffectImports": true,

@@ -31,3 +31,7 @@ export type FilteredContent = Omit<ItemWithLikes, '_count' | 'likes'> & {
 export interface UserContentResponse {
   data: FilteredContent[] | Comment[];
 }
+
+export type UserContentList = GetUserContent & {
+  userContent: UserWithContent;
+};

@@ -1,7 +1,12 @@
 import { Prisma } from '@prisma/client';
 import { validatePassword, passwordHashing } from '@lib/bcrypt.js';
 import { BadRequestError, UnauthorizedError } from '@lib/errors.js';
-import type { PatchUserData, UserContentResponse, GetUserContent } from '@/types/user.types.js';
+import type {
+  PatchUserData,
+  UserContentResponse,
+  GetUserContent,
+  UserContentList,
+} from '@/types/user.types.js';
 import type { Options, SingularContentType, UserId } from '@/types/shared.type.js';
 import type { UserRepository } from '@/repositories/users.repository.js';
 import { inject, injectable } from 'inversify';
@@ -9,7 +14,54 @@ import { TYPES } from '@/types/layer.types.js';
 
 @injectable()
 export class UserService {
-  constructor(@inject(TYPES.UserRepository) private readonly userRepository: UserRepository) {}
+  constructor(
+    @inject(TYPES.UserRepository)
+    private readonly userRepository: UserRepository
+  ) {}
+  private buildContentQueryOptions({ userId, content }: GetUserContent): Options {
+    let options: Options = {};
+    if (content === 'comments') {
+      options = {
+        select: {
+          [content]: true,
+        },
+      };
+    } else {
+      options = {
+        select: {
+          [content]: {
+            include: {
+              _count: { select: { likes: true } },
+              likes: { where: { userId } },
+            },
+          },
+        },
+      };
+    }
+    return options;
+  }
+  private transformUserContent({
+    userContent,
+    content,
+    userId,
+  }: UserContentList): UserContentResponse {
+    let result: UserContentResponse;
+    if (content === 'products' || content === 'articles') {
+      const contentList = userContent[content] ?? [];
+      const filteredContentList = contentList.map((content) => {
+        const { likes: _likesNouse, _count: _countNoUse, ...filteredContent } = content;
+        return {
+          likeCount: content._count.likes,
+          isLike: userId ? content.likes.length === 1 : false,
+          ...filteredContent,
+        };
+      });
+      result = { data: filteredContentList };
+    } else {
+      result = { data: userContent.comments ?? [] };
+    }
+    return result;
+  }
 
   async getUser({ userId }: UserId) {
     const result = await this.userRepository.findById({ userId });
@@ -42,44 +94,17 @@ export class UserService {
     return result;
   }
   async getUserContentList({ userId, content }: GetUserContent) {
-    let options: Options = {};
-    if (content === 'comments') {
-      options = {
-        select: {
-          [content]: true,
-        },
-      };
-    } else {
-      options = {
-        select: {
-          [content]: {
-            include: {
-              _count: { select: { likes: true } },
-              likes: { where: { userId } },
-            },
-          },
-        },
-      };
-    }
+    const options: Options = this.buildContentQueryOptions({ userId, content });
+
     const userContent = await this.userRepository.findManyContent({
       userId,
       options,
     });
-    let result: UserContentResponse;
-    if (content === 'products' || content === 'articles') {
-      const contentList = userContent[content] ?? [];
-      const filteredContentList = contentList.map((content) => {
-        const { likes: _likesNouse, _count: _countNoUse, ...filteredContent } = content;
-        return {
-          likeCount: content._count.likes,
-          isLike: userId ? content.likes.length === 1 : false,
-          ...filteredContent,
-        };
-      });
-      result = { data: filteredContentList };
-    } else {
-      result = { data: userContent.comments ?? [] };
-    }
+    const result: UserContentResponse = this.transformUserContent({
+      userContent,
+      content,
+      userId,
+    });
     return result;
   }
   async getUserContentLikeList({ userId, content }: GetUserContent) {
@@ -94,7 +119,10 @@ export class UserService {
       default:
         throw new BadRequestError(`'${content}' 타입의 좋아요 목록은 조회할 수 없습니다.`);
     }
-    const result = await this.userRepository.findManyLikeContent({ userId, singularContentType });
+    const result = await this.userRepository.findManyLikeContent({
+      userId,
+      singularContentType,
+    });
     return result;
   }
 }

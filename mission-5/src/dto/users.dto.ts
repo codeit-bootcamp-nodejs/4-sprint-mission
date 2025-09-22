@@ -1,4 +1,4 @@
-import type { GetListParams, Options, singularContentType, UserId } from '@/types/shared.type.js';
+import type { GetListParams, Options, SingularContentType, UserId } from '@/types/shared.type.js';
 import type { Prisma } from '@prisma/client';
 
 export interface UpdateDTO extends UserId {
@@ -15,5 +15,5 @@ export interface findManyContentDTO extends UserId {
   options: Options;
 }
 export interface findManyLikeContentDTO extends UserId {
-  singularContentType: singularContentType;
+  singularContentType: SingularContentType;
 }
