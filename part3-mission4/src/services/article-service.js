@@ -185,29 +185,57 @@ class ArticleService {
     return likedArticles;
   }
 
-  // 게시글 좋아요
-  async articleLike(userId, articleId) {
-    const articleLiked = await prisma.article.update({
-      where: { id: parseInt(articleId) },
-      data: {
-        likedBy: { connect: { id: parseInt(userId) } },
-        likeCount: { increment: 1 },
-      },
-    });
-    return articleLiked;
+async articleLike(userId, articleId) {
+  const alreadyLiked = await prisma.article.findFirst({
+    where: {
+      id: parseInt(articleId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
+
+  if (alreadyLiked) {
+    throw new AppError('이미 좋아요한 게시글입니다.', 400);
   }
 
-  // 게시글 좋아요 취소
-  async articleUnlike(userId, articleId) {
-    const articleUnliked = await prisma.article.update({
+  const [updated] = await prisma.$transaction([
+    prisma.article.update({
       where: { id: parseInt(articleId) },
-      data: {
-        likedBy: { disconnect: { id: parseInt(userId) } },
-        likeCount: { decrement: 1 },
-      },
-    });
-    return articleUnliked;
+      data: { likedBy: { connect: { id: parseInt(userId) } } },
+    }),
+    prisma.article.update({
+      where: { id: parseInt(articleId) },
+      data: { likeCount: { increment: 1 } },
+    }),
+  ]);
+
+  return updated;
+}
+
+// 게시글 좋아요 취소
+async articleUnlike(userId, articleId) {
+  const alreadyLiked = await prisma.article.findFirst({
+    where: {
+      id: parseInt(articleId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
+
+  if (!alreadyLiked) {
+    throw new AppError('좋아요한 기록이 없습니다.', 400);
   }
+
+  const [updated] = await prisma.$transaction([
+    prisma.article.update({
+      where: { id: parseInt(articleId) },
+      data: { likedBy: { disconnect: { id: parseInt(userId) } } },
+    }),
+    prisma.article.update({
+      where: { id: parseInt(articleId) },
+      data: { likeCount: { decrement: 1 } },
+    }),
+  ]);
+
+  return updated;
 }
 
 export const articleService = new ArticleService();
