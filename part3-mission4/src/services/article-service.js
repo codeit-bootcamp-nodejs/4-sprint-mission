@@ -101,10 +101,6 @@ class ArticleService {
       include,
     });
 
-    if (!article) {
-      throw new AppError('존재하지 않는 게시글입니다.', 404);
-    }
-
     const articleWithLike = {
       ...article,
       isLiked: article.likedBy?.length > 0 || false,
