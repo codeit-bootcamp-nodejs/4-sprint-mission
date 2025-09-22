@@ -29,25 +29,57 @@ export const commentRepository = {
     return { message: '댓글이 삭제되었습니다.' };
   },
 
-  // 댓글 좋아요
-  async like(userId, commentId) {
-    return prisma.comment.update({
-      where: { id: parseInt(commentId) },
-      data: {
-        likedBy: { connect: { id: userId } },
-        likeCount: { increment: 1 },
-      },
-    });
-  },
+// 댓글 좋아요
+async like(userId, commentId) {
+  const alreadyLiked = await prisma.comment.findFirst({
+    where: {
+      id: parseInt(commentId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
 
-  // 댓글 좋아요 취소
-  async unlike(userId, commentId) {
-    return prisma.comment.update({
+  if (alreadyLiked) {
+    throw new AppError('이미 좋아요한 댓글입니다.', 400);
+  }
+
+  const [updated] = await prisma.$transaction([
+    prisma.comment.update({
       where: { id: parseInt(commentId) },
-      data: {
-        likedBy: { disconnect: { id: userId } },
-        likeCount: { decrement: 1 },
-      },
-    });
+      data: { likedBy: { connect: { id: parseInt(userId) } } },
+    }),
+    prisma.comment.update({
+      where: { id: parseInt(commentId) },
+      data: { likeCount: { increment: 1 } },
+    }),
+  ]);
+
+  return updated;
+},
+
+// 댓글 좋아요 취소
+async unlike(userId, commentId) {
+  const alreadyLiked = await prisma.comment.findFirst({
+    where: {
+      id: parseInt(commentId),
+      likedBy: { some: { id: parseInt(userId) } },
+    },
+  });
+
+  if (!alreadyLiked) {
+    throw new AppError('좋아요한 기록이 없습니다.', 400);
+  }
+
+  const [updated] = await prisma.$transaction([
+    prisma.comment.update({
+      where: { id: parseInt(commentId) },
+      data: { likedBy: { disconnect: { id: parseInt(userId) } } },
+    }),
+    prisma.comment.update({
+      where: { id: parseInt(commentId) },
+      data: { likeCount: { decrement: 1 } },
+    }),
+  ]);
+
+  return updated;
   },
 };
