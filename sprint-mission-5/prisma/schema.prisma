@@ -1,0 +1,76 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @unique @default(autoincrement())
+  email    String  @unique
+  nickname String
+  image    String?
+  password String
+
+  myProducts   Product[] @relation(name: "myProducts")
+  likeProducts Product[] @relation(name: "likedProduct")
+
+  myArticles   Article[] @relation(name: "myArticles")
+  likeArticles Article[] @relation(name: "likeArticles")
+
+  myComments Comment[]
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+}
+
+model Product {
+  id          Int       @id @unique @default(autoincrement())
+  name        String    @unique
+  description String?
+  tags        String[]
+  price       Decimal   @db.Decimal(10, 2)
+  createdAt   DateTime  @default(now())
+  updateAt    DateTime  @updatedAt
+  comments    Comment[]
+
+  owner   User @relation(fields: [ownerId], references: [id], name: "myProducts")
+  ownerId Int
+
+  likedUsers User[] @relation(name: "likedProduct")
+}
+
+model Article {
+  id        Int       @id @unique @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  comments  Comment[]
+
+  owner   User @relation(fields: [ownerId], references: [id], name: "myArticles")
+  ownerId Int
+
+  likedUsers User[] @relation(name: "likeArticles")
+}
+
+model Comment {
+  id        Int      @id @unique @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+
+  owner   User @relation(fields: [ownerId], references: [id])
+  ownerId Int
+
+  Product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  Article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
+}
