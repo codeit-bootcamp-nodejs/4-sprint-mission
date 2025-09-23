@@ -20,8 +20,8 @@ model User {
   image        String?
   password     String
   refreshToken String?
-  createAt     DateTime  @default(now())
-  updateAt     DateTime  @updatedAt
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
   products     Product[]
   articles     Article[]
   Comment      Comment[]
