@@ -1,25 +1,15 @@
-/uploads
-/generated/prisma
-/generated/
-
-# 의존성 모듈
+# Dependencies
 /node_modules
 
-# 로그
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# 환경 변수
-.env
-.env.local
-.env.development.local
-.env.production.local
-
-# 빌드 및 기타
+# Build output
 /dist
-/build
-.DS_Store
 
-prisma/generated/
-prisma/client/
+# Env
+.env
+
+# Uploads (keep folder, ignore files)
+/uploads/*
+!uploads/.gitkeep
+
+# Prisma generated client
+/generated/
