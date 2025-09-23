@@ -12,6 +12,19 @@
 
 /sprint3
 
+
+/generated/prisma
+
+/.env
+
+/sprint3-sprint4/prisma/migrations
+
+/sprint1
+
+/sprint2
+
+/sprint3
+
 /dist
 
 *.js
