@@ -1,8 +1,9 @@
 import passport from 'passport';
 import localStrategy from '../middlewares/localStrategy.js';
-import accessTokenStrategy from '../middlewares/jwtStrategy.js';
+import jwtStrategy from '../middlewares/jwtStrategy.js';
 
 passport.use(localStrategy);
-passport.use('access-token', accessTokenStrategy);
+passport.use('access-token', jwtStrategy.accessTokenStrategy);
+passport.use('refresh-token', jwtStrategy.refreshTokenStrategy);
 
 export default passport;

@@ -17,6 +17,8 @@ controller.post('/',
             next(error);
         }
     })
+//벨리데이션 필요함 
+
 
 // 상품 수정
 controller.patch('/:productId',

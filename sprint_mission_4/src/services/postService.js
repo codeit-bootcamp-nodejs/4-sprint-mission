@@ -1,6 +1,5 @@
 import postRepository from '../repositories/postRepository.js';
 
-
 async function createPost(postData, userId) {
     return await postRepository.save(postData, userId);
 }

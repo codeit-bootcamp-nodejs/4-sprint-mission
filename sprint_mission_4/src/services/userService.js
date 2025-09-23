@@ -9,7 +9,7 @@ async function hashingPassword(password) {
 }
 
 // 민감 정보 빼기 (password, refreshToken)
-async function filterseneitiveUserData(user) {
+async function filterSensitiveUserData(user) {
     const { password, refreshToken, ...rest } = user;
     return rest;
 }
@@ -22,13 +22,13 @@ async function createUser(user) {
         error.code = 409;
         throw error;
     };
-    const hashedPaaword = await hashingPassword(user.password);
-    const createdUser = await userRepository.save({ ...user, password: hashedPaaword });
-    return filterseneitiveUserData(createdUser);
+    const hashedPassword = await hashingPassword(user.password);
+    const createdUser = await userRepository.save({ ...user, password: hashedPassword });
+    return filterSensitiveUserData(createdUser);
 }
 
 //토큰 만들기 & 리프레시 토큰
-async function createToken(user, type) {
+function createToken(user, type) {
     const payload = { userId: user.id };
     const options = { expiresIn: type === 'refresh' ? '1w' : '1h' };
     return jwt.sign(payload, process.env.JWT_SECRET, options)
@@ -55,8 +55,8 @@ async function getUser(email, password) {
         error.code = 401;
         throw error;
     }
-    await verifyPassword(password, user.password); //패스워드 오류시 여기서 에러 던지고 리턴까지 안 감
-    return filterseneitiveUserData(user);
+    verifyPassword(password, user.password); //패스워드 오류시 여기서 에러 던지고 리턴까지 안 감
+    return filterSensitiveUserData(user);
 }
 
 //유저 정보 조회
@@ -67,21 +67,23 @@ async function getUserId(id) {
         error.code = 401;
         throw error;
     }
-    return filterseneitiveUserData(user);
+    return filterSensitiveUserData(user);
 }
 
 //유저 패스워드 수정
-async function updatePassword(id, password) {
+async function updatePassword(id, currentPassword, newPassword) {
     const user = await userRepository.findById(id);
     if (!user) {
         const error = new Error('User not found');
         error.code = 404;
         throw error;
     }
-    const hashedPassword = await hashingPassword(password);
+    const hashedPassword = await hashingPassword(newPassword);
+    verifyPassword(currentPassword, newPassword);
     await userRepository.updateUserPassword(id, hashedPassword);
-    return filterseneitiveUserData(user);
+    return filterSensitiveUserData(user);
 }
+//if(truth)여야 한다 무조건 ㅇㅋ
 
 //유저가 등록한 상품 조회
 async function getUserProducts(userId) {
@@ -93,7 +95,6 @@ async function getUserProducts(userId) {
     }
     return await productRepository.getUserProduct(userId);
 }
-
 export default {
     createUser,
     createToken,
