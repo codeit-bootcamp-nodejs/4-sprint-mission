@@ -2,15 +2,6 @@
 import prisma from '../lib/prisma.js'
 import type { Request, Response, NextFunction } from 'express';
 
-interface User{
-    id: number,
-    password: string,
-    image: string,
-    email: string,
-
-}
-
-
 class LikeController{
     ArticleLike = async(req: Request,res: Response,next: NextFunction) => {
         const user:any = req.user

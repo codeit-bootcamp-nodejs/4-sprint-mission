@@ -2,7 +2,6 @@
 import productService from '../service/product-service';
 import prisma from '../lib/prisma'
 import type { Request, Response, NextFunction } from 'express';
-import { userInfo } from 'os';
 
 export class ProductController{
     getProducts = async (req: Request,res: Response,next: NextFunction) =>{
@@ -160,8 +159,8 @@ export class ProductController{
                 // err.status = 400;
                 return next(err);
             }
-            const newComment = await prisma.productComment.create({
-                data: {
+             const newComment = await prisma.productComment.create({
+               data: {
                     commentContent,
                     product:{connect:{id}},
                     user:{connect: {id: user.id}}

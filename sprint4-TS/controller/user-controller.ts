@@ -4,13 +4,13 @@ import jsonWebToken from '../lib/json-web-token';
 import userService from '../service/user-service';
 import type { Request, Response, NextFunction } from 'express';
 
-interface User{
+
+export interface User{
     id: number,
     password: string,
     image: string,
     email: string,
 }
-
 
 
 export class UserController{

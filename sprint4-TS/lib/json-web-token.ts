@@ -1,17 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { REFRESH_SECRET_KEY, ACCESS_SECRET_KEY}  from './constants.js'
+import type {User} from '../controller/user-controller.js'
 
 interface payload{
     userId: number
 }
 
-interface User{
-    id: number,
-    password: string,
-    image: string,
-    email: string,
 
-}
 
 
 

@@ -7,7 +7,7 @@
     "main": "node sprint3/main.js",
     "build": "tsc sprint4-TS/*",
     "start": "node sprint4-TS/main.js",
-    "dev": "nodemon --watch sprint4-TS --exec ts-node sprint4-TS/main.ts"
+    "dev": "nodemon --watch sprint4-TS/*/* --exec ts-node sprint4-TS/main.ts"
   },
   "author": "SonJuneYoung",
   "license": "ISC",

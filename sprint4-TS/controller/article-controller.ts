@@ -2,27 +2,19 @@ import express from 'express'
 import prisma from '../lib/prisma'
 import ArticleService from '../service/article-service';
 import type { Request, Response, NextFunction } from 'express';
+import userController from './user-controller';
+import articleService from '../service/article-service';
 
 //모든 게시글 불러오기, 댓글 미포함
-interface User{
-    id: number,
-    password: string,
-    image: string,
-    email: string,
 
-}
 
-interface Article{
+export interface Article{
     id: number,
     title: string,
     articleContent: string,
     createdAt: Date,
     updatedAt: Date,
     userId: number
-}
-
-interface Product{
-    id: number
 }
 
 interface getArticleParams{
@@ -38,8 +30,8 @@ export class ArticleController{
     getArticles = async (req: Request<{},{},{}, getArticleParams>, res: Response, next: NextFunction) =>{
         let {sort ='recent', skip = 0, take=30, searchtitle, searchcontent} = req.query;
     
-        skip = Number(skip);
-        take = Number(take);
+        skip = +skip;
+        take = +take;
         const data: getArticleParams = {sort, skip, take, searchtitle,searchcontent}
         
         const user = req.user;
@@ -64,13 +56,7 @@ export class ArticleController{
             let id = req.params.id;
             id = Number(id);
             const user = req.user;
-            console.log(user)
-            let article = await prisma.article.findUnique({
-                where: {id},
-                include : {comment: true}
-            });
-
-            article = await ArticleService.addIsLiked(user, article);
+            let article = articleService.getOneArticle({id,user});
 
             return res.status(200).send(article);
             
@@ -91,11 +77,10 @@ export class ArticleController{
             return next(err);
         }
         try{
-            let Article =  await prisma.article.create({
-                data: {title,articleContent, userId:user.id}
-            });
+            const Article = await articleService.postArticle({title, articleContent, user})
             console.log("post Article success");
             return res.status(201).send(Article);
+
         }catch(error){
             console.log("post Article failed because of server");
             const err = new Error("Server Error");
@@ -109,13 +94,17 @@ export class ArticleController{
         try{
             const id = Number(req.params.id);
             const {title, articleContent} = req.body;
+            const user: any =  req.user;
 
-            const Article: Article = await prisma.article.update({
-                where:{id},
-                data: {title,articleContent}
-            })
+            if (!user){
+                const err = new Error("login first");
+                // err.status = 500;
+                return next(err);
+            }
+
+            const Article: Article = await articleService.patchArticle({id,title,articleContent,user})
             console.log("patch Article success")
-            return res.status(200).send(Article);
+            return res.status(200).send(Article);   
 
         } catch(error){
             console.log("patch Article failed because of server");
@@ -129,12 +118,11 @@ export class ArticleController{
         try{
             const id = Number(req.params.id);
 
-            await prisma.article.delete({
-                where:{id}
-            });
+            articleService.deleteArticle(id);
 
             console.log("deleting article success");
             return res.status(204).send("deleting completed");
+
         } catch(error){
             console.log("delete Article failed because of server");
             const err = new Error("Server Error");
@@ -172,20 +160,7 @@ export class ArticleController{
         }
 
         try{
-            const newComment = await prisma.articleComment.create({
-            data: {
-                commentContent,
-                article: {
-                    connect: {id: id}
-                },
-                user:{
-                    connect:{
-                        id:user.id
-                    }
-                }
-            },
-
-            });
+            const newComment = await articleService.postComment({commentContent,id,user})
             return res.status(201).send(newComment);
         } catch(error){
             console.error(error);
@@ -209,10 +184,7 @@ export class ArticleController{
                 return next(err)
             }
 
-            const newComment = await prisma.articleComment.update({
-                where:{id:CommentId},
-                data: {commentContent}
-            });
+            const newComment = await articleService.patchComment({commentContent,CommentId})
             
             return res.status(200).send(newComment);
         }catch(error){
@@ -227,9 +199,8 @@ export class ArticleController{
     deleteComment = async (req: Request,res: Response,next:NextFunction) =>{
         try{
             const CommentId= Number(req.params.commentId)
-            await prisma.articleComment.delete({
-                where:{id: CommentId}
-            })
+            await articleService.deleteComment(CommentId);
+
             return res.status(204).send("deleting success");
 
         }catch(error){
