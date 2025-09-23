@@ -1,0 +1,61 @@
+{
+  "compilerOptions": {
+    // Basics
+    "module": "nodenext",
+    "target": "esnext",
+    "types": ["node"],
+    "lib": ["esnext"],
+
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+
+    // File Layout
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": ["components/*"],
+      "@config/*": ["config/*"],
+      "@middleware/*": ["middleware/*"],
+      "@utils/*": ["utils/*"]
+    },
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+
+    // Stricter Typechecking Options
+    "allowJs": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+    "forceConsistentCasingInFileNames": false,
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Recommended Options
+    "incremental": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "moduleResolution": "nodenext"
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
