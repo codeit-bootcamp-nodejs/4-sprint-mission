@@ -38,7 +38,7 @@ const ArticleService = {
       throw error;
     }
 
-    if (article.userId != userId) {
+    if (article.userId !== userId) {
       const error: CustomError = new Error("게시글을 수정할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;
@@ -56,7 +56,7 @@ const ArticleService = {
       throw error;
     }
 
-    if (article.userId != userId) {
+    if (article.userId !== userId) {
       const error: CustomError = new Error("게시글을 삭제할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;

@@ -10,6 +10,11 @@ import type { CustomError } from "src/api/types/error.js";
 const ProductController = {
   async createProduct(req: RequestWithDto<ProductDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const productDto = req.body;
       const newProduct = await ProductService.createProduct(productDto, userId);
@@ -51,6 +56,11 @@ const ProductController = {
 
   async patchProduct(req: RequestWithDto<ProductDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id } = req.params;
       const { id: userId } = req.user;
       const productDto = req.body;
@@ -67,11 +77,16 @@ const ProductController = {
 
   async deleteProduct(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id } = req.params;
       const { id: userId } = req.user;
       await ProductService.deleteProduct(Number(id), userId);
 
-      res.status(204).json({ success: "상품 삭제 성공" });
+      res.status(200).json({ success: "상품 삭제 성공" });
     } catch (err) {
       next(err);
     }

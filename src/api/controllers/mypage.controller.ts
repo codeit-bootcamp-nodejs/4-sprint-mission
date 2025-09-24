@@ -2,10 +2,16 @@ import MypageService from "../services/mypage/mypage.service.js";
 import type { Request, Response, NextFunction } from "express";
 import type { RequestWithDto } from "../types/express.d.ts";
 import type { UpdateUserDto, UpdatePasswordDto } from "../services/mypage/mypage.dto.js";
+import type { CustomError } from "../types/error.js";
 
 const MypageController = {
   async getUser(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
 
       const user = await MypageService.getUser(userId);
@@ -17,6 +23,11 @@ const MypageController = {
 
   async updateUser(req: RequestWithDto<UpdateUserDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const updateUserDTO = req.body;
       const updatedUser = await MypageService.updateUser(userId, updateUserDTO);
@@ -28,6 +39,11 @@ const MypageController = {
 
   async updatePassword(req: RequestWithDto<UpdatePasswordDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const updatePasswordDTO = req.body;
 
@@ -50,12 +66,17 @@ const MypageController = {
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
 
       await MypageService.deleteUser(userId);
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
-      res.status(204).json("회원 탈퇴가 완료되었습니다.");
+      res.status(200).json("회원 탈퇴가 완료되었습니다.");
     } catch (err) {
       next(err);
     }
@@ -63,6 +84,11 @@ const MypageController = {
 
   async getProducts(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
 
       const products = await MypageService.getProducts(userId);
@@ -74,6 +100,11 @@ const MypageController = {
 
   async getLikeProducts(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
 
       const products = await MypageService.getLikeProducts(userId);

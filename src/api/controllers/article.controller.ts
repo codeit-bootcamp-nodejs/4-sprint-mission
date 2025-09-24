@@ -10,6 +10,11 @@ import { FindManyParamsDto } from "../types/dto.js";
 const ArticleController = {
   async createArticle(req: RequestWithDto<ArticleDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const articleDto = req.body;
       const newArticle = await ArticleService.createArticle(articleDto, userId);
@@ -50,6 +55,11 @@ const ArticleController = {
 
   async updateArticle(req: RequestWithDto<ArticleDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const { id } = req.params;
       const articleDto = req.body;
@@ -63,10 +73,15 @@ const ArticleController = {
 
   async deleteArticle(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const { id } = req.params;
       await ArticleService.deleteArticle(Number(id), userId);
-      res.status(204).json({ success: "상품 삭제 성공" });
+      res.status(200).json({ success: "상품 삭제 성공" });
     } catch (err) {
       next(err);
     }

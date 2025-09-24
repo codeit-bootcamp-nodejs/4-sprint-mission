@@ -1,9 +1,15 @@
 import LikeService from "../services/like/like.service.js";
 import type { Request, Response, NextFunction } from "express";
+import type { CustomError } from "../types/error.js";
 
 const LikeController = {
   async toggleLike(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const { type, id } = req.params;
 

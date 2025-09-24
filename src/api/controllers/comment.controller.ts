@@ -3,10 +3,16 @@ import type { Request, Response, NextFunction } from "express";
 import type { RequestWithDto } from "../types/express.d.ts";
 import { CreateCommentDto, UpdateCommentDto } from "../services/comment/comment.dto.js";
 import { FindManyCommentsQueryDto } from "../services/comment/comment-findmany.dto.js";
+import type { CustomError } from "../types/error.js";
 
 const CommentController = {
   async createComment(req: RequestWithDto<CreateCommentDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const commentDto = req.body;
 
@@ -19,6 +25,11 @@ const CommentController = {
 
   async updateComment(req: RequestWithDto<UpdateCommentDto>, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const { id } = req.params;
       const commentDto = req.body;
@@ -32,10 +43,15 @@ const CommentController = {
 
   async deleteComment(req: Request, res: Response, next: NextFunction) {
     try {
+      if (!req.user) {
+        const error: CustomError = new Error("인증이 필요합니다.");
+        error.statusCode = 401;
+        throw error;
+      }
       const { id: userId } = req.user;
       const { id } = req.params;
       await CommentService.deleteComment(Number(id), userId);
-      res.status(204).json({ success: "댓글 삭제" });
+      res.status(200).json({ success: "댓글 삭제" });
     } catch (err) {
       next(err);
     }

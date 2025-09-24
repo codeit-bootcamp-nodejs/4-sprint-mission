@@ -47,7 +47,7 @@ const CommentService = {
       throw error;
     }
 
-    if (comment.userId != userId) {
+    if (comment.userId !== userId) {
       const error: CustomError = new Error("댓글을 수정할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;
@@ -65,7 +65,7 @@ const CommentService = {
       throw error;
     }
 
-    if (comment.userId != userId) {
+    if (comment.userId !== userId) {
       const error: CustomError = new Error("댓글을 삭제할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;

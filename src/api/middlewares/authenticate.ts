@@ -32,7 +32,11 @@ export default async function authenticate(req: Request, res: Response, next: Ne
       return next(error);
     }
 
-    req.user = user;
+    req.user = {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+    };
     next();
   } catch (err) {
     let message;

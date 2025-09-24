@@ -5,13 +5,14 @@ import type { Prisma } from "@prisma/client";
 import type { CustomError } from "../../types/error.js";
 
 const LikeService = {
-  async toggleLike(userId: number, type: string, contentId: number) {
-    const article = await ArticleRepository.findById(contentId);
-
-    if (!article) {
-      const error: CustomError = new Error("존재하지 않는 게시글입니다.");
-      error.statusCode = 404;
-      throw error;
+  async toggleLike(userId: number, type: "article" | "product", contentId: number) {
+    if (type === "article") {
+      const article = await ArticleRepository.findById(contentId);
+      if (!article) {
+        const error: CustomError = new Error("존재하지 않는 게시글입니다.");
+        error.statusCode = 404;
+        throw error;
+      }
     } else {
       const product = await ProductRepository.findById(contentId);
       if (!product) {

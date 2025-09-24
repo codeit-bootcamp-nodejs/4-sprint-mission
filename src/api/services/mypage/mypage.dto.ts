@@ -2,7 +2,6 @@ import { IsString, MinLength, IsUrl, IsOptional } from "class-validator";
 
 export class UpdateUserDto {
   @IsOptional()
-  @IsOptional()
   @MinLength(2, { message: "닉네임은 최소 2자 이상이어야 합니다." })
   nickname?: string;
 

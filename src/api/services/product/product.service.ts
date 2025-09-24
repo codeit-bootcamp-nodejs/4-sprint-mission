@@ -37,7 +37,7 @@ const ProductService = {
       throw error;
     }
 
-    if (product.userId != userId) {
+    if (product.userId !== userId) {
       const error: CustomError = new Error("상품을 수정할 권한이 없습니다.");
       error.statusCode = 403;
       throw error;
