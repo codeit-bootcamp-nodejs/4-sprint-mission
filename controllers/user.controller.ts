@@ -1,3 +1,4 @@
+import type { Request, Response, NextFunction } from "express";
 import {
   editPasswordService,
   editUserService,
@@ -7,20 +8,25 @@ import {
   refreshService,
   signupService,
 } from "../services/user.service.js";
+import { HttpError } from "../middlewares/errorHandler.middleware.js";
 
 // select 대신에 include 를 사용하면 관계된 다른 테이블 데이터 까지 같이 가져올 수 있음.
 
 // 회원가입 기능 구현
-export async function signupController(req, res, next) {
+export async function signupController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // 이메일과 패스워드 프론트에서 가져오기
-    const { email, nickname, password } = req.body;
+    const { email, nickname, password } = req.body as {
+      email: string;
+      nickname: string;
+      password: string;
+    };
 
     // 서비스 로직
     const newUser = await signupService(email, nickname, password);
 
     // 응답
-    return res.status(201).json({
+    res.status(201).json({
       message: "회원가입 성공",
       user: newUser,
     });
@@ -30,10 +36,13 @@ export async function signupController(req, res, next) {
 }
 
 // 로그인 기능 구현
-export async function loginController(req, res, next) {
+export async function loginController(req:Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // email과 password 프론트에서 받아오기
-    const { email, password } = req.body;
+    const { email, password } = req.body as {
+      email: string;
+      password: string;
+    }
 
     // 서비스 로직
     const { safeuser, accessToken, refreshToken } = await loginService(
@@ -54,13 +63,15 @@ export async function loginController(req, res, next) {
 }
 
 //  내 정보 조회
-export async function inquiryController(req, res, next) {
+export async function inquiryController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // 로그인시 발급한 토큰 가져오기
-    const userId = req.user.userId;
-
+    const userIdStr = req.user?.userId;
+    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
+    
+    const userId = Number(userIdStr);
     // 서비스 로직
-    const inquiryUser = await inquiryService(req.user.userId);
+    const inquiryUser = await inquiryService(userId);
 
     // 응답
     res.status(200).json({
@@ -73,12 +84,20 @@ export async function inquiryController(req, res, next) {
 }
 
 // 내 정보 수정
-export async function editUserController(req, res, next) {
+export async function editUserController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // 토큰에서 id정보 가져오기
-    const userId = req.user.userId;
+    const userIdStr = req.user?.userId;
+    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
+    
+    const userId = Number(userIdStr);
     // 수정할 값들 꺼내오기
-    const { password, nickname, email, image } = req.body || {};
+    const { password, nickname, email, image } = req.body as {
+      password?: string;
+      nickname?: string;
+      email?: string;
+      image?: string;
+    };
 
     // 서비스 로직
     const updatedUser = await editUserService(userId, {
@@ -99,17 +118,24 @@ export async function editUserController(req, res, next) {
 }
 
 // 내 비밀번호 수정
-export async function editPasswordController(req, res, next) {
+export async function editPasswordController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // 토큰에서 id 정보 가져오기
-    const userId = req.user.userId;
-    const { currentPassword, newPassword } = req.body;
+     const userIdStr = req.user?.userId;
+    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
+    
+    const userId = Number(userIdStr);
+
+    const { currentPassword, newPassword } = req.body as {
+      currentPassword: string;
+      newPassword: string;
+    };
 
     // 서비스 로직
-    const updatedPassword = await editPasswordService(userId, {
+    const updatedPassword = await editPasswordService(userId, 
       currentPassword,
       newPassword,
-    });
+    );
 
     // 응답
     res.status(200).json({
@@ -122,9 +148,11 @@ export async function editPasswordController(req, res, next) {
 }
 
 // Refresh Token을 이용해 Access Token 재발급
-export async function refreshController(req, res, next) {
+export async function refreshController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { refreshToken } = req.body;
+    const { refreshToken } = req.body as {
+      refreshToken: string;
+    }
 
     // 서비스 로직
     const newAccessToken = await refreshService(refreshToken);
@@ -140,9 +168,12 @@ export async function refreshController(req, res, next) {
 
 // 등록한 상품의 목록 조회 기능
 // 코드 구현간에 상품 아이디를 DB에서 가져와서 있는지 확인하고 보내야하는줄 알고 불필요한 코드를 잘못 작성하여서 수정했음.
-export async function listupController(req, res, next) {
+export async function listupController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const userId = req.user.userId;
+    const userIdStr = req.user?.userId;
+    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
+    
+    const userId = Number(userIdStr);
 
     // 서비스 로직
     const listup = await listupService(userId);
