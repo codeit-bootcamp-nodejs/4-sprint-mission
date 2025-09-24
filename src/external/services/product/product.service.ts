@@ -1,10 +1,11 @@
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
+import type { CreateProductDto, PatchProductDto, ProductListQuery, ProductListResponse } from "./product.dto.js";
 
 const BASE_URL = "https://panda-market-api-crud.vercel.app/products";
 
 const ProductService = {
   // 상품 리스트 조회
-  async getProductList(query) {
+  async getProductList(query?: ProductListQuery): Promise<ProductListResponse> {
     const url = new URL(BASE_URL);
 
     for (let key in query) {
@@ -14,7 +15,7 @@ const ProductService = {
     }
 
     try {
-      const res = await axios.get(url);
+      const res = await axios.get(url.toString());
       const data = await res.data;
       return data;
     } catch (err) {
@@ -24,7 +25,7 @@ const ProductService = {
   },
 
   // 개별 상품 조회
-  async getProduct(id) {
+  async getProduct(id: string) {
     try {
       const res = await axios.get(`${BASE_URL}/${id}`);
       const data = await res.data;
@@ -36,7 +37,7 @@ const ProductService = {
   },
 
   // 상품 등록
-  async createProduct(productData) {
+  async createProduct(productData: CreateProductDto) {
     try {
       const res = await axios.post(BASE_URL, productData);
       const data = await res.data;
@@ -48,7 +49,7 @@ const ProductService = {
   },
 
   // 상품 정보 수정
-  async patchProduct(id, productPatchData) {
+  async patchProduct(id: string, productPatchData: PatchProductDto) {
     try {
       const res = await axios.patch(`${BASE_URL}/${id}`, productPatchData);
       const data = res.data;
@@ -60,7 +61,7 @@ const ProductService = {
   },
 
   // 상품 삭제
-  async deleteProduct(id) {
+  async deleteProduct(id: string) {
     try {
       const res = await axios.delete(`${BASE_URL}/${id}`);
       const data = res.data;

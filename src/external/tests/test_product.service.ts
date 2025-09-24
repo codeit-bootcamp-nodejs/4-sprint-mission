@@ -1,4 +1,4 @@
-import ProductService from "../services/ProductService.js";
+import ProductService from "../services/product/product.service.js";
 
 // const res = await ProductService.getProductList();
 // console.log(res);
@@ -42,10 +42,7 @@ export async function testAllProductService() {
   console.log("-------개별 상품 수정--------");
   try {
     const patchProductData = { name: "이름을 수정함" };
-    const updated = await ProductService.patchProduct(
-      createdId,
-      patchProductData
-    );
+    const updated = await ProductService.patchProduct(createdId, patchProductData);
     console.log(`[상품 정보 수정 성공]`, updated);
   } catch (err) {
     console.log(`❌`, err);

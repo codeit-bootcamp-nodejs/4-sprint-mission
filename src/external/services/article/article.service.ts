@@ -1,20 +1,24 @@
+import type { ArticleListQuery, ArticleListResponse, CreateArticleDto, PatchArticleDto } from "./article.dto.js";
+
 const BASE_URL = "https://panda-market-api-crud.vercel.app/articles";
 
 const ArticleService = {
   // 기사 목록 조회
-  getArticleList(query) {
+  getArticleList(query?: ArticleListQuery): Promise<ArticleListResponse> {
     const url = new URL(BASE_URL);
 
-    for (const [key, value] of Object.entries(query)) {
-      if (value !== undefined) {
-        url.searchParams.append(key, value);
+    if (query) {
+      for (const key in query) {
+        if (query[key] !== undefined) {
+          url.searchParams.append(key, String(query[key]));
+        }
       }
     }
 
-    return fetch(url)
+    return fetch(url.toString())
       .then((res) => {
         if (!res.ok) throw new Error(`[error] 상태 코드: ${res.status}`);
-        return res.json();
+        return res.json() as Promise<ArticleListResponse>; // 이후에 수정..
       })
       .catch((err) => {
         console.error("[error] 요청 실패:", err.message);
@@ -23,7 +27,7 @@ const ArticleService = {
   },
 
   // 특정 기사 조회
-  getArticle(id) {
+  getArticle(id: string) {
     return fetch(`${BASE_URL}/${id}`)
       .then((res) => {
         if (!res.ok) throw new Error(`[error] 상태 코드: ${res.status}`);
@@ -36,7 +40,7 @@ const ArticleService = {
   },
 
   // 기사 생성
-  createArticle(articleData) {
+  createArticle(articleData: CreateArticleDto) {
     return fetch(BASE_URL, {
       method: "POST",
       headers: {
@@ -55,7 +59,7 @@ const ArticleService = {
   },
 
   // 기사 수정
-  patchArticle(id, articlePatchData) {
+  patchArticle(id: string, articlePatchData: PatchArticleDto) {
     return fetch(`${BASE_URL}/${id}`, {
       method: "PATCH",
       headers: {
@@ -74,7 +78,7 @@ const ArticleService = {
   },
 
   // 기사 삭제
-  deleteArticle(id) {
+  deleteArticle(id: string) {
     return fetch(`${BASE_URL}/${id}`, {
       method: "DELETE",
     })

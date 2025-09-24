@@ -1,4 +1,6 @@
-import ArticleService from "../services/ArticleService.js";
+import { create } from "node_modules/axios/index.cjs";
+import ArticleService from "../services/article/article.service.js";
+import { isArticleData } from "../services/article/article.dto.js";
 
 // const res = await ArticleService.getArticleList();
 // console.log(res.list.length);
@@ -26,7 +28,10 @@ export async function testAllArticleService() {
       image: "https://example.com/...",
     };
     const created = await ArticleService.createArticle(newArticle);
-    createdId = created.id;
+
+    if (isArticleData(created)) {
+      createdId = created.id;
+    }
     console.log(`생성한 기사 id : ${createdId}`);
   } catch (err) {
     console.log("❌", err);
@@ -34,25 +39,31 @@ export async function testAllArticleService() {
 
   console.log("--------특정 기사 조회---------");
   try {
-    const article = await ArticleService.getArticle(createdId);
-    console.log(`[생성한 기사]`, article);
+    if (createdId) {
+      const article = await ArticleService.getArticle(createdId);
+      console.log(`[생성한 기사]`, article);
+    }
   } catch (err) {
     console.log("❌", err);
   }
 
   console.log("--------기사 수정---------");
   try {
-    const patchData = { title: "제목 수정했음" };
-    const updated = await ArticleService.patchArticle(createdId, patchData);
-    console.log(`[기사 정보 수정 성공]`, updated);
+    const patchData = { title: "제목 수정했음", content: "수정된 내용" };
+    if (createdId) {
+      const updated = await ArticleService.patchArticle(createdId, patchData);
+      console.log(`[기사 정보 수정 성공]`, updated);
+    }
   } catch (err) {
     console.log("❌", err);
   }
 
   console.log("--------기사 삭제---------");
   try {
-    const deleted = await ArticleService.deleteArticle(createdId);
-    console.log(`[기사 삭제 성공]`, deleted);
+    if (createdId) {
+      const deleted = await ArticleService.deleteArticle(createdId);
+      console.log(`[기사 삭제 성공]`, deleted);
+    }
   } catch (err) {
     console.log("❌", err);
   }
