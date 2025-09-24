@@ -12,7 +12,7 @@ router.patch(
   "/:id",
   authenticate,
   validateParams(CommentIdParamDto),
-  validateDto(CreateCommentDto),
+  validateDto(UpdateCommentDto),
   CommentController.updateComment
 );
 router.delete("/:id", authenticate, validateParams(CommentIdParamDto), CommentController.deleteComment);

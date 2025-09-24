@@ -19,7 +19,7 @@ export class ProductDto {
 
     dto.name = data.name;
     dto.price = data.price;
-    dto.tags = dto.tags;
+    dto.tags = data.tags;
 
     return dto;
   }

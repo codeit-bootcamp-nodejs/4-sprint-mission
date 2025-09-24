@@ -15,6 +15,11 @@ const ProductService = {
   async findUniqueProduct(productId: number, userId: number) {
     const product = await ProductRepository.findById(productId);
 
+    if (!product) {
+      const error: CustomError = new Error("존재하지 않는 상품입니다.");
+      error.statusCode = 404;
+      throw error;
+    }
     if (!userId) {
       return { ...product, isLiked: false };
     }

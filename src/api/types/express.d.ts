@@ -1,6 +1,5 @@
 import { Request } from "express";
 import { AuthenticatedUser } from "./user";
-import type { number } from "zod";
 
 declare global {
   namespace Express {

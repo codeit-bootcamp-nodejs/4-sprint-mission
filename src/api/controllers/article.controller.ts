@@ -36,7 +36,7 @@ const ArticleController = {
             error.statusCode = 403;
             throw error;
           }
-          userId = decoded.userId;
+          userId = decoded.id;
         } catch (err) {
           console.error("토큰 검증 오류:", err);
         }

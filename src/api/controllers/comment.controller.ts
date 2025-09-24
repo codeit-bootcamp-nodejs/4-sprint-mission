@@ -17,7 +17,7 @@ const CommentController = {
     }
   },
 
-  async updateComment(req: RequestWithDto<CreateCommentDto>, res: Response, next: NextFunction) {
+  async updateComment(req: RequestWithDto<UpdateCommentDto>, res: Response, next: NextFunction) {
     try {
       const { id: userId } = req.user;
       const { id } = req.params;
