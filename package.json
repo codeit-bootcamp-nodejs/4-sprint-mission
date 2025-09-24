@@ -1,11 +1,11 @@
 {
-  "name": "4",
+  "name": "5",
   "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
+  "main": "dist/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "dev": "nodemon --watch src --exec ts-node src/app.ts",
+    "start": "node dist/app.js"
   },
   "repository": {
     "type": "git",
@@ -20,14 +20,24 @@
   "homepage": "https://github.com/ammgree/4-sprint-mission#readme",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.1",
     "bcrypt": "^6.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.2",
-    "path": "^0.12.7"
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   }
 }
