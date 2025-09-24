@@ -78,8 +78,7 @@ FROM
     orders
 WHERE
     date = '2025-03-12'
-    AND time BETWEEN '00:00:00'
-    AND '11:59:59';
+    AND time < '12:00:00';
 
 -- 10. `pizza_types` 테이블에서 이름에 'Cheese' 혹은 'Chicken'이 포함된 피자 종류를 조회하세요. (대소문자를 구분합니다)
 SELECT
@@ -127,7 +126,6 @@ WHERE
         WHERE
             price > 20
     );
-
 
 -- 4. `orders` 테이블에서 각 날짜별 총 주문 건수를 `order_count` 라는 이름으로 계산하고, 하루 총 주문 건수가 80건 이상인 날짜만 조회한 뒤, 주문 건수가 많은 순서대로 정렬하세요.
 SELECT
@@ -319,4 +317,3 @@ GROUP BY
     pt.name
 ORDER BY
     total_revenue DESC;
-
