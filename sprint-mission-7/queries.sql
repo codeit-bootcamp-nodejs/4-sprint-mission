@@ -32,6 +32,7 @@ OFFSET 20;
 SELECT COUNT(*) AS product_total
 FROM "Product"
 WHERE userId = 1;
+
 /*
   4. 내가 좋아요 누른 상품 조회
   - 현재 로그인한 유저 id가 1이라고 가정
@@ -88,6 +89,7 @@ OFFSET 0;
 SELECT *
 FROM "Product"
 WHERE id = 1;
+
 /*
   9. 상품 정보 수정
   - 1번 상품 수정
@@ -98,6 +100,7 @@ SET name = '수정된 상품명',
     price = 15000,
     tags = ARRAY['updated', 'tag']
 WHERE id = 1;
+
 /*
   10. 상품 삭제
   - 1번 상품 삭제
@@ -111,6 +114,7 @@ WHERE id = 1;
 */
 INSERT INTO "ProductLike" (userId, productId)
 VALUES (1, 2);
+
 /*
   12. 상품 좋아요 취소
   - 1번 유저가 2번 상품 좋아요 취소

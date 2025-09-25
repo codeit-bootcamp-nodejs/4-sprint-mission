@@ -35,8 +35,6 @@ CREATE TABLE "Article" (
     CONSTRAINT fk_article_user FOREIGN KEY (userId) REFERENCES "User"(id) ON DELETE SET NULL
 );
 
-
-
 CREATE TABLE "ProductComment" (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
