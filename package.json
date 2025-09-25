@@ -6,7 +6,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "main": "node sprint3/main.js"
     "test": "echo \"Error: no test specified\" && exit 1",
-    "main": "node sprint3/main.js"
+    "main": "node sprint3/main.js",
+    "build": "tsc sprint4-TS/*",
+    "start": "node sprint4-TS/main.js",
+    "dev": "nodemon --watch sprint4-TS/*/* --exec ts-node sprint4-TS/main.ts"
   },
   "author": "SonJuneYoung",
   "license": "ISC",
@@ -14,8 +17,11 @@
   "type": "module",
   "dependencies": {
     "@prisma/client": "^6.13.0",
+    "@types/express": "^5.0.3",
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cookieparser": "^0.1.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "image-resize": "^1.4.1",
@@ -26,7 +32,18 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
-    "prisma": "^6.13.0"
+    "@tsconfig/recommended": "^1.0.10",
+    "@types/bcrypt": "^6.0.0",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.4.0",
+    "@types/passport": "^1.0.17",
+    "@types/passport-jwt": "^4.0.1",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.13.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

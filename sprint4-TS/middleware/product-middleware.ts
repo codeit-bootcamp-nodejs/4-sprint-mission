@@ -1,8 +1,9 @@
 import multer from "multer";
 import express from 'express';
+import prisma from '../lib/prisma'
+import type { Request, Response, NextFunction } from 'express';
 
-
-export function ProductValid(req,res,next){
+export function ProductValid(req: Request,res: Response,next: NextFunction){
     const {name,description, price, tags} = req.body;
     try{
         if (typeof(name) =='undefined' || typeof(description) =='undefined'||
@@ -17,11 +18,11 @@ export function ProductValid(req,res,next){
 }
 
 export class ProductMiddleware{
-    validateId = async(req,res,next) => {
-        const id = number(req.params.id);
+    validateId = async(req: Request,res: Response,next: NextFunction) => {
+        const id = Number(req.params.id);
         if (!id){
             const err = new Error("invalid parameter")
-            err.status = 400;
+            // err.status = 400;
             return next(err);
         }
     
@@ -29,30 +30,30 @@ export class ProductMiddleware{
             where:{id},
             include: {comment:true}
         });
-        if (!product){
+        if (!Product){
             const err = new Error("No content")
-            err.status = 404;
+            // err.status = 404;
             return next(err);
         }
 
         next()
     }
 
-    validateForm = async(req,res,next) => {
+    validateForm = async(req: Request,res: Response,next: NextFunction) => {
         const {name,description, price, tags} = req.body;
         if (!name|| !description ||!price || !tags){
             const err = new Error("invalid body data");
-            err.status = 400;
+            // err.status = 400;
             return next(err)
         }
         next()
     }
     
-    validateCommentId = async(req,res,next) => {
+    validateCommentId = async(req: Request,res: Response,next: NextFunction) => {
         const CommentId = Number(req.params.commentId);
         if (!CommentId){
             const err = new Error("invalid parameter")
-            err.status = 400;
+            // err.status = 400;
             return next(err);
         }
         next()

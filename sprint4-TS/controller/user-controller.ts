@@ -1,11 +1,21 @@
 import bcrypt from 'bcrypt'
-import prisma from '../lib/prisma.js'
-import jsonWebToken from '../lib/json-web-token.js';
-import userService from '../service/user-service.js';
+import prisma from '../lib/prisma'
+import jsonWebToken from '../lib/json-web-token';
+import userService from '../service/user-service';
+import type { Request, Response, NextFunction } from 'express';
+
+
+export interface User{
+    id: number,
+    password: string,
+    image: string,
+    email: string,
+}
+
 
 export class UserController{
     //회원가입 유효성 검사 필요
-    register = async(req,res,next) => {
+    register = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {email, nickname, password, image} = req.body;
         
@@ -20,7 +30,7 @@ export class UserController{
         
     }
 
-    login = async(req,res,next) => {
+    login = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {email, password} = req.body;
             const user = await prisma.user.findUnique({
@@ -40,7 +50,7 @@ export class UserController{
         
     }
 
-    getUser = async(req,res,next) => {
+    getUser = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const user = req.user ;
             return res.send(userService.formatUser(user))
@@ -51,10 +61,11 @@ export class UserController{
         
     }
 
-    patchUser = async(req,res,next) => {
+    patchUser = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {nickname, image} = req.body;
-            const userId = Number(req.user.id);
+            const user:any = req.user
+            const userId = Number(user.id);
             const patchUser = await prisma.user.update({
                 where:{id:userId},
                 data:{nickname,image}
@@ -67,10 +78,11 @@ export class UserController{
         
     }
 
-    patchPassword = async(req,res,next) => {
+    patchPassword = async(req: Request,res: Response,next: NextFunction) => {
         try{
             const {password} = req.body;
-            const userId = Number(req.user.id);
+            const user:any = req.user
+            const userId = Number(user.id);
             const patchUser = await prisma.user.update({
                 where:{id:userId},
                 data:{password}
@@ -82,7 +94,7 @@ export class UserController{
         }
     }
 
-    getUserProduct = async(req,res, next) => {
+    getUserProduct = async(req: Request,res: Response,next: NextFunction) => {
         const userId = Number(req.params.userId);
         try{
             const user = prisma.user.findUnique({
@@ -100,13 +112,13 @@ export class UserController{
         
     }
 
-    getLikedProduct = async(req, res, next) => {
-        const user = req.user
+    getLikedProduct = async(req: Request,res: Response,next: NextFunction) => {
+        const user:any = req.user
 
         //likeModels는 유저, product의 정보를 가진 좋아요 모델의 list 
         const likedModels = user.productLike;
         //like models를 바탕으로 현재 로그인 한 유저가 좋아요 한 product들을 가져옵니다
-        const likedProducList = await userService.likedProdcut(likedModels)
+        const likedProducList = await userService.likedProduct(likedModels)
 
         return res.send(likedProducList)
     }

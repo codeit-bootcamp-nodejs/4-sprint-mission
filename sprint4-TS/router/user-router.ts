@@ -1,9 +1,9 @@
 import express from 'express';
-import userController from '../controller/user-controller.js';
+import userController from '../controller/user-controller';
 import passport from 'passport';
-import { checkUserAuth } from '../middleware/auth-middleware.js';
-import { authUserWithParmaId } from '../lib/passport-lib.js';
-import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants.js';
+import { checkUserAuth } from '../middleware/auth-middleware';
+// import { authUserWithParmaId } from '../lib/passport-lib';
+import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants';
 
 const userRouter = express.Router();
 
