@@ -1,4 +1,4 @@
-export function validateProdCreate(req, res, next) {
+export function validateProductCreate(req, res, next) {
   const { name, price, tags } = req.body;
 
   if (!name || !price) {
@@ -6,24 +6,28 @@ export function validateProdCreate(req, res, next) {
   }
   if (tags !== undefined) {
     if (!Array.isArray(tags) || !tags.every((tag) => typeof tag === "string")) {
-      return res.status(400).json({ error: "tags는 문자열 배열이여야 합니다." });
+      return res
+        .status(400)
+        .json({ error: "tags는 문자열 배열이여야 합니다." });
     }
   }
   next();
 }
 
-export function validateProdUpdate(req, res, next) {
+export function validateProductUpdate(req, res, next) {
   const { tags } = req.body;
 
   if (tags !== undefined) {
     if (!Array.isArray(tags) || !tags.every((tag) => typeof tag === "string")) {
-      return res.status(400).json({ error: "tags는 문자열 배열이여야 합니다." });
+      return res
+        .status(400)
+        .json({ error: "tags는 문자열 배열이여야 합니다." });
     }
   }
   next();
 }
 
-export function validateProdQuery(req, res, next) {
+export function validateProductQuery(req, res, next) {
   const allowedKeys = ["offset", "limit", "name", "description"];
 
   const queryKeys = Object.keys(req.query);
@@ -37,17 +41,24 @@ export function validateProdQuery(req, res, next) {
   const { name, description } = req.query;
 
   if (name !== undefined && (typeof name !== "string" || name.trim() === "")) {
-    return res.status(400).json({ error: "name은은 공백 없는 문자열이여야합니다." });
+    return res
+      .status(400)
+      .json({ error: "name은은 공백 없는 문자열이여야합니다." });
   }
 
-  if (description !== undefined && (typeof description !== "string" || description.trim() === "")) {
-    return res.status(400).json({ error: "description는 공백 없는 문자열이여야합니다." });
+  if (
+    description !== undefined &&
+    (typeof description !== "string" || description.trim() === "")
+  ) {
+    return res
+      .status(400)
+      .json({ error: "description는 공백 없는 문자열이여야합니다." });
   }
 
   next();
 }
 
-export function validateArtCreate(req, res, next) {
+export function validateArticleCreate(req, res, next) {
   const { title, content } = req.body;
 
   if (!title || !content) {
@@ -57,7 +68,7 @@ export function validateArtCreate(req, res, next) {
   next();
 }
 
-export function validateArtQuery(req, res, next) {
+export function validateArticleQuery(req, res, next) {
   const allowedKeys = ["offset", "limit", "title", "content"];
 
   const queryKeys = Object.keys(req.query);
@@ -70,12 +81,22 @@ export function validateArtQuery(req, res, next) {
 
   const { title, content } = req.query;
 
-  if (title !== undefined && (typeof title !== "string" || title.trim() === "")) {
-    return res.status(400).json({ error: "title은 공백 없는 문자열이여야합니다." });
+  if (
+    title !== undefined &&
+    (typeof title !== "string" || title.trim() === "")
+  ) {
+    return res
+      .status(400)
+      .json({ error: "title은 공백 없는 문자열이여야합니다." });
   }
 
-  if (content !== undefined && (typeof content !== "string" || content.trim() === "")) {
-    return res.status(400).json({ error: "content는 공백 없는 문자열이여야합니다." });
+  if (
+    content !== undefined &&
+    (typeof content !== "string" || content.trim() === "")
+  ) {
+    return res
+      .status(400)
+      .json({ error: "content는 공백 없는 문자열이여야합니다." });
   }
 
   next();
@@ -123,7 +144,9 @@ export function validateId(req, res, next) {
     (articleId !== null && isNaN(articleId)) ||
     (productId !== null && isNaN(productId))
   ) {
-    return res.status(400).json({ error: "잘못된 ID 입니다. 숫자여야 합니다." });
+    return res
+      .status(400)
+      .json({ error: "잘못된 ID 입니다. 숫자여야 합니다." });
   }
   next();
 }

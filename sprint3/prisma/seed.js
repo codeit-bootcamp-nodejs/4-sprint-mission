@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 const seed = async () => {
+  console.log("Start seeding ...");
+
   await prisma.article.create({
     data: {
       title: "게시글",
@@ -17,6 +19,8 @@ const seed = async () => {
       tags: ["tag1", "tag2"],
     },
   });
+
+  console.log(`✅ Seeding finished.`);
 };
 
 seed().then(() => prisma.$disconnect());
