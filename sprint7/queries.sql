@@ -1,6 +1,6 @@
 -- psql -h localhost -p 5432 -U postgres   
 -- \c sprint7
--- /home/sonj0407/sql-practice/sprint7/queries.sql
+-- \i /home/sonj0407/sql-practice/sprint7/queries.sql
 
 
 /*
@@ -55,7 +55,7 @@ WHERE p.user_id = 1;
 
 SELECT p.*
   FROM product As p
-JOIN "like" AS l
+JOIN product_like AS l
   ON l.product_id = p.id
 WHERE p.user_id = 1
 ORDER BY p.created_at DESC
@@ -73,7 +73,7 @@ LIMIT 10 ;
 */
 SELECT *
 FROM product as p
-JOIN "like" as l
+JOIN product_like as l
   ON l.product_id= p.id
 WHERE l.user_id = 1;
 
@@ -137,7 +137,7 @@ DELETE FROM product
   11. 상품 좋아요
   - 1번 유저가 2번 상품 좋아요
 */
-INSERT INTO "like" (user_id, product_id)
+INSERT INTO product_like (user_id, product_id)
   VALUES (1,2) 
 
 
@@ -145,7 +145,7 @@ INSERT INTO "like" (user_id, product_id)
   12. 상품 좋아요 취소
   - 1번 유저가 2번 상품 좋아요 취소
 */
-DELETE FROM "like"
+DELETE FROM product_like
   WHERE
    user_id = 1 AND
    product_id = 2
@@ -156,7 +156,7 @@ DELETE FROM "like"
   13. 상품 댓글 작성
   - 1번 유저가 2번 상품에 댓글 작성
 */
-INSERT INTO comment (user_id, product_id, content)
+INSERT INTO product_comment (user_id, product_id, content)
 VALUES 
   (1,2, '이 상품은 정말 좋아요 ')
 
@@ -171,9 +171,13 @@ VALUES
 
 SELECT *
 FROM product as p
-JOIN comment as c
+JOIN product_comment as c
   ON p.id = c.product_id
 WHERE c.updated_at<'2025-03-25 00:00:00'
 ORDER BY c.updated_at DESC
 LIMIT 10
 
+
+
+
+  

@@ -34,6 +34,22 @@ CREATE TABLE
   );
 
 
+-- comment 에서 product_comment로 변경, 아직 실제 db에 적용되지 않았음 
+CREATE TABLE 
+  product_comment (
+    id SERIAL PRIMARY KEY ,
+    content VARCHAR(70) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
+    user_id INTEGER,
+    product_id INTEGER,
+    CONSTRAINT fk_user
+      FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_product
+      FOREIGN KEY (product_id) REFERENCES product(id)
+  );
+
+
 
 CREATE TABLE
   article (
@@ -49,26 +65,28 @@ CREATE TABLE
   );
 
 
-
+-- article comment추가, 아직 db에 적용되지 않았음(지금 없는 상태)
 CREATE TABLE 
-  comment (
+  article_comment (
     id SERIAL PRIMARY KEY ,
     content VARCHAR(70) NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     user_id INTEGER,
-    product_id INTEGER,
+    article_id INTEGER,
     CONSTRAINT fk_user
       FOREIGN KEY (user_id) REFERENCES "user"(id),
     CONSTRAINT fk_article
-      FOREIGN KEY (product_id) REFERENCES product(id)
+      FOREIGN KEY (article_id) REFERENCES article(id)
   );
 
 
 
 
+
+-- 이름을 like에서 product_like로 변경, db에 적용되지 않았음 
 CREATE TABLE 
-  "like" (
+  product_like (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
     product_id INTEGER,
@@ -76,6 +94,20 @@ CREATE TABLE
       FOREIGN KEY (user_id) REFERENCES "user"(id),
     CONSTRAINT fk_product
       FOREIGN KEY (product_id) REFERENCES product(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+
+  -- article_like 생성, db에 적용되지 않았음 
+CREATE TABLE 
+  article_like (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER,
+    article_id INTEGER,
+    CONSTRAINT fk_user
+      FOREIGN KEY (user_id) REFERENCES "user"(id),
+    CONSTRAINT fk_article
+      FOREIGN KEY (article_id) REFERENCES article(id),
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   );
@@ -104,27 +136,35 @@ INSERT INTO article (title,content,image,user_id)
     ('두번째 기사', '기사의 내용' , 'naver.com' , 1);
 
 
--- comment 생성 
-INSERT INTO comment (content, user_id, product_id)
+
+
+-- product comment 생성 
+INSERT INTO product_comment (content, user_id, product_id)
   VALUES 
     ('와 이 상품 정말 좋군요', 1, 1),
     ('생각보다 괜찮더라구요', 2, 1);
 
+-- article comment  생성
+INSERT INTO article_comment (content, user_id, article_id)
+  VALUES 
+    ('좋은 게시글 입니다', 1, 1),
+    ('잘 읽고 갑니다', 2, 1);
 
--- like 생성 
-INSERT INTO "like" (user_id, product_id)
+
+-- product_like 생성 
+INSERT INTO product_like (user_id, product_id)
+  VALUES 
+    (1 , 1);
+
+-- article_like 생성
+INSERT INTO article_like (user_id, article_id)
   VALUES 
     (1 , 1);
 
 
 
 
-  -- foreign key 설정하기                     완료 
-  -- like n:m 모델 생성하기                    완료
-  -- tag 어떻게 구상할지 생각하기               완료
-  -- default now 문법 맞는지 검사하기          완료
-  -- seeding 하기                            완료
-  -- image에 string만 담을지, 이미지 자체를 담을지 생각하기    완료 
-  -- psql 접속해서 데이터베이스 생성하고, 데이터 베이스에 들어가고, 테이블 생성하기 완료
-  -- 문제들 실제로 작동하는지 체크하기           
-  -- article, product에 각각 comment를 적용할 것인지?
+  -- 스키마에 관한 고민
+
+
+  -- queries에서 바뀐 모델 이름 수정하기 
