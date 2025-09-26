@@ -23,7 +23,7 @@ CREATE TABLE
     id SERIAL PRIMARY KEY,
     name VARCHAR(10) NOT NULL,
     description VARCHAR(100) NOT NULL,
-    image VARCHAR(100) ,
+    image text[] ,
     price INTEGER NOT NULL,
     tag TEXT[],
     user_id INTEGER,
@@ -56,7 +56,7 @@ CREATE TABLE
     id SERIAL PRIMARY KEY,
     title VARCHAR(10) NOT NULL,
     content VARCHAR(10) NOT NULL,
-    image VARCHAR(10) NOT NULL,
+    image text[] NOT NULL,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     user_id INTEGER,
@@ -127,13 +127,13 @@ INSERT INTO "user" (email,password,nickname)
 
 -- product 생성
 INSERT INTO product (name, description, image, price, tag, user_id)
-  VALUES ('첫번째 물건', '손준영의 물건', 'http:localhost:3000', 40000, ARRAY['첫번째 태그'], 1)
+  VALUES ('첫번째 물건', '손준영의 물건', ['http:localhost:3000'], 40000, ARRAY['첫번째 태그'], 1)
 
 -- article 생성 
 INSERT INTO article (title,content,image,user_id)
   VALUES 
-    ('첫번째 기사', '기사의 내용' , 'naver.com' , 1),
-    ('두번째 기사', '기사의 내용' , 'naver.com' , 1);
+    ('첫번째 기사', '기사의 내용' , ['naver.com'] , 1),
+    ('두번째 기사', '기사의 내용' , ['naver.com'] , 1);
 
 
 
