@@ -1,0 +1,13 @@
+{
+  "prismaERDPreviewer.preferredTheme": "light",
+  // 파일을 저장할 때마다 포맷팅 실행
+  "editor.formatOnSave": true,
+
+  // 저장 시 모든 ESLint 문제를 자동으로 수정
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+  },
+
+  // 여러 포맷터가 있을 경우 Prettier를 기본으로 사용
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}

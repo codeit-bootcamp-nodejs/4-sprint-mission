@@ -1,0 +1,70 @@
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // File Layout
+    "baseUrl": ".",
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "paths": {
+      "@/*": ["src/*"],
+      // lib 폴더를 위한 별칭
+      "@lib/*": ["src/lib/*"],
+      "@types/*": ["src/types/*"],
+      // services 폴더를 위한 별칭
+      "@services/*": ["src/services/*"],
+      // controllers 폴더를 위한 별칭
+      "@controllers/*": ["src/controllers/*"],
+      "@validations/*": ["src/validations/*"],
+      "@routers/*": ["src/routers/*"],
+      "@middlewares/*": ["src/middlewares/*"]
+    },
+
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "es2024",
+    // "types": ["node"],
+    // For nodejs:
+    "lib": ["esnext"],
+    "types": ["node"],
+    // and npm install -D @types/node
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true, // 인덱스 엄격 검사
+    "exactOptionalPropertyTypes": true, // 옵셔널에 널방지
+
+    // Style Options
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "strict": true,
+    "verbatimModuleSyntax": true, // 타입정보 컴파일 이후 삭제
+    "isolatedModules": true, // 각 파일 모듈처럼
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true, // 직접 설치한 라이브러리 타입 검사 건너뜀
+
+    "esModuleInterop": true, // 'require'와 'import' 호환
+    "resolveJsonModule": true, // .json 확장자로 import된 모듈을 포함
+
+    // inversify
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": ["src/**/*", "test", "src/**/*.d.ts"],
+  "exclude": ["node_modules", "eslint.config.ts", "tsconfig.json"], // 컴파일에서 제외할 목록
+  "ts-node": {
+    "esm": true
+  }
+}
