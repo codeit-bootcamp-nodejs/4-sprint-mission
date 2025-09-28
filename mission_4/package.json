@@ -1,0 +1,31 @@
+{
+  "name": "sprint_mission_3",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.13.0"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "type": "module"
+}
