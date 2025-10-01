@@ -47,11 +47,9 @@ OFFSET 20;
   5. 내가 좋아요 누른 상품의 총 개수
   - 현재 로그인한 유저 id가 1이라고 가정
 */
-SELECT COUNT(p.*) 
-FROM "Product" as p
-JOIN "ProductLike" as pl
-on p.id = pl."productId"
-WHERE pl."userId" = 1;
+SELECT COUNT(*) AS "총 개수"
+FROM "ProductLike"
+WHERE "userId" = 1;
 
 /*
   6. 상품 생성
