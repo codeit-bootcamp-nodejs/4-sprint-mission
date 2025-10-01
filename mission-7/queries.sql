@@ -96,7 +96,9 @@ DELETE FROM "Product" WHERE id = 1;
   11. 상품 좋아요
   - 1번 유저가 2번 상품 좋아요
 */
-INSERT INTO "ProductLike" ("userId", "productId") VALUES (1, 2);
+INSERT INTO "ProductLike" ("userId","productId")
+VALUES (1, 2)
+ON CONFLICT DO NOTHING;
 
 /*
   12. 상품 좋아요 취소
