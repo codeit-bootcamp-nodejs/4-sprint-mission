@@ -120,5 +120,11 @@ SELECT *
 FROM "Comment"
 WHERE "productId" = 1 and "createdAt" < '2025-03-25'
 ORDER BY "createdAt" DESC
+SELECT *
+FROM "Comment"
+WHERE "productId" = 1
+  AND "articleId" IS NULL
+  AND "createdAt" < TIMESTAMP '2025-03-25'
+ORDER BY "createdAt" DESC, id DESC
 LIMIT 10;
 
