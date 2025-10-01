@@ -65,13 +65,16 @@ INSERT INTO "Product" (name, description, price, tags, "userId") VALUES ('테스
   - 10개씩 페이지네이션, 1번째 페이지
   - 각 상품의 좋아요 개수를 포함해서 조회하기
 */
-SELECT p.*, count(pl."productId") as "좋아요 수"
-FROM "Product" as p
-LEFT JOIN "ProductLike" as pl
-ON p.id = pl."productId"
-WHERE p.name Like '%test%'
-GROUP BY p.id
-ORDER BY p."createdAt" DESC
+SELECT p.*, COALESCE(l.like_cnt, 0) AS "좋아요 수"
+FROM "Product" AS p
+LEFT JOIN (
+  SELECT "productId", COUNT(*) AS like_cnt
+  FROM "ProductLike"
+  GROUP BY "productId"
+) AS l
+  ON l."productId" = p.id
+WHERE p.name LIKE '%test%'
+ORDER BY p."createdAt" DESC, p.id DESC
 LIMIT 10;
 
 /*
