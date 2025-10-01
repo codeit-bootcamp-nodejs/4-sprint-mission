@@ -30,7 +30,12 @@ CREATE TABLE "public"."Comment"(
 
     userId INTEGER,
     productId INTEGER,
-    articleId INTEGER
+    articleId INTEGER,
+    
+    -- 정확히 하나만 허용
+    CONSTRAINT comment_target_xor CHECK (
+      (( "productId" IS NOT NULL )::int + ( "articleId" IS NOT NULL )::int) = 1
+    ),
 );
 
 CREATE TABLE "public"."Image"(
