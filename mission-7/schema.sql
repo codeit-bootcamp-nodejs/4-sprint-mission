@@ -51,8 +51,19 @@ CREATE TABLE "public"."User"(
     nickname VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     refreshToken VARCHAR(512) UNIQUE, 
+    providerId VARCHAR(255),
+    providerType VARCHAR(255),
     createdAt TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt TIMESTAMP(3) NOT NULL
+    updatedAt TIMESTAMP(3) NOT NULL,
+
+    -- 소셜 로그인 고유성 보장
+    CONSTRAINT user_provider_unique UNIQUE (providerType, providerId),
+
+    -- providerType / providerId 둘 다 NULL 또는 둘 다 NOT NULL만 허용
+    CONSTRAINT user_provider_check CHECK (
+        (providerType IS NULL AND providerId IS NULL)
+        OR (providerType IS NOT NULL AND providerId IS NOT NULL)
+    )
 );
 
 CREATE TABLE "public"."ProductLike"(
