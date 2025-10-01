@@ -19,7 +19,7 @@ UPDATE "User" SET nickname = 'test' WHERE id = 1;
   - 10개씩 페이지네이션, 3번째 페이지
 */
 -- INSERT INTO "Product" (name, description, price, tags, "userId") VALUES ('test 상품', '테스트입니다.', 10000, ARRAY['test1', 'test2'], 2);
-SELECT * FROM "Product" WHERE "userId" = 1 LIMIT 10 OFFSET 20;
+SELECT * FROM "Product" WHERE "userId" = 1 ORDER BY "createdAt" DESC, id DESC LIMIT 10 OFFSET 20;
 -- SELECT * from "Product";
 
 /*
