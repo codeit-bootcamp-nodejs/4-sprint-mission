@@ -1,0 +1,132 @@
+erDiagram
+    users ||--o{ products : "sells"
+    users ||--o{ product_likes : "likes"
+    users ||--o{ product_comments : "writes"
+    users ||--o{ reservations : "reserves"
+    users ||--o{ posts : "authors"
+    users ||--o{ post_comments : "writes"
+    users ||--o{ post_likes : "likes"
+
+    categories ||--o{ products : "categorizes"
+
+    products ||--o{ product_images : "has"
+    products ||--o{ product_likes : "liked_by"
+    products ||--o{ product_comments : "has_comments"
+    products ||--o{ product_tags : "tagged_with"
+    products ||--o{ reservations : "reserved"
+
+    tags ||--o{ product_tags : "used_in"
+
+    boards ||--o{ posts : "contains"
+
+    posts ||--o{ post_comments : "has_comments"
+    posts ||--o{ post_likes : "liked_by"
+
+    product_comments ||--o{ product_comments : "replies_to"
+    post_comments ||--o{ post_comments : "replies_to"
+
+    users {
+        bigint id PK
+        varchar email UK "NOT NULL"
+        varchar password_hash "NOT NULL"
+        varchar nickname UK "NOT NULL"
+        text profile_image
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    categories {
+        bigint id PK
+        varchar name UK "NOT NULL"
+    }
+
+    tags {
+        bigint id PK
+        varchar name UK "NOT NULL"
+    }
+
+    products {
+        bigint id PK
+        bigint seller_id FK "NOT NULL"
+        bigint category_id FK
+        varchar name "NOT NULL"
+        text description "NOT NULL"
+        numeric price "NOT NULL, >= 0"
+        varchar condition "NOT NULL, DEFAULT NEW"
+        varchar status "NOT NULL, DEFAULT FOR_SALE"
+        int like_count "NOT NULL, DEFAULT 0"
+        int view_count "NOT NULL, DEFAULT 0"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    product_images {
+        bigint id PK
+        bigint product_id FK "NOT NULL"
+        text url "NOT NULL"
+        int sort_order "NOT NULL, DEFAULT 0"
+        timestamptz created_at "NOT NULL"
+    }
+
+    product_tags {
+        bigint product_id PK,FK "NOT NULL"
+        bigint tag_id PK,FK "NOT NULL"
+    }
+
+    product_likes {
+        bigint user_id PK,FK "NOT NULL"
+        bigint product_id PK,FK "NOT NULL"
+        timestamptz created_at "NOT NULL"
+    }
+
+    product_comments {
+        bigint id PK
+        bigint product_id FK "NOT NULL"
+        bigint user_id FK "NOT NULL"
+        bigint parent_id FK
+        text content "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    reservations {
+        bigint id PK
+        bigint product_id FK "NOT NULL"
+        bigint buyer_id FK "NOT NULL"
+        varchar status "NOT NULL, DEFAULT REQUESTED"
+        varchar message
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    boards {
+        bigint id PK
+        varchar code UK "NOT NULL"
+        varchar name "NOT NULL"
+    }
+
+    posts {
+        bigint id PK
+        bigint board_id FK "NOT NULL"
+        bigint author_id FK "NOT NULL"
+        varchar title "NOT NULL"
+        text content "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    post_comments {
+        bigint id PK
+        bigint post_id FK "NOT NULL"
+        bigint user_id FK "NOT NULL"
+        bigint parent_id FK
+        text content "NOT NULL"
+        timestamptz created_at "NOT NULL"
+        timestamptz updated_at "NOT NULL"
+    }
+
+    post_likes {
+        bigint user_id PK,FK "NOT NULL"
+        bigint post_id PK,FK "NOT NULL"
+        timestamptz created_at "NOT NULL"
+    }
