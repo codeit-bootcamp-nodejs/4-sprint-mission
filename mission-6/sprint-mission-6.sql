@@ -55,7 +55,7 @@ where name like '%Cheese%' or name like '%Chicken%';
 -- # 중급 문제
 
 -- 1. `order_details` 테이블에서 각 피자(`pizza_id`)별로 주문된 건 수(`order_id`)를 보여주세요.
-select pizza_id, count(order_id) as "주문 건 수" 
+select pizza_id, count(distinct order_id) as "주문 건 수" 
 from order_details 
 group by pizza_id;
 
@@ -75,14 +75,14 @@ where pizza_id in (select id
 select date, count(id) as order_count 
 from orders 
 group by date 
-having count(id) > 80 
+having count(id) >= 80 
 order by order_count desc;
 
 -- 5. `order_details` 테이블에서 피자별(`pizza_id`) 총 주문 수량이 10개 이상인 피자만 조회하고, 총 주문 수량 기준으로 내림차순 정렬하세요.
 select pizza_id, sum(quantity) as "총 주문 수량" 
 from order_details 
 group by pizza_id 
-having count(quantity) > 10 
+having count(quantity) >= 10 
 order by "총 주문 수량" desc; 
 
 -- 6. `order_details` 테이블에서 피자별 총 수익을 `total_revenue` 라는 이름으로 구하세요. (수익 = `quantity * price`)
@@ -104,11 +104,12 @@ order by o.date desc;
 
 
 --    1. 피자별(`pizzas.id` 기준) 판매 수량 순위에서 피자별 판매 수량 상위에 드는 베스트 피자를 10개를 조회해 주세요. `pizzas`의 모든 컬럼을 조회하면서 각 피자에 해당하는 판매량을 `total_quantity`라는 이름으로 함께 조회합니다.
-        select p.*, sum(od.quantity) as "total_quantity"
+        select p.id, p.type_id, p.size, p.price,
+       SUM(od.quantity) AS "total_quantity"
         from pizzas as p
         join order_details as od
         on od.pizza_id = p.id
-        group by p.id
+        group by p.id, p.type_id, p.size, p.price
         order by "total_quantity" desc
         limit 10;
         -- 출력 예시:
@@ -178,11 +179,12 @@ order by o.date desc;
 
 
     -- 4. `order_details`와 `pizzas` 테이블을 JOIN해서 피자 크기별(S, M, L) 총 수익을 계산하고, 크기별 수익을 출력하세요.
-        select p.size, sum(od.quantity * p.price)
+        select p.size, sum(od.quantity * p.price) AS "total_revenue"
         from order_details as od
         join pizzas as p
         on od.pizza_id = p.id
-        group by p.size;
+        group by p.size
+        ORDER BY "total_revenue" DESC;
     --     출력 예시:
         
     --     ```sql
