@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String?
+  image     String?
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  products Product[]
+  posts    Article[]
+  comments Comment[]
+}
+
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int?
+  tags        String[] // PostgreSQL 배열 타입
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerId     Int
+  owner       User     @relation(fields: [ownerId], references: [id])
+  comments    Comment[]
+}
+
+model Article {
+  id        Int    @id @default(autoincrement())
+  title     String
+  content   String
+  ownerId   Int
+  owner     User      @relation(fields: [ownerId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  authorId  Int
+  author    User      @relation(fields: [authorId], references: [id])
+  productId Int?
+  product   Product?  @relation(fields: [productId], references: [id])
+  articleId Int?
+  article   Article?  @relation(fields: [articleId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
