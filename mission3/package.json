@@ -1,0 +1,23 @@
+{
+  "name": "mission3",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:push": "prisma db push --schema=./prisma/schema/"
+  },
+  "prisma": {
+    "schema": "./prisma/schema/",
+    "seed": "node prisma/seed.js"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^6.13.0",
+    "dotenv": "^17.2.1",
+    "multer": "^2.0.2",
+    "zod": "^4.0.15"
+  }
+}
