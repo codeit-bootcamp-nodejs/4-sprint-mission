@@ -5,6 +5,7 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "start": "node dist/app.js",
     "dev": "nodemon",
     "dev:ts": "ts-node -r tsconfig-paths/register src/app.ts",
