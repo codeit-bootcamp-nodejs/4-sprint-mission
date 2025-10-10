@@ -1,0 +1,187 @@
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { UserRepository } from '../repository/user-repository';
+import { ProductRepository } from '../repository/product-repository';
+import {
+  ChangePasswordDto,
+  SignInDto,
+  SignUpDto,
+  TokensResponseDto,
+  UpdateUserInfoDto,
+  UserResponseDto,
+  RefreshTokenResponseDto,
+} from '../types/dto';
+import { Product, Article } from '@prisma/client';
+
+export class UserService {
+  constructor(
+    private userRepository: UserRepository,
+    private productRepository: ProductRepository,
+  ) {}
+
+  signUp = async (signUpDto: SignUpDto): Promise<UserResponseDto> => {
+    const { email, nickname, password } = signUpDto;
+    if (!email || !nickname || !password) {
+      throw new Error('필수 정보가 누락되었습니다.');
+    }
+
+    const existingUser = await this.userRepository.findUserByEmail(email);
+    if (existingUser) {
+      throw new Error('이미 사용 중인 이메일입니다.');
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await this.userRepository.createUser(
+      email,
+      nickname,
+      hashedPassword,
+    );
+
+    const { password: _, ...userWithoutPassword } = newUser;
+    return userWithoutPassword;
+  };
+
+  signIn = async (signInDto: SignInDto): Promise<TokensResponseDto> => {
+    const { email, password } = signInDto;
+    if (!email || !password) {
+      throw new Error('이메일과 비밀번호를 모두 입력해주세요.');
+    }
+
+    const user = await this.userRepository.findUserByEmail(email);
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      throw new Error('비밀번호가 일치하지 않습니다.');
+    }
+
+    const accessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: '1h',
+    });
+
+    const refreshToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET!, {
+      expiresIn: '7d',
+    });
+
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.userRepository.updateUser(user.id, {
+      currentHashedRefreshToken: hashedRefreshToken,
+    });
+
+    return { accessToken, refreshToken };
+  };
+
+  refreshToken = async (
+    refreshToken: string,
+  ): Promise<RefreshTokenResponseDto> => {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_SECRET!,
+    ) as jwt.JwtPayload;
+    const userId = decoded.userId;
+
+    const user = await this.userRepository.findUserById(userId);
+    if (!user || !user.currentHashedRefreshToken) {
+      throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    const isTokenValid = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken,
+    );
+    if (!isTokenValid) {
+      throw new Error('유효하지 않은 리프레시 토큰입니다.');
+    }
+
+    const newAccessToken = jwt.sign(
+      { userId: user.id },
+      process.env.JWT_SECRET!,
+      {
+        expiresIn: '1h',
+      },
+    );
+
+    return { accessToken: newAccessToken };
+  };
+
+  signOut = async (userId: number): Promise<void> => {
+    await this.userRepository.updateUser(userId, {
+      currentHashedRefreshToken: null,
+    });
+  };
+
+  getUserInfo = async (userId: number): Promise<UserResponseDto> => {
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  };
+
+  updateUserInfo = async (
+    userId: number,
+    updateUserInfoDto: UpdateUserInfoDto,
+  ): Promise<UserResponseDto> => {
+    const { nickname, image } = updateUserInfoDto;
+    const dataToUpdate: UpdateUserInfoDto = {};
+
+    if (nickname) dataToUpdate.nickname = nickname;
+    if (image) dataToUpdate.image = image;
+
+    if (Object.keys(dataToUpdate).length === 0) {
+      throw new Error('수정할 정보를 입력해주세요.');
+    }
+
+    const updatedUser = await this.userRepository.updateUser(
+      userId,
+      dataToUpdate,
+    );
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  };
+
+  changePassword = async (
+    userId: number,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> => {
+    const { currentPassword, newPassword } = changePasswordDto;
+    if (!currentPassword || !newPassword) {
+      throw new Error('현재 비밀번호와 새 비밀번호를 모두 입력해주세요.');
+    }
+
+    const user = await this.userRepository.findUserById(userId);
+    if (!user) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new Error('현재 비밀번호가 일치하지 않습니다.');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.userRepository.updateUser(userId, {
+      password: hashedNewPassword,
+    });
+  };
+
+  getMyProducts = async (userId: number): Promise<Partial<Product>[]> => {
+    return await this.productRepository.findProductsByUserId(userId);
+  };
+
+  getLikedProducts = async (userId: number): Promise<Partial<Product>[]> => {
+    return await this.userRepository.findLikedProductsByUserId(userId);
+  };
+
+  getLikedArticles = async (userId: number): Promise<Partial<Article>[]> => {
+    return await this.userRepository.findLikedArticlesByUserId(userId);
+  };
+}
