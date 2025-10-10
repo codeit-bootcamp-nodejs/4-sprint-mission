@@ -1,37 +1,45 @@
-import *as productService from './ProductService.js';
-import *as articleService from './ArticleService.js';
+import * as dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
 
-async function main() {
+import container from './src/container.js';
+import productRouter from './src/routes/product.route.js';
+import articleRouter from './src/routes/article.route.js';
+import imageRouter from './src/routes/image.route.js';
+import userRouter from './src/route/user-router.js';
+import { errorHandler } from './src/middleware/index.js';
 
-    console.log('=====getProductList() 테스트=====');
-    await productService.getProductList(1, 2); // page, pageSize, keyword, orderBy = 'recent'
+dotenv.config();
 
-    console.log('=====getProduct() 테스트=====');
-    await productService.getProduct(1274); // productId = undefined
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    console.log('=====createProduct() 테스트=====');
-    await productService.createProduct("상품이름", "상품설명", 10, ["전자제품"], ["https://example.com/..."]); // name, description, price, tags, images
+app.use(cors());
+app.use(express.json());
 
-    console.log('=====patchProduct() 테스트=====');
-    await productService.patchProduct("상품이름", "상품설명", 10, ["제품"], ["https://example.com/..."], 1280); // name, description, price, tags, images, productId = undefined
+const {
+  productController,
+  articleController,
+  commentController,
+  imageController,
+  userController,
+  validationMiddleware,
+  imageMiddleware,
+} = container;
 
-    console.log('=====deleteProduct() 테스트=====');
-    await productService.deleteProduct(1275); // productId = undefined
+app.use(
+  '/products',
+  productRouter(productController, commentController, validationMiddleware),
+);
+app.use(
+  '/articles',
+  articleRouter(articleController, commentController, validationMiddleware),
+);
+app.use('/users', userRouter(userController));
+app.use('/uploads', imageRouter(imageController, imageMiddleware));
 
-    await console.log('=====getArticleList() 테스트=====');
-    await articleService.getArticleList(1, 1) // page, pageSize, keyword, orderBy = 'recent'
+app.use(errorHandler);
 
-    await console.log('=====getArticle() 테스트====='); // articleId = undefined
-    await articleService.getArticle(1733);
-
-    await console.log('=====createArticle() 테스트=====');
-    await articleService.createArticle("기사제목", "기사내용", "https://example.com/...") // title, content, image
-
-    await console.log('=====patchArticle() 테스트=====');
-    await articleService.patchArticle("기사제목", "기사내용", "https://example.com/...", 1733) // title, content, image, articleId = undefined
-
-    await console.log('=====deleteArticle() 테스트=====');
-    await articleService.deleteArticle(1717)// articleId = undefined)
-}
-
-main();
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

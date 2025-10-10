@@ -14,48 +14,83 @@ generator client {
 }
 
 model Product {
-  id              Int               @id @default(autoincrement())
-  name            String 
-  description     String 
-  price           Int
-  tags            String[]
-  comments        ProductComment[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  comments Comment[]
+  likes    ProductLike[]
 }
 
 model Article {
-  id              Int               @id @default(autoincrement())
-  title           String 
-  content         String 
-  comments        ArticleComment[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  comments Comment[]
+  likes    ArticleLike[]
 }
 
 model Comment {
-  id              Int               @id @default(autoincrement())
-  content         String 
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  productComment  ProductComment?
-  articleComment  ArticleComment?
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  Product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  Article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
 }
 
-model ProductComment {
-  product         Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId       Int
-  comment         Comment           @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId       Int               @unique
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String
+  image     String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@id([productId, commentId])
+  currentHashedRefreshToken String?
+
+  products Product[]
+  articles Article[]
+  comments Comment[]
+
+  productLikes ProductLike[]
+  articleLikes ArticleLike[]
 }
 
-model ArticleComment {
-  article         Article           @relation(fields: [articleId], references: [id], onDelete: Cascade)
-  articleId       Int
-  comment         Comment           @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId       Int               @unique
+model ProductLike {
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
 
-  @@id([articleId, commentId])
+  @@id([userId, productId])
+}
+
+model ArticleLike {
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int
+
+  @@id([userId, articleId])
 }
