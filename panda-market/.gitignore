@@ -25,8 +25,6 @@ yarn-error.log*
 .env.*.local
 
 # Prisma
-/prisma/migrations/
-prisma/migrations/
 prisma/dev.db
 /prisma/dev.db-journal
 
