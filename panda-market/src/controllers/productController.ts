@@ -7,15 +7,18 @@ import {
   hasTokenPayload,
 } from '@/types/guard.js';
 import { BadRequestError } from '@/lib/errors.js';
-import type { ProductService } from '@/services/productService.js';
+import type { ProductService } from '@/services/product.service.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
+import { ProductLikeService } from '@/services/product-like.service.js';
 
 @injectable()
 export class ProductController {
   constructor(
     @inject(TYPES.ProductService)
     private readonly productService: ProductService,
+    @inject(TYPES.ProductLikeService)
+    private readonly productLikeService: ProductLikeService,
   ) {}
 
   getProduct: RequestHandler = async (req, res) => {
@@ -82,7 +85,7 @@ export class ProductController {
     }
     const { id: productId } = req.parsedId;
     const { userId } = req.tokenPayload;
-    const result = await this.productService.postProductLike({
+    const result = await this.productLikeService.postProductLike({
       userId,
       productId,
     });
@@ -94,7 +97,7 @@ export class ProductController {
     }
     const { id: productId } = req.parsedId;
     const { userId } = req.tokenPayload;
-    const result = await this.productService.deleteProductLike({
+    const result = await this.productLikeService.deleteProductLike({
       userId,
       productId,
     });

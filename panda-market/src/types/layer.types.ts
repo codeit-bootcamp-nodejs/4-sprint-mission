@@ -20,6 +20,7 @@ export const TYPES = {
   CommentService: Symbol.for('CommentService'),
   AuthService: Symbol.for('AuthService'),
   FileService: Symbol.for('FileService'),
+  ProductLikeService: Symbol.for('ProductLikeService'),
 
   // Controllers
   UserController: Symbol.for('UserController'),

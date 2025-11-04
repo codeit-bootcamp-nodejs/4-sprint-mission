@@ -9,7 +9,7 @@ import { CommentRepository } from '@/repositories/comments.repository.js';
 import { FileRepository } from '@/repositories/files.repository.js';
 import { AuthRepository } from '@/repositories/auths.repository.js';
 import { UserService } from '@/services/userService.js';
-import { ProductService } from '@/services/productService.js';
+import { ProductService } from '@/services/product.service.js';
 import { CommentService } from '@/services/commentService.js';
 import { FileService } from '@/services/fileService.js';
 import { AuthService } from '@/services/authService.js';
@@ -23,6 +23,7 @@ import { ArticleController } from '@/controllers/articleController.js';
 import { TagRepository } from '@/repositories/tags.repository.js';
 import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
 import { ProductImageRepository } from '@/repositories/product-images.repository.js';
+import { ProductLikeService } from '@/services/product-like.service.js';
 
 const container = new Container();
 
@@ -47,6 +48,7 @@ container.bind(TYPES.CommentService).to(CommentService).inSingletonScope();
 container.bind(TYPES.FileService).to(FileService).inSingletonScope();
 container.bind(TYPES.AuthService).to(AuthService).inSingletonScope();
 container.bind(TYPES.ArticleService).to(ArticleService).inSingletonScope();
+container.bind(TYPES.ProductLikeService).to(ProductLikeService).inSingletonScope();
 
 // controllers
 container.bind(TYPES.UserController).to(UserController).inSingletonScope();
