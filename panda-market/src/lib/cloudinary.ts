@@ -5,6 +5,7 @@ import {
   CLOUDINARY_CLOUD_NAME,
 } from './constants.js';
 import fs from 'fs';
+import { BadRequestError } from './errors.js';
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
@@ -35,5 +36,40 @@ export async function deleteCloudinaryFile(publicId: string) {
     throw new Error(
       `Cloudinary에서 이미지 ${publicId} 삭제 중 알 수 없는 에러 발생: ${String(err)}`,
     );
+  }
+}
+
+export function extractPublicIdFromCloudinaryUrl(imageUrl: string): string {
+  try {
+    const pivot = '/upload/';
+    const uploadIndex = imageUrl.indexOf(pivot);
+
+    if (uploadIndex === -1) {
+      throw new BadRequestError('올바르지 않는 imageUrl 입니다');
+    }
+
+    let tail = imageUrl.slice(uploadIndex + pivot.length);
+    const segments = tail.split('/');
+
+    // v123456 형태의 버전 번호 제거
+    if (segments[0].startsWith('v') && /^\d+$/.test(segments[0].slice(1))) {
+      segments.shift();
+    }
+
+    // 변환 파라미터 제거 (예: c_fill,w_200 등)
+    while (
+      segments.length &&
+      /[,_]/.test(segments[0]) &&
+      !segments[0].includes('.')
+    ) {
+      segments.shift();
+    }
+
+    const joined = segments.join('/');
+    const lastDotIndex = joined.lastIndexOf('.');
+
+    return lastDotIndex > -1 ? joined.slice(0, lastDotIndex) : joined;
+  } catch {
+    throw new BadRequestError('올바르지 않는 imageUrl 입니다');
   }
 }
