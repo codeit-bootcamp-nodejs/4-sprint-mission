@@ -5,12 +5,18 @@ export type SingleContent = 'product' | 'article' | 'comment';
 
 export type ParentContentType = Exclude<Content, 'comments'>;
 export type SingularContentType = Exclude<SingleContent, 'comment'>;
+
 export interface EntityId {
   id: number;
 }
 export interface UserId {
   userId: number;
 }
+
+export interface Transaction {
+  tx?: Prisma.TransactionClient;
+}
+
 export interface GetListParams extends UserId {
   keyword: string;
   page: number;

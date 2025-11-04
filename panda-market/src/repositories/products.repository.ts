@@ -1,20 +1,20 @@
 import type {
   CreateDTO,
-  DeleteDTO,
-  FindByIdDTO,
-  FindManyDTO,
-  LikeDTO,
-  UnlikeDTO,
+  ProductIdWithTx,
+  ProductParams,
   UpdateDTO,
 } from '@/dto/products.dto.js';
 import type { ProductId } from '@/types/product.types.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
+import { GetListParams } from '@/types/shared.type.js';
 
 @injectable()
 export class ProductRepository {
-  constructor(@inject(TYPES.PrismaClient) private readonly prisma: PrismaClient) {}
+  constructor(
+    @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
+  ) {}
 
   async findOwnerById({ productId }: ProductId) {
     return await this.prisma.product.findUniqueOrThrow({
@@ -22,19 +22,9 @@ export class ProductRepository {
       select: { userId: true },
     });
   }
-  async create({ userId, name, description, price, tags }: CreateDTO) {
-    return await this.prisma.product.create({
-      data: {
-        name,
-        description,
-        price,
-        tags,
-        userId,
-      },
-    });
-  }
-  async findById({ productId, userId }: FindByIdDTO) {
-    return await this.prisma.product.findUniqueOrThrow({
+  async findById({ productId, userId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.product.findUniqueOrThrow({
       where: {
         id: productId,
       },
@@ -50,11 +40,7 @@ export class ProductRepository {
             userId,
           },
         },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
+        likeCount: true,
         user: {
           select: {
             id: true,
@@ -65,10 +51,13 @@ export class ProductRepository {
       },
     });
   }
-  async findMany({ keyword, page, pageSize, userId }: FindManyDTO) {
+  async findMany({ keyword, page, pageSize, userId }: GetListParams) {
     return await this.prisma.product.findMany({
       where: {
-        OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
+        OR: [
+          { name: { contains: keyword } },
+          { description: { contains: keyword } },
+        ],
       },
       select: {
         id: true,
@@ -80,11 +69,7 @@ export class ProductRepository {
             userId,
           },
         },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
+        likeCount: true,
         user: {
           select: {
             id: true,
@@ -100,19 +85,28 @@ export class ProductRepository {
       },
     });
   }
-  async update({ productId, data }: UpdateDTO) {
-    return await this.prisma.product.update({
+  async create({ tx, createData: data }: CreateDTO) {
+    const db = tx || this.prisma;
+    return await db.product.create({
+      data: data,
+    });
+  }
+  async update({ productId, tx, patchData: data }: UpdateDTO) {
+    const db = tx || this.prisma;
+    return await db.product.update({
       where: { id: productId },
       data,
     });
   }
-  async delete({ productId }: DeleteDTO) {
-    return await this.prisma.product.delete({
+  async delete({ productId, tx }: ProductIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.product.delete({
       where: { id: productId },
     });
   }
-  async like({ userId, productId }: LikeDTO) {
-    return await this.prisma.productLike.create({
+  async like({ userId, productId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.productLike.create({
       data: {
         userId,
         productId,
@@ -122,8 +116,9 @@ export class ProductRepository {
       },
     });
   }
-  async unlike({ userId, productId }: UnlikeDTO) {
-    return await this.prisma.productLike.delete({
+  async unlike({ userId, productId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.productLike.delete({
       where: {
         userId_productId: {
           userId,

@@ -9,6 +9,9 @@ export const TYPES = {
   CommentRepository: Symbol.for('CommentRepository'),
   AuthRepository: Symbol.for('AuthRepository'),
   FileRepository: Symbol.for('FileRepository'),
+  TagRepository: Symbol.for('TagRepository'),
+  ProductLikeRepository: Symbol.for('ProductLikeRepository'),
+  ProductImageRepository: Symbol.for('ProductImageRepository'),
 
   // Services
   UserService: Symbol.for('UserService'),

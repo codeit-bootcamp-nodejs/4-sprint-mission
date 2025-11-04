@@ -1,25 +1,28 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
-import { TYPES } from '../types/layer.types.js';
+import { TYPES } from '@/types/layer.types.js';
 import prisma from './prisma.js';
-import { UserRepository } from '../repositories/users.repository.js';
-import { ArticleRepository } from '../repositories/articles.repository.js';
-import { ProductRepository } from '../repositories/products.repository.js';
-import { CommentRepository } from '../repositories/comments.repository.js';
-import { FileRepository } from '../repositories/files.repository.js';
-import { AuthRepository } from '../repositories/auths.repository.js';
-import { UserService } from '../services/userService.js';
-import { ProductService } from '../services/productService.js';
-import { CommentService } from '../services/commentService.js';
-import { FileService } from '../services/fileService.js';
-import { AuthService } from '../services/authService.js';
-import { ArticleService } from '../services/articleService.js';
-import { UserController } from '../controllers/userController.js';
-import { ProductController } from '../controllers/productController.js';
-import { CommentController } from '../controllers/commentController.js';
-import { FileController } from '../controllers/fileController.js';
-import { AuthController } from '../controllers/authController.js';
-import { ArticleController } from '../controllers/articleController.js';
+import { UserRepository } from '@/repositories/users.repository.js';
+import { ArticleRepository } from '@/repositories/articles.repository.js';
+import { ProductRepository } from '@/repositories/products.repository.js';
+import { CommentRepository } from '@/repositories/comments.repository.js';
+import { FileRepository } from '@/repositories/files.repository.js';
+import { AuthRepository } from '@/repositories/auths.repository.js';
+import { UserService } from '@/services/userService.js';
+import { ProductService } from '@/services/productService.js';
+import { CommentService } from '@/services/commentService.js';
+import { FileService } from '@/services/fileService.js';
+import { AuthService } from '@/services/authService.js';
+import { ArticleService } from '@/services/articleService.js';
+import { UserController } from '@/controllers/userController.js';
+import { ProductController } from '@/controllers/productController.js';
+import { CommentController } from '@/controllers/commentController.js';
+import { FileController } from '@/controllers/fileController.js';
+import { AuthController } from '@/controllers/authController.js';
+import { ArticleController } from '@/controllers/articleController.js';
+import { TagRepository } from '@/repositories/tags.repository.js';
+import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
+import { ProductImageRepository } from '@/repositories/product-images.repository.js';
 
 const container = new Container();
 
@@ -32,6 +35,10 @@ container.bind(TYPES.CommentRepository).to(CommentRepository).inSingletonScope()
 container.bind(TYPES.FileRepository).to(FileRepository).inSingletonScope();
 container.bind(TYPES.AuthRepository).to(AuthRepository).inSingletonScope();
 container.bind(TYPES.ArticleRepository).to(ArticleRepository).inSingletonScope();
+container.bind(TYPES.TagRepository).to(TagRepository).inSingletonScope();
+container.bind(TYPES.ProductLikeRepository).to(ProductLikeRepository).inSingletonScope();
+container.bind(TYPES.ProductImageRepository).to(ProductImageRepository).inSingletonScope();
+
 
 // services
 container.bind(TYPES.UserService).to(UserService).inSingletonScope();

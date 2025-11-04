@@ -42,11 +42,11 @@ export class ProductController {
     if (!hasTokenPayload(req)) {
       throw new BadRequestError();
     }
-    // const { id: userId } = req.tokenPayload;
     const { userId } = req.tokenPayload;
+    const data = req.body;
     const result = await this.productService.postProduct({
       userId,
-      ...req.body,
+      data,
     });
     return res.status(201).json(result);
   };

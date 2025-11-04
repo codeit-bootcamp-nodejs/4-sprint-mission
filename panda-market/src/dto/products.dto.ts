@@ -1,29 +1,23 @@
-import type { GetListParams, UserId } from '@/types/shared.type.js';
-import type { ProductId } from '../types/product.types.js';
+import type { Transaction, UserId } from '@/types/shared.type.js';
+import type { BaseProductInput, ProductId } from '@/types/product.types.js';
+import { Prisma } from '@prisma/client';
 
-export interface CreateDTO extends UserId {
-  name: string;
-  description: string;
-  price: number;
-  tags: string[];
+// Request Dtos
+export interface ProductParams extends UserId, ProductId, Transaction {}
+
+export interface PostProductDTO extends UserId {
+  data: BaseProductInput;
 }
 
-export interface UpdateDTO extends ProductId {
-  data: {
-    name?: string;
-    description?: string;
-    price?: number;
-    tags?: string[];
-  };
+export interface CreateDTO extends Transaction {
+  createData: Prisma.ProductCreateInput;
 }
 
-export interface FindByIdDTO extends UserId, ProductId {}
+export interface PatchProductDTO extends ProductParams {
+  data: Partial<BaseProductInput>;
+}
+export interface UpdateDTO extends ProductId, Transaction {
+  patchData: Prisma.ProductUpdateInput;
+}
 
-export type FindManyDTO = GetListParams;
-
-export type DeleteDTO = ProductId; // eslint 오류 방지
-
-export interface Like extends ProductId, UserId {}
-
-export type LikeDTO = Like;
-export type UnlikeDTO = Like;
+export interface ProductIdWithTx extends ProductId, Transaction {}

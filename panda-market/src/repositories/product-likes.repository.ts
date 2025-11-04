@@ -1,0 +1,48 @@
+import { PrismaClient } from '@prisma/client';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
+import { ProductParams } from '@/dto/products.dto.js';
+
+@injectable()
+export class ProductLikeRepository {
+  constructor(
+    @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
+  ) {}
+  async findById({ userId, productId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.productLike.findUnique({
+      where: {
+        userId_productId: {
+          userId,
+          productId,
+        },
+      },
+    });
+  }
+  async create({ userId, productId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.productLike.create({
+      data: {
+        userId,
+        productId,
+      },
+      select: {
+        product: true,
+      },
+    });
+  }
+  async delete({ userId, productId, tx }: ProductParams) {
+    const db = tx || this.prisma;
+    return await db.productLike.delete({
+      where: {
+        userId_productId: {
+          userId,
+          productId,
+        },
+      },
+      select: {
+        product: true,
+      },
+    });
+  }
+}
