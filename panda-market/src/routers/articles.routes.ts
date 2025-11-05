@@ -14,7 +14,7 @@ import {
 } from '@/middlewares/validators/sharedValidator.js';
 import container from '@/lib/inversify.config.js';
 import { TYPES } from '@/types/layer.types.js';
-import type { ArticleController } from '@/controllers/articleController.js';
+import type { ArticleController } from '@/controllers/article.controller.js';
 
 const articleRouter = express.Router();
 

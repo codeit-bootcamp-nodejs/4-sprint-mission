@@ -1,25 +1,23 @@
-import type { ArticleId } from '@/types/article.types.js';
-import type { GetListParams, UserId } from '@/types/shared.type.js';
+import type { ArticleId, BaseArticleInput } from '@/types/article.types.js';
+import type { Transaction, UserId } from '@/types/shared.type.js';
+import { Prisma } from '@prisma/client';
 
-export interface CreateDTO extends UserId {
-  title: string;
-  content: string;
+export interface ArticleParams extends UserId, ArticleId, Transaction {}
+
+export interface PostArticleDTO extends UserId {
+  data: BaseArticleInput;
 }
 
-export interface UpdateDTO extends ArticleId {
-  data: {
-    title?: string;
-    content: string;
-  };
+export interface CreateDTO extends Transaction {
+  createData: Prisma.ArticleCreateInput;
 }
 
-export interface FindByIdDTO extends UserId, ArticleId {}
+export interface PatchArticleDTO extends ArticleParams {
+  data: Partial<BaseArticleInput>;
+}
 
-export type FindManyDTO = GetListParams;
+export interface UpdateDTO extends ArticleId, Transaction {
+  patchData: Prisma.ArticleUpdateInput;
+}
 
-export type DeleteDTO = ArticleId; // eslint 오류 방지
-
-export interface Like extends ArticleId, UserId {}
-
-export type LikeDTO = Like;
-export type UnlikeDTO = Like;
+export interface ArticleIdWithTx extends ArticleId, Transaction {}

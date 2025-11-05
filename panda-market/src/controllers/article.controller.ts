@@ -6,15 +6,18 @@ import {
   hasTokenPayload,
 } from '@/types/guard.js';
 import type { RequestHandler } from 'express';
-import type { ArticleService } from '@/services/articleService.js';
+import type { ArticleService } from '@/services/article.service.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
+import { ArticleLikeService } from '@/services/article-like.service.js';
 
 @injectable()
 export class ArticleController {
   constructor(
     @inject(TYPES.ArticleService)
     private readonly articleService: ArticleService,
+    @inject(TYPES.ArticleLikeService)
+    private readonly articleLikeService: ArticleLikeService,
   ) {}
 
   getArticle: RequestHandler = async (req, res) => {
@@ -43,9 +46,10 @@ export class ArticleController {
       throw new BadRequestError();
     }
     const { userId } = req.tokenPayload;
+    const data = req.body;
     const result = await this.articleService.postArticle({
       userId,
-      ...req.body,
+      data,
     });
     return res.status(201).json(result);
   };
@@ -81,7 +85,7 @@ export class ArticleController {
     }
     const { id: articleId } = req.parsedId;
     const { userId } = req.tokenPayload;
-    const result = await this.articleService.postArticleLike({
+    const result = await this.articleLikeService.postArticleLike({
       userId,
       articleId,
     });
@@ -93,7 +97,7 @@ export class ArticleController {
     }
     const { id: articleId } = req.parsedId;
     const { userId } = req.tokenPayload;
-    const result = await this.articleService.deleteArticleLike({
+    const result = await this.articleLikeService.deleteArticleLike({
       userId,
       articleId,
     });

@@ -1,20 +1,20 @@
 import type {
+  ArticleIdWithTx,
+  ArticleParams,
   CreateDTO,
-  DeleteDTO,
-  FindByIdDTO,
-  FindManyDTO,
-  LikeDTO,
-  UnlikeDTO,
   UpdateDTO,
 } from '@/dto/articles.dto.js';
 import type { ArticleId } from '@/types/article.types.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
+import { GetListParams } from '../types/shared.type.js';
 
 @injectable()
 export class ArticleRepository {
-  constructor(@inject(TYPES.PrismaClient) private readonly prisma: PrismaClient) {}
+  constructor(
+    @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
+  ) {}
 
   async findOwnerById({ articleId }: ArticleId) {
     return await this.prisma.article.findUniqueOrThrow({
@@ -22,17 +22,9 @@ export class ArticleRepository {
       select: { userId: true },
     });
   }
-  async create({ title, userId, content }: CreateDTO) {
-    return await this.prisma.article.create({
-      data: {
-        title,
-        userId,
-        content,
-      },
-    });
-  }
-  async findById({ articleId, userId }: FindByIdDTO) {
-    return await this.prisma.article.findUniqueOrThrow({
+  async findById({ articleId, userId, tx }: ArticleParams) {
+    const db = tx || this.prisma;
+    return await db.article.findUniqueOrThrow({
       where: {
         id: articleId,
       },
@@ -46,11 +38,7 @@ export class ArticleRepository {
             userId,
           },
         },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
+        likeCount: true,
         user: {
           select: {
             id: true,
@@ -61,10 +49,13 @@ export class ArticleRepository {
       },
     });
   }
-  async findMany({ keyword, page, pageSize, userId }: FindManyDTO) {
+  async findMany({ keyword, page, pageSize, userId }: GetListParams) {
     return await this.prisma.article.findMany({
       where: {
-        OR: [{ title: { contains: keyword } }, { content: { contains: keyword } }],
+        OR: [
+          { title: { contains: keyword } },
+          { content: { contains: keyword } },
+        ],
       },
       select: {
         id: true,
@@ -76,11 +67,7 @@ export class ArticleRepository {
             userId,
           },
         },
-        _count: {
-          select: {
-            likes: true,
-          },
-        },
+        likeCount: true,
         user: {
           select: {
             id: true,
@@ -96,39 +83,23 @@ export class ArticleRepository {
       take: pageSize,
     });
   }
-  async update({ articleId, data }: UpdateDTO) {
-    return await this.prisma.article.update({
+  async create({ tx, createData: data }: CreateDTO) {
+    const db = tx || this.prisma;
+    return await db.article.create({
+      data: data,
+    });
+  }
+  async update({ tx, articleId, patchData: data }: UpdateDTO) {
+    const db = tx || this.prisma;
+    return await db.article.update({
       where: { id: articleId },
       data,
     });
   }
-  async delete({ articleId }: DeleteDTO) {
-    return await this.prisma.article.delete({
+  async delete({ articleId, tx }: ArticleIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.article.delete({
       where: { id: articleId },
-    });
-  }
-  async like({ userId, articleId }: LikeDTO) {
-    return await this.prisma.articleLike.create({
-      data: {
-        userId,
-        articleId,
-      },
-      select: {
-        article: true,
-      },
-    });
-  }
-  async unlike({ userId, articleId }: UnlikeDTO) {
-    return await this.prisma.articleLike.delete({
-      where: {
-        userId_articleId: {
-          userId,
-          articleId,
-        },
-      },
-      select: {
-        article: true,
-      },
     });
   }
 }
