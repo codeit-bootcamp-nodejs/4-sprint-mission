@@ -1,4 +1,3 @@
-import { ProductId } from '../types/product.types.js';
 import { Transaction } from '../types/shared.type.js';
 
 export interface CreateProductImages extends Transaction {
@@ -8,5 +7,3 @@ export interface CreateProductImages extends Transaction {
     publicId: string;
   }[];
 }
-
-export interface ProductImageParams extends ProductId, Transaction {}

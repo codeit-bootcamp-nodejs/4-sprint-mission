@@ -104,30 +104,4 @@ export class ProductRepository {
       where: { id: productId },
     });
   }
-  async like({ userId, productId, tx }: ProductParams) {
-    const db = tx || this.prisma;
-    return await db.productLike.create({
-      data: {
-        userId,
-        productId,
-      },
-      select: {
-        product: true,
-      },
-    });
-  }
-  async unlike({ userId, productId, tx }: ProductParams) {
-    const db = tx || this.prisma;
-    return await db.productLike.delete({
-      where: {
-        userId_productId: {
-          userId,
-          productId,
-        },
-      },
-      select: {
-        product: true,
-      },
-    });
-  }
 }
