@@ -4,7 +4,7 @@ import type { Content, ParentContentType } from './shared.type.js';
 import { UnauthorizedError } from '@/lib/errors.js';
 
 export function hasTokenPayload(
-  req: Request
+  req: Request,
 ): req is Request & { tokenPayload: JwtPayload & { userId: number } } {
   // 이 결과가 true가 되면 req객체에 tokenPayload가 반드시 있다는 증명
   return (
@@ -15,12 +15,14 @@ export function hasTokenPayload(
 }
 
 export function hasContent(
-  req: Request
+  req: Request,
 ): req is Request & { tokenPayload: JwtPayload; content: Content } {
   return hasTokenPayload(req) && typeof req.content === 'string';
 }
 
-export function hasId(req: Request): req is Request & { parsedId: { id: number } } {
+export function hasId(
+  req: Request,
+): req is Request & { parsedId: { id: number } } {
   return (
     typeof req.parsedId === 'object' && // 1. parsedId가 객체이고
     req.parsedId !== null && // 2. null이 아니며
@@ -30,14 +32,14 @@ export function hasId(req: Request): req is Request & { parsedId: { id: number }
 }
 
 export function hasIdAndUserId(
-  req: Request
+  req: Request,
 ): req is Request & { parsedId: { id: number }; tokenPayload: JwtPayload } {
   return hasTokenPayload(req) && hasId(req);
 }
 
-export function hasParsedQuery(
-  req: Request
-): req is Request & { parsedQuery: { keyword: string; page: number; pageSize: number } } {
+export function hasParsedQuery(req: Request): req is Request & {
+  parsedQuery: { keyword: string; page: number; pageSize: number };
+} {
   return (
     typeof req.parsedQuery === 'object' &&
     req.parsedQuery !== null &&
@@ -48,7 +50,7 @@ export function hasParsedQuery(
 }
 
 export function hasCursorQuery(
-  req: Request
+  req: Request,
 ): req is Request & { parsedCursorQuery: { page: number; pageSize: number } } {
   return (
     typeof req.parsedCursorQuery === 'object' &&
@@ -67,20 +69,35 @@ export function hasFile(req: Request): req is Request & { file: File } {
   );
 }
 
-export function hasParent(req: Request): req is Request & { parentType: 'products' | 'articles' } {
+export function hasBuffer(req: Request): req is Request & { file: File } {
+  return (
+    typeof req.file === 'object' &&
+    req.file !== null &&
+    'buffer' in req.file &&
+    Buffer.isBuffer(req.file.buffer)
+  );
+}
+
+export function hasParent(
+  req: Request,
+): req is Request & { parentType: 'products' | 'articles' } {
   const validParentTypes: ParentContentType[] = ['products', 'articles'];
   return (
     typeof req.parentType === 'string' &&
-    // req.parentType이 유효한 값 중 하나인지 런타임에 확인합니다.
+    // req.parentType이 유효한 값 중 하나인지 런타임에 확인
     (validParentTypes as string[]).includes(req.parentType)
   );
 }
 
-export function hasParentId(req: Request): req is Request & { parentId: number } {
+export function hasParentId(
+  req: Request,
+): req is Request & { parentId: number } {
   return typeof req.parentId === 'number';
 }
 
-export function isValidBearerToken(authHeader: string | undefined): authHeader is string {
+export function isValidBearerToken(
+  authHeader: string | undefined,
+): authHeader is string {
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new UnauthorizedError('유효한 인증 헤더가 필요합니다.');
   }

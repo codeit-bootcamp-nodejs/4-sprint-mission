@@ -8,7 +8,6 @@ export const TYPES = {
   ProductRepository: Symbol.for('ProductRepository'),
   CommentRepository: Symbol.for('CommentRepository'),
   AuthRepository: Symbol.for('AuthRepository'),
-  FileRepository: Symbol.for('FileRepository'),
   TagRepository: Symbol.for('TagRepository'),
   ProductLikeRepository: Symbol.for('ProductLikeRepository'),
   ProductImageRepository: Symbol.for('ProductImageRepository'),
@@ -22,7 +21,7 @@ export const TYPES = {
   ArticleService: Symbol.for('ArticleService'),
   ProductService: Symbol.for('ProductService'),
   AuthService: Symbol.for('AuthService'),
-  FileService: Symbol.for('FileService'),
+  ImageService: Symbol.for('ImageService'),
   ProductLikeService: Symbol.for('ProductLikeService'),
   ArticleLikeService: Symbol.for('ArticleLikeService'),
   ProductCommentService: Symbol.for('ProductCommentService'),
@@ -35,5 +34,5 @@ export const TYPES = {
   ProductCommentController: Symbol.for('ProductCommentController'),
   ArticleCommentController: Symbol.for('ArticleCommentController'),
   AuthController: Symbol.for('AuthController'),
-  FileController: Symbol.for('FileController'),
+  ImageController: Symbol.for('ImageController'),
 };

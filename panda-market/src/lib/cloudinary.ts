@@ -1,18 +1,19 @@
-import { v2 as cloudinary } from 'cloudinary';
+import { v2 as cloudinary, UploadApiResponse } from 'cloudinary';
+import streamifier from 'streamifier';
 import {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
   CLOUDINARY_CLOUD_NAME,
 } from './constants.js';
 import fs from 'fs';
-import { BadRequestError } from './errors.js';
+import { BadRequestError, InternalServerError } from './errors.js';
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
-
+// 파일 패스를 통해 업로드
 export async function cloudinaryUpload(path: string) {
   const result = await cloudinary.uploader.upload(path, {
     folder: 'mission8_files',
@@ -20,6 +21,36 @@ export async function cloudinaryUpload(path: string) {
   fs.unlinkSync(path);
   console.log('Cloudinary에 이미지 업로드 완료');
   return result;
+}
+// 메모리 버퍼를 통해 스트림으로 업로드
+export function cloudinaryStreamUpload(buffer: Buffer) {
+  return new Promise<UploadApiResponse>((resolve, reject) => {
+    // 업로드 스트림 생성
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'mission8_files',
+      },
+      (error, result) => {
+        if (error) {
+          return reject(
+            new InternalServerError(
+              `Cloudinary 스트림 업로드 실패: ${error.message}`,
+            ),
+          );
+        }
+        if (result) {
+          resolve(result);
+        } else {
+          reject(
+            new InternalServerError('Cloudinary 업로드 후 result가 없습니다.'),
+          );
+        }
+      },
+    );
+
+    // 버퍼를 스트림으로 변환하여 Cloudinary로 파이프
+    streamifier.createReadStream(buffer).pipe(uploadStream);
+  });
 }
 
 export async function deleteCloudinaryFile(publicId: string) {

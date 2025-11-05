@@ -8,7 +8,7 @@ import { zodErrorHandler } from './middlewares/errorHandlers/zodErrorHandler.js'
 import { catchAllErrorHandler } from './middlewares/errorHandlers/catchAllErrorHandler.js';
 import articleRouter from '@/routers/articles.routes.js';
 import productRouter from '@/routers/products.routes.js';
-import fileRouter from '@/routers/file.js';
+import fileRouter from '@/routers/images.routes.js';
 import authRouter from '@/routers/auth.js';
 import userRouter from '@/routers/user.js';
 
