@@ -12,21 +12,28 @@ export const TYPES = {
   TagRepository: Symbol.for('TagRepository'),
   ProductLikeRepository: Symbol.for('ProductLikeRepository'),
   ProductImageRepository: Symbol.for('ProductImageRepository'),
+  ArticleImageRepository: Symbol.for('ArticleImageRepository'),
+  ArticleLikeRepository: Symbol.for('ArticleLikeRepository'),
+  ProductCommentRepository: Symbol.for('ProductCommentRepository'),
+  ArticleCommentRepository: Symbol.for('ArticleCommentRepository'),
 
   // Services
   UserService: Symbol.for('UserService'),
   ArticleService: Symbol.for('ArticleService'),
   ProductService: Symbol.for('ProductService'),
-  CommentService: Symbol.for('CommentService'),
   AuthService: Symbol.for('AuthService'),
   FileService: Symbol.for('FileService'),
   ProductLikeService: Symbol.for('ProductLikeService'),
+  ArticleLikeService: Symbol.for('ArticleLikeService'),
+  ProductCommentService: Symbol.for('ProductCommentService'),
+  ArticleCommentService: Symbol.for('ArticleCommentService'),
 
   // Controllers
   UserController: Symbol.for('UserController'),
   ArticleController: Symbol.for('ArticleController'),
   ProductController: Symbol.for('ProductController'),
-  CommentController: Symbol.for('CommentController'),
+  ProductCommentController: Symbol.for('ProductCommentController'),
+  ArticleCommentController: Symbol.for('ArticleCommentController'),
   AuthController: Symbol.for('AuthController'),
   FileController: Symbol.for('FileController'),
 };

@@ -1,5 +1,4 @@
 import express from 'express';
-import commentRouter from './comment.js';
 import parentIdParser from '@/middlewares/parnetIdParser.js';
 import asyncHandler from '@/middlewares/asyncHandler.js';
 import {
@@ -15,6 +14,7 @@ import {
 import container from '@/lib/inversify.config.js';
 import { TYPES } from '@/types/layer.types.js';
 import type { ArticleController } from '@/controllers/article.controller.js';
+import articleCommentRouter from './article-comments.route.js';
 
 const articleRouter = express.Router();
 
@@ -22,22 +22,51 @@ const articleController = container.get<ArticleController>(
   TYPES.ArticleController,
 );
 
-articleRouter.use('/:id/comment', parentIdParser, commentRouter);
+articleRouter.use('/:id/comment', parentIdParser, articleCommentRouter);
 
-// prettier-ignore
-articleRouter.route('/')
-    .get(optionalAuthentication(), validateGetListQuery, asyncHandler(articleController.getArticleList))
-    .post(authentication(), validatePostBody, asyncHandler(articleController.postArticle))
+articleRouter
+  .route('/')
+  .get(
+    optionalAuthentication(),
+    validateGetListQuery,
+    asyncHandler(articleController.getArticleList),
+  )
+  .post(
+    authentication(),
+    validatePostBody,
+    asyncHandler(articleController.postArticle),
+  );
 
-// prettier-ignore
-articleRouter.route("/:id")
-  .get(optionalAuthentication(), validateId, asyncHandler(articleController.getArticle))
-  .patch(authentication(), validateId, validatePatchBody, asyncHandler(articleController.patchArticle))
-  .delete(authentication(), validateId, asyncHandler(articleController.deleteArticle));
+articleRouter
+  .route('/:id')
+  .get(
+    optionalAuthentication(),
+    validateId,
+    asyncHandler(articleController.getArticle),
+  )
+  .patch(
+    authentication(),
+    validateId,
+    validatePatchBody,
+    asyncHandler(articleController.patchArticle),
+  )
+  .delete(
+    authentication(),
+    validateId,
+    asyncHandler(articleController.deleteArticle),
+  );
 
-// prettier-ignore
-articleRouter.route("/:id/likes")
-  .post(authentication(), validateId, asyncHandler(articleController.postArticleLike))
-  .delete(authentication(), validateId, asyncHandler(articleController.deleteArticleLike))
+articleRouter
+  .route('/:id/likes')
+  .post(
+    authentication(),
+    validateId,
+    asyncHandler(articleController.postArticleLike),
+  )
+  .delete(
+    authentication(),
+    validateId,
+    asyncHandler(articleController.deleteArticleLike),
+  );
 
 export default articleRouter;
