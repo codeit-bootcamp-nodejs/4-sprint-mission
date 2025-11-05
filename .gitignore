@@ -1,0 +1,14 @@
+.idea
+.DS_Store
+
+test.sql
+testa.iml
+
+.env
+/src/generated/prisma
+
+/node_modules
+/dist
+/build
+/out
+prisma.config.ts.backup

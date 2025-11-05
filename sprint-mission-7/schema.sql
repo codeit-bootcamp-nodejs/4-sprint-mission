@@ -1,4 +1,3 @@
--- 사용자 테이블
 CREATE TABLE users (
                        id SERIAL PRIMARY KEY,
                        email VARCHAR(255) UNIQUE NOT NULL,
@@ -7,7 +6,6 @@ CREATE TABLE users (
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 상품 테이블
 CREATE TABLE products (
                           id SERIAL PRIMARY KEY,
                           seller_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -20,7 +18,6 @@ CREATE TABLE products (
                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 자유게시판 게시글 테이블
 CREATE TABLE posts (
                        id SERIAL PRIMARY KEY,
                        author_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -31,7 +28,6 @@ CREATE TABLE posts (
                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 상품 문의 테이블
 CREATE TABLE inquiries (
                            id SERIAL PRIMARY KEY,
                            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -41,10 +37,27 @@ CREATE TABLE inquiries (
                            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 좋아요 테이블
 CREATE TABLE likes (
                        user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
                        product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                        PRIMARY KEY (user_id, product_id)
+);
+
+CREATE TABLE post_comments (
+                               id SERIAL PRIMARY KEY,
+                               post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+                               author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                               content TEXT NOT NULL,
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE notifications (
+                               id SERIAL PRIMARY KEY,
+                               user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                               content TEXT NOT NULL,
+                               link_url VARCHAR(255),
+                               is_read BOOLEAN DEFAULT FALSE,
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
