@@ -1,20 +1,16 @@
-import type {
-  DeleteDTO,
-  FindByIdDTO,
-  findManyContentDTO,
-  findManyLikeContentDTO,
-  UpdateDTO,
-} from '@/dto/users.dto.js';
-import type { UserWithContent } from '../types/user.types.js';
+import type { UpdateDTO } from '@/dto/users.dto.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types/layer.types.js';
+import { TYPES } from '@/types/layer.types.js';
+import { UserId } from '@/types/user.types.js';
 
 @injectable()
 export class UserRepository {
-  constructor(@inject(TYPES.PrismaClient) private readonly prisma: PrismaClient) {}
+  constructor(
+    @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
+  ) {}
 
-  async findById({ userId }: FindByIdDTO) {
+  async findById({ userId }: UserId) {
     return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
@@ -23,13 +19,13 @@ export class UserRepository {
         id: true,
         email: true,
         nickname: true,
-        image: true,
+        imagePublicId: true,
         createdAt: true,
         updatedAt: true,
       },
     });
   }
-  async findPasswordById({ userId }: FindByIdDTO) {
+  async findPasswordById({ userId }: UserId) {
     return await this.prisma.user.findUniqueOrThrow({
       where: {
         id: userId,
@@ -49,7 +45,7 @@ export class UserRepository {
         id: true,
         email: true,
         nickname: true,
-        image: true,
+        imagePublicId: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -57,7 +53,7 @@ export class UserRepository {
     });
   }
 
-  async delete({ userId }: DeleteDTO) {
+  async delete({ userId }: UserId) {
     return await this.prisma.user.delete({
       where: {
         id: userId,
@@ -66,31 +62,9 @@ export class UserRepository {
         id: true,
         email: true,
         nickname: true,
-        image: true,
+        imagePublicId: true,
         createdAt: true,
         updatedAt: true,
-      },
-    });
-  }
-  async findManyContent({ userId, options }: findManyContentDTO): Promise<UserWithContent> {
-    return await this.prisma.user.findUniqueOrThrow({
-      where: {
-        id: userId,
-      },
-      ...options,
-    });
-  }
-  async findManyLikeContent({ userId, singularContentType }: findManyLikeContentDTO) {
-    return await this.prisma.user.findUniqueOrThrow({
-      where: {
-        id: userId,
-      },
-      select: {
-        [`${singularContentType}Likes`]: {
-          include: {
-            [singularContentType]: true,
-          },
-        },
       },
     });
   }
