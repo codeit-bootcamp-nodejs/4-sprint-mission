@@ -1,0 +1,11 @@
+# Local files
+.vscode/
+node_modules/
+.env*
+!.env.example
+build/
+
+# Uploaded files
+public/*
+!public/.gitkeep
+.DS_Store
