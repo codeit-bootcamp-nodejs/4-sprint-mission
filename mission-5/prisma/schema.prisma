@@ -26,6 +26,7 @@ model User {
   productLikes  ProductLike[]
   articleLikes  ArticleLike[]
   refreshTokens RefreshToken[]
+
   @@map("users")
 }
 
