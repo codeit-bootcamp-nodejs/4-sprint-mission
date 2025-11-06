@@ -110,9 +110,10 @@ model User {
   profileImage  String?    @map("profile_image")
   imagePublicId String?  @map("image_public_id")
   nickname      String  @unique
-  password      String
+  password      String?
   refreshToken  String? @map("refresh_token")
   authProvider   String   @default("local") @map("auth_provider")
+  providerId   String?      @unique
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
   products      Product[]

@@ -53,6 +53,9 @@ export class UserService {
     if (changePassword && currentPassword) {
       // 비밀번호 변경시에만 실행
       const user = await this.userRepository.findPasswordById({ userId });
+      if (!user.password) {
+        throw new UnauthorizedError('간편 로그인 회원입니다.');
+      }
       if (await validatePassword(currentPassword, user.password)) {
         updateData['password'] = await passwordHashing(changePassword);
       } else {

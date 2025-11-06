@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import type { Secret } from 'jsonwebtoken';
+import { InternalServerError } from './errors.js';
 
 dotenv.config();
 
@@ -8,12 +9,34 @@ const jwtRefreshTokenSecret = process.env['JWT_REFRESH_TOKEN_SECRET'];
 const cloudinary_cloud_name = process.env['CLOUDINARY_CLOUD_NAME'];
 const cloudinary_api_key = process.env['CLOUDINARY_API_KEY'];
 const cloudinary_api_secret = process.env['CLOUDINARY_API_SECRET'];
+const google_client_id = process.env['GOOGLE_CLIENT_ID'];
+const google_client_secret = process.env['GOOGLE_CLIENT_SECRET'];
+const google_redirect_uri = process.env['GOOGLE_REDIRECT_URI'];
+const kakao_client_api_key = process.env['KAKAO_CLIENT_API_KEY'];
+const kakao_client_secret = process.env['KAKAO_CLIENT_SECRET'];
+const kakao_redirect_uri = process.env['KAKAO_REDIRECT_URI'];
+const node_env = process.env['NODE_ENV'];
+
 // (타입 가드 역할)
 if (!jwtAccessTokenSecret || !jwtRefreshTokenSecret) {
-  throw new Error('JWT 시크릿 키가 .env 파일에 설정되지 않았습니다.');
+  throw new InternalServerError(
+    'JWT 시크릿 키가 .env 파일에 설정되지 않았습니다.',
+  );
 }
 if (!cloudinary_cloud_name || !cloudinary_api_key || !cloudinary_api_secret) {
-  throw new Error('cloudinary 정보가 .env 파일에 설정되지 않았습니다.');
+  throw new InternalServerError(
+    'cloudinary 정보가 .env 파일에 설정되지 않았습니다.',
+  );
+}
+if (!google_client_id || !google_client_secret || !google_redirect_uri) {
+  throw new InternalServerError(
+    '구글 로그인 api 정보가 .env 파일에 설정되지 않았습니다.',
+  );
+}
+if (!kakao_client_api_key || !kakao_client_secret || !kakao_redirect_uri) {
+  throw new InternalServerError(
+    '카카오 로그인 api 정보가 .env 파일에 설정되지 않았습니다.',
+  );
 }
 const JWT_ACCESS_TOKEN_SECRET: Secret = jwtAccessTokenSecret;
 const JWT_REFRESH_TOKEN_SECRET: Secret = jwtRefreshTokenSecret;
@@ -22,6 +45,14 @@ const CLOUDINARY_API_KEY = cloudinary_api_key;
 const CLOUDINARY_API_SECRET = cloudinary_api_secret;
 const REDIS_URL = process.env['REDIS_URL'];
 const REDIS_KEY = process.env['REDIS_KEY'];
+const GOOGLE_CLIENT_ID = google_client_id;
+const GOOGLE_CLIENT_SECRET = google_client_secret;
+const GOOGLE_REDIRECT_URI = google_redirect_uri;
+const KAKAO_CLIENT_API_KEY = kakao_client_api_key;
+const KAKAO_CLIENT_SECRET = kakao_client_secret;
+const KAKAO_REDIRECT_URI = kakao_redirect_uri;
+
+const NODE_ENV = node_env;
 
 export {
   REDIS_URL,
@@ -31,4 +62,11 @@ export {
   CLOUDINARY_CLOUD_NAME,
   JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REDIRECT_URI,
+  KAKAO_CLIENT_API_KEY,
+  KAKAO_CLIENT_SECRET,
+  KAKAO_REDIRECT_URI,
+  NODE_ENV,
 };

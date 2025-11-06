@@ -24,6 +24,8 @@ export function prismaErrorHandler(
         let msg = '';
         if (modelName.endsWith('Like')) {
           msg = '이미 좋아요를 눌렀습니다.';
+        } else if (field.includes('email')) {
+          msg = '이미 가입된 이메일 입니다.';
         } else {
           msg = `${field} 필드의 값이 이미 존재합니다.`;
         }

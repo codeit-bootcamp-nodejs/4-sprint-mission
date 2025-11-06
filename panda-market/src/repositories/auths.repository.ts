@@ -1,8 +1,9 @@
 import type {
-  findByEmailDTO,
+  FindByEmailDTO,
+  FindByProviderIdDTO,
   FindByIdDTO,
-  SignupDTO,
   UpdateDTO,
+  CreateDTO,
 } from '@/dto/auths.dto.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
@@ -13,35 +14,14 @@ export class AuthRepository {
   constructor(
     @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
   ) {}
-
-  async create({ email, nickname, hashedPassword }: SignupDTO) {
-    return await this.prisma.user.create({
-      data: {
-        email,
-        nickname,
-        password: hashedPassword,
-      },
-    });
-  }
-  async findByEmail({ received_email }: findByEmailDTO) {
+  async findByEmail({ received_email }: FindByEmailDTO) {
     return await this.prisma.user.findUniqueOrThrow({
       where: { email: received_email },
     });
   }
-  async update({ tx, userId, refreshToken }: UpdateDTO) {
-    const client = tx || this.prisma;
-    return await client.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        refreshToken,
-      },
-    });
-  }
   async findById({ tx, userId }: FindByIdDTO) {
-    const client = tx || this.prisma;
-    return await client.user.findUniqueOrThrow({
+    const db = tx || this.prisma;
+    return await db.user.findUniqueOrThrow({
       where: {
         id: userId,
       },
@@ -49,6 +29,32 @@ export class AuthRepository {
         id: true,
         email: true,
         refreshToken: true,
+      },
+    });
+  }
+  async findByProviderId({ tx, providerId }: FindByProviderIdDTO) {
+    const db = tx || this.prisma;
+    return await db.user.findUnique({
+      where: {
+        providerId,
+      },
+    });
+  }
+  async create({ tx, createData }: CreateDTO) {
+    const db = tx || this.prisma;
+    return await db.user.create({
+      data: createData,
+    });
+  }
+
+  async update({ tx, userId, refreshToken }: UpdateDTO) {
+    const db = tx || this.prisma;
+    return await db.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        refreshToken,
       },
     });
   }

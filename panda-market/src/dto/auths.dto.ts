@@ -1,5 +1,6 @@
 import type { UserId } from '@/types/user.types.js';
-import type { Prisma } from '@prisma/client';
+import { Transaction } from '@/types/shared.types.js';
+import { Prisma } from '@prisma/client';
 
 export interface SignupDTO {
   email: string;
@@ -7,15 +8,20 @@ export interface SignupDTO {
   hashedPassword: string;
 }
 
-export type findByEmailDTO = {
+export type FindByEmailDTO = {
   received_email: string;
 };
 
-export interface FindByIdDTO extends UserId {
-  tx?: Prisma.TransactionClient;
+export interface FindByIdDTO extends UserId, Transaction {}
+
+export interface FindByProviderIdDTO extends Transaction {
+  providerId: string;
 }
 
-export interface UpdateDTO extends UserId {
+export interface CreateDTO extends Transaction {
+  createData: Prisma.UserCreateInput;
+}
+
+export interface UpdateDTO extends UserId, Transaction {
   refreshToken: string;
-  tx?: Prisma.TransactionClient;
 }
