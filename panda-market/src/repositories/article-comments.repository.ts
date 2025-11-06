@@ -4,6 +4,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { CommentId } from '@/types/base-comment.typs.js';
 import { GetCommentListParams } from '@/dto/article-comments.dto.js';
+import { UserId } from '@/types/user.types.js';
 
 @injectable()
 export class ArticleCommentRepository {
@@ -45,7 +46,11 @@ export class ArticleCommentRepository {
     }
     return await this.prisma.articleComment.findMany(options);
   }
-
+  async findManyByUserId({ userId }: UserId) {
+    return await this.prisma.articleComment.findMany({
+      where: { userId },
+    });
+  }
   async create(data: Prisma.ArticleCommentCreateInput) {
     return await this.prisma.articleComment.create({
       data,

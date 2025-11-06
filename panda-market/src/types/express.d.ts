@@ -21,7 +21,6 @@ declare global {
         page: number;
         pageSize: number;
       };
-      content?: string;
       file?: File;
     }
   }

@@ -5,7 +5,10 @@ async function passwordHashing(password: string): Promise<string> {
   return await bcrypt.hash(password, salt);
 }
 
-async function validatePassword(password: string, userPassword: string): Promise<boolean> {
+async function validatePassword(
+  password: string,
+  userPassword: string,
+): Promise<boolean> {
   return await bcrypt.compare(password, userPassword);
 }
 

@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
-import type { GetListParams } from '@/types/shared.type.js';
+import type { GetListParams } from '@/types/shared.types.js';
 import type { ProductRepository } from '@/repositories/products.repository.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
@@ -13,9 +13,9 @@ import { TagRepository } from '@/repositories/tags.repository.js';
 import {
   deleteCloudinaryFile,
   extractPublicIdFromCloudinaryUrl,
-} from '../lib/cloudinary.js';
+} from '@/lib/cloudinary.js';
 import { ProductImageRepository } from '@/repositories/product-images.repository.js';
-import { ImageUpdateInput, TagUpdateInput } from '../types/product.types.js';
+import { ImageUpdateInput, TagUpdateInput } from '@/types/product.types.js';
 
 @injectable()
 export class ProductService {

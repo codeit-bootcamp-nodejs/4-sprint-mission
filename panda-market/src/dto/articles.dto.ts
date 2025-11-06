@@ -1,6 +1,7 @@
 import type { ArticleId, BaseArticleInput } from '@/types/article.types.js';
-import type { Transaction, UserId } from '@/types/shared.type.js';
+import type { Transaction } from '@/types/shared.types.js';
 import { Prisma } from '@prisma/client';
+import { UserId } from '@/types/user.types.js';
 
 export interface ArticleParams extends UserId, ArticleId, Transaction {}
 

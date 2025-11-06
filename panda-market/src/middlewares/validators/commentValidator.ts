@@ -1,6 +1,6 @@
-import { postSchema } from '../../validations/commentSchema.js';
-import { getCommentListSchema } from '../../validations/commentSchema.js';
-import createValidator from '../validator.factory.js';
+import { postSchema } from '@/validations/commentSchema.js';
+import { getCommentListSchema } from '@/validations/commentSchema.js';
+import createValidator from '@/middlewares/validator.factory.js';
 
 export const validateGetListQuery = createValidator((req) => {
   req.parsedCursorQuery = getCommentListSchema.parse(req.query);

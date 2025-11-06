@@ -1,5 +1,5 @@
 import { ArticleId } from '@/types/article.types.js';
-import { UserId } from '@/types/shared.type.js';
+import { UserId } from '@/types/user.types.js';
 
 export interface GetCommentListParams extends ArticleId {
   cursorId?: number;

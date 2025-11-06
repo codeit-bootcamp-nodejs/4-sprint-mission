@@ -1,6 +1,5 @@
 import type { Request } from 'express';
 import type { JwtPayload } from 'jsonwebtoken';
-import type { Content, ParentContentType } from './shared.type.js';
 import { UnauthorizedError } from '@/lib/errors.js';
 
 export function hasTokenPayload(
@@ -12,12 +11,6 @@ export function hasTokenPayload(
     req.tokenPayload !== null && // 2. null이 아니며
     'userId' in req.tokenPayload // 3. 내부에 'id' 속성이 있는지 확인
   );
-}
-
-export function hasContent(
-  req: Request,
-): req is Request & { tokenPayload: JwtPayload; content: Content } {
-  return hasTokenPayload(req) && typeof req.content === 'string';
 }
 
 export function hasId(
@@ -75,17 +68,6 @@ export function hasBuffer(req: Request): req is Request & { file: File } {
     req.file !== null &&
     'buffer' in req.file &&
     Buffer.isBuffer(req.file.buffer)
-  );
-}
-
-export function hasParent(
-  req: Request,
-): req is Request & { parentType: 'products' | 'articles' } {
-  const validParentTypes: ParentContentType[] = ['products', 'articles'];
-  return (
-    typeof req.parentType === 'string' &&
-    // req.parentType이 유효한 값 중 하나인지 런타임에 확인
-    (validParentTypes as string[]).includes(req.parentType)
   );
 }
 

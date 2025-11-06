@@ -1,5 +1,5 @@
 import type { CommentId } from '@/types/base-comment.typs.js';
-import { UserId } from '@/types/shared.type.js';
+import { UserId } from '@/types/user.types.js';
 import { Prisma } from '@prisma/client';
 
 export interface CommentParams extends UserId, CommentId {}

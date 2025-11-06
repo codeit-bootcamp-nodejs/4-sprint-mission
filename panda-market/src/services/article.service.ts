@@ -1,6 +1,6 @@
 import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
 import type { ArticleParams } from '@/dto/articles.dto.js';
-import type { GetListParams } from '@/types/shared.type.js';
+import type { GetListParams } from '@/types/shared.types.js';
 import type { ArticleRepository } from '@/repositories/articles.repository.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';

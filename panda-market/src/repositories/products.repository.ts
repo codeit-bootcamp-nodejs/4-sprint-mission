@@ -8,7 +8,8 @@ import type { ProductId } from '@/types/product.types.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import { GetListParams } from '@/types/shared.type.js';
+import { GetListParams } from '@/types/shared.types.js';
+import { UserId } from '@/types/user.types.js';
 
 @injectable()
 export class ProductRepository {
@@ -82,6 +83,30 @@ export class ProductRepository {
       take: pageSize,
       orderBy: {
         createdAt: 'desc',
+      },
+    });
+  }
+  async findManyByUserId({ userId }: UserId) {
+    return await this.prisma.product.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        createdAt: true,
+        likes: {
+          where: {
+            userId,
+          },
+        },
+        likeCount: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            nickname: true,
+          },
+        },
       },
     });
   }

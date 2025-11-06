@@ -1,6 +1,7 @@
-import type { Transaction, UserId } from '@/types/shared.type.js';
+import type { Transaction } from '@/types/shared.types.js';
 import type { BaseProductInput, ProductId } from '@/types/product.types.js';
 import { Prisma } from '@prisma/client';
+import { UserId } from '@/types/user.types.js';
 
 // Request Dtos
 export interface ProductParams extends UserId, ProductId, Transaction {}

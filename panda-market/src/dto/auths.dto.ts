@@ -1,4 +1,4 @@
-import type { UserId } from '@/types/shared.type.js';
+import type { UserId } from '@/types/user.types.js';
 import type { Prisma } from '@prisma/client';
 
 export interface SignupDTO {

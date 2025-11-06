@@ -1,5 +1,5 @@
-import { ProductId } from '../types/product.types.js';
-import { UserId } from '../types/shared.type.js';
+import { ProductId } from '@/types/product.types.js';
+import { UserId } from '@/types/user.types.js';
 
 export interface GetCommentListParams extends ProductId {
   cursorId?: number;

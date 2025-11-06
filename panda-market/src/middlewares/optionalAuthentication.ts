@@ -19,7 +19,7 @@ export default function optionalAuthentication(): RequestHandler {
       const isBlacklisted = await redisClient.get(`${REDIS_KEY}:${token}`);
 
       if (isBlacklisted) {
-        return res.status(401).json({ error: '로그아웃된 토큰입니다. 다시 로그인해주세요.' });
+        throw new UnauthorizedError('만료된 토큰입니다. 다시 로그인해주세요.');
       }
       req.tokenPayload = verifyAccessToken(token);
       return next();

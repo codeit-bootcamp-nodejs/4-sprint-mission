@@ -8,7 +8,8 @@ import type { ArticleId } from '@/types/article.types.js';
 import type { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import { GetListParams } from '../types/shared.type.js';
+import { GetListParams } from '@/types/shared.types.js';
+import { UserId } from '@/types/user.types.js';
 
 @injectable()
 export class ArticleRepository {
@@ -81,6 +82,30 @@ export class ArticleRepository {
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
+    });
+  }
+  async findManyByUserId({ userId }: UserId) {
+    return await this.prisma.article.findMany({
+      where: { userId },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        likes: {
+          where: {
+            userId,
+          },
+        },
+        likeCount: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            nickname: true,
+          },
+        },
+      },
     });
   }
   async create({ tx, createData: data }: CreateDTO) {

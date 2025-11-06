@@ -1,4 +1,4 @@
-import { Transaction } from '@/types/shared.type.js';
+import { Transaction } from '@/types/shared.types.js';
 
 export interface CreateArticleImages extends Transaction {
   imageData: {
