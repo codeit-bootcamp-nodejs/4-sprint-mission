@@ -9,6 +9,7 @@ import productRouter from "./route/product-router";
 import articleRouter from "./route/article-router";
 import imageRouter from "./route/image-router";
 import userRouter from "./route/user-router";
+import notificationRouter from "./route/notification-router";
 import { errorHandler } from "./middleware";
 
 dotenv.config();
@@ -40,13 +41,17 @@ app.use(
 app.use("/users", userRouter(userController));
 app.use("/uploads", imageRouter(imageController, imageMiddleware));
 
+app.use("/notifications", (req, res, next) => {
+  notificationRouter(container.notificationController)(req, res, next);
+});
+
 app.use(errorHandler);
 
 const server = createServer(app);
 
 const io = new SocketIOServer(server, {
   cors: {
-    origin: "*", // 👈 실제 프로덕션에서는 클라이언트 주소로 제한하세요.
+    origin: "*", // 실제 프로덕션에서는 클라이언트 주소로 제한필요
     methods: ["GET", "POST"],
   },
 });

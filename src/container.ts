@@ -5,6 +5,7 @@ import {
   CommentController,
   ImageController,
   UserController,
+  NotificationController,
 } from "./controller";
 
 import {
@@ -13,6 +14,7 @@ import {
   CommentService,
   UserService,
   LikeService,
+  NotificationService,
 } from "./service";
 
 import {
@@ -21,6 +23,7 @@ import {
   CommentRepository,
   UserRepository,
   LikeRepository,
+  NotificationRepository,
 } from "./repository";
 
 import { ValidationMiddleware } from "./middleware/validation-middleware";
@@ -35,6 +38,7 @@ const articleRepository = new ArticleRepository(prisma);
 const commentRepository = new CommentRepository(prisma);
 const userRepository = new UserRepository(prisma);
 const likeRepository = new LikeRepository(prisma);
+const notificationRepository = new NotificationRepository(prisma);
 
 // Service
 const productService = new ProductService(productRepository);
@@ -58,7 +62,7 @@ const userController = new UserController(userService);
 const validationMiddleware = new ValidationMiddleware();
 const imageMiddleware = new ImageMiddleware();
 
-export default {
+const container = {
   productController,
   articleController,
   commentController,
@@ -67,5 +71,35 @@ export default {
   validationMiddleware,
   imageMiddleware,
   likeService,
+
+  // io와 Notification 관련 객체들을 관리
   io: null as Server | null,
+  notificationRepository, // Repository는 io가 필요 없으므로 바로 등록
+
+  // Service와 Controller는 io 객체가 설정된 후에 생성되도록 getter로 만듦
+  _notificationService: null as NotificationService | null,
+  get notificationService(): NotificationService {
+    if (!this.io) {
+      throw new Error("Socket.IO (io) is not initialized.");
+    }
+    if (!this._notificationService) {
+      this._notificationService = new NotificationService(
+        this.notificationRepository,
+        this.io
+      );
+    }
+    return this._notificationService;
+  },
+
+  _notificationController: null as NotificationController | null,
+  get notificationController(): NotificationController {
+    if (!this._notificationController) {
+      this._notificationController = new NotificationController(
+        this.notificationService // service getter를 호출
+      );
+    }
+    return this._notificationController;
+  },
 };
+
+export default container;
