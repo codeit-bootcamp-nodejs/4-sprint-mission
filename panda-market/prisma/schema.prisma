@@ -14,6 +14,14 @@ datasource db {
   url               = env("DATABASE_URL")
 }
 
+enum NotifyType {
+  NEW_COMMENT_PRODUCT   // 상품에 새 댓글
+  NEW_LIKE_PRODUCT      // 상품에 새 좋아요
+  NEW_COMMENT_ARTICLE   // 게시글에 새 댓글
+  NEW_LIKE_ARTICLE      // 게시글에 새 좋아요
+  PRICE_UPDATE_PRODUCT  // 좋아요한 상품 가격 변동
+}
+
 model Product {
   id          Int       @id @default(autoincrement())
   name        String
@@ -122,6 +130,8 @@ model User {
   articleComments     ArticleComment[]
   productLikes  ProductLike[]
   articleLikes  ArticleLike[]
+  notificationReceives Notification[] @relation("notificationsReceived")
+  notificationsSents Notification[] @relation("notificationsSent")
 
   @@map("users")
 }
@@ -164,3 +174,17 @@ model ArticleLike{
   @@map("article_likes")
 }
 
+model Notification{
+  id Int @id @default(autoincrement())
+  recipientId Int      @map("recipient_id") 
+  senderId    Int      @map("sender_id")
+  type        NotifyType
+  targetId    Int      @map("target_id")
+  isRead      Boolean  @default(false)     @map("is_read")
+  createdAt   DateTime @default(now())     @map("created_at")
+
+  recipient User @relation("notificationsReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User @relation("notificationsSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}

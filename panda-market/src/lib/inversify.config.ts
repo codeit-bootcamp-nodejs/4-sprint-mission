@@ -29,10 +29,15 @@ import { ProductCommentRepository } from '@/repositories/product-comments.reposi
 import { ArticleCommentController } from '@/controllers/article-comments.controller.js';
 import { ArticleCommentService } from '@/services/article-comment.service.js';
 import { ArticleCommentRepository } from '@/repositories/article-comments.repository.js';
+import { NotificationRepository } from '@/repositories/notification.repository.js';
+import { NotificationController } from '@/controllers/notification.controller.js';
+import { NotificationService } from '@/services/notification.service.js';
+import { io } from './socket.js';
 
 const container = new Container();
 
 container.bind(TYPES.PrismaClient).toConstantValue(prisma);
+container.bind(TYPES.SocketIO).toConstantValue(io);
 
 // repositories
 container.bind(TYPES.UserRepository).to(UserRepository).inSingletonScope();
@@ -46,6 +51,7 @@ container.bind(TYPES.ArticleImageRepository).to(ArticleImageRepository).inSingle
 container.bind(TYPES.ArticleLikeRepository).to(ArticleLikeRepository).inSingletonScope();
 container.bind(TYPES.ProductCommentRepository).to(ProductCommentRepository).inSingletonScope();
 container.bind(TYPES.ArticleCommentRepository).to(ArticleCommentRepository).inSingletonScope();
+container.bind(TYPES.NotificationRepository).to(NotificationRepository).inSingletonScope();
 
 // services
 container.bind(TYPES.UserService).to(UserService).inSingletonScope();
@@ -57,6 +63,7 @@ container.bind(TYPES.ProductLikeService).to(ProductLikeService).inSingletonScope
 container.bind(TYPES.ArticleLikeService).to(ArticleLikeService).inSingletonScope();
 container.bind(TYPES.ProductCommentService).to(ProductCommentService).inSingletonScope();
 container.bind(TYPES.ArticleCommentService).to(ArticleCommentService).inSingletonScope();
+container.bind(TYPES.NotificationService).to(NotificationService).inSingletonScope();
 
 // controllers
 container.bind(TYPES.UserController).to(UserController).inSingletonScope();
@@ -66,5 +73,6 @@ container.bind(TYPES.ArticleCommentController).to(ArticleCommentController).inSi
 container.bind(TYPES.ImageController).to(ImageController).inSingletonScope();
 container.bind(TYPES.AuthController).to(AuthController).inSingletonScope();
 container.bind(TYPES.ArticleController).to(ArticleController).inSingletonScope();
+container.bind(TYPES.NotificationController).to(NotificationController).inSingletonScope();
 
 export default container;

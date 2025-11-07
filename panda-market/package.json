@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "tsx watch src/app.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start": "node dist/server.js",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "typecheck": "tsc --noEmit",
@@ -55,6 +55,7 @@
     "multer": "^2.0.2",
     "qs": "^6.14.0",
     "redis": "^5.9.0",
+    "socket.io": "^4.8.1",
     "streamifier": "^0.1.1",
     "zod": "^4.1.12"
   }

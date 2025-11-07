@@ -1,4 +1,6 @@
 export const TYPES = {
+  SocketIO: Symbol.for('SocketIO'),
+
   // Prisma
   PrismaClient: Symbol.for('PrismaClient'),
 
@@ -15,6 +17,7 @@ export const TYPES = {
   ArticleLikeRepository: Symbol.for('ArticleLikeRepository'),
   ProductCommentRepository: Symbol.for('ProductCommentRepository'),
   ArticleCommentRepository: Symbol.for('ArticleCommentRepository'),
+  NotificationRepository: Symbol.for('NotificationRepository'),
 
   // Services
   UserService: Symbol.for('UserService'),
@@ -26,6 +29,7 @@ export const TYPES = {
   ArticleLikeService: Symbol.for('ArticleLikeService'),
   ProductCommentService: Symbol.for('ProductCommentService'),
   ArticleCommentService: Symbol.for('ArticleCommentService'),
+  NotificationService: Symbol.for('NotificationService'),
 
   // Controllers
   UserController: Symbol.for('UserController'),
@@ -35,4 +39,5 @@ export const TYPES = {
   ArticleCommentController: Symbol.for('ArticleCommentController'),
   AuthController: Symbol.for('AuthController'),
   ImageController: Symbol.for('ImageController'),
+  NotificationController: Symbol.for('NotificationController'),
 };
