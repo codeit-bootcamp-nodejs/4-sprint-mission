@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ArticlesService } from '../services/articles.service.js';
+import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js'; // Import DTOs
 
 export class ArticlesController {
   articlesService = new ArticlesService();
@@ -7,7 +8,7 @@ export class ArticlesController {
   // 게시글 생성
   createArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { title, content } = req.body;
+      const createArticleDto: CreateArticleDto = req.body; // Use DTO
       const user = req.user;
 
       if (!user) {
@@ -15,11 +16,11 @@ export class ArticlesController {
       }
       const userId = user.id;
 
-      if (!title || !content) {
+      if (!createArticleDto.title || !createArticleDto.content) { // Validate DTO fields
         return res.status(400).json({ message: '제목과 내용을 모두 입력해주세요.' });
       }
 
-      const newArticle = await this.articlesService.createArticle(title, content, userId);
+      const newArticle = await this.articlesService.createArticle(createArticleDto, userId); // Pass DTO
 
       return res.status(201).json({ data: newArticle });
     } catch (err) {
@@ -62,7 +63,7 @@ export class ArticlesController {
   updateArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { articleId } = req.params;
-      const { title, content } = req.body;
+      const updateArticleDto: UpdateArticleDto = req.body; // Use DTO
       const user = req.user;
 
       if (!user) {
@@ -70,7 +71,7 @@ export class ArticlesController {
       }
       const userId = user.id;
 
-      const updatedArticle = await this.articlesService.updateArticle(+articleId, userId, title, content);
+      const updatedArticle = await this.articlesService.updateArticle(+articleId, userId, updateArticleDto); // Pass DTO
 
       return res.status(200).json({ data: updatedArticle });
     } catch (err: any) {

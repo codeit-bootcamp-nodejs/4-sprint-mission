@@ -1,16 +1,18 @@
 import { ProductsRepository } from '../repositories/products.repository.js';
 import { Prisma, NotificationType } from '@prisma/client'; // Import NotificationType
 import { NotificationsService } from './notifications.service.js'; // Import NotificationsService
+import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js'; // Import DTOs
 
 export class ProductsService {
   productsRepository = new ProductsRepository();
   notificationsService = NotificationsService.getInstance(); // Get singleton instance
 
-  createProduct = async (name: string, content: string, userId: number, price?: number) => { // price 추가
+  createProduct = async (createProductDto: CreateProductDto, userId: number) => { // Use DTO
+    const { name, content, price } = createProductDto; // Destructure DTO
     const newProduct = await this.productsRepository.createProduct({
       name,
       content,
-      price, // price 추가
+      price,
       author: {
         connect: { id: userId },
       },
@@ -43,7 +45,8 @@ export class ProductsService {
     return responseProduct;
   };
 
-  updateProduct = async (productId: number, userId: number, name?: string, content?: string, price?: number) => { // Add price
+  updateProduct = async (productId: number, userId: number, updateProductDto: UpdateProductDto) => { // Use DTO
+    const { name, content, price } = updateProductDto; // Destructure DTO
     const product = await this.productsRepository.findProductByIdSimple(productId);
     if (!product) {
       const err = new Error("상품을 찾을 수 없습니다.");
@@ -56,7 +59,7 @@ export class ProductsService {
       throw err;
     }
 
-    if (!name && !content && price === undefined) { // Check for price as well
+    if (!name && !content && price === undefined) {
       const err = new Error("수정할 정보를 입력해주세요.");
       err.name = "BadRequestError";
       throw err;
@@ -65,13 +68,13 @@ export class ProductsService {
     const dataToUpdate: Prisma.ProductUpdateInput = {};
     if (name) dataToUpdate.name = name;
     if (content) dataToUpdate.content = content;
-    if (price !== undefined) dataToUpdate.price = price; // Add price to update data
+    if (price !== undefined) dataToUpdate.price = price;
 
     const updatedProduct = await this.productsRepository.updateProduct(productId, dataToUpdate);
 
     // Notification for price change
     if (price !== undefined && product.price !== price) {
-      const likedUsers = await this.productsRepository.findProductLikesByProductId(productId); // Need to implement this in repository
+      const likedUsers = await this.productsRepository.findProductLikesByProductId(productId);
       for (const like of likedUsers) {
         await this.notificationsService.createNotification(
           like.userId,

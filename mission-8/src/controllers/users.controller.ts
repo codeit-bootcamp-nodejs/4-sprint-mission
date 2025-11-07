@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UsersService } from "../services/users.service.js";
+import { SignUpDto, SignInDto, UpdateUserDto, UpdatePasswordDto } from "../dtos/user.dto.js"; // Import DTOs
 // getMyProducts, getLikedProducts는 아직 리팩토링 전이라 prisma가 필요합니다.
 import { prisma } from "../utils/prisma.util.js";
 
@@ -9,19 +10,19 @@ export class UsersController {
   // 회원가입
   signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { password, confirmPassword, email, nickname } = req.body;
+      const signUpDto: SignUpDto = req.body; // Use DTO
 
-      if (!email || !password || !confirmPassword || !nickname) {
+      if (!signUpDto.email || !signUpDto.password || !signUpDto.confirmPassword || !signUpDto.nickname) {
         return res.status(400).json({ message: "모든 필드 입력해주세요." });
       }
-      if (password.length < 6) {
+      if (signUpDto.password.length < 6) {
         return res.status(400).json({ message: "비밀번호는 6자리 이상이어야 합니다." });
       }
-      if (password !== confirmPassword) {
+      if (signUpDto.password !== signUpDto.confirmPassword) {
         return res.status(400).json({ message: "비밀번호를 확인해주세요" });
       }
 
-      const newUser = await this.usersService.signUp(email, password, nickname);
+      const newUser = await this.usersService.signUp(signUpDto); // Pass DTO
       return res.status(201).json({ data: newUser });
     } catch (err: any) {
       if (err.name === "ConflictError") {
@@ -34,11 +35,11 @@ export class UsersController {
   // 로그인
   signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { email, password } = req.body;
-      if (!email || !password) {
+      const signInDto: SignInDto = req.body; // Use DTO
+      if (!signInDto.email || !signInDto.password) {
         return res.status(400).json({ message: "이메일과 비밀번호를 모두 입력해주세요." });
       }
-      const tokens = await this.usersService.signIn(email, password);
+      const tokens = await this.usersService.signIn(signInDto); // Pass DTO
       return res.status(200).json({ data: tokens });
     } catch (err: any) {
       if (err.name === "UnauthorizedError") {
@@ -77,11 +78,11 @@ export class UsersController {
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const { image, nickname } = req.body;
-      if (!nickname && !image) {
+      const updateUserDto: UpdateUserDto = req.body; // Use DTO
+      if (!updateUserDto.nickname && !updateUserDto.image) {
         return res.status(400).json({ message: "수정할 정보를 입력해주세요." });
       }
-      const updatedUser = await this.usersService.updateMe(user.id, nickname, image);
+      const updatedUser = await this.usersService.updateMe(user.id, updateUserDto); // Pass DTO
       return res.status(200).json({ data: updatedUser });
     } catch (err: any) {
       if (err.name === "ConflictError") {
@@ -98,17 +99,17 @@ export class UsersController {
       if (!user) {
         return res.status(401).json({ message: "인증 정보가 없습니다." });
       }
-      const { currentPassword, newPassword, confirmNewPassword } = req.body;
-      if (!currentPassword || !newPassword || !confirmNewPassword) {
+      const updatePasswordDto: UpdatePasswordDto = req.body; // Use DTO
+      if (!updatePasswordDto.currentPassword || !updatePasswordDto.newPassword || !updatePasswordDto.confirmNewPassword) {
         return res.status(400).json({ message: "모든 필드 입력해주세요" });
       }
-      if (newPassword.length < 6) {
+      if (updatePasswordDto.newPassword.length < 6) {
         return res.status(400).json({ message: "새로운 비밀번호는 6자 이상 작성해야합니다." });
       }
-      if (newPassword !== confirmNewPassword) {
+      if (updatePasswordDto.newPassword !== updatePasswordDto.confirmNewPassword) {
         return res.status(400).json({ message: "새로운 비밀번호 일치하지 않습니다." });
       }
-      await this.usersService.updatePassword(user.id, currentPassword, newPassword);
+      await this.usersService.updatePassword(user.id, updatePasswordDto); // Pass DTO
       return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다." });
     } catch (err: any) {
       if (err.name === "NotFoundError") {

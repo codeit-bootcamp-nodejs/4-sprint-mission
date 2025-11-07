@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { ProductsService } from '../services/products.service.js';
-import { prisma } from '../utils/prisma.util.js';
+import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js'; // Import DTOs
 
 export class ProductsController {
   productsService = new ProductsService();
@@ -8,18 +8,18 @@ export class ProductsController {
   // 상품 등록
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, content, price } = req.body; // price 추가
+      const createProductDto: CreateProductDto = req.body; // Use DTO
       const user = req.user;
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        return res.status(401).json({ message: '인증 정보가 없습니다.' });
       }
       const userId = user.id;
 
-      if (!name || !content) {
+      if (!createProductDto.name || !createProductDto.content) { // Validate DTO fields
         return res.status(400).json({ message: '상품명과 내용을 모두 입력해주세요.' });
       }
 
-      const newProduct = await this.productsService.createProduct(name, content, userId, price); // price 전달
+      const newProduct = await this.productsService.createProduct(createProductDto, userId); // Pass DTO
 
       return res.status(201).json({ data: newProduct });
     } catch (err) {
@@ -59,14 +59,14 @@ export class ProductsController {
   updateProduct = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { productId } = req.params;
-      const { name, content, price } = req.body; // price 추가
+      const updateProductDto: UpdateProductDto = req.body; // Use DTO
       const user = req.user;
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        return res.status(401).json({ message: '인증 정보가 없습니다.' });
       }
       const userId = user.id;
 
-      const updatedProduct = await this.productsService.updateProduct(+productId, userId, name, content, price); // price 전달
+      const updatedProduct = await this.productsService.updateProduct(+productId, userId, updateProductDto); // Pass DTO
 
       return res.status(200).json({ data: updatedProduct });
     } catch (err: any) {

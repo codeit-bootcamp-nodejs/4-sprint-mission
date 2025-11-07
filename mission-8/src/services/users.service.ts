@@ -2,11 +2,13 @@ import { UsersRepository } from '../repositories/users.repository.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
+import { SignUpDto, SignInDto, UpdateUserDto, UpdatePasswordDto } from '../dtos/user.dto.js'; // Import DTOs
 
 export class UsersService {
   usersRepository = new UsersRepository();
 
-  signUp = async (email: string, password: string, nickname: string) => {
+  signUp = async (signUpDto: SignUpDto) => { // Use DTO
+    const { email, password, nickname } = signUpDto; // Destructure DTO
     const isExistUser = await this.usersRepository.findUserByEmailOrNickname(email, nickname);
     if (isExistUser) {
       const err = new Error("이미 사용중인 이메일 또는 닉네임 입니다.");
@@ -31,7 +33,8 @@ export class UsersService {
     };
   };
 
-  signIn = async (email: string, password: string) => {
+  signIn = async (signInDto: SignInDto) => { // Use DTO
+    const { email, password } = signInDto; // Destructure DTO
     const user = await this.usersRepository.findUserByEmail(email);
     if (!user) {
       const err = new Error("인증 정보가 유효하지 않습니다.");
@@ -67,7 +70,8 @@ export class UsersService {
     return { accessToken, refreshToken };
   };
 
-  updateMe = async (userId: number, nickname: string | undefined, image: string | undefined) => {
+  updateMe = async (userId: number, updateUserDto: UpdateUserDto) => { // Use DTO
+    const { nickname, image } = updateUserDto; // Destructure DTO
     if (nickname) {
       const isExistNickname = await this.usersRepository.findOtherUserByNickname(nickname, userId);
       if (isExistNickname) {
@@ -86,7 +90,8 @@ export class UsersService {
     return updatedUser;
   };
 
-  updatePassword = async (userId: number, currentPassword: string, newPassword: string) => {
+  updatePassword = async (userId: number, updatePasswordDto: UpdatePasswordDto) => { // Use DTO
+    const { currentPassword, newPassword } = updatePasswordDto; // Destructure DTO
     const user = await this.usersRepository.findUserById(userId);
     if (!user) {
       // This should not happen if the user is authenticated, but as a safeguard

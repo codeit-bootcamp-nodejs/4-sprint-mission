@@ -1,10 +1,12 @@
 import { ArticlesRepository } from '../repositories/articles.repository.js';
 import { Prisma } from '@prisma/client';
+import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js'; // Import DTOs
 
 export class ArticlesService {
   articlesRepository = new ArticlesRepository();
 
-  createArticle = async (title: string, content: string, userId: number) => {
+  createArticle = async (createArticleDto: CreateArticleDto, userId: number) => { // Use DTO
+    const { title, content } = createArticleDto; // Destructure DTO
     const newArticle = await this.articlesRepository.createArticle({
       title,
       content,
@@ -40,7 +42,8 @@ export class ArticlesService {
     return responseArticle;
   };
 
-  updateArticle = async (articleId: number, userId: number, title?: string, content?: string) => {
+  updateArticle = async (articleId: number, userId: number, updateArticleDto: UpdateArticleDto) => { // Use DTO
+    const { title, content } = updateArticleDto; // Destructure DTO
     const article = await this.articlesRepository.findArticleByIdSimple(articleId);
     if (!article) {
       const err = new Error("게시글을 찾을 수 없습니다.");

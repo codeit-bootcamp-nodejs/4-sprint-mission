@@ -1,12 +1,14 @@
 import { CommentsRepository } from '../repositories/comments.repository.js';
 import { Prisma, NotificationType } from '@prisma/client'; // Import NotificationType
 import { NotificationsService } from './notifications.service.js'; // Import NotificationsService
+import { CreateCommentDto, UpdateCommentDto } from '../dtos/comment.dto.js'; // Import DTOs
 
 export class CommentsService {
   commentsRepository = new CommentsRepository();
   notificationsService = NotificationsService.getInstance(); // Get singleton instance
 
-  createArticleComment = async (articleId: number, content: string, userId: number) => {
+  createArticleComment = async (articleId: number, createCommentDto: CreateCommentDto, userId: number) => { // Use DTO
+    const { content } = createCommentDto; // Destructure DTO
     if (!content) {
       const err = new Error("댓글 내용을 입력해주세요.");
       err.name = "BadRequestError";
@@ -40,7 +42,8 @@ export class CommentsService {
     return newComment;
   };
 
-  createProductComment = async (productId: number, content: string, userId: number) => {
+  createProductComment = async (productId: number, createCommentDto: CreateCommentDto, userId: number) => { // Use DTO
+    const { content } = createCommentDto; // Destructure DTO
     if (!content) {
       const err = new Error("댓글 내용을 입력해주세요.");
       err.name = "BadRequestError";
@@ -86,7 +89,8 @@ export class CommentsService {
     return comments;
   };
 
-  updateComment = async (commentId: number, content: string, userId: number) => {
+  updateComment = async (commentId: number, updateCommentDto: UpdateCommentDto, userId: number) => { // Use DTO
+    const { content } = updateCommentDto; // Destructure DTO
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) {
       const err = new Error("댓글을 찾을 수 없습니다.");
