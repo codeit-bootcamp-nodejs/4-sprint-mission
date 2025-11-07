@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 export class LikeRepository {
   constructor(private prisma: PrismaClient) {}
@@ -37,5 +37,16 @@ export class LikeRepository {
     return await this.prisma.articleLike.delete({
       where: { userId_articleId: { userId, articleId } },
     });
+  };
+
+  /**
+   * 특정 상품을 좋아요한 모든 사용자 ID 목록을 반환합니다.
+   */
+  findUserIdsByProductId = async (productId: number): Promise<number[]> => {
+    const likes = await this.prisma.productLike.findMany({
+      where: { productId },
+      select: { userId: true },
+    });
+    return likes.map((like) => like.userId);
   };
 }

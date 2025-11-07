@@ -41,7 +41,6 @@ const likeRepository = new LikeRepository(prisma);
 const notificationRepository = new NotificationRepository(prisma);
 
 // Service
-const productService = new ProductService(productRepository);
 const articleService = new ArticleService(articleRepository, prisma);
 const userService = new UserService(userRepository, productRepository);
 const likeService = new LikeService(
@@ -51,7 +50,6 @@ const likeService = new LikeService(
 );
 
 // Controller
-const productController = new ProductController(productService, likeService);
 const articleController = new ArticleController(articleService, likeService);
 const imageController = new ImageController();
 const userController = new UserController(userService);
@@ -61,7 +59,6 @@ const validationMiddleware = new ValidationMiddleware();
 const imageMiddleware = new ImageMiddleware();
 
 const container = {
-  productController,
   articleController,
   imageController,
   userController,
@@ -121,6 +118,29 @@ const container = {
       this._commentController = new CommentController(this.commentService);
     }
     return this._commentController;
+  },
+
+  _productService: null as ProductService | null,
+  get productService(): ProductService {
+    if (!this._productService) {
+      this._productService = new ProductService(
+        this.productRepository,
+        this.likeRepository,
+        this.notificationService
+      );
+    }
+    return this._productService;
+  },
+
+  _productController: null as ProductController | null,
+  get productController(): ProductController {
+    if (!this._productController) {
+      this._productController = new ProductController(
+        this.productService,
+        this.likeService
+      );
+    }
+    return this._productController;
   },
 };
 

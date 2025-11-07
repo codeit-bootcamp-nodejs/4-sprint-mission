@@ -21,7 +21,6 @@ app.use(cors());
 app.use(express.json());
 
 const {
-  productController,
   articleController,
   imageController,
   userController,
@@ -32,7 +31,7 @@ const {
 app.use(
   "/products",
   productRouter(
-    productController,
+    container.productController,
     container.commentController,
     validationMiddleware
   )
