@@ -5,7 +5,7 @@ import {
   validatePatchBody,
   validatePostBody,
 } from '@/middlewares/validators/articleValidator.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import optionalAuthentication from '@/middlewares/optionalAuthentication.js';
 import {
   validateGetListQuery,

@@ -1,7 +1,7 @@
 import express from 'express';
 import asyncHandler from '@/middlewares/asyncHandler.js';
 import { validatePatchUser } from '@/middlewares/validators/userValidator.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import container from '@/lib/inversify.config.js';
 import { TYPES } from '@/types/layer.types.js';
 import type { UserController } from '@/controllers/user.controller.js';

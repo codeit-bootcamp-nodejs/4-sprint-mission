@@ -1,7 +1,7 @@
 import express from 'express';
 import upload from '@/lib/multer.js';
 import asyncHandler from '@/middlewares/asyncHandler.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import container from '@/lib/inversify.config.js';
 import { TYPES } from '@/types/layer.types.js';
 import { ImageController } from '@/controllers/image.controller.js';

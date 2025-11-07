@@ -1,6 +1,6 @@
 import express from 'express';
 import asyncHandler from '@/middlewares/asyncHandler.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import {
   validatePostBody,
   validatePatchBody,

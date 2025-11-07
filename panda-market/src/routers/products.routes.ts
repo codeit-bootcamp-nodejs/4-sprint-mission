@@ -9,7 +9,7 @@ import {
   validateId,
   validateGetListQuery,
 } from '@/middlewares/validators/sharedValidator.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import optionalAuthentication from '@/middlewares/optionalAuthentication.js';
 import container from '@/lib/inversify.config.js';
 import type { ProductController } from '@/controllers/product.controller.js';

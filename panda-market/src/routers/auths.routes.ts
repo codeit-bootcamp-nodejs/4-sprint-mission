@@ -4,7 +4,7 @@ import {
   validateLoginBody,
   validateSignupBody,
 } from '@/middlewares/validators/authValidator.js';
-import authentication from '@/middlewares/authentication.js';
+import { authentication } from '@/middlewares/authentication.js';
 import container from '@/lib/inversify.config.js';
 import { AuthController } from '@/controllers/auth.controller.js';
 import { TYPES } from '@/types/layer.types.js';
