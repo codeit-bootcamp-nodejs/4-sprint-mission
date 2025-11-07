@@ -3,7 +3,7 @@ import type { Prisma, PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { CommentId } from '@/types/base-comment.typs.js';
-import { GetCommentListParams } from '@/dto/product-comments.dto.js';
+import { CreateDTO, GetCommentListParams } from '@/dto/product-comments.dto.js';
 import { UserId } from '@/types/user.types.js';
 
 @injectable()
@@ -51,8 +51,9 @@ export class ProductCommentRepository {
       where: { userId },
     });
   }
-  async create(data: Prisma.ProductCommentCreateInput) {
-    return await this.prisma.productComment.create({
+  async create({ tx, createData: data }: CreateDTO) {
+    const db = tx || this.prisma;
+    return await db.productComment.create({
       data,
       include: {
         product: true,

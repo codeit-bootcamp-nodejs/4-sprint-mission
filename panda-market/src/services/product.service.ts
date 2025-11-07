@@ -8,14 +8,21 @@ import {
   PostProductDTO,
   ProductParams,
 } from '@/dto/products.dto.js';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { NotifyType, Prisma, PrismaClient } from '@prisma/client';
 import { TagRepository } from '@/repositories/tags.repository.js';
 import {
   deleteCloudinaryFile,
   extractPublicIdFromCloudinaryUrl,
 } from '@/lib/cloudinary.js';
 import { ProductImageRepository } from '@/repositories/product-images.repository.js';
-import { ImageUpdateInput, TagUpdateInput } from '@/types/product.types.js';
+import {
+  ImageUpdateInput,
+  PriceUpdateInput,
+  TagUpdateInput,
+} from '@/types/product.types.js';
+import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
+import { NotificationRepository } from '@/repositories/notification.repository.js';
+import { Server } from 'socket.io';
 
 @injectable()
 export class ProductService {
@@ -28,6 +35,12 @@ export class ProductService {
     private readonly tagRepository: TagRepository,
     @inject(TYPES.ProductImageRepository)
     private readonly productImageRepository: ProductImageRepository,
+    @inject(TYPES.ProductLikeRepository)
+    private readonly productLikeRepository: ProductLikeRepository,
+    @inject(TYPES.NotificationRepository)
+    private readonly notificationRepository: NotificationRepository,
+    @inject(TYPES.SocketIO)
+    private readonly io: Server,
   ) {}
   private async authorization({
     userId,
@@ -101,6 +114,42 @@ export class ProductService {
       },
     };
   }
+  private async updatePrice({
+    tx,
+    productId,
+    userId,
+    newPrice,
+  }: PriceUpdateInput) {
+    const likers = await this.productLikeRepository.findManyByProductId({
+      productId,
+      tx,
+    });
+    const recipientIds = likers.map((like) => like.userId);
+
+    if (recipientIds.length > 0) {
+      const notificationData = recipientIds.map((id) => ({
+        recipientId: id,
+        senderId: userId,
+        type: NotifyType.PRICE_UPDATE_PRODUCT,
+        targetId: productId,
+      }));
+
+      await this.notificationRepository.createMany({
+        createData: notificationData,
+        tx,
+      });
+      recipientIds.forEach((id) => {
+        if (id === userId) return;
+        const userRoom = `user_${id}`;
+        this.io.to(userRoom).emit('new_notification', {
+          type: NotifyType.PRICE_UPDATE_PRODUCT,
+          message: '좋아요한 상품의 가격이 변동되었습니다!',
+          productId: productId,
+          newPrice: newPrice,
+        });
+      });
+    }
+  }
 
   async getProductList({ keyword, page, pageSize, userId }: GetListParams) {
     const products = await this.productRepository.findMany({
@@ -172,16 +221,23 @@ export class ProductService {
   }
   async patchProduct({ userId, productId, data }: PatchProductDTO) {
     if (await this.authorization({ userId, productId })) {
-      const { tags: newTags, imageUrls: newImages, ...restData } = data;
+      const {
+        tags: newTags,
+        imageUrls: newImages,
+        price: newPrice,
+        ...restData
+      } = data;
       const patchData: Prisma.ProductUpdateInput = {
+        price: newPrice,
         ...restData,
       };
       let deletedImages: string[] = [];
-      if (!newTags && !newImages) {
-        if (Object.keys(patchData).length > 0) {
+      if (!newTags && !newImages && newPrice === undefined) {
+        // 가격은 0원도 유효한 값임
+        if (Object.keys(restData).length > 0) {
           return await this.productRepository.update({
             productId,
-            patchData,
+            patchData: restData,
           });
         } else {
           throw new BadRequestError('수정할 상품 데이터가 없습니다.');
@@ -205,6 +261,21 @@ export class ProductService {
           });
           deletedImages = result.deletedImageIds;
           patchData.images = result.query;
+        }
+        // 가격 변경시 좋아요 누른 유저에게 알림 발송
+        if (newPrice !== undefined) {
+          const oldProduct = await this.productRepository.findPriceById({
+            productId,
+            tx,
+          });
+          if (oldProduct && oldProduct.price !== newPrice) {
+            await this.updatePrice({
+              tx,
+              productId,
+              userId,
+              newPrice,
+            });
+          }
         }
         await this.productRepository.update({
           productId,

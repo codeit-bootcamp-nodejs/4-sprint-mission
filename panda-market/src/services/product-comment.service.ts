@@ -7,12 +7,24 @@ import {
   GetCommentListParams,
   PostCommentDTO,
 } from '@/dto/product-comments.dto.js';
+import { ProductRepository } from '@/repositories/products.repository.js';
+import { Notification, NotifyType, PrismaClient } from '@prisma/client';
+import { NotificationRepository } from '@/repositories/notification.repository.js';
+import { Server } from 'socket.io';
 
 @injectable()
 export class ProductCommentService {
   constructor(
     @inject(TYPES.ProductCommentRepository)
     private readonly productCommentRepository: ProductCommentRepository,
+    @inject(TYPES.NotificationRepository)
+    private readonly notificationRepository: NotificationRepository,
+    @inject(TYPES.SocketIO)
+    private readonly io: Server,
+    @inject(TYPES.ProductRepository)
+    private readonly productRepository: ProductRepository,
+    @inject(TYPES.PrismaClient)
+    private readonly prisma: PrismaClient,
   ) {}
 
   async authorization({ userId, commentId }: CommentParams): Promise<boolean> {
@@ -36,6 +48,11 @@ export class ProductCommentService {
   }
 
   async postComment({ userId, productId, content }: PostCommentDTO) {
+    const { userId: authorId } = await this.productRepository.findOwnerById({
+      productId,
+    });
+    let newNotification: Notification | null = null;
+
     const createData = {
       user: {
         connect: {
@@ -49,7 +66,37 @@ export class ProductCommentService {
       },
       content,
     };
-    const comment = await this.productCommentRepository.create(createData);
+    const comment = await this.prisma.$transaction(async (tx) => {
+      const createdComment = await this.productCommentRepository.create({
+        tx,
+        createData,
+      });
+      if (userId !== authorId) {
+        const createData = {
+          recipient: {
+            connect: {
+              id: authorId,
+            },
+          },
+          sender: {
+            connect: {
+              id: userId,
+            },
+          },
+          type: NotifyType.NEW_COMMENT_PRODUCT,
+          targetId: productId,
+        };
+        newNotification = await this.notificationRepository.create({
+          tx,
+          createData,
+        });
+      }
+      return createdComment;
+    });
+    if (newNotification) {
+      const authorRoom = `user_${authorId}`;
+      this.io.to(authorRoom).emit('new_notification', newNotification);
+    }
     return comment;
   }
 

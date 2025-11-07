@@ -48,9 +48,13 @@ export class AuthService {
   }
 
   async login({ received_email, received_password }: Login) {
-    const { id, password } = await this.authRepository.findByEmail({
+    const currentUser = await this.authRepository.findByEmail({
       received_email,
     });
+    if (!currentUser) {
+      throw new UnauthorizedError('가입되어 있지 않은 사용자입니다.');
+    }
+    const { id, password } = currentUser;
     if (!password) {
       throw new UnauthorizedError('간편 로그인 회원입니다.');
     }

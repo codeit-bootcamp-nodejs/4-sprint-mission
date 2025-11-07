@@ -23,6 +23,13 @@ export class ProductRepository {
       select: { userId: true },
     });
   }
+  async findPriceById({ productId, tx }: ProductIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.product.findUnique({
+      where: { id: productId },
+      select: { price: true },
+    });
+  }
   async findById({ productId, userId, tx }: ProductParams) {
     const db = tx || this.prisma;
     return await db.product.findUniqueOrThrow({

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import { ProductParams } from '@/dto/products.dto.js';
+import { ProductIdWithTx, ProductParams } from '@/dto/products.dto.js';
 import { UserId } from '@/types/user.types.js';
 
 @injectable()
@@ -17,6 +17,14 @@ export class ProductLikeRepository {
           userId,
           productId,
         },
+      },
+    });
+  }
+  async findManyByProductId({ productId, tx }: ProductIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.productLike.findMany({
+      where: {
+        productId,
       },
     });
   }

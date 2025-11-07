@@ -15,7 +15,7 @@ export class AuthRepository {
     @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
   ) {}
   async findByEmail({ received_email }: FindByEmailDTO) {
-    return await this.prisma.user.findUniqueOrThrow({
+    return await this.prisma.user.findUnique({
       where: { email: received_email },
     });
   }

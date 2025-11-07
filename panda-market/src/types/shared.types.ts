@@ -18,4 +18,3 @@ export interface GetListParams extends UserId {
   page: number;
   pageSize: number;
 }
-export type Options = Omit<Prisma.UserFindUniqueOrThrowArgs, 'where'>;
