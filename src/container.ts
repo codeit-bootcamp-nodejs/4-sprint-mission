@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 import {
   ProductController,
   ArticleController,
   CommentController,
   ImageController,
   UserController,
-} from './controller';
+} from "./controller";
 
 import {
   ProductService,
@@ -13,7 +13,7 @@ import {
   CommentService,
   UserService,
   LikeService,
-} from './service';
+} from "./service";
 
 import {
   ProductRepository,
@@ -21,10 +21,11 @@ import {
   CommentRepository,
   UserRepository,
   LikeRepository,
-} from './repository';
+} from "./repository";
 
-import { ValidationMiddleware } from './middleware/validation-middleware';
-import { ImageMiddleware } from './middleware/image-middleware';
+import { ValidationMiddleware } from "./middleware/validation-middleware";
+import { ImageMiddleware } from "./middleware/image-middleware";
+import { Server } from "socket.io";
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,7 @@ const userService = new UserService(userRepository, productRepository);
 const likeService = new LikeService(
   likeRepository,
   productRepository,
-  articleRepository,
+  articleRepository
 );
 
 // Controller
@@ -66,4 +67,5 @@ export default {
   validationMiddleware,
   imageMiddleware,
   likeService,
+  io: null as Server | null,
 };
