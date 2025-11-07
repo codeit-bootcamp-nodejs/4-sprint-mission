@@ -43,7 +43,6 @@ const notificationRepository = new NotificationRepository(prisma);
 // Service
 const productService = new ProductService(productRepository);
 const articleService = new ArticleService(articleRepository, prisma);
-const commentService = new CommentService(commentRepository);
 const userService = new UserService(userRepository, productRepository);
 const likeService = new LikeService(
   likeRepository,
@@ -54,7 +53,6 @@ const likeService = new LikeService(
 // Controller
 const productController = new ProductController(productService, likeService);
 const articleController = new ArticleController(articleService, likeService);
-const commentController = new CommentController(commentService);
 const imageController = new ImageController();
 const userController = new UserController(userService);
 
@@ -65,7 +63,6 @@ const imageMiddleware = new ImageMiddleware();
 const container = {
   productController,
   articleController,
-  commentController,
   imageController,
   userController,
   validationMiddleware,
@@ -74,7 +71,12 @@ const container = {
 
   // io와 Notification 관련 객체들을 관리
   io: null as Server | null,
-  notificationRepository, // Repository는 io가 필요 없으므로 바로 등록
+  productRepository,
+  articleRepository,
+  commentRepository,
+  userRepository,
+  likeRepository,
+  notificationRepository,
 
   // Service와 Controller는 io 객체가 설정된 후에 생성되도록 getter로 만듦
   _notificationService: null as NotificationService | null,
@@ -99,6 +101,26 @@ const container = {
       );
     }
     return this._notificationController;
+  },
+
+  _commentService: null as CommentService | null,
+  get commentService(): CommentService {
+    if (!this._commentService) {
+      this._commentService = new CommentService(
+        this.commentRepository,
+        this.articleRepository,
+        this.notificationService
+      );
+    }
+    return this._commentService;
+  },
+
+  _commentController: null as CommentController | null,
+  get commentController(): CommentController {
+    if (!this._commentController) {
+      this._commentController = new CommentController(this.commentService);
+    }
+    return this._commentController;
   },
 };
 

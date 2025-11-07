@@ -1,34 +1,63 @@
-import { CommentRepository } from '../repository/comment-repository';
+import { CommentRepository } from "../repository/comment-repository";
 import {
   CreateCommentDto,
   UpdateCommentDto,
   CommentListResponseDto,
-} from '../types/dto';
-import { Comment, Prisma } from '@prisma/client';
+} from "../types/dto";
+import { Comment, Prisma } from "@prisma/client";
+import { ArticleRepository } from "../repository/article-repository";
+import { NotificationService } from "./notification-service";
 
 export class CommentService {
-  constructor(private commentRepository: CommentRepository) {}
+  constructor(
+    private commentRepository: CommentRepository,
+    private articleRepository: ArticleRepository,
+    private notificationService: NotificationService
+  ) {}
 
   createComment = async (
     userId: number,
+    commenterNickname: string,
     createCommentDto: CreateCommentDto,
     productId: string | undefined,
-    articleId: string | undefined,
+    articleId: string | undefined
   ): Promise<Comment> => {
     const { content } = createCommentDto;
-    return await this.commentRepository.createComment(
+    const newComment = await this.commentRepository.createComment(
       userId,
       content,
       productId,
-      articleId,
+      articleId
     );
+
+    // 게시글 댓글 알림 로직
+    if (articleId) {
+      // 게시글 정보 조회
+      const article = await this.articleRepository.findArticleById(articleId);
+
+      // 게시글이 존재하고, 댓글 작성자와 게시글 작성자가 다를 때 알림 생성
+      if (article && article.userId !== userId) {
+        const message = `${commenterNickname}님이 '${article.title}' 게시글에 댓글을 남겼습니다.`;
+        const link = `/articles/${articleId}`;
+
+        // 2-3. 알림 생성 및 실시간 전송
+        await this.notificationService.createAndSendNotification(
+          article.userId,
+          message,
+          "NEW_COMMENT",
+          link
+        );
+      }
+    }
+
+    return newComment;
   };
 
   getComments = async (
     productId: string | undefined,
     articleId: string | undefined,
     limit: number,
-    cursor: number | undefined,
+    cursor: number | undefined
   ): Promise<CommentListResponseDto> => {
     const where: Prisma.CommentWhereInput = {
       productId: productId ? parseInt(productId) : undefined,
@@ -38,7 +67,7 @@ export class CommentService {
     const comments = await this.commentRepository.findManyComments(
       where,
       limit,
-      cursor,
+      cursor
     );
 
     const nextCursor =
@@ -50,15 +79,15 @@ export class CommentService {
   updateComment = async (
     userId: number,
     commentId: string,
-    updateCommentDto: UpdateCommentDto,
+    updateCommentDto: UpdateCommentDto
   ): Promise<Comment> => {
     const { content } = updateCommentDto;
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
-      throw new Error('댓글을 찾을 수 없습니다.');
+      throw new Error("댓글을 찾을 수 없습니다.");
     }
     if (comment.userId !== userId) {
-      throw new Error('댓글을 수정할 권한이 없습니다.');
+      throw new Error("댓글을 수정할 권한이 없습니다.");
     }
     return await this.commentRepository.updateComment(commentId, content);
   };
@@ -66,10 +95,10 @@ export class CommentService {
   deleteComment = async (userId: number, commentId: string): Promise<void> => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
-      throw new Error('댓글을 찾을 수 없습니다.');
+      throw new Error("댓글을 찾을 수 없습니다.");
     }
     if (comment.userId !== userId) {
-      throw new Error('댓글을 삭제할 권한이 없습니다.');
+      throw new Error("댓글을 삭제할 권한이 없습니다.");
     }
     await this.commentRepository.deleteComment(commentId);
   };
@@ -77,7 +106,7 @@ export class CommentService {
   getCommentById = async (commentId: string): Promise<Comment> => {
     const comment = await this.commentRepository.findCommentById(commentId);
     if (!comment) {
-      throw new Error('댓글을 찾을 수 없습니다.');
+      throw new Error("댓글을 찾을 수 없습니다.");
     }
     return comment;
   };

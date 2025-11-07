@@ -23,7 +23,6 @@ app.use(express.json());
 const {
   productController,
   articleController,
-  commentController,
   imageController,
   userController,
   validationMiddleware,
@@ -32,11 +31,19 @@ const {
 
 app.use(
   "/products",
-  productRouter(productController, commentController, validationMiddleware)
+  productRouter(
+    productController,
+    container.commentController,
+    validationMiddleware
+  )
 );
 app.use(
   "/articles",
-  articleRouter(articleController, commentController, validationMiddleware)
+  articleRouter(
+    articleController,
+    container.commentController,
+    validationMiddleware
+  )
 );
 app.use("/users", userRouter(userController));
 app.use("/uploads", imageRouter(imageController, imageMiddleware));
