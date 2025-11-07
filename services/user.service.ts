@@ -143,7 +143,14 @@ export async function inquiryService(userId: number): Promise<{
 
 
 // 내 정보 수정
-export async function editUserService(userId: number, data = {} ): Promise<{
+type EditUserData = {
+    password: string;
+    nickname: string;
+    email: string;
+    image: string | null ;
+};
+
+export async function editUserService(userId: number, data: EditUserData ): Promise<{
   id: number;
   email: string;
   nickname: string;
@@ -151,12 +158,8 @@ export async function editUserService(userId: number, data = {} ): Promise<{
   createdAt: Date;
   updatedAt: Date;
 }> {
-  const { password, nickname, email, image} = data as {
-    password: string;
-    nickname: string;
-    email: string;
-    image: string | null ;
-  };
+  const { password, nickname, email, image } = data;
+
   if (!password) {
     throw new HttpError("비밀번호는 필수입니다.", 400);
   }
@@ -239,7 +242,7 @@ export async function editPasswordService(userId: number,  currentPassword: stri
 
 
 // Refresh Token을 이용해 Access Token 재발급
-export async function refreshService(refreshToken: any): Promise<string>  {
+export async function refreshService(refreshToken: string): Promise<string>  {
   if (!refreshToken) {
     throw new HttpError("리프레쉬 토큰이 필요합니다.", 401);
   }

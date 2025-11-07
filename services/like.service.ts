@@ -1,6 +1,8 @@
 import prisma from "../prisma/prisma.js";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Like } from "@prisma/client";
+import { createNotification } from "./notification.service.js";
+
 // 로그인한 유저는 상품에 '좋아요' 와 '좋아요 취소' 가능                                 좋아요는 함수하나에 두개씩 들어가 있어서 한번더 확인 필요
 export async function likeProductService(userId: number, productId: number): Promise<
   | { message: "좋아요 취소" }
@@ -17,9 +19,7 @@ export async function likeProductService(userId: number, productId: number): Pro
   });
   
   if (!productId || isNaN(productId)) {
-    const error = new Error("상품 ID가 필요합니다.");
-    error.status = 400;
-    throw error;
+    throw new HttpError("상품 ID가 필요합니다.", 404)
   }
 
   if (existingLike) {
@@ -34,6 +34,44 @@ export async function likeProductService(userId: number, productId: number): Pro
       productId,
     },
   });
+    
+    // 알림 생성 로직
+    // 1. 상품 정보 조회 (작성자 확인)
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { userId: true, title: true },
+    });
+    
+    // 2. 자기 자신이 아니면 알림 생성
+    if (!product) {
+      console.log("상품을 찾을 수 없습니다:", productId);
+    } else if (product.userId === userId) {
+      console.log("자기 자신의 상품에 좋아요를 눌렀습니다. 알림 생성하지 않음.");
+    } else {
+      try {
+        // 좋아요를 누른 사용자 정보 조회 (닉네임)
+        const actor = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { nickname: true },
+        });
+        
+        console.log(`알림 생성 시도: 상품 작성자(${product.userId})에게, 좋아요 누른 사람(${userId})`);
+        
+        await createNotification({
+          userId: product.userId, // 상품 작성자에게
+          type: "LIKE",
+          message: `${actor?.nickname || "사용자"}님이 당신의 상품 "${product.title}"에 좋아요를 눌렀습니다.`,
+          productId: productId,
+          postId: null,
+        });
+        
+        console.log("알림 생성 성공");
+      } catch (error) {
+        // 알림 생성 실패해도 좋아요는 성공했으므로 에러 로그만 남기고 계속 진행
+        console.error("알림 생성 실패:", error);
+      }
+    }
+    
     return {
       message: "좋아요 추가",
       data: createdLike,
@@ -68,6 +106,44 @@ export async function likePostService(userId: number, postId: number): Promise<
       postId,
     },
   });
+  
+    // 알림 생성 로직
+    // 1. 게시글 정보 조회 (작성자 확인)
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      select: { userId: true, title: true },
+    });
+    
+    // 2. 자기 자신이 아니면 알림 생성
+    if (!post) {
+      console.log("게시글을 찾을 수 없습니다:", postId);
+    } else if (post.userId === userId) {
+      console.log("자기 자신의 게시글에 좋아요를 눌렀습니다. 알림 생성하지 않음.");
+    } else {
+      try {
+        // 좋아요를 누른 사용자 정보 조회 (닉네임)
+        const actor = await prisma.user.findUnique({
+          where: { id: userId },
+          select: { nickname: true },
+        });
+        
+        console.log(`알림 생성 시도: 게시글 작성자(${post.userId})에게, 좋아요 누른 사람(${userId})`);
+        
+        await createNotification({
+          userId: post.userId, // 게시글 작성자에게
+          type: "LIKE",
+          message: `${actor?.nickname || "사용자"}님이 당신의 게시글 "${post.title}"에 좋아요를 눌렀습니다.`,
+          productId: null,
+          postId: postId,
+        });
+        
+        console.log("알림 생성 성공");
+      } catch (error) {
+        // 알림 생성 실패해도 좋아요는 성공했으므로 에러 로그만 남기고 계속 진행
+        console.error("알림 생성 실패:", error);
+      }
+    }
+  
   return {
     message: "좋아요 추가",
     data: createdLikePost

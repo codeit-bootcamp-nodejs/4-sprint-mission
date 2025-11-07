@@ -93,10 +93,10 @@ export async function editUserController(req: Request, res: Response, next: Next
     const userId = Number(userIdStr);
     // 수정할 값들 꺼내오기
     const { password, nickname, email, image } = req.body as {
-      password?: string;
-      nickname?: string;
-      email?: string;
-      image?: string;
+      password: string;
+      nickname: string;
+      email: string;
+      image: string | null;
     };
 
     // 서비스 로직
