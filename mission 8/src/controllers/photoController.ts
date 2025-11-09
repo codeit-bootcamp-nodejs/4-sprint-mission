@@ -11,10 +11,8 @@ export class PhotoController {
     }
 
     try {
-      // 파일 저장 위치 → 지금은 로컬, 나중에 S3 같은 외부 스토리지로 확장 가능
       const imageUrl = `/download/${req.file.filename}`;
 
-      // 📌 기본 동작: 유저 프로필 업데이트
       const updatedUser = await prisma.user.update({
         where: { id: req.user.id },
         data: { image: imageUrl },

@@ -34,16 +34,19 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.3.1",
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
+    "jest": "^30.2.0",
     "prisma": "^6.15.0",
+    "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

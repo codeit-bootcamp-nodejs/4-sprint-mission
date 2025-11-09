@@ -5,12 +5,10 @@ import { CommentService } from "../services/commentService";
 
 const commentService = new CommentService();
 
-// body 검증
 const commentSchema = z.object({
   content: z.string().min(5).max(100),
 });
 
-// query 검증
 const commentListSchema = z.object({
   id: z.coerce.number().int().positive(),
   lastId: z.coerce.number().int().positive().optional(),

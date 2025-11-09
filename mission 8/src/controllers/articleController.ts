@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import status from "http-status";
 import { ArticleService } from "../services/articleService";
-import { ArticleCreateSchema, ArticleUpdateSchema, ArticleQuerySchema, ArticleUpdateDTO } from "../dtos/article.dto";
+import { ArticleCreateSchema, ArticleUpdateSchema, ArticleQuerySchema } from "../dtos/article.dto";
 
 const articleService = new ArticleService();
 
@@ -42,10 +42,9 @@ export class ArticleController {
   async update(req: Request, res: Response, next: NextFunction) {
     try {
       if (!req.user) return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });
-
       const parsed = ArticleUpdateSchema.parse(req.body) as { title?: string; content?: string; };
       const articleId = Number(req.params.id);
-      const updated = await articleService.update(req.user.id, articleId, parsed);
+      const updated = await articleService.update(req.user.id, parsed, articleId);
 
       res.status(status.OK).json(updated);
     } catch (err: any) {

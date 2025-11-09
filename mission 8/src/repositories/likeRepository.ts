@@ -64,4 +64,22 @@ export class LikeRepository {
       },
     });
   }
+
+  async findUsersWhoLikedProduct(productId: number) {
+    const likes = await prisma.like.findMany({
+      where: {
+        productId,
+        like: true,
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            nickname: true,
+          },
+        },
+      },
+    });
+    return likes.map((like) => like.user);
+  }
 }

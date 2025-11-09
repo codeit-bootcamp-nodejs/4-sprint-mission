@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+ import jwt from 'jsonwebtoken';
 import {
   JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET,

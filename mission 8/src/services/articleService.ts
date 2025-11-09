@@ -26,7 +26,7 @@ export class ArticleService {
     return this.repo.findById(id);
   }
 
-  async update(userId: number, articleId: number, data: { title?: string; content?: string; }) {
+  async update(userId: number, data: ArticleUpdateDTO, articleId: number) {
     const article = await this.repo.findById(articleId);
     if (!article) throw new Error("NOT_FOUND");
     if (article.userId !== userId) throw new Error("FORBIDDEN");
@@ -42,3 +42,5 @@ export class ArticleService {
     await this.repo.deleteArticle(articleId);
   }
 }
+
+export default new ArticleService();

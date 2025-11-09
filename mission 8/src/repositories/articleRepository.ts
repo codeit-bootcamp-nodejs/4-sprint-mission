@@ -24,7 +24,6 @@ export class ArticleRepository {
   }
 
   async updatedArticle(id: number, data: { title?: string; content?: string }) {
-    // undefined 필드 제거
     const updateData: { title?: string; content?: string } = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.content !== undefined) updateData.content = data.content;
@@ -32,7 +31,9 @@ export class ArticleRepository {
     return prisma.article.update({ where: { id }, data: updateData });
   }
 
-  async deleteArticle(id: number) {
-    return prisma.article.delete({ where: { id } });
+  async deleteArticle(id: number): Promise<void> {
+    await prisma.article.delete({ where: { id } });
   }
 }
+
+export default new ArticleRepository();
