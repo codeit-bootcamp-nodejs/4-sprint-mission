@@ -1,0 +1,44 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc2MjY5MTg0NCwiZXhwIjoxNzYyNjk1NDQ0fQ.TAqRi-x7S1zNKDHMRqnkGnePXzXA8NVYFky3QTC0dco
+
+### 특정 게시글 댓글 조회
+GET http://localhost:3000/posts/2/comments
+
+### 특정 댓글 조회
+GET http://localhost:3000/comments/1
+
+
+### 특정 상품 댓글 조회
+GET http://localhost:3000/products/2/comments
+
+
+### 특정 게시글 댓글 생성 (로그인 필요)
+POST http://localhost:3000/posts/2/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "소중한 게시글 정보 감사합니다."
+}
+
+
+### 특정 상품 댓글 생성 (로그인 필요)
+POST http://localhost:3000/products/2/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "소중한 상품 정보 감사합니다."
+}
+
+### 특정 댓글 수정 (작성자만 가능)
+PUT http://localhost:3000/comments/3
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "Thank you for your precious information."
+}
+
+### 특정 댓글 삭제 (작성자만 가능)
+DELETE http://localhost:3000/comments/2
+Authorization: Bearer {{accessToken}}
