@@ -1,5 +1,7 @@
 import { articleRepository } from "../repositories/articleRepository.js";
 import { articleCommentsRepository } from "../repositories/articleCommentsRepository.js";
+import { notificationRepository } from "../repositories/notificationRepository.js";
+import { emitToUser } from "../utils/notificationSocket.js";
 import type { ArticleComment } from "../types/dto.js";
 
 export const articleCommentsService = {
@@ -50,11 +52,31 @@ export const articleCommentsService = {
         throw error;
       }
 
-      return await articleCommentsRepository.createArticleComment(
+      const comment = articleCommentsRepository.createArticleComment(
         articleId,
         content,
         userId
       );
+
+      //  본인 작성 댓글이면 알림 안 보내기
+      if (article.userId && article.userId !== userId) {
+        // 알림 DB 생성
+        await notificationRepository.createNotification({
+          userId: article.userId, // 게시글 작성자에게 알림
+          type: "COMMENT",
+          message: `게시글 "${article.title}"에 새 댓글이 달렸습니다.`,
+          targetId: articleId,
+        });
+
+        // 실시간 전송
+        emitToUser(article.userId, {
+          type: "COMMENT",
+          message: `게시글 "${article.title}"에 새 댓글이 달렸습니다.`,
+          targetId: articleId,
+        });
+      }
+
+      return comment;
     } catch (err) {
       throw err;
     }
