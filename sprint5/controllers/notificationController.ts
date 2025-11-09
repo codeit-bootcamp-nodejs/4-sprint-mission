@@ -16,7 +16,9 @@ export const notificationController = {
         throw error;
       }
 
-      const notifications = notificationService.getNotificationsByUser(userId);
+      const notifications = await notificationService.getNotificationsByUser(
+        userId
+      );
 
       res.status(200).json(notifications);
     } catch (err) {
@@ -34,7 +36,9 @@ export const notificationController = {
         throw error;
       }
 
-      const notificationsCount = notificationService.getUnreadCount(userId);
+      const notificationsCount = await notificationService.getUnreadCount(
+        userId
+      );
 
       res.status(200).json(notificationsCount);
     } catch (err) {
