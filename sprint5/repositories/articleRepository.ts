@@ -93,6 +93,7 @@ export const articleRepository = {
       },
       select: {
         articleId: true,
+        userId: true,
       },
     });
   },

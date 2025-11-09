@@ -98,6 +98,7 @@ export const productRepository = {
       },
       select: {
         productId: true,
+        userId: true,
       },
     });
   },
