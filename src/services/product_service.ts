@@ -1,4 +1,5 @@
 import * as productRepo from "../repository/product_repository";
+import { createNotificationService } from "./notification_service";
 import { AppError } from "../utils/error";
 
 export async function createProductService({ data, user }: Product.Create) {
@@ -53,5 +54,16 @@ export async function updateProductService({
     updateData,
     user,
   });
-  return updatedProduct;
+
+  // 가격 변화있을 때
+  if (updateData.price !== undefined && updateData.price !== product.price) {
+    const likedUsers = await productRepo.findUserLikedProduct(id);
+    if (likedUsers && likedUsers.length > 0) {
+      const message = `좋아요한 상품 '${product.name}'의 가격이 ${updateData.price}원으로 변경되었습니다.`;
+      for (const { user } of likedUsers) {
+        await createNotificationService(user!.id, message);
+      }
+    }
+    return updatedProduct;
+  }
 }

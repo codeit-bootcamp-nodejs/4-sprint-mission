@@ -43,5 +43,5 @@
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false
   },
-  "include": ["src/**/*.ts", "src/typings/**/*.d.ts"]
+  "include": ["src/**/*.ts", "src/typings/**/*.d.ts", "src/test.js"]
 }

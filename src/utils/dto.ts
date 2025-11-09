@@ -5,7 +5,7 @@ export class ArticleDto {
   title!: string;
 
   @RequiredString("내용", 1, 1000)
-  comment!: string;
+  content!: string;
 }
 
 export class ProductDto {

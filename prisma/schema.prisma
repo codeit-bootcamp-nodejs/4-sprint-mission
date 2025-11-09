@@ -55,17 +55,18 @@ model Comment {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  nickname  String    @unique
-  image     String?
-  password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  product   Product[]
-  article   Article[]
-  comment   Comment[]
-  Like      Like[]
+  id           Int            @id @default(autoincrement())
+  email        String         @unique
+  nickname     String         @unique
+  image        String?
+  password     String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  product      Product[]
+  article      Article[]
+  comment      Comment[]
+  Like         Like[]
+  Notification Notification[]
 }
 
 model Like {
@@ -79,4 +80,13 @@ model Like {
 
   @@unique([articleId, userId])
   @@unique([productId, userId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
