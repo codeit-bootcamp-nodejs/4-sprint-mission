@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Socket.IO 테스트 클라이언트</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 20px;
+        background-color: #f0f2f5;
+      }
+      h1 {
+        color: #333;
+      }
+      pre {
+        background-color: #2d2d2d;
+        color: #f1f1f1;
+        padding: 15px;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Socket.IO 알림 수신기 (클라이언트 A)</h1>
+    <pre id="log">로그 대기 중...</pre>
+
+    <script>
+      // -----------------------------------------------------------------
+      // 🚨 토큰과 ngrok URL을 다시 확인하세요
+      // -----------------------------------------------------------------
+      const USER_A_TOKEN =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQwLCJpYXQiOjE3NjI1MTI5MjUsImV4cCI6MTc2MjUxNjUyNX0.z_NL3BchRcXSuBOrxddlwYfK__f4n_Yj8hkKbEklREY';
+
+      const BACKEND_NGROK_URL = 'http://localhost:3000';
+      // -----------------------------------------------------------------
+
+      const logElement = document.getElementById('log');
+
+      function log(message) {
+        console.log(message);
+        const timestamp = new Date().toLocaleTimeString();
+        logElement.innerHTML =
+          `[${timestamp}] ${message}\n` + logElement.innerHTML;
+      }
+
+      if (!USER_A_TOKEN || USER_A_TOKEN.includes('붙여넣기')) {
+        log("❌ 에러: 'USER_A_TOKEN' 변수를 수정해주세요.");
+      } else {
+        log(`🔌 서버 연결을 시도합니다 (${BACKEND_NGROK_URL})...`);
+
+        const socket = io(BACKEND_NGROK_URL, {
+          auth: {
+            token: USER_A_TOKEN,
+          },
+        });
+
+        // --- 표준 리스너 ---
+        socket.on('connect', () => {
+          log(`✅ [connect] 서버 연결 성공! (Socket ID: ${socket.id})`);
+          log('... (클라이언트 B가 댓글을 달면 알림이 여기에 뜹니다) ...');
+        });
+
+        socket.on('new_notification', (data) => {
+          log('🔔 [new_notification] 새 알림 수신!');
+          log(JSON.stringify(data, null, 2));
+        });
+
+        socket.on('disconnect', (reason) => {
+          log(`🔌 [disconnect] 연결 끊김: ${reason}`);
+        });
+
+        // --- 🚀 향상된 디버깅 리스너 🚀 ---
+
+        // (수정) 연결 실패 시 상세 에러 객체 덤프
+        socket.on('connect_error', (err) => {
+          log(`❌ [connect_error] 연결 실패: ${err.message}`);
+
+          // (추가) 에러 객체 전체를 덤프
+          log('--- 💡 에러 객체 상세 💡 ---');
+          log(
+            JSON.stringify(
+              {
+                message: err.message,
+                data: err.data, // (커스텀 에러 데이터가 있을 경우)
+                description: err.description, // (XHR 에러 상세)
+                context: err.context,
+              },
+              null,
+              2,
+            ),
+          );
+          log('---------------------');
+
+          if (err.message.includes('xhr poll error')) {
+            log(
+              "💡 힌트: 'xhr poll error'는 99% ngrok 'Visit Site' 경고 페이지 문제입니다.",
+            );
+            log(
+              "👉 해결: 1. 백엔드 ngrok 주소로 '직접' 방문해서 Visit Site 버튼을 클릭하세요.",
+            );
+            log(
+              "👉 해결: 2. 백엔드 server.ts의 CORS origin: 'http://localhost:3001'이 맞는지 확인하세요.",
+            );
+          } else if (err.message.includes('server error')) {
+            log(
+              "💡 힌트: 'server error'는 백엔드 socketAuth 미들웨어에서 에러가 났다는 뜻입니다.",
+            );
+            log('👉 해결: 1. 토큰이 만료되었는지 확인하세요. (새 토큰 발급)');
+            log(
+              "👉 해결: 2. socketAuth에서 'payload.userId'를 올바르게 꺼내고 있는지 확인하세요.",
+            );
+          } else {
+            log(
+              "💡 힌트: 브라우저 개발자 도구(F12)의 '콘솔(Console)'과 '네트워크(Network)' 탭에서 더 자세한 CORS 또는 차단 오류를 확인하세요.",
+            );
+          }
+        });
+
+        // (신규) 발생하는 "모든" 이벤트를 잡는 리스너
+        socket.onAny((eventName, ...args) => {
+          // 'connect', 'connect_error' 외의 다른 이벤트가 잡히는지 확인
+          log(`[ANY EVENT]: ${eventName}`);
+          if (args.length > 0) {
+            log(JSON.stringify(args, null, 2));
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

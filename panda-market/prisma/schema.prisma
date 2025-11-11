@@ -1,0 +1,190 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../generated/prisma"
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+}
+
+enum NotifyType {
+  NEW_COMMENT_PRODUCT   // 상품에 새 댓글
+  NEW_LIKE_PRODUCT      // 상품에 새 좋아요
+  NEW_COMMENT_ARTICLE   // 게시글에 새 댓글
+  NEW_LIKE_ARTICLE      // 게시글에 새 좋아요
+  PRICE_UPDATE_PRODUCT  // 좋아요한 상품 가격 변동
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  likeCount   Int @default(0) @map("like_count")
+  userId      Int @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  tags        Tag[]
+  comments    ProductComment[]
+  likes       ProductLike[]
+  images      ProductImage[]
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("products")
+}
+
+model Article {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  likeCount Int @default(0) @map("like_count")
+  userId    Int @map("user_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  comments  ArticleComment[]
+  likes     ArticleLike[]
+  images    ArticleImage[]
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("articles")
+}
+
+model ProductComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  userId    Int @map("user_id")
+  productId Int @map("product_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@map("product_comments")
+}
+
+model ArticleComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  userId    Int @map("user_id")
+  articleId Int @map("article_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("article_comments")
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  publicId  String   @unique @map("public_id")
+  url       String   @unique
+  productId Int @map("product_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id])
+  
+  @@map("product_images")
+}
+
+model ArticleImage {
+  id        Int      @id @default(autoincrement())
+  publicId  String   @unique @map("public_id")
+  url       String   @unique
+  articleId Int @map("article_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  article Article @relation(fields: [articleId], references: [id])
+
+  @@map("article_images")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  profileImage  String?    @map("profile_image")
+  imagePublicId String?  @map("image_public_id")
+  nickname      String  @unique
+  password      String?
+  refreshToken  String? @map("refresh_token")
+  authProvider   String   @default("local") @map("auth_provider")
+  providerId   String?      @unique
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  products      Product[]
+  articles      Article[]
+  productComments      ProductComment[]
+  articleComments     ArticleComment[]
+  productLikes  ProductLike[]
+  articleLikes  ArticleLike[]
+  notificationReceives Notification[] @relation("notificationsReceived")
+  notificationsSents Notification[] @relation("notificationsSent")
+
+  @@map("users")
+}
+
+model Tag {
+  id Int @id @default(autoincrement())
+  name String @unique
+  productCount Int @default(0) @map("product_count")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@map("tags")
+}
+
+model ProductLike{
+  userId    Int @map("user_id")
+  productId Int @map("product_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([userId, productId])
+  @@map("product_likes")
+}
+
+model ArticleLike{
+  userId    Int @map("user_id")
+  articleId Int @map("article_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+  @@map("article_likes")
+}
+
+model Notification{
+  id Int @id @default(autoincrement())
+  recipientId Int      @map("recipient_id") 
+  senderId    Int      @map("sender_id")
+  type        NotifyType
+  targetId    Int      @map("target_id")
+  isRead      Boolean  @default(false)     @map("is_read")
+  createdAt   DateTime @default(now())     @map("created_at")
+
+  recipient User @relation("notificationsReceived", fields: [recipientId], references: [id], onDelete: Cascade)
+  sender    User @relation("notificationsSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}

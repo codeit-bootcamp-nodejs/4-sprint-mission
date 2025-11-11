@@ -1,0 +1,333 @@
+import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
+import type { GetListParams } from '@/types/shared.types.js';
+import type { ProductRepository } from '@/repositories/products.repository.js';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '@/types/layer.types.js';
+import {
+  PatchProductDTO,
+  PostProductDTO,
+  ProductParams,
+} from '@/dto/products.dto.js';
+import { NotifyType, Prisma, PrismaClient } from '@prisma/client';
+import { TagRepository } from '@/repositories/tags.repository.js';
+import {
+  deleteCloudinaryFile,
+  extractPublicIdFromCloudinaryUrl,
+} from '@/lib/cloudinary.js';
+import { ProductImageRepository } from '@/repositories/product-images.repository.js';
+import {
+  ImageUpdateInput,
+  PriceUpdateInput,
+  TagUpdateInput,
+} from '@/types/product.types.js';
+import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
+import { NotificationRepository } from '@/repositories/notification.repository.js';
+import { Server } from 'socket.io';
+
+@injectable()
+export class ProductService {
+  constructor(
+    @inject(TYPES.ProductRepository)
+    private readonly productRepository: ProductRepository,
+    @inject(TYPES.PrismaClient)
+    private readonly prisma: PrismaClient,
+    @inject(TYPES.TagRepository)
+    private readonly tagRepository: TagRepository,
+    @inject(TYPES.ProductImageRepository)
+    private readonly productImageRepository: ProductImageRepository,
+    @inject(TYPES.ProductLikeRepository)
+    private readonly productLikeRepository: ProductLikeRepository,
+    @inject(TYPES.NotificationRepository)
+    private readonly notificationRepository: NotificationRepository,
+    @inject(TYPES.SocketIO)
+    private readonly io: Server,
+  ) {}
+  private async authorization({
+    userId,
+    productId,
+  }: ProductParams): Promise<boolean> {
+    const product = await this.productRepository.findOwnerById({ productId });
+    return product.userId === userId;
+  }
+  private async tagUpdate({ tx, productId, newTags }: TagUpdateInput) {
+    const currentTags = await this.tagRepository.findMany({
+      productId,
+      tx,
+    });
+    // string[]을 Set으로 바꾸는 이유
+    // 변경 목록 계산 시 string[]의 includes를 사용하면 배열의 모든 데이터를 순회함
+    // Set은 해시테이블이라 해당 값만 바로 찾음
+    // 사용하는 데이터가 태그들 유무 여부만 알면 되므로 Set을 사용하기 적절한거같음
+    const currentTagSet = new Set(currentTags);
+    const newTagSet = new Set(newTags);
+    // 태그 변동 사항 반영
+    const tagsToDecrement = currentTags.filter((tag) => !newTagSet.has(tag));
+    const tagsToIncrement = newTags.filter((tag) => !currentTagSet.has(tag));
+    // 태그 카운트 증가 혹은 감소
+    if (tagsToDecrement.length > 0) {
+      await this.tagRepository.decrementCounts({
+        tags: tagsToDecrement,
+        tx,
+      });
+    }
+    if (tagsToIncrement.length > 0) {
+      await this.tagRepository.incrementCounts({
+        tags: tagsToIncrement,
+        tx,
+      });
+    }
+    return {
+      disconnect: tagsToDecrement.map((name) => ({ name })),
+      connectOrCreate: tagsToIncrement.map((name) => ({
+        where: { name },
+        create: { name },
+      })),
+    };
+  }
+  private async imageUpdate({ productId, tx, newImages }: ImageUpdateInput) {
+    const images = await this.productImageRepository.findMany({
+      productId,
+      tx,
+    });
+    const imageSet = new Set(images.map((img) => img.publicId));
+    const newImageList = newImages.map((imageUrl) =>
+      extractPublicIdFromCloudinaryUrl(imageUrl),
+    );
+    const newImageSet = new Set(newImageList);
+    // 삭제할 이미지들
+    const imagesToDelete = images
+      .filter((img) => !newImageSet.has(img.publicId))
+      .map((img) => ({ publicId: img.publicId }));
+    const deletedImageIds = imagesToDelete.map((img) => img.publicId);
+    // 새로 생성할 이미지들
+    const imagesToCreate = newImages.filter(
+      (url) => !imageSet.has(extractPublicIdFromCloudinaryUrl(url)),
+    );
+    return {
+      deletedImageIds,
+      query: {
+        deleteMany: imagesToDelete,
+        create: imagesToCreate.map((url) => ({
+          url: url,
+          publicId: extractPublicIdFromCloudinaryUrl(url),
+        })),
+      },
+    };
+  }
+  private async updatePrice({
+    tx,
+    productId,
+    userId,
+    newPrice,
+  }: PriceUpdateInput) {
+    const likers = await this.productLikeRepository.findManyByProductId({
+      productId,
+      tx,
+    });
+    const recipientIds = likers.map((like) => like.userId);
+
+    if (recipientIds.length > 0) {
+      const notificationData = recipientIds.map((id) => ({
+        recipientId: id,
+        senderId: userId,
+        type: NotifyType.PRICE_UPDATE_PRODUCT,
+        targetId: productId,
+      }));
+
+      await this.notificationRepository.createMany({
+        createData: notificationData,
+        tx,
+      });
+      recipientIds.forEach((id) => {
+        if (id === userId) return;
+        const userRoom = `user_${id}`;
+        this.io.to(userRoom).emit('new_notification', {
+          type: NotifyType.PRICE_UPDATE_PRODUCT,
+          message: '좋아요한 상품의 가격이 변동되었습니다!',
+          productId: productId,
+          newPrice: newPrice,
+        });
+      });
+    }
+  }
+
+  async getProductList({ keyword, page, pageSize, userId }: GetListParams) {
+    const products = await this.productRepository.findMany({
+      keyword,
+      page,
+      pageSize,
+      userId,
+    });
+    const results = products.map((product) => {
+      const { likes, ...filteredProduct } = product;
+      return {
+        isLike: userId ? likes.length > 0 : false,
+        ...filteredProduct,
+      };
+    });
+    return results;
+  }
+
+  async getProduct({ productId, userId }: ProductParams) {
+    const product = await this.productRepository.findById({
+      productId,
+      userId,
+    });
+    const { likes, ...filteredProduct } = product;
+    const result = {
+      isLike: userId ? likes.length > 0 : false,
+      ...filteredProduct,
+    };
+    return result;
+  }
+
+  async postProduct({ userId, data }: PostProductDTO) {
+    const { tags, imageUrls, ...restData } = data;
+    const parsedTags = tags.map((tag) => {
+      return {
+        where: { name: tag },
+        create: { name: tag },
+      };
+    });
+    const createData = {
+      ...restData,
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      tags: {
+        connectOrCreate: parsedTags,
+      },
+    };
+    return await this.prisma.$transaction(async (tx) => {
+      const product = await this.productRepository.create({
+        createData,
+        tx,
+      });
+      await this.tagRepository.incrementCounts({ tags, tx });
+      if (imageUrls && imageUrls.length > 0) {
+        const imageData = imageUrls.map((imageUrl) => {
+          return {
+            publicId: extractPublicIdFromCloudinaryUrl(imageUrl),
+            url: imageUrl,
+            productId: product.id,
+          };
+        });
+        await this.productImageRepository.createMany({ imageData, tx });
+      }
+      return product;
+    });
+  }
+  async patchProduct({ userId, productId, data }: PatchProductDTO) {
+    if (await this.authorization({ userId, productId })) {
+      const {
+        tags: newTags,
+        imageUrls: newImages,
+        price: newPrice,
+        ...restData
+      } = data;
+      const patchData: Prisma.ProductUpdateInput = {
+        price: newPrice,
+        ...restData,
+      };
+      let deletedImages: string[] = [];
+      if (!newTags && !newImages && newPrice === undefined) {
+        // 가격은 0원도 유효한 값임
+        if (Object.keys(restData).length > 0) {
+          return await this.productRepository.update({
+            productId,
+            patchData: restData,
+          });
+        } else {
+          throw new BadRequestError('수정할 상품 데이터가 없습니다.');
+        }
+      }
+      // 태그 변동사항에 맞춰 태그 카운트 증가 혹은 감소 작업
+      const updatedProduct = await this.prisma.$transaction(async (tx) => {
+        if (newTags && newTags.length > 0) {
+          patchData.tags = await this.tagUpdate({
+            tx,
+            productId,
+            newTags,
+          });
+        }
+        // 이미지 변경시
+        if (newImages && newImages.length > 0) {
+          const result = await this.imageUpdate({
+            tx,
+            productId,
+            newImages,
+          });
+          deletedImages = result.deletedImageIds;
+          patchData.images = result.query;
+        }
+        // 가격 변경시 좋아요 누른 유저에게 알림 발송
+        if (newPrice !== undefined) {
+          const oldProduct = await this.productRepository.findPriceById({
+            productId,
+            tx,
+          });
+          if (oldProduct && oldProduct.price !== newPrice) {
+            await this.updatePrice({
+              tx,
+              productId,
+              userId,
+              newPrice,
+            });
+          }
+        }
+        await this.productRepository.update({
+          productId,
+          patchData,
+          tx,
+        });
+
+        return this.productRepository.findById({ productId, userId, tx });
+      });
+      if (deletedImages.length > 0) {
+        // 클라우디너리 이미지 삭제
+        await Promise.all(
+          deletedImages.map(async (publicId) => deleteCloudinaryFile(publicId)),
+        );
+      }
+
+      return updatedProduct;
+    } else {
+      throw new ForbiddenError('수정 권한이 없습니다.');
+    }
+  }
+
+  async deleteProduct({ userId, productId }: ProductParams) {
+    if (await this.authorization({ userId, productId })) {
+      let imageIdsToDelete: string[] = [];
+      const deletedProduct = await this.prisma.$transaction(async (tx) => {
+        const tags = await this.tagRepository.findMany({ productId, tx });
+        if (tags.length > 0) {
+          await this.tagRepository.decrementCounts({ tags, tx });
+        }
+        const images = await this.productImageRepository.findMany({
+          productId,
+          tx,
+        });
+        if (images.length > 0) {
+          imageIdsToDelete = images.map((img) => img.publicId);
+        }
+        const deletedProduct = await this.productRepository.delete({
+          productId,
+          tx,
+        });
+        return deletedProduct;
+      });
+
+      if (imageIdsToDelete.length > 0) {
+        await Promise.all(
+          imageIdsToDelete.map((publicId) => deleteCloudinaryFile(publicId)),
+        );
+      }
+      return deletedProduct;
+    } else {
+      throw new ForbiddenError('삭제 권한이 없습니다.');
+    }
+  }
+}
