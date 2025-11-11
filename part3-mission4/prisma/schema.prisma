@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -14,23 +15,23 @@ datasource db {
 }
 
 model User {
-  id            Int            @id @default(autoincrement())
-  username      String         @unique
-  email         String         @unique
+  id            Int       @id @default(autoincrement())
+  username      String    @unique
+  email         String    @unique
   images        String[]
   password      String
   products      Product[]
   articles      Article[]
   comments      Comment[]
-  productLikes  ProductLike[]
-  articleLikes  ArticleLike[]
-  commentLikes  CommentLike[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  productsLiked Product[] @relation("ProductLikes")
+  articlesLiked Article[] @relation("ArticleLikes")
+  commentsLiked Comment[] @relation("CommentLikes")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Product {
-  id          Int           @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
   price       Int
@@ -38,72 +39,39 @@ model Product {
   images      String[]
   comments    Comment[]
   userId      Int
-  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  likes       ProductLike[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likedBy     User[]    @relation("ProductLikes")
+  likeCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Article {
-  id        Int           @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
   content   String
   tags      String[]
   images    String[]
   userId    Int
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments  Comment[]
-  likes     ArticleLike[]
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  likedBy   User[]    @relation("ArticleLikes")
+  likeCount Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Comment {
-  id        Int           @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   content   String
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
+  likedBy   User[]   @relation("CommentLikes")
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   userId    Int
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   articleId Int?
-  article   Article?      @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   productId Int?
-  product   Product?      @relation(fields: [productId], references: [id], onDelete: Cascade)
-  likes     CommentLike[]
-}
-
-model ProductLike {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  productId Int
-  createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, productId])
-}
-
-model ArticleLike {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  articleId Int
-  createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, articleId])
-}
-
-model CommentLike {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  commentId Int
-  createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, commentId])
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
