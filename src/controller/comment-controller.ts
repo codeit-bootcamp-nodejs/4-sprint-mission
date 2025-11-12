@@ -1,20 +1,21 @@
-import { Request, Response, NextFunction } from 'express';
-import { CommentService } from '../service/comment-service';
-import { CreateCommentDto, UpdateCommentDto } from '../types/dto';
+import { Request, Response, NextFunction } from "express";
+import { CommentService } from "../service/comment-service";
+import { CreateCommentDto, UpdateCommentDto } from "../types/dto";
 
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
   createComment = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user!.id;
+      const { id: userId, nickname: commenterNickname } = req.user!;
       const createCommentDto: CreateCommentDto = req.body;
       const { productId, articleId } = req.params;
       const newComment = await this.commentService.createComment(
         userId,
+        commenterNickname,
         createCommentDto,
         productId,
-        articleId,
+        articleId
       );
       res.status(201).json(newComment);
     } catch (error) {
@@ -25,7 +26,7 @@ export class CommentController {
   getComments = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { productId, articleId } = req.params;
-      const limit = parseInt((req.query.limit as string) || '10');
+      const limit = parseInt((req.query.limit as string) || "10");
       const cursor = req.query.cursor
         ? parseInt(req.query.cursor as string)
         : undefined;
@@ -34,7 +35,7 @@ export class CommentController {
         productId,
         articleId,
         limit,
-        cursor,
+        cursor
       );
       res.status(200).json(comments);
     } catch (error) {
@@ -50,7 +51,7 @@ export class CommentController {
       const updatedComment = await this.commentService.updateComment(
         userId,
         commentId,
-        updateCommentDto,
+        updateCommentDto
       );
       res.status(200).json(updatedComment);
     } catch (error) {

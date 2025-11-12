@@ -75,6 +75,8 @@ model User {
 
   productLikes ProductLike[]
   articleLikes ArticleLike[]
+
+  notifications Notification[]
 }
 
 model ProductLike {
@@ -93,4 +95,17 @@ model ArticleLike {
   articleId Int
 
   @@id([userId, articleId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  message   String // 알림 내용 (예: "OOO님이 '게시글 제목'에 댓글을 남겼습니다.")
+  type      String // 알림 타입 (예: "NEW_COMMENT", "PRICE_CHANGE")
+  link      String // 클릭 시 이동할 경로 (예: "/articles/1", "/products/10")
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId]) // 사용자가 자신의 알림을 조회할 때 성능 향상을 위해 인덱스 추가
 }

@@ -162,3 +162,12 @@ export interface TokensResponseDto {
 export interface RefreshTokenResponseDto {
   accessToken: string;
 }
+
+// Notification 응답 DTO
+export interface NotificationResponseDto {
+  id: number;
+  message: string;
+  link: string;
+  isRead: boolean;
+  createdAt: Date;
+}
