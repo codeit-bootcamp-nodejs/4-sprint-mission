@@ -1,0 +1,37 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTc2MjY5MTcxNCwiZXhwIjoxNzYyNjk1MzE0fQ.sLwWg6wfy5yAALoCowcGZ_7SRWLsmemXaCXn5QrpQsI
+
+### 유저 정보 조회 (로그인 필요)
+GET http://localhost:3000/users/profile
+Authorization: Bearer {{accessToken}}
+
+### 유저 정보 수정 (해당 유저만 가능 / 패스워드 변경 무시됨)
+PUT http://localhost:3000/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "moen",
+    "password": "nemo1234"
+}
+
+### 유저 정보 패스워드 변경 (해당 유저만 가능)
+PUT http://localhost:3000/users/me/password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "currentPassword": "mone1234",
+    "newPassword": "nemo1234"
+}
+
+### 유저 좋아요 게시글 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/likes/posts
+Authorization: Bearer {{accessToken}}
+
+### 유저 좋아요 상품 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/likes/products
+Authorization: Bearer {{accessToken}}
+
+### 유저 등록 상품 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/products
+Authorization: Bearer {{accessToken}}

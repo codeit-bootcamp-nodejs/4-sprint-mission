@@ -1,0 +1,40 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc2MjY4NjM0MCwiZXhwIjoxNzYyNjg5OTQwfQ.S0IbzLg9GwfWGNtlJue8Cp0Kze3u03RO9L-mfwhPrZw
+
+### 상품 목록 조회
+GET http://localhost:3000/products
+
+### 특정 상품 상세 조회
+GET http://localhost:3000/products/2
+Authorization: Bearer {{accessToken}}
+
+### 상품 등록 (로그인 필요)
+POST http://localhost:3000/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰",
+    "description": "최고의 음질과 편안함을 선사하는 노이즈 캔슬링 무선 헤드폰입니다. 30시간 연속 재생이 가능하며, 초고속 충전을 지원합니다.",
+    "price": 299000,
+    "tags": ["헤드폰", "무선", "노이즈캔슬링"]
+}
+
+### 상품 정보 수정 (작성자만 가능)
+PUT http://localhost:3000/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰",
+    "description": "최고의 음질과 편안함을 선사하는 노이즈 캔슬링 무선 헤드폰입니다. 30시간 연속 재생이 가능하며, 초고속 충전을 지원합니다.",
+    "price": 399000,
+    "tags": ["헤드폰", "무선", "노이즈캔슬링"]
+}
+
+### 상품 삭제 (작성자만 가능)
+DELETE http://localhost:3000/products/1
+Authorization: Bearer {{accessToken}}
+
+### 상품 좋아요 및 취소 (로그인 필요)
+POST http://localhost:3000/products/7/likes
+Authorization: Bearer {{accessToken}}
