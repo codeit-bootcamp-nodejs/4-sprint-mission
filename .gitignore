@@ -7,3 +7,6 @@ node_modules
 migration_lock.toml
 
 upload/
+
+dist
+

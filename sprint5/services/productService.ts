@@ -1,4 +1,7 @@
 import { productRepository } from "../repositories/productRepository.js";
+import { likeRepository } from "../repositories/likeRepository.js";
+import { notificationRepository } from "../repositories/notificationRepository.js";
+import { emitToUser } from "../utils/notificationSocket.js";
 import type { Like, Product, ProductWithLike } from "../types/dto.js";
 
 export const productService = {
@@ -112,13 +115,42 @@ export const productService = {
         throw error;
       }
 
-      return await productRepository.updateProduct(
+      // 🔸 기존 가격 저장
+      const oldPrice = product.price;
+
+      // 🔹 상품 수정
+      const updatedProduct = await productRepository.updateProduct(
         id,
         name,
         description,
         price,
         tags
       );
+
+      // 🔸 가격 변경 감지
+      if (price !== undefined && oldPrice !== price) {
+        //  좋아요한 사용자 목록 조회
+        const likedUsers = await likeRepository.getUsersWhoLikedProduct(id);
+
+        // 각 사용자에게 알림 생성
+        for (const { user } of likedUsers) {
+          await notificationRepository.createNotification({
+            userId: user.id,
+            type: "PRICE_CHANGE",
+            message: `좋아요한 상품 "${updatedProduct.name}"의 가격이 ${oldPrice}원 → ${price}원으로 변경되었습니다.`,
+            targetId: updatedProduct.id,
+          });
+
+          // 실시간 알림 전송
+          emitToUser(user.id, {
+            type: "PRICE_CHANGE",
+            productId: updatedProduct.id,
+            message: `좋아요한 상품 "${updatedProduct.name}"의 가격이 ${oldPrice}원 → ${price}원으로 변경되었습니다.`,
+          });
+        }
+      }
+
+      return updatedProduct;
     } catch (err) {
       throw err;
     }

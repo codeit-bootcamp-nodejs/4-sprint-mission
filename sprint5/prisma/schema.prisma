@@ -67,6 +67,7 @@ model User {
   product     Product[]
   comments    Comment[]
   like        Like[]
+  notifications Notification[]
 }
 
 model Like {
@@ -81,4 +82,16 @@ model Like {
  
   @@unique([userId, productId])
   @@unique([userId, articleId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String
+  message   String
+  targetId  Int?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
 }
