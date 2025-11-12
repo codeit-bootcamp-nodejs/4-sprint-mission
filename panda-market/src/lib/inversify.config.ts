@@ -1,7 +1,7 @@
 import { Container } from 'inversify';
 import 'reflect-metadata';
 import { TYPES } from '@/types/layer.types.js';
-import prisma from './prisma.js';
+import prisma from '@/lib/prisma.js';
 import { UserRepository } from '@/repositories/users.repository.js';
 import { ArticleRepository } from '@/repositories/articles.repository.js';
 import { ProductRepository } from '@/repositories/products.repository.js';
@@ -32,7 +32,7 @@ import { ArticleCommentRepository } from '@/repositories/article-comments.reposi
 import { NotificationRepository } from '@/repositories/notification.repository.js';
 import { NotificationController } from '@/controllers/notification.controller.js';
 import { NotificationService } from '@/services/notification.service.js';
-import { io } from './socket.js';
+import { io } from '@/lib/socket.js';
 
 const container = new Container();
 

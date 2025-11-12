@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import type { Secret } from 'jsonwebtoken';
-import { InternalServerError } from './errors.js';
+import { InternalServerError } from '@/lib/errors.js';
 
 dotenv.config();
 

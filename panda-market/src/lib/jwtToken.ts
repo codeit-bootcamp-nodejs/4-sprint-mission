@@ -2,7 +2,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import {
   JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET,
-} from './constants.js';
+} from '@/lib/constants.js';
 
 function generateToken(userId: number) {
   const accessToken = jwt.sign({ userId }, JWT_ACCESS_TOKEN_SECRET, {

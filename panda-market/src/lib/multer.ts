@@ -1,6 +1,6 @@
 import multer, { FileFilterCallback } from 'multer';
 import { ImageType } from '@/types/image.types.js';
-import { BadRequestError } from './errors.js';
+import { BadRequestError } from '@/lib/errors.js';
 import { Request } from 'express';
 
 const MAX_IMAGE_SIZE = 5;

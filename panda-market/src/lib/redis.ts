@@ -1,6 +1,6 @@
 import { createClient, type RedisClientType } from 'redis';
-import { REDIS_URL } from './constants.js';
-import { InternalServerError } from './errors.js';
+import { REDIS_URL } from '@/lib/constants.js';
+import { InternalServerError } from '@/lib/errors.js';
 
 let redisClient: RedisClientType;
 let isReady = false;
