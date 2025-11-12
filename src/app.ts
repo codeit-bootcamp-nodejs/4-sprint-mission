@@ -1,0 +1,28 @@
+//src/app.ts
+import express, { Express, Request, Response } from 'express';
+import cors from 'cors';
+import path from 'path';
+import notificationRouter from './router/notification_router';
+import productRouter from './router/product_router';
+import postRouter from './router/post_router';
+
+const app: Express = express();
+
+app.use(cors({
+    origin: '*',
+}));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+
+app.get('/', (req: Request, res: Response) => {
+    res.status(200).send('Server is running!');
+});
+
+app.use('/api/products', productRouter);
+app.use('/api/posts', postRouter);
+app.use('/api/notifications', notificationRouter);
+
+export default app;
