@@ -137,7 +137,7 @@ export class ArticleService {
         }
       }
       const updatedArticle = await this.prisma.$transaction(async (tx) => {
-        if (newImages && newImages.length > 0) {
+        if (newImages !== undefined) {
           const result = await this.imageUpdate({
             tx,
             articleId,

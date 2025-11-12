@@ -80,7 +80,7 @@ export class ArticleCommentService {
               id: userId,
             },
           },
-          type: NotifyType.NEW_COMMENT_PRODUCT,
+          type: NotifyType.NEW_COMMENT_ARTICLE,
           targetId: articleId,
         };
         newNotification = await this.notificationRepository.create({

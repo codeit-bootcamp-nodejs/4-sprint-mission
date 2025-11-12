@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types/layer.types.js';
+import { TYPES } from '@/types/layer.types.js';
 import { PrismaClient } from '@prisma/client';
 import { CreateProductImages } from '@/dto/product-images.dto.js';
 import { ProductIdWithTx } from '@/dto/products.dto.js';

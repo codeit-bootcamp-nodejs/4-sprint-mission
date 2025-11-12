@@ -253,7 +253,7 @@ export class ProductService {
           });
         }
         // 이미지 변경시
-        if (newImages && newImages.length > 0) {
+        if (newImages !== undefined) {
           const result = await this.imageUpdate({
             tx,
             productId,
