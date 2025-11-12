@@ -1,4 +1,5 @@
 import * as commentRepo from "../repository/comment_repository";
+import { createNotificationService } from "./notification_service";
 import { AppError } from "../utils/error";
 
 export async function createArticleCommentService({
@@ -11,6 +12,10 @@ export async function createArticleCommentService({
     content,
     user,
   });
+  const author = await commentRepo.findArticleAuthor(id);
+  const message = "새로운 댓글이 달렸습니다.";
+  await createNotificationService(author!.userId!, message);
+
   return comment;
 }
 

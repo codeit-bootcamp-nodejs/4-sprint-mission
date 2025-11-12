@@ -84,3 +84,11 @@ export async function updateProduct({ id, updateData, user }: Product.Update) {
     data: { ...updateData, userId: user.id },
   });
 }
+
+// 좋아요 누른 사람
+export async function findUserLikedProduct(productId: number) {
+  return await prisma.like.findMany({
+    where: { productId },
+    select: { user: true },
+  });
+}

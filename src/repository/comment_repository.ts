@@ -81,3 +81,11 @@ export async function updateCommentRepo({
     data: { content, userId: user.id },
   });
 }
+
+// 게시물 작성자 찾기
+export async function findArticleAuthor(articleId: number) {
+  return await prisma.article.findUnique({
+    where: { id: articleId },
+    select: { userId: true },
+  });
+}
