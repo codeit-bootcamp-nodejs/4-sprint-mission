@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  username       String           @unique @db.VarChar(20)
+  email          String           @unique
+  hashedPassword String
+  isAdmin        Boolean          @default(false)
+  lastLogin      DateTime
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  posts          Post[]
+  postComments   PostComment[]
+  products       Product[]
+  productVotes   ProductVote[]
+  postVotes      PostVote[]
+  notification   Notification[]
+  productComment ProductComment[]
+  refreshToken   RefreshToken?
+  isDeleted      Boolean          @default(false)
+
+  @@index([id])
+}
+
+model Product {
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(200)
+  description     String           @db.VarChar(1000)
+  price           Int
+  tags            String[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  voteCount       Int              @default(0)
+  commentCount    Int              @default(0)
+  user            User             @relation(fields: [userId], references: [id])
+  userId          Int
+  productComments ProductComment[]
+  productVotes    ProductVote[]
+}
+
+model Post {
+  id           Int           @id @default(autoincrement())
+  title        String        @db.VarChar(200)
+  content      String        @db.VarChar(1000)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  voteCount    Int           @default(0)
+  commentCount Int           @default(0)
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  postComments PostComment[]
+  postVotes    PostVote[]
+}
+
+model PostComment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model ProductComment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model ProductVote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  products  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+}
+
+model PostVote {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  Post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+}
+
+enum NotificationTypeEnum {
+  NEW_COMMENT
+  PRODUCT_PRICE_CHANGED
+}
+
+model Notification {
+  id        Int                  @id @default(autoincrement())
+  user      User                 @relation(fields: [userId], references: [id])
+  userId    Int
+  type      NotificationTypeEnum
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+  message   String
+  isRead    Boolean              @default(false)
+
+  @@index([userId, createdAt, id])
+  @@index([userId, isRead, createdAt, id])
+}
