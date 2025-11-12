@@ -41,7 +41,7 @@ controller.patch('/:commentId',
     async (req, res, next) => {
         try {
             const userId = req.user.id;
-            const commentId = parseInt(req.params.commentId);
+            const commentId = parseInt(req.params.commentId, 10);
             const commentData = req.body;
             await commentService.updateComment(commentData, commentId, userId);
             return res.status(200).json({ message: "Comment updated successfully" })
@@ -57,7 +57,7 @@ controller.delete('/:commentId',
             const userId = req.user.id;
             const commentId = parseInt(req.params.commentId);
             await commentService.deleteComment(commentId, userId);
-            return res.status(200).json({ messags: "Comment deleted successfully" })
+            return res.status(200).json({ message: "Comment deleted successfully" });
         } catch (error) {
             next(error);
         }
