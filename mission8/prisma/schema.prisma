@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+//---------------------------------------------------
+// user
+//---------------------------------------------------
+model User{
+    id                    Int             @id@default(autoincrement())
+    email                 String          @unique
+    nickname              String?         @unique
+    password              String?        
+    createdAt             DateTime        @default(now())
+    updatedAt             DateTime        @updatedAt
+    comment               Comment[]
+    article               Article[]
+    product               Product[]
+    receivedNotification  Notification[]    @relation("NotificationReceiver")
+    sentNotifications     Notification[]   @relation("NotificationSender")
+    likes                 Like[]
+}
+
+//--------------------------------------------------
+// notification
+//--------------------------------------------------
+enum NotificationCategory {
+  NEW_COMMENT
+  NEW_LIKE
+  CHANGED_PRICE
+}
+
+enum NotificationTypes {
+  IS_READ
+  UNREAD
+}
+
+model Notification{ 
+  id        Int               @id @default(autoincrement())
+
+  category  NotificationCategory
+  type      NotificationTypes 
+
+  content   String            
+  createdAt DateTime          @default(now())
+
+  receiverId Int 
+  receiver  User             @relation("NotificationReceiver",fields: [receiverId], references: [id])
+  
+  senderId  Int
+  sender    User             @relation("NotificationSender",fields: [senderId], references: [id])
+}
+//---------------------------------------------------
+// article
+//---------------------------------------------------
+model Article {
+  id        Int               @id @default(autoincrement())
+  title     String ?
+  content   String 
+  createdAt DateTime          @default(now())
+  ownerId    Int
+  owner      User             @relation(fields:[ownerId], references:[id])  
+  comments  Comment[]
+  likes      Like[]
+}
+//---------------------------------------------------
+//product
+//---------------------------------------------------
+model Product {
+  id                Int         @id @default(autoincrement())
+  name              String
+  description       String?
+  price             Int         
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  productTags       ProductTag[] 
+  comment           Comment[]
+  ownerId           Int
+  owner             User        @relation(fields:[ownerId], references:[id])  
+  likes             Like[]
+}
+
+model ProductTag{
+  id          Int        @id @default(autoincrement())
+  productId   Int   
+  product     Product   @relation(fields:[productId], references:[id], onDelete: Cascade, onUpdate: Cascade)  
+  tagId       Int 
+  tag         Tag       @relation(fields:[tagId], references:[id], onDelete: Cascade, onUpdate: Cascade)
+  
+  @@unique([productId, tagId])
+   
+}
+
+model Tag {
+  id        Int         @id @default(autoincrement())
+  name      String     @unique
+  productTags    ProductTag[]   
+}
+//--------------------------------------------------
+// likes
+//--------------------------------------------------
+model Like {
+  id          Int           @id @default(autoincrement())
+  userId      Int          
+  user        User          @relation(fields: [userId], references: [id])
+  productId   Int         
+  product     Product       @relation(fields: [productId], references: [id])
+  articleId   Int 
+  article     Article       @relation(fields: [articleId], references: [id])
+
+    @@index([userId, productId])
+    @@index([userId, articleId])
+}
+
+//---------------------------------------------------
+// comment
+//---------------------------------------------------
+
+model Comment{
+    id          Int            @id @default(autoincrement())
+    name        String?         @unique
+    title       String?
+    type        String?
+    content     String?
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+    userId      Int
+    user        User?             @relation(fields:[userId], references:[id])
+    productId   Int          
+    product     Product?        @relation(fields:[productId], references:[id], onDelete:Cascade,  onUpdate:Cascade)
+    articleId   Int           
+    article     Article?        @relation(fields:[articleId], references:[id],  onDelete:Cascade,  onUpdate:Cascade)
+}

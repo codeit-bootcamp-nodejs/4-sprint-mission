@@ -67,8 +67,8 @@ export const createdComment = async (req, res) => {
 
   const connectedData =
     type === "MARKET"
-      ? { product: { connect: { productId } } }
-      : { articleId: { connect: { articleId } } };
+      ? { product: { connect: { id: productId } } }
+      : { article: { connect: {id : articleId } } };
 
   console.log("incomming data : ", req.body)
   try {
