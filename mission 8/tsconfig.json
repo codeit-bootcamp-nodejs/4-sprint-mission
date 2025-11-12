@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    /* ----- 기본 옵션 ----- */
+    "target": "ES2020", // 어떤 버전의 JavaScript로 컴파일할지 (ES2020은 최신 Node.js와 호환성이 좋음)
+    "module": "commonjs", // Node.js 환경에서 사용하는 모듈 시스템
+    "rootDir": "./src", // 타입스크립트 소스코드의 루트 폴더
+    "outDir": "./dist", // 컴파일된 JavaScript 파일이 저장될 폴더
+
+    /* ----- 엄격한 타입 검사 옵션 (강력 추천) ----- */
+    "strict": true, // 모든 엄격한 타입 검사 옵션을 활성화 (가장 중요!)
+    "noImplicitAny": true, // 'any' 타입을 명시적으로 사용하지 않으면 에러 발생
+
+    /* ----- 모듈 관련 옵션 ----- */
+    "moduleResolution": "node", // 모듈 해석 방식을 Node.js 스타일로 설정
+    "esModuleInterop": true, // CommonJS 모듈을 ES 모듈 방식으로 'import' 할 수 있게 해줌 (예: import express from 'express')
+    "resolveJsonModule": true, // .json 파일을 모듈처럼 import 할 수 있게 허용
+
+    /* ----- 추가 옵션 ----- */
+    "sourceMap": true, // .map 파일을 생성하여, 디버깅 시 ts 코드를 볼 수 있게 함
+    "forceConsistentCasingInFileNames": true, // 파일 이름의 대소문자를 구분하도록 강제
+    "skipLibCheck": true, // 의존하는 라이브러리(*.d.ts)의 타입 검사를 건너뛰어 컴파일 속도 향상
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  "include": ["src/**/*"], // 컴파일할 파일 범위 (src 폴더 아래의 모든 파일)
+  "exclude": ["node_modules", "dist"], // 컴파일에서 제외할 폴더
+  "ts-node": {
+    "files": true
+  }
+}
