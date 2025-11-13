@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --watch",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --coverage",
     "dev": "nodemon --exec tsx app.ts",
     "seed": "node prisma/seed.js",
     "build": "tsc",
@@ -28,6 +30,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "nodemon": "^3.1.10",
+    "save-dev": "^0.0.1-security",
     "ws": "^8.18.3"
   },
   "description": "",
@@ -46,6 +49,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.19.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.3"
+    "typescript-eslint": "^8.46.3",
+    "supertest": "^7.0.0",
+    "@types/supertest": "^6.0.2"
   }
 }

@@ -61,6 +61,11 @@ export function sendNotificationToUser(userId: number, notification:any) {
 
 const PORT: number = Number(process.env.PORT) || 3000;
 
-server.listen(PORT, () => {
-  console.log(`서버 실행 중: http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== "test") {
+  server.listen(PORT, () => {
+    console.log(`서버 실행 중: http://localhost:${PORT}`);
+  });
+}
+
+// 테스트에서 사용할 수 있도록 export
+export { app, server };
