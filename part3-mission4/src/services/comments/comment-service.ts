@@ -1,4 +1,4 @@
-import { commentRepository } from '../../repositories/comment-reposipory.js';
+import { commentRepository } from '../../repositories/comment-repository.js';
 import { commentLikeRepository } from '../../repositories/like-repository.js';
 import AppError from '../../lib/appError.js';
 

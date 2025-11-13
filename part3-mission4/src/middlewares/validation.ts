@@ -68,6 +68,17 @@ class Validation {
     ),
   });
 
+  passwordSchema = z.object({
+    password: z
+      .string()
+      .min(8, '비밀번호는 최소 8자 이상이어야 합니다.')
+      .max(64, '비밀번호는 최대 64자까지 가능합니다.')
+      .regex(/[A-Z]/, '대문자가 최소 1개 포함되어야 합니다.')
+      .regex(/[a-z]/, '소문자가 최소 1개 포함되어야 합니다.')
+      .regex(/[0-9]/, '숫자가 최소 1개 포함되어야 합니다.')
+      .regex(/[^A-Za-z0-9]/, '특수문자가 최소 1개 포함되어야 합니다.'),
+  });
+
   // ------------------------------
   // ID 검증
   // ------------------------------
@@ -106,10 +117,8 @@ class Validation {
   // ------------------------------
   validate(schema: z.ZodTypeAny) {
     return (req: Request, res: Response, next: NextFunction) => {
-      console.log('📌 들어온 body:', req.body);
       const result = schema.safeParse(req.body);
       if (!result.success) {
-        console.error('❌ ZodError:', result.error.issues);
         return res.status(400).json({
           message: result.error.issues.map((e) => e.message).join(', '),
         });
@@ -120,10 +129,8 @@ class Validation {
 
   validateParam(paramName: string, schema: z.ZodTypeAny) {
     return (req: Request, res: Response, next: NextFunction) => {
-      console.log('📌 들어온 params:', req.params);
       const result = schema.safeParse(req.params[paramName]);
       if (!result.success) {
-        console.error('❌ ZodError:', result.error.issues);
         return res.status(400).json({
           message: result.error.issues.map((e) => e.message).join(', '),
         });

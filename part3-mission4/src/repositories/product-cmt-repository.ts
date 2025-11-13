@@ -24,4 +24,19 @@ export const productCommentRepository = {
       },
     });
   },
+
+  async countByCommentIds(commentIds: number[]) {
+    return prisma.commentLike.groupBy({
+      by: ['commentId'],
+      _count: { commentId: true },
+      where: { commentId: { in: commentIds } },
+    });
+  },
+
+  async findByUserAndCommentIds(userId: number, commentIds: number[]) {
+    return prisma.commentLike.findMany({
+      where: { userId, commentId: { in: commentIds } },
+      select: { commentId: true },
+    });
+  },
 };

@@ -4,7 +4,7 @@ import {
   productLikeRepository,
   commentLikeRepository,
 } from '../repositories/like-repository.js';
-import type { ProductQuery } from '../types/product-types.js';
+import type { ProductQuery, UpdateProductDto } from '../types/product-types.js';
 import AppError from '../lib/appError.js';
 
 class ProductService {
@@ -41,35 +41,50 @@ class ProductService {
       },
     });
 
-    const productsWithLike = await Promise.all(
-      products.map(async (p) => {
-        const likeCount = await productLikeRepository.count(p.id);
-        const isLiked = userId
-          ? await productLikeRepository.exists(userId, p.id)
-          : false;
+    const productIds = products.map((p) => p.id);
+    const commentIds = products.flatMap((p) => p.comments.map((c) => c.id));
 
-        const commentsWithLikes = await Promise.all(
-          p.comments.map(async (c) => {
-            const cLikeCount = await commentLikeRepository.count(c.id);
-            const cIsLiked = userId
-              ? await commentLikeRepository.exists(userId, c.id)
-              : false;
-            return {
-              ...c,
-              likeCount: cLikeCount,
-              isLiked: cIsLiked,
-            };
-          })
-        );
-
-        return {
-          ...p,
-          likeCount,
-          isLiked,
-          comments: commentsWithLikes,
-        };
-      })
+    const productLikeCounts = await productLikeRepository.countByTargetIds(
+      productIds
     );
+    const productLikeCountMap = Object.fromEntries(
+      productLikeCounts.map((pl) => [pl.productId, pl._count.productId])
+    );
+
+    const commentLikeCounts = await commentLikeRepository.countByTargetIds(
+      commentIds
+    );
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedProductIds: number[] = [];
+    let myLikedCommentIds: number[] = [];
+
+    if (userId) {
+      const likedProducts = await productLikeRepository.findByUserAndTargetIds(
+        userId,
+        productIds
+      );
+      myLikedProductIds = likedProducts.map((l) => l.productId);
+
+      const likedComments = await commentLikeRepository.findByUserAndTargetIds(
+        userId,
+        commentIds
+      );
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const productsWithLike = products.map((p) => ({
+      ...p,
+      likeCount: productLikeCountMap[p.id] || 0,
+      isLiked: userId ? myLikedProductIds.includes(p.id) : false,
+      comments: p.comments.map((c) => ({
+        ...c,
+        likeCount: commentLikeCountMap[c.id] || 0,
+        isLiked: userId ? myLikedCommentIds.includes(c.id) : false,
+      })),
+    }));
 
     const totalProducts = await productRepository.count(where);
     const totalPages = Math.ceil(totalProducts / limit);
@@ -91,19 +106,29 @@ class ProductService {
       ? await productLikeRepository.exists(userId, product.id)
       : false;
 
-    const commentsWithLikes = await Promise.all(
-      product.comments.map(async (c) => {
-        const cLikeCount = await commentLikeRepository.count(c.id);
-        const cIsLiked = userId
-          ? await commentLikeRepository.exists(userId, c.id)
-          : false;
-        return {
-          ...c,
-          likeCount: cLikeCount,
-          isLiked: cIsLiked,
-        };
-      })
+    const commentIds = product.comments.map((c) => c.id);
+
+    const commentLikeCounts = await commentLikeRepository.countByTargetIds(
+      commentIds
     );
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedCommentIds: number[] = [];
+    if (userId) {
+      const likedComments = await commentLikeRepository.findByUserAndTargetIds(
+        userId,
+        commentIds
+      );
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const commentsWithLikes = product.comments.map((c) => ({
+      ...c,
+      likeCount: commentLikeCountMap[c.id] || 0,
+      isLiked: userId ? myLikedCommentIds.includes(c.id) : false,
+    }));
 
     const productWithLike = {
       ...product,
@@ -136,7 +161,7 @@ class ProductService {
   async updateProduct(
     productId: number,
     userId: number,
-    updateData: Record<string, any>
+    updateData: UpdateProductDto
   ) {
     const product = await productRepository.findUnique(productId);
     if (!product) throw new AppError('제품 없음', 404);

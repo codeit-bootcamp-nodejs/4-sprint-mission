@@ -12,7 +12,7 @@ const router = express.Router();
 // 등록
 /**
  * @openapi
- * /register:
+ * /users/register:
  *   post:
  *     summary: 회원가입
  *     tags:
@@ -70,7 +70,7 @@ router.post('/register', validation.validateRegister, userController.register);
 // 로그인&로그아웃
 /**
  * @openapi
- * /login:
+ * /users/login:
  *   post:
  *     summary: 로그인
  *     tags:
@@ -124,7 +124,7 @@ router.post(
 // 로그인&로그아웃
 /**
  * @openapi
- * /logout:
+ * /users/logout:
  *   post:
  *     summary: 로그아웃
  *     tags:
@@ -312,6 +312,7 @@ router.patch(
   '/:userId/password',
   authenticate,
   isUserSelf,
+  validation.validate(validation.passwordSchema),
   userController.updatePassword
 );
 

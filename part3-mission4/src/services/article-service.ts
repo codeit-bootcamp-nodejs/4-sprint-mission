@@ -4,7 +4,7 @@ import {
   articleLikeRepository,
   commentLikeRepository,
 } from '../repositories/like-repository.js';
-import type { ArticleQuery } from '../types/article-types.js';
+import type { ArticleQuery, UpdateArticleDto } from '../types/article-types.js';
 import AppError from '../lib/appError.js';
 
 class ArticleService {
@@ -41,39 +41,50 @@ class ArticleService {
       },
     });
 
-    const articlesWithLike = await Promise.all(
-      articles.map(async (a) => {
-        const likeCount = await articleLikeRepository.count(a.id);
+    const articleIds = articles.map((a) => a.id);
+    const commentIds = articles.flatMap((a) => a.comments.map((c) => c.id));
 
-        const commentsWithLikes = await Promise.all(
-          a.comments.map(async (c) => {
-            const cLikeCount = await commentLikeRepository.count(c.id);
-
-            // userId가 있으면 exists 체크, 없으면 false
-            const cIsLiked = userId
-              ? await commentLikeRepository.exists(userId, c.id)
-              : false;
-
-            return {
-              ...c,
-              likeCount: cLikeCount,
-              isLiked: cIsLiked,
-            };
-          })
-        );
-
-        const isLiked = userId
-          ? await articleLikeRepository.exists(userId, a.id)
-          : false;
-
-        return {
-          ...a,
-          likeCount,
-          isLiked,
-          comments: commentsWithLikes,
-        };
-      })
+    const articleLikeCounts = await articleLikeRepository.countByTargetIds(
+      articleIds
     );
+    const articleLikeCountMap = Object.fromEntries(
+      articleLikeCounts.map((al) => [al.articleId, al._count.articleId])
+    );
+
+    const commentLikeCounts = await commentLikeRepository.countByTargetIds(
+      commentIds
+    );
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedArticleIds: number[] = [];
+    let myLikedCommentIds: number[] = [];
+
+    if (userId) {
+      const likedArticles = await articleLikeRepository.findByUserAndTargetIds(
+        userId,
+        articleIds
+      );
+      myLikedArticleIds = likedArticles.map((l) => l.articleId);
+
+      const likedComments = await commentLikeRepository.findByUserAndTargetIds(
+        userId,
+        commentIds
+      );
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const articlesWithLike = articles.map((a) => ({
+      ...a,
+      likeCount: articleLikeCountMap[a.id] || 0,
+      isLiked: userId ? myLikedArticleIds.includes(a.id) : false,
+      comments: a.comments.map((c) => ({
+        ...c,
+        likeCount: commentLikeCountMap[c.id] || 0,
+        isLiked: userId ? myLikedCommentIds.includes(c.id) : false,
+      })),
+    }));
 
     const totalArticles = await articleRepository.count(where);
     const totalPages = Math.ceil(totalArticles / limit);
@@ -95,20 +106,29 @@ class ArticleService {
       ? await articleLikeRepository.exists(userId, article.id)
       : false;
 
-    const commentsWithLikes = await Promise.all(
-      article.comments.map(async (c) => {
-        const cLikeCount = await commentLikeRepository.count(c.id);
-        const cIsLiked = userId
-          ? await commentLikeRepository.exists(userId, c.id)
-          : false;
+    const commentIds = article.comments.map((c) => c.id);
 
-        return {
-          ...c,
-          likeCount: cLikeCount,
-          isLiked: cIsLiked,
-        };
-      })
+    const commentLikeCounts = await commentLikeRepository.countByTargetIds(
+      commentIds
     );
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedCommentIds: number[] = [];
+    if (userId) {
+      const likedComments = await commentLikeRepository.findByUserAndTargetIds(
+        userId,
+        commentIds
+      );
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const commentsWithLikes = article.comments.map((c) => ({
+      ...c,
+      likeCount: commentLikeCountMap[c.id] || 0,
+      isLiked: userId ? myLikedCommentIds.includes(c.id) : false,
+    }));
 
     return {
       ...article,
@@ -136,7 +156,7 @@ class ArticleService {
   async updateArticle(
     articleId: number,
     userId: number,
-    updateData: Record<string, any>
+    updateData: UpdateArticleDto
   ) {
     const product = await articleRepository.findUnique(articleId);
     if (!product) throw new AppError('제품 없음', 404);

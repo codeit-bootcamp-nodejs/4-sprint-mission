@@ -9,7 +9,10 @@ const router = express.Router();
 // 게시글 조회, 생성
 router
   .route('/')
-  .get(articleController.getAllArticles)
+  .get(
+    validation.validateParam('id', validation.idSchema),
+    articleController.getAllArticles
+  )
   .post(
     authenticate,
     validation.validate(validation.articleSchema),

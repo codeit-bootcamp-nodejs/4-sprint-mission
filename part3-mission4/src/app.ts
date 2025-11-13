@@ -10,7 +10,6 @@ import { setupSwagger } from './swagger.js';
 
 dotenv.config();
 
-console.log('[App] DATABASE_URL at app.ts start:', process.env.DATABASE_URL);
 const PORT = Number(process.env.PORT) || 3000;
 const app = express();
 

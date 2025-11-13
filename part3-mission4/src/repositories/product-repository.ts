@@ -81,8 +81,23 @@ class ProductRepository {
   async findLikedProducts(userId: number) {
     return prisma.product.findMany({
       where: {
-        likes: { some: { userId } }, // ✅ ProductLike 테이블 기준
+        likes: { some: { userId } },
       },
+    });
+  }
+
+  async countByProductIds(productIds: number[]) {
+    return prisma.productLike.groupBy({
+      by: ['productId'],
+      _count: { productId: true },
+      where: { productId: { in: productIds } },
+    });
+  }
+
+  async findByUserAndProductIds(userId: number, productIds: number[]) {
+    return prisma.productLike.findMany({
+      where: { userId, productId: { in: productIds } },
+      select: { productId: true },
     });
   }
 }

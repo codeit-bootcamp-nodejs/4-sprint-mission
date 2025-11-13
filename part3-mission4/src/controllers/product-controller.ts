@@ -4,10 +4,10 @@ import { productService } from '../services/product-service.js';
 class ProductController {
   // 상품
   async getAllProducts(req: Request, res: Response) {
-    const userId = req.user?.id || null;
+    const userId = req.user?.id;
     const { data, pagination } = await productService.getAllProducts(
       req.query,
-      userId!
+      userId
     );
     res.json({ data, pagination });
   }
