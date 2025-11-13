@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int      @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  username       String           @unique @db.VarChar(20)
+  email          String           @unique
+  hashedPassword String
+  isAdmin        Boolean          @default(false)
+  lastLogin      DateTime
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
+  posts          Post[]
+  postComments   PostComment[]
+  products       Product[]
+  productLikes   ProductLike[]
+  postLikes      PostLike[]
+  notification   Notification[]
+  productComment ProductComment[]
+  refreshToken   RefreshToken?
+  isDeleted      Boolean          @default(false)
+
+  @@index([email])
+}
+
+model Product {
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(200)
+  description     String           @db.VarChar(1000)
+  price           Int
+  tags            String[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  likeCount       Int              @default(0)
+  commentCount    Int              @default(0)
+  user            User             @relation(fields: [userId], references: [id])
+  userId          Int
+  productComments ProductComment[]
+  productLikes    ProductLike[]
+
+  @@index([id])
+  @@index([id, userId])
+}
+
+model Post {
+  id           Int           @id @default(autoincrement())
+  title        String        @db.VarChar(200)
+  content      String        @db.VarChar(1000)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  likeCount    Int           @default(0)
+  commentCount Int           @default(0)
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  postComments PostComment[]
+  postLikes    PostLike[]
+
+  @@index([id])
+  @@index([id, userId])
+}
+
+model PostComment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  posts     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@index([userId])
+}
+
+model ProductComment {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  products  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@index([userId])
+}
+
+model ProductLike {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  products  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+
+  @@index([productId])
+}
+
+model PostLike {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  Post      Post     @relation(fields: [postId], references: [id])
+  postId    Int
+
+  @@index([postId])
+}
+
+enum NotificationTypeEnum {
+  NEW_COMMENT
+  PRODUCT_PRICE_CHANGED
+}
+
+enum NotificationTargetType {
+  POST
+  PRODUCT
+}
+
+model Notification {
+  id         Int                    @id @default(autoincrement())
+  user       User                   @relation(fields: [userId], references: [id])
+  userId     Int
+  type       NotificationTypeEnum
+  targetType NotificationTargetType
+  targetId   Int
+  createdAt  DateTime               @default(now())
+  updatedAt  DateTime               @updatedAt
+  message    String
+  isRead     Boolean                @default(false)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@index([userId, createdAt(sort: Desc) , id(sort: Desc)])
+}

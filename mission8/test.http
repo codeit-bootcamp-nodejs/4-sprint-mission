@@ -1,0 +1,60 @@
+@baseUrl=http://localhost:3001
+@accessTokenName=accessToken
+@accessToken={{login.response.body.accessToken}}
+@refreshTokenName=refreshToken
+@refreshToken={{login.response.body.refreshToken}}
+
+### 로그인
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@test.com",
+  "password": "testuser1"
+}
+
+### 리프레시
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 알람 목록 조회
+GET {{baseUrl}}/notifications
+Authorization: Bearer {{accessToken}}
+Content-Type : application/json
+
+### 안 읽은 알람 개수 조회
+GET {{baseUrl}}/notifications/unread/count
+Authorization: Bearer {{accessToken}}
+Content-Type : application/json
+
+### 알림 읽음 처리
+PATCH {{baseUrl}}/notifications/read
+Authorization: Bearer {{accessToken}}
+Content-Type : application/json
+
+{
+  "notificationIds": [1]
+}
+
+### 게시글 댓글 달기
+POST {{baseUrl}}/posts/1/comments
+Authorization: Bearer {{accessToken}}
+Content-Type : application/json
+
+{
+  "comment": "테스트 댓글"
+}
+
+### 상품 가격 변경
+PATCH  {{baseUrl}}/products/1/price
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "price": 10000
+}
