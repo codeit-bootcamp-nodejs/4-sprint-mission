@@ -12,6 +12,6 @@ const router = Router();
 router.post("/", authMiddleware, productRegisterController);
 router.put("/:productId", authMiddleware, productPutController);
 router.delete("/:productId", authMiddleware, productDeleteController);
-router.get("/", authMiddleware, productListupController);
+router.get("/", productListupController);
 
 export default router;

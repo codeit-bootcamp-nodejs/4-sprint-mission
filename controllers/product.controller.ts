@@ -13,13 +13,7 @@ import { HttpError } from "../middlewares/errorHandler.middleware.js";
 // 상품 목록 조회
 export async function productListupController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    
-    const userIdStr = req.user?.userId;
-    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
-    
-    const userId = Number(userIdStr);
-    
-    const list = await prodcutListupService(userId)
+    const list = await prodcutListupService()
 
     // 응답
     res.status(200).json({

@@ -8,7 +8,7 @@ import { createNotification } from './notification.service.js';
 dotenv.config();
 
 // 상품 목록 조회
-export async function prodcutListupService(userId: number): Promise<{
+export async function prodcutListupService(): Promise<{
   id: number;
   price: number;
   title: string;
@@ -17,7 +17,6 @@ export async function prodcutListupService(userId: number): Promise<{
   updatedAt: Date;
   }[]> {
   const listup = await prisma.product.findMany({
-    where: { userId: userId },
     select: {
       id: true,
       price: true,

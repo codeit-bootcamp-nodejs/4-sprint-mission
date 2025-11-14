@@ -2,7 +2,7 @@ import prisma from '../prisma/prisma.js';
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Post } from "@prisma/client";
 // 게시글 목록 조회
-export async function postListService(userId: number): Promise<{
+export async function postListService(): Promise<{
   id: number;
   title: string;
   content: string;
@@ -10,7 +10,6 @@ export async function postListService(userId: number): Promise<{
   updatedAt: Date;
 }[]> {
   const listup = await prisma.post.findMany({
-    where: { userId: userId },
     select: {
       id: true,
       title: true,
