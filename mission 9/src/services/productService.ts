@@ -49,7 +49,7 @@ export class ProductService {
       for (const user of targetUsers) {
         await this.alertService.create(
           user.id,
-          `좋아요한 상품 "${product.name}"의 가격이 ${oldPrice}원 → ${data.price}원으로 변경되었습니다.`,
+          `좋아요한 상품 "${updated.name}"의 가격이 ${oldPrice}원 → ${data.price}원으로 변경되었습니다.`,
           `/products/${productId}`
         );
       }

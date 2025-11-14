@@ -1,5 +1,5 @@
 import { AlertRepository } from "../repositories/alertRepository";
-import { io } from "../app";
+import { getIo } from "../socket/io";
 
 export class AlertService {
   private repo = new AlertRepository();
@@ -7,6 +7,7 @@ export class AlertService {
   async create(userId: number, message: string, link?: string) {
     const alert = await this.repo.createAlert({ userId, message, link });
 
+    const io = getIo();
     io.to(`user:${userId}`).emit("newAlert", alert);
 
     return alert;
@@ -16,8 +17,18 @@ export class AlertService {
     return this.repo.findByUserId(userId);
   }
 
-  async read(alertId: number) {
-    return this.repo.markAsRead(alertId);
+  async read(alertId: number, userId: number) {
+    const alert = await this.repo.findById(alertId);
+
+    if (!alert) return false;
+
+    if (alert.userId !== userId) {
+      return false;
+    }
+
+    await this.repo.markAsRead(alertId);
+
+    return true;
   }
 
   async countUnread(userId: number) {

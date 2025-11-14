@@ -6,9 +6,10 @@ const router = express.Router();
 const controller = new ArticleController();
 
 router.post("/", passport.authenticate("access-token", { session: false }), controller.create);
-router.get("/", passport.authenticate("access-token", { session: false }), controller.list);
-router.get("/:id", passport.authenticate("access-token", { session: false }), controller.detail);
 router.patch("/:id", passport.authenticate("access-token", { session: false }), controller.update);
 router.delete("/:id", passport.authenticate("access-token", { session: false }), controller.delete);
+
+router.get("/", controller.list);
+router.get("/:id", controller.detail);
 
 export default router;

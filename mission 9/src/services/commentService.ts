@@ -14,12 +14,16 @@ export class CommentService {
     articleId: number,
     content: string
   ) {
+    const article = await this.articleRepo.findById(articleId);
+    if (!article) {
+      throw new Error("Article not found");
+    }
+
     const comment = await this.repo.createArticleComment(
       userId,
       articleId,
       content
     );
-    const article = await this.articleRepo.findById(articleId);
 
     if (article && article.userId !== userId) {
       await this.alertService.create(
@@ -37,12 +41,16 @@ export class CommentService {
     productId: number,
     content: string
   ) {
+    const product = await this.productRepo.findById(productId);
+    if (!product) {
+      throw new Error("Product not found");
+    }
+
     const comment = await this.repo.createProductComment(
       userId,
       productId,
       content
     );
-    const product = await this.productRepo.findById(productId);
 
     if (product && product.userId !== userId) {
       await this.alertService.create(

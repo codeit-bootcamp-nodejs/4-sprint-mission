@@ -14,8 +14,23 @@ export class AlertController {
   };
 
   markAsRead = async (req: Request, res: Response) => {
+    if (!req.user)
+      return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });
+
+    const userId = req.user.id;
     const alertId = Number(req.params.id);
-    await this.service.read(alertId);
+
+    if (!alertId) {
+      throw new Error("Article not found");
+    }
+
+    const success = await this.service.read(alertId, userId);
+
+    if (!success) {
+      return res.status(status.FORBIDDEN).json({
+        message: "You do not have permission to read this alert",
+      });
+    }
     res.status(204).send();
   };
 }

@@ -24,4 +24,10 @@ export class AlertRepository {
       where: { userId, isRead: false },
     });
   }
+
+  async findById(id: number) {
+    return prisma.alert.findUnique({
+      where: { id },
+    });
+  }
 }

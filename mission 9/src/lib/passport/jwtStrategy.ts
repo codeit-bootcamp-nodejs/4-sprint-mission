@@ -1,4 +1,4 @@
-import { Strategy as JwtStrategy } from 'passport-jwt';
+import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import prisma from '../prisma';
 import type { Request } from 'express';
 import type { VerifiedCallback } from 'passport-jwt';
@@ -13,8 +13,15 @@ interface JwtPayload {
   sub: number;
 }
 
+// const accessTokenOptions = {
+//   jwtFromRequest: (req: Request) => req.cookies[ACCESS_TOKEN_COOKIE_NAME],
+//   secretOrKey: JWT_ACCESS_TOKEN_SECRET,
+// };
+
 const accessTokenOptions = {
-  jwtFromRequest: (req: Request) => req.cookies[ACCESS_TOKEN_COOKIE_NAME],
+  jwtFromRequest: (req: Request) => {
+    return req.cookies[ACCESS_TOKEN_COOKIE_NAME] || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+  },
   secretOrKey: JWT_ACCESS_TOKEN_SECRET,
 };
 

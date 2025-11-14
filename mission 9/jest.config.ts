@@ -1,9 +1,15 @@
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  verbose: true,
-  testMatch: ['**/*.test.ts'],
-  transform: {
-    '^.+\\.ts$': 'ts-jest',
+  roots: ['<rootDir>/tests'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1', // 경로 alias 사용 시
   },
-  moduleFileExtensions: ['ts', 'js'],
+  setupFilesAfterEnv: [],
+  clearMocks: true,
+  restoreMocks: true,
+  collectCoverage: true,
+  coverageDirectory: '<rootDir>/coverage',
+  coverageReporters: ['text', 'lcov'],
 };

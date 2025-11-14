@@ -26,7 +26,8 @@ export class UserController {
     try {
       const { accessToken, refreshToken } = userService.generateUserTokens(req.user.id);
       setTokenCookies(res, accessToken, refreshToken);
-      res.status(status.OK).json({ token: accessToken, refreshToken });
+      
+      res.status(status.OK).json({ accessToken, refreshToken });
     } catch (err) {
       next(err);
     }
