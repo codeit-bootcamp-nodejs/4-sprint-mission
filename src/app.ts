@@ -1,0 +1,80 @@
+import * as dotenv from "dotenv";
+import express, { Express, Request, Response, NextFunction } from "express";
+import cors from "cors";
+import { createServer } from "http";
+import { Server as SocketIOServer } from "socket.io";
+
+import container from "./container";
+import productRouter from "./route/product-router";
+import articleRouter from "./route/article-router";
+import imageRouter from "./route/image-router";
+import userRouter from "./route/user-router";
+import notificationRouter from "./route/notification-router";
+import { errorHandler } from "./middleware";
+
+dotenv.config();
+
+const app: Express = express();
+
+app.use(cors());
+app.use(express.json());
+
+const server = createServer(app); // http.Server 인스턴스
+
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+container.io = io; // 컨테이너에 io 주입
+
+const {
+  articleController,
+  imageController,
+  userController,
+  validationMiddleware,
+  imageMiddleware,
+} = container;
+
+app.use(
+  "/products",
+  productRouter(
+    container.productController,
+    container.commentController,
+    validationMiddleware
+  )
+);
+app.use(
+  "/articles",
+  articleRouter(
+    articleController,
+    container.commentController,
+    validationMiddleware
+  )
+);
+app.use("/users", userRouter(userController));
+app.use("/uploads", imageRouter(imageController, imageMiddleware));
+
+app.use("/notifications", (req, res, next) => {
+  notificationRouter(container.notificationController)(req, res, next);
+});
+
+app.use(errorHandler);
+
+io.on("connection", (socket) => {
+  console.log(`[Socket.IO] a user connected: ${socket.id}`);
+
+  socket.on("join_room", (userId: number) => {
+    console.log(`[Socket.IO] User ${userId} joined room: user_room_${userId}`);
+    socket.join(`user_room_${userId}`);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`[Socket.IO] user disconnected: ${socket.id}`);
+  });
+});
+
+// server.listen() 부분을 제거하고 server를 export
+export default server;
