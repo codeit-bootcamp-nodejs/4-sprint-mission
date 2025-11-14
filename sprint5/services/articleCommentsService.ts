@@ -52,7 +52,7 @@ export const articleCommentsService = {
         throw error;
       }
 
-      const comment = articleCommentsRepository.createArticleComment(
+      const comment = await articleCommentsRepository.createArticleComment(
         articleId,
         content,
         userId
