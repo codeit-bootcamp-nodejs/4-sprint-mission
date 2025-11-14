@@ -13,3 +13,5 @@ sprintMission2/
 .env
 
 /prisma/migrations
+
+.env.test

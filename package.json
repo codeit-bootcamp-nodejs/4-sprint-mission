@@ -18,6 +18,7 @@
     "@types/socket.io": "^3.0.1",
     "@types/supertest": "^6.0.3",
     "bcrypt": "^6.0.0",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9.32.0",
     "jest": "^30.2.0",
     "jsonwebtoken": "^9.0.2",
@@ -38,7 +39,7 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "nodemon --exec ts-node src/main.ts",
-    "test": "jest --detectOpenHandles",
-    "test:cov": "jest --coverage"
+    "test": "dotenv -e .env.test -- jest --detectOpenHandles",
+    "test:cov": "dotenv -e .env.test -- jest --coverage"
   }
 }
