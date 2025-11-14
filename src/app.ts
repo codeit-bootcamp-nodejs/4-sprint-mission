@@ -2,6 +2,7 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
+import authRouter from './router/auth_router';
 import notificationRouter from './router/notification_router';
 import productRouter from './router/product_router';
 import postRouter from './router/post_router';
@@ -21,6 +22,7 @@ app.get('/', (req: Request, res: Response) => {
     res.status(200).send('Server is running!');
 });
 
+app.use('/api/auth', authRouter);
 app.use('/api/products', productRouter);
 app.use('/api/posts', postRouter);
 app.use('/api/notifications', notificationRouter);
