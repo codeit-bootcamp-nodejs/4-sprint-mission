@@ -20,6 +20,17 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+const server = createServer(app);
+
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: "*", // 실제 프로덕션에서는 클라이언트 주소로 제한필요
+    methods: ["GET", "POST"],
+  },
+});
+
+container.io = io;
+
 const {
   articleController,
   imageController,
@@ -52,17 +63,6 @@ app.use("/notifications", (req, res, next) => {
 });
 
 app.use(errorHandler);
-
-const server = createServer(app);
-
-const io = new SocketIOServer(server, {
-  cors: {
-    origin: "*", // 실제 프로덕션에서는 클라이언트 주소로 제한필요
-    methods: ["GET", "POST"],
-  },
-});
-
-container.io = io;
 
 io.on("connection", (socket) => {
   console.log(`[Socket.IO] a user connected: ${socket.id}`);

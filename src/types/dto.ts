@@ -168,6 +168,7 @@ export interface NotificationResponseDto {
   id: number;
   message: string;
   link: string;
+  type: string;
   isRead: boolean;
   createdAt: Date;
 }
