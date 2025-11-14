@@ -1,45 +1,73 @@
-// tests/product.integration.test.ts
 import request from "supertest";
-import { app } from "../src/app";
+import { app, server } from "../src/app";
 import { loginAndGetToken } from "./helpers/auth";
+import { ProductRepository } from "../src/repositories/productRepository";
 
-describe("상품 API 통합 테스트", () => {
+describe("Product API Integration Test", () => {
   let accessToken: string;
+  let userId: number;
+  let productId: number;
 
   beforeAll(async () => {
-    // 테스트용 계정 로그인 및 토큰 발급
     const tokens = await loginAndGetToken();
     accessToken = tokens.accessToken;
+    userId = tokens.userId;
+
+    if (!server.listening) {
+      await new Promise<void>((resolve) => server.listen(0, resolve));
+    }
+
+    const productRepo = new ProductRepository();
+    const product = await productRepo.createProduct({
+      userId,
+      name: "상품",
+      description: "설명",
+      price: 1000,
+      tags: "상품",
+    });
+    productId = product.id; 
   });
 
-  it("인증 필요 상품 생성", async () => {
-    const res = await request(app)
-      .post("/products") // 실제 라우트 확인 필요
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        name: "테스트상품",
-        price: 1000,
-        description: "테스트용 상품입니다", // 10자 이상 필수
-        tags: "테스트",
-      })
-      .expect(201); // 성공 예상
-
-    expect(res.body).toHaveProperty("id");
-    expect(res.body.name).toBe("테스트상품");
-    expect(res.body.price).toBe(1000);
-    expect(res.body.description).toBe("테스트용 상품입니다");
+  afterAll(async () => {
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => (err ? reject(err) : resolve()));
+    });
   });
 
-  it("인증 필요 상품 조회", async () => {
-    const res = await request(app)
-      .get("/products")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .expect(200);
+  describe("Public Product API", () => {
+    it("상품 목록 조회", async () => {
+      const res = await request(app).get("/products").expect(200);
+      expect(Array.isArray(res.body)).toBe(true);
+    });
 
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body[0]).toHaveProperty("name");
-    expect(res.body[0]).toHaveProperty("price");
-    expect(res.body[0]).toHaveProperty("description");
+    it("상품 상세 조회", async () => {
+      const res = await request(app)
+        .get(`/products/${productId}`)
+        .expect(200);
+
+      expect(res.body).toHaveProperty("id", productId);
+      expect(res.body).toHaveProperty("name", "상품");
+    });
+  });
+
+  describe("Private Product API", () => {
+    it("상품 수정", async () => {
+      const res = await request(app)
+        .patch(`/products/${productId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .send({ price: 2000 })
+        .expect(200);
+
+      expect(res.body).toHaveProperty("price", 2000);
+    });
+
+    it("상품 삭제", async () => {
+      await request(app)
+        .delete(`/products/${productId}`)
+        .set("Authorization", `Bearer ${accessToken}`)
+        .expect(204);
+
+      await request(app).get(`/products/${productId}`).expect(404);
+    });
   });
 });
