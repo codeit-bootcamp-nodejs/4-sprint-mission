@@ -38,7 +38,7 @@ export const notificationRepository = {
 
   // 🔹 알림 읽음 처리
   markAsRead: async (userId: number, notificationId: number) => {
-    return await prisma.notification.update({
+    return await prisma.notification.updateMany({
       where: { id: notificationId, userId },
       data: { isRead: true },
     });
