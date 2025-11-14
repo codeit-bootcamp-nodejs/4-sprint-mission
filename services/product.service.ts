@@ -13,6 +13,7 @@ export async function prodcutListupService(): Promise<{
   price: number;
   title: string;
   content: string;
+  userId: number;
   createdAt: Date;
   updatedAt: Date;
   }[]> {
@@ -22,6 +23,7 @@ export async function prodcutListupService(): Promise<{
       price: true,
       title: true,
       content: true,
+      userId: true,
       createdAt: true,
       updatedAt: true
     }

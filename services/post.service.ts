@@ -6,6 +6,7 @@ export async function postListService(): Promise<{
   id: number;
   title: string;
   content: string;
+  userId: number;
   createdAt: Date;
   updatedAt: Date;
 }[]> {
@@ -14,6 +15,7 @@ export async function postListService(): Promise<{
       id: true,
       title: true,
       content: true,
+      userId: true,
       createdAt: true,
       updatedAt: true
     }
