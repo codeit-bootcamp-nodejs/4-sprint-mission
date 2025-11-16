@@ -1,12 +1,13 @@
 import { NotificationsRepository } from '../repositories/notifications.repository.js';
 import { NotificationType } from '@prisma/client';
+import { Server } from 'socket.io';
 
 export class NotificationsService {
   private static instance: NotificationsService;
   notificationsRepository = new NotificationsRepository();
 
   // Socket.IO instance will be injected later
-  private io: any;
+  private io!: Server;
 
   private constructor() {} // Private constructor
 
@@ -17,7 +18,7 @@ export class NotificationsService {
     return NotificationsService.instance;
   }
 
-  setIo(io: any) {
+  setIo(io: Server) {
     this.io = io;
   }
 

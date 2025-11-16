@@ -139,5 +139,7 @@ model Notification {
   relatedArticle  Article?       @relation(fields: [relatedArticleId], references: [id], onDelete: SetNull)
 
   @@index([recipientId])
+  @@index([recipientId, isRead])
+  @@index([recipientId, createdAt(sort: Desc)])
   @@map("notifications")
 }

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { NotificationsService } from '../services/notifications.service.js';
 
 export class NotificationsController {
-  notificationsService = new NotificationsService();
+  notificationsService = NotificationsService.getInstance();
 
   getNotifications = async (req: Request, res: Response, next: NextFunction) => {
     try {
