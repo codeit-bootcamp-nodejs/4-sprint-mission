@@ -13,6 +13,14 @@ export const getNotifications = async (req: Request, res: Response, next: NextFu
         const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
         const offset = req.query.offset ? parseInt(req.query.offset as string) : 0;
 
+        // limit, offset 유효성 검증
+        if (isNaN(limit) || limit < 1 || limit > 100) {
+            throw new CustomError('limit은 1에서 100 사이의 숫자여야 합니다.', 400);
+        }
+        if (isNaN(offset) || offset < 0) {
+            throw new CustomError('offset은 0 이상의 숫자여야 합니다.', 400);
+        }
+
         const notifications = await notificationService.getNotifications(req.user.id, limit, offset);
 
         sendResponse(res, 200, '알림 목록 조회 성공', { notifications });

@@ -81,7 +81,7 @@ export const updateProduct = async (productId: number, userId: number, productDa
             likedUserIds.map(async (likedUserId) => {
                 await notificationService.createAndSendNotification({
                     type: 'PRICE_CHANGE',
-                    message: `내가 판매 신청한 매물에 새로운 댓글이 달렸습니다.`,
+                    message: `좋아요한 상품의 가격이 변경되었습니다.`,
                     userId: likedUserId,
                     productId,
                 });
