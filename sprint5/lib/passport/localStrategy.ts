@@ -1,8 +1,7 @@
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import prisma from "../prisma.js";
+import prisma from "../prisma";
 
-// LocalStrategy 설정 (이메일과 비밀번호로 로그인)
 export const localStrategy = new LocalStrategy(
   {
     usernameField: "email",
@@ -15,21 +14,23 @@ export const localStrategy = new LocalStrategy(
       const user = await prisma.user.findUnique({ where: { email } });
 
       if (!user) {
-        console.log("사용자를 찾을 수 없습니다.");
-        return done(null, false, { message: "사용자를 찾을 수 없습니다." });
+        const err: HttpError = new Error("잘못된 이메일 또는 비밀번호입니다.");
+        err.status = 401;
+        return done(err);
       }
 
       // 비밀번호 비교
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid) {
-        console.log("비밀번호가 일치하지 않습니다.");
-        return done(null, false, { message: "비밀번호가 일치하지 않습니다." });
+        const err: HttpError = new Error("잘못된 이메일 또는 비밀번호입니다.");
+        err.status = 401;
+        return done(err);
       }
 
       // 비밀번호가 일치하면 사용자 반환
-      done(null, user);
+      return done(null, user);
     } catch (err) {
-      done(err);
+      return done(err);
     }
   }
 );

@@ -1,14 +1,14 @@
 import express from "express";
-import { articleController } from "../controllers/articleController.js";
+import { articleController } from "../controllers/articleController";
 import {
   validateArticleCreate,
   validateId,
   validateArticleQuery,
-} from "../middlewares/validate.js";
-import articleCommentRouter from "./articleCommentsRouter.js";
-import likeRouter from "./articleLikeRouter.js";
-import passport from "../lib/passport/index.js";
-import { optionalAuth } from "../middlewares/optionalAuth.js";
+} from "../middlewares/validate";
+import articleCommentRouter from "./articleCommentsRouter";
+import likeRouter from "./articleLikeRouter";
+import passport from "../lib/passport/index";
+import { optionalAuth } from "../middlewares/optionalAuth";
 
 const articleRouter = express.Router();
 

@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.js";
+import prisma from "../lib/prisma";
 
 export const productLikeReposioty = {
   findLike: (userId: number, productId: number) => {

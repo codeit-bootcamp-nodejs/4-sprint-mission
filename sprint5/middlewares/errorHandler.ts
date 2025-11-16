@@ -13,6 +13,10 @@ export function errorHandler(
     return res
       .status(status)
       .json({ error: err.message || "잘못된 요청입니다." });
+  } else if (status === 401) {
+    return res
+      .status(status)
+      .json({ error: err.message || "인증에 실패했습니다." });
   } else if (status === 403) {
     return res
       .status(status)
@@ -24,7 +28,7 @@ export function errorHandler(
   } else if (status === 409) {
     return res
       .status(status)
-      .json({ error: err.message || "이미 존재하는 데이터입니다." });
+      .json({ message: err.message || "이미 존재하는 데이터입니다." });
   } else {
     return res.status(500).json({ error: "서버 오류" });
   }

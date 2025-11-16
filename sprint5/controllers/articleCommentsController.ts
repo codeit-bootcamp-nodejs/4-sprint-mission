@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { articleCommentsService } from "../services/articleCommentsService.js";
+import { articleCommentsService } from "../services/articleCommentsService";
 
 export const aritcleCommentsController = {
   getArticleComments: async (

@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma.js";
-import type { UserProduct, UpdateUserData } from "../types/dto.js";
+import prisma from "../lib/prisma";
+import type { UserProduct, UpdateUserData } from "../types/dto";
 
 export const userRepository = {
   findUser: async (id: number): Promise<Express.User | null> => {

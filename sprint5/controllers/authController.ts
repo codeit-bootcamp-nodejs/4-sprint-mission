@@ -3,12 +3,12 @@ import {
   registerUser,
   loginUser,
   refreshAccessToken,
-} from "../services/authService.js";
+} from "../services/authService";
 import {
   NODE_ENV,
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
-} from "../lib/constants.js";
+} from "../lib/constants";
 
 export async function register(
   req: Request,

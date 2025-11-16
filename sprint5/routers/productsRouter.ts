@@ -1,15 +1,15 @@
 import express from "express";
-import { productController } from "../controllers/productController.js";
+import { productController } from "../controllers/productController";
 import {
   validateProductCreate,
   validateId,
   validateProductUpdate,
   validateProductQuery,
-} from "../middlewares/validate.js";
-import productCommentRouter from "./productCommentsRouter.js";
-import likeRouter from "./productLikeRouter.js";
-import passport from "../lib/passport/index.js";
-import { optionalAuth } from "../middlewares/optionalAuth.js";
+} from "../middlewares/validate";
+import productCommentRouter from "./productCommentsRouter";
+import likeRouter from "./productLikeRouter";
+import passport from "../lib/passport/index";
+import { optionalAuth } from "../middlewares/optionalAuth";
 
 const productRouter = express.Router();
 

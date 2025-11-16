@@ -1,11 +1,11 @@
 import express from "express";
-import { aritcleCommentsController } from "../controllers/articleCommentsController.js";
+import { aritcleCommentsController } from "../controllers/articleCommentsController";
 import {
   validateNewComment,
   validateCommentUpdate,
   validateId,
-} from "../middlewares/validate.js";
-import passport from "../lib/passport/index.js";
+} from "../middlewares/validate";
+import passport from "../lib/passport/index";
 
 const articleCommentRouter = express.Router({ mergeParams: true });
 

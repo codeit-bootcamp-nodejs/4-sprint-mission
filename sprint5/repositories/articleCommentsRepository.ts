@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma.js";
-import type { ArticleComment } from "../types/dto.js";
+import prisma from "../lib/prisma";
+import type { ArticleComment } from "../types/dto";
 
 export const articleCommentsRepository = {
   getArticleComments: async (

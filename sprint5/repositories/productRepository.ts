@@ -1,5 +1,5 @@
-import prisma from "../lib/prisma.js";
-import type { Product } from "../types/dto.js";
+import prisma from "../lib/prisma";
+import type { Product } from "../types/dto";
 
 export const productRepository = {
   getProducts: async (

@@ -1,5 +1,5 @@
-import { articleRepository } from "../repositories/articleRepository.js";
-import type { Article, ArticleWithLike, Like } from "../types/dto.js";
+import { articleRepository } from "../repositories/articleRepository";
+import type { Article, ArticleWithLike, Like } from "../types/dto";
 
 export const articleService = {
   getArticles: async (

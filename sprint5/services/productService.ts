@@ -1,8 +1,8 @@
-import { productRepository } from "../repositories/productRepository.js";
-import { likeRepository } from "../repositories/likeRepository.js";
-import { notificationRepository } from "../repositories/notificationRepository.js";
-import { emitToUser } from "../utils/notificationSocket.js";
-import type { Like, Product, ProductWithLike } from "../types/dto.js";
+import { productRepository } from "../repositories/productRepository";
+import { likeRepository } from "../repositories/likeRepository";
+import { notificationRepository } from "../repositories/notificationRepository";
+import { emitToUser } from "../utils/notificationSocket";
+import type { Like, Product, ProductWithLike } from "../types/dto";
 
 export const productService = {
   getProducts: async (

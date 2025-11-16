@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { notificationService } from "../services/notificationService.js";
+import { notificationService } from "../services/notificationService";
 
 export const notificationController = {
   getNotificationsByUser: async (

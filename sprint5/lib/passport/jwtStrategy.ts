@@ -1,12 +1,12 @@
 import type { Request } from "express";
 import { Strategy as JwtStrategy } from "passport-jwt";
-import prisma from "../prisma.js";
+import prisma from "../prisma";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
   JWT_ACCESS_TOKEN_SECRET,
   JWT_REFRESH_TOKEN_SECRET,
-} from "../constants.js";
+} from "../constants";
 
 interface JwtPayload {
   sub: string;
