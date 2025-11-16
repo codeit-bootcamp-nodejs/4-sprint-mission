@@ -115,10 +115,7 @@ describe("Article API 통합 테스트 (JWT 기반)", () => {
 
   describe("GET /articles", () => {
     it("게시글 목록 조회", async () => {
-      const res = await request(app)
-        .get("/articles")
-        .set("Cookie", cookie)
-        .expect(200);
+      const res = await request(app).get("/articles").expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
     });
@@ -126,10 +123,7 @@ describe("Article API 통합 테스트 (JWT 기반)", () => {
 
   describe("GET /articles/:id", () => {
     it("게시글 상세 조회", async () => {
-      const res = await request(app)
-        .get(`/articles/${articleId}`)
-        .set("Cookie", cookie)
-        .expect(200);
+      const res = await request(app).get(`/articles/${articleId}`).expect(200);
 
       expect(res.body).toHaveProperty("id", articleId);
       expect(res.body).toHaveProperty("title", "테스트 글");
