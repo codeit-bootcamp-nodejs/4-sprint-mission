@@ -108,6 +108,7 @@ describe("Article API 통합 테스트 (JWT 기반)", () => {
 
       expect(res.body).toHaveProperty("id");
       expect(res.body.title).toBe("테스트 글");
+      expect(res.body.content).toBe("테스트 내용");
 
       articleId = res.body.id; // 이후 테스트에 사용
     });
@@ -126,7 +127,8 @@ describe("Article API 통합 테스트 (JWT 기반)", () => {
       const res = await request(app).get(`/articles/${articleId}`).expect(200);
 
       expect(res.body).toHaveProperty("id", articleId);
-      expect(res.body).toHaveProperty("title", "테스트 글");
+      expect(res.body.title).toBe("테스트 글");
+      expect(res.body.content).toBe("테스트 내용");
     });
   });
 
