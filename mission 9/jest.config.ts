@@ -4,7 +4,7 @@ module.exports = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1', // 경로 alias 사용 시
+    '^@/(.*)$': '<rootDir>/src/$1', 
   },
   setupFilesAfterEnv: [],
   clearMocks: true,

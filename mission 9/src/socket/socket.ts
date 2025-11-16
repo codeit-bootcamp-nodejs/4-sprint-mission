@@ -2,7 +2,7 @@ import { getIo } from "./io";
 import jwt from "jsonwebtoken";
 
 export function registerSocket() {
-  const io = getIo(); // <-- initIo에서 만든 io 가져오기
+  const io = getIo();
 
   io.on("connection", (socket) => {
     console.log("Socket connected:", socket.id);
