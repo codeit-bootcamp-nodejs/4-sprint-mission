@@ -18,7 +18,7 @@ export class ProductRepository {
   ) {}
 
   async findOwnerById({ productId }: ProductId) {
-    return await this.prisma.product.findUniqueOrThrow({
+    return await this.prisma.product.findUnique({
       where: { id: productId },
       select: { userId: true },
     });
@@ -32,7 +32,7 @@ export class ProductRepository {
   }
   async findById({ productId, userId, tx }: ProductParams) {
     const db = tx || this.prisma;
-    return await db.product.findUniqueOrThrow({
+    return await db.product.findUnique({
       where: {
         id: productId,
       },
@@ -54,6 +54,13 @@ export class ProductRepository {
             id: true,
             email: true,
             nickname: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
           },
         },
       },
@@ -85,6 +92,13 @@ export class ProductRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
@@ -114,6 +128,13 @@ export class ProductRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -121,13 +142,52 @@ export class ProductRepository {
     const db = tx || this.prisma;
     return await db.product.create({
       data: data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        likeCount: true,
+        userId: true,
+        createdAt: true,
+        tags: true,
+        images: true,
+      },
     });
   }
-  async update({ productId, tx, patchData: data }: UpdateDTO) {
+  async update({ productId, tx, userId, patchData: data }: UpdateDTO) {
     const db = tx || this.prisma;
     return await db.product.update({
       where: { id: productId },
       data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        createdAt: true,
+        likes: {
+          where: {
+            userId,
+          },
+        },
+        likeCount: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            nickname: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
+      },
     });
   }
   async delete({ productId, tx }: ProductIdWithTx) {

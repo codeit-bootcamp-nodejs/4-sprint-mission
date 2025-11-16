@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
-import type { ArticleParams } from '@/dto/articles.dto.js';
+import type { ArticleParams, AuthArticleParams } from '@/dto/articles.dto.js';
 import type { GetListParams } from '@/types/shared.types.js';
 import type { ArticleRepository } from '@/repositories/articles.repository.js';
 import { inject, injectable } from 'inversify';
@@ -27,7 +27,7 @@ export class ArticleService {
   private async authorization({
     userId,
     articleId,
-  }: ArticleParams): Promise<boolean> {
+  }: AuthArticleParams): Promise<boolean> {
     const article = await this.articleRepository.findOwnerById({ articleId });
     return article.userId === userId;
   }
@@ -166,7 +166,7 @@ export class ArticleService {
     }
   }
 
-  async deleteArticle({ articleId, userId }: ArticleParams) {
+  async deleteArticle({ articleId, userId }: AuthArticleParams) {
     if (await this.authorization({ userId, articleId })) {
       let imageIdsToDelete: string[] = [];
       const deletedArticle = await this.prisma.$transaction(async (tx) => {

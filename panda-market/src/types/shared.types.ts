@@ -1,5 +1,4 @@
 import type { ArticleLike, Prisma, ProductLike } from '@prisma/client';
-import { UserId } from './user.types.js';
 
 export interface EntityId {
   id: number;
@@ -13,7 +12,8 @@ export interface Transaction {
   tx?: Prisma.TransactionClient;
 }
 
-export interface GetListParams extends UserId {
+export interface GetListParams {
+  userId?: number;
   keyword: string;
   page: number;
   pageSize: number;

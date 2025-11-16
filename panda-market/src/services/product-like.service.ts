@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { ProductParams } from '@/dto/products.dto.js';
+import { AuthProductParams } from '@/dto/products.dto.js';
 import { NotFoundError } from '@/lib/errors.js';
 import { ProductRepository } from '@/repositories/products.repository.js';
 
@@ -16,7 +16,7 @@ export class ProductLikeService {
     @inject(TYPES.ProductRepository)
     private readonly productRepository: ProductRepository,
   ) {}
-  async postProductLike({ userId, productId }: ProductParams) {
+  async postProductLike({ userId, productId }: AuthProductParams) {
     return await this.prisma.$transaction(async (tx) => {
       const existingLike = await this.productLikeRepository.findById({
         userId,
@@ -44,7 +44,7 @@ export class ProductLikeService {
     });
   }
 
-  async deleteProductLike({ userId, productId }: ProductParams) {
+  async deleteProductLike({ userId, productId }: AuthProductParams) {
     return await this.prisma.$transaction(async (tx) => {
       const deleteLike = await this.productLikeRepository.delete({
         userId,

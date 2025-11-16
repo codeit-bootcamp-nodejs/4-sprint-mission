@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import { ArticleParams } from '@/dto/articles.dto.js';
+import { AuthArticleParams } from '@/dto/articles.dto.js';
 import { UserId } from '@/types/user.types.js';
 
 @injectable()
@@ -9,7 +9,7 @@ export class ArticleLikeRepository {
   constructor(
     @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
   ) {}
-  async findById({ userId, articleId, tx }: ArticleParams) {
+  async findById({ userId, articleId, tx }: AuthArticleParams) {
     const db = tx || this.prisma;
     return await db.articleLike.findUnique({
       where: {
@@ -25,7 +25,7 @@ export class ArticleLikeRepository {
       where: { userId },
     });
   }
-  async create({ userId, articleId, tx }: ArticleParams) {
+  async create({ userId, articleId, tx }: AuthArticleParams) {
     const db = tx || this.prisma;
     return await db.articleLike.create({
       data: {
@@ -37,7 +37,7 @@ export class ArticleLikeRepository {
       },
     });
   }
-  async delete({ userId, articleId, tx }: ArticleParams) {
+  async delete({ userId, articleId, tx }: AuthArticleParams) {
     const db = tx || this.prisma;
     return await db.articleLike.delete({
       where: {

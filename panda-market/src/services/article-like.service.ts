@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { ArticleLikeRepository } from '@/repositories/article-likes.repository.js';
 import { Prisma, PrismaClient } from '@prisma/client';
-import { ArticleParams } from '@/dto/articles.dto.js';
+import { AuthArticleParams } from '@/dto/articles.dto.js';
 import { NotFoundError } from '@/lib/errors.js';
 import { ArticleRepository } from '@/repositories/articles.repository.js';
 
@@ -16,7 +16,7 @@ export class ArticleLikeService {
     @inject(TYPES.ArticleRepository)
     private readonly articleRepository: ArticleRepository,
   ) {}
-  async postArticleLike({ userId, articleId }: ArticleParams) {
+  async postArticleLike({ userId, articleId }: AuthArticleParams) {
     return await this.prisma.$transaction(async (tx) => {
       const existingLike = await this.articleLikeRepository.findById({
         userId,
@@ -44,7 +44,7 @@ export class ArticleLikeService {
     });
   }
 
-  async deleteArticleLike({ userId, articleId }: ArticleParams) {
+  async deleteArticleLike({ userId, articleId }: AuthArticleParams) {
     return await this.prisma.$transaction(async (tx) => {
       const deleteLike = await this.articleLikeRepository.delete({
         userId,

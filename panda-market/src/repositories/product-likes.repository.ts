@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import { ProductIdWithTx, ProductParams } from '@/dto/products.dto.js';
+import { AuthProductParams, ProductIdWithTx } from '@/dto/products.dto.js';
 import { UserId } from '@/types/user.types.js';
 
 @injectable()
@@ -9,7 +9,7 @@ export class ProductLikeRepository {
   constructor(
     @inject(TYPES.PrismaClient) private readonly prisma: PrismaClient,
   ) {}
-  async findById({ userId, productId, tx }: ProductParams) {
+  async findById({ userId, productId, tx }: AuthProductParams) {
     const db = tx || this.prisma;
     return await db.productLike.findUnique({
       where: {
@@ -26,6 +26,9 @@ export class ProductLikeRepository {
       where: {
         productId,
       },
+      select: {
+        userId: true,
+      },
     });
   }
   async findManyByUserId({ userId }: UserId) {
@@ -33,7 +36,7 @@ export class ProductLikeRepository {
       where: { userId },
     });
   }
-  async create({ userId, productId, tx }: ProductParams) {
+  async create({ userId, productId, tx }: AuthProductParams) {
     const db = tx || this.prisma;
     return await db.productLike.create({
       data: {
@@ -45,7 +48,7 @@ export class ProductLikeRepository {
       },
     });
   }
-  async delete({ userId, productId, tx }: ProductParams) {
+  async delete({ userId, productId, tx }: AuthProductParams) {
     const db = tx || this.prisma;
     return await db.productLike.delete({
       where: {

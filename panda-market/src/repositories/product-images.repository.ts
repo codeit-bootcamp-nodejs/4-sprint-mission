@@ -21,6 +21,10 @@ export class ProductImageRepository {
       where: {
         productId,
       },
+      select: {
+        publicId: true,
+        url: true,
+      },
     });
   }
 }
