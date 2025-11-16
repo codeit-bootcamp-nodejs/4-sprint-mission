@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "prisma:migrate": "npx prisma migrate deploy --schema ./sprint5/prisma/schema.prisma",
-    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- npx jest",
+    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- npx jest --runInBand --coverage",
     "seed": "node prisma/seed.js",
     "build": "tsc",
     "dev": "nodemon --watch 'sprint5/**/*.ts' --exec 'node --loader ts-node/esm' sprint5/app.ts",
