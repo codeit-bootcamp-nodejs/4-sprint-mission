@@ -1,0 +1,12 @@
+{
+    "tempUser1":{
+        "nickname": "juno",
+        "email": "example@hotmail.com",
+        "password": "12345678@"
+    },
+    "tempUser2": {
+        "nickname": "mike",
+        "email": "mike@test.com",
+        "password": "Test1234!"
+  }
+}

@@ -1,0 +1,18 @@
+{
+    "article1": {
+        "id": 1,
+        "title": "First Article",
+        "content": "This is the content of the first article.",
+        "ownerId": 1,
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "comments": [{"id":1,"content":"test", "type":"ARTICLE", "title":"testTitle", "createdAt":"2025-01-26" ,"updatedAt":"2025-01-27", "productId":0, "articleId":1, "userId": 2}]
+    },
+    "article2": {
+        "id": 2,
+        "title": "Second Article",
+        "content": "This is the content of the second article.",
+        "ownerId": 2,
+        "createdAt": "2024-02-01T00:00:00.000Z",
+        "comments": [{"id":1,"content":"test", "type":"ARTICLE", "title":"testTitle", "createdAt":"2025-01-26" ,"updatedAt":"2025-01-27", "productId":0, "articleId":1, "userId": 2}]
+    }
+}

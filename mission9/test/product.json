@@ -1,0 +1,28 @@
+{
+    "product1":
+    {
+        "id": 1,
+        "name": "testProduct",
+        "description": "test",
+        "price": 1000,
+        "createdAt":"2025-01-24" ,
+        "updatedAt": "2025-01-25" ,
+        "ownerId": 1,
+        "userId": 1,
+        "comment": [{"id":1,"content":"test", "type":"MARKET", "title":"testTitle", "createdAt":"2025-01-26" ,"updatedAt":"2025-01-27", "productId":1, "articleId":0, "userId": 1}],
+        "productTags": [{"tag":{"id":0, "name":"electronic"} }]
+    },
+    "product2":
+    {
+        "id": 2,
+        "name": "testProduct1",
+        "description": "test",
+        "price": 1000,
+        "createdAt":"2025-01-25" ,
+        "updatedAt": "2025-01-29" ,
+        "ownerId": 1,
+        "comment": [{"id":2,"type":"MARKET","content":"test","createdAt":"2025-01-26" ,"updatedAt":"2025-01-27", "title":"testTitle", "productId":2, "articleId":0, "userId": 2}],
+        "productTags": [{"tag":{ "id":0, "name":"electronic"} }]
+    }
+    
+}

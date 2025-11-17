@@ -1,0 +1,24 @@
+{
+    "comment1": {
+        "id": 1,
+        "content": "test",
+        "type": "ARTICLE",
+        "title": "testTitle",
+        "createdAt": "2025-01-26",
+        "updatedAt": "2025-01-27",
+        "productId": 0,
+        "articleId": 1,
+        "ownerId": 2
+    },
+    "comment2": {
+        "id": 2,
+        "content": "test",
+        "type": "MARKET",
+        "title": "testTitle",
+        "createdAt": "2025-01-26",
+        "updatedAt": "2025-01-27",
+        "productId": 0,
+        "articleId": 1,
+        "ownerId": 2
+    }
+}

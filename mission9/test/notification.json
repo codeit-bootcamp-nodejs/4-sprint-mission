@@ -1,0 +1,22 @@
+{
+    "alert1":{
+        "senderId" : 2,
+        "receiverId":1,
+        "type":"UNREAD",
+        "category":"NEW_COMMENT"
+    },
+    "alert2":{
+        "senderId" : 3,
+        "receiverId":1,
+        "type":"UNREAD",
+        "category":"CHANGED_PRICE"
+    },
+    "alert3":{
+        "senderId" : 4,
+        "receiverId":1,
+        "type":"UNREAD",
+        "category":"CHANGED_PRICE"
+    }
+  
+  
+}
