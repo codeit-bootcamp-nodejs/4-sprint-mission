@@ -273,7 +273,15 @@ export async function refreshService(refreshToken: string): Promise<string>  {
 
 
 // 등록한 상품의 목록 조회 기능
-export async function listupService(userId: number): Promise<Pick<Product, 'id' | 'title' | 'content' | 'createdAt'>[]> {
+export async function listupService(userId: number): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  price: number;
+  image: string | null;
+  tags: string[];
+  createdAt: Date;
+}[]> {
   // 해당 유저가 등록한 상품 목록 가져오기
   const listup = await prisma.product.findMany({
     where: { userId: userId },
@@ -281,6 +289,9 @@ export async function listupService(userId: number): Promise<Pick<Product, 'id' 
       id: true,
       title: true,
       content: true,
+      price: true,
+      image: true,
+      tags: true,
       createdAt: true,
     },
   });

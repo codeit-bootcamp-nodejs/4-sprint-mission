@@ -6,6 +6,7 @@ export async function postListService(): Promise<{
   id: number;
   title: string;
   content: string;
+  image: string | null;
   userId: number;
   createdAt: Date;
   updatedAt: Date;
@@ -15,6 +16,7 @@ export async function postListService(): Promise<{
       id: true,
       title: true,
       content: true,
+      image: true,
       userId: true,
       createdAt: true,
       updatedAt: true
@@ -26,10 +28,11 @@ export async function postListService(): Promise<{
   return listup;
 }
 // 로그인한 유저만 게시글 등록 가능
-export async function postRegisterService(userId: number, title: string, content: string): Promise<{
+export async function postRegisterService(userId: number, title: string, content: string, image?: string | null): Promise<{
   id: number;
   title: string;
   content: string;
+  image: string | null;
   createdAt: Date;
 }> {
   // 유효성 검사
@@ -41,12 +44,14 @@ export async function postRegisterService(userId: number, title: string, content
     data: {
       title,
       content,
+      image: image || null,
       userId,
     },
     select: {
       id: true,
       title: true,
       content: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -56,10 +61,11 @@ export async function postRegisterService(userId: number, title: string, content
 }
 
 // 게시글을 등록한 유저만 해당 글을 수정할 수 있음
-export async function postPutService(userId: number, postId: number, title: string, content: string): Promise<{
+export async function postPutService(userId: number, postId: number, title: string, content: string, image?: string | null): Promise<{
   id: number;
   title: string;
   content: string;
+  image: string | null;
   createdAt: Date;
   updatedAt: Date;
 }> {
@@ -83,11 +89,13 @@ export async function postPutService(userId: number, postId: number, title: stri
     data: {
       title,
       content,
+      ...(image !== undefined && { image }),
     },
     select: {
       id: true,
       title: true,
       content: true,
+      image: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -118,4 +126,83 @@ export async function postDeleteService(userId: number, postId: number): Promise
   });
 
   return deletedPost;
+}
+
+// 게시글 상세 조회 (좋아요 개수, 댓글 목록, 작성자 정보 포함)
+export async function postDetailService(postId: number, userId?: number): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  image: string | null;
+  userId: number;
+  userNickname: string;
+  createdAt: Date;
+  updatedAt: Date;
+  likeCount: number;
+  isLiked: boolean;
+  comments: {
+    id: number;
+    content: string;
+    userId: number;
+    userNickname: string;
+    createdAt: Date;
+  }[];
+}> {
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    include: {
+      User: {
+        select: {
+          id: true,
+          nickname: true,
+        },
+      },
+      likes: {
+        select: {
+          id: true,
+          userId: true,
+        },
+      },
+      comments: {
+        include: {
+          User: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+
+  if (!post) {
+    throw new HttpError("게시글을 찾을 수 없습니다.", 404);
+  }
+
+  const likeCount = post.likes.length;
+  const isLiked = userId ? post.likes.some(like => like.userId === userId) : false;
+
+  return {
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    image: post.image,
+    userId: post.userId,
+    userNickname: post.User.nickname,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    likeCount,
+    isLiked,
+    comments: post.comments.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      userId: comment.userId,
+      userNickname: comment.User.nickname,
+      createdAt: comment.createdAt,
+    })),
+  };
 }

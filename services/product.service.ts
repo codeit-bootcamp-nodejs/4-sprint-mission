@@ -13,6 +13,8 @@ export async function prodcutListupService(): Promise<{
   price: number;
   title: string;
   content: string;
+  image: string | null;
+  tags: string[];
   userId: number;
   createdAt: Date;
   updatedAt: Date;
@@ -23,6 +25,8 @@ export async function prodcutListupService(): Promise<{
       price: true,
       title: true,
       content: true,
+      image: true,
+      tags: true,
       userId: true,
       createdAt: true,
       updatedAt: true
@@ -37,11 +41,13 @@ export async function prodcutListupService(): Promise<{
 
 
 // 로그인한 유저만 상품 등록
-export async function productRegisterService(userId: number, price: number, title: string, content: string): Promise<{
+export async function productRegisterService(userId: number, price: number, title: string, content: string, image?: string | null, tags?: string[]): Promise<{
   id: number;
   price: number;
   title: string;
   content: string;
+  image: string | null;
+  tags: string[];
   createdAt: Date;
 }> {
   // 유효성 검사
@@ -51,12 +57,14 @@ export async function productRegisterService(userId: number, price: number, titl
   if (!price) {
     throw new HttpError("상품 가격을 입력해주세요.", 400)
   };
-  // 싱픔 등록
+  // 상품 등록
   const newProduct = await prisma.product.create({
     data: {
       title,
       price,
       content,
+      image: image || null,
+      tags: tags || [],
       userId,
     },
     select: {
@@ -64,6 +72,8 @@ export async function productRegisterService(userId: number, price: number, titl
       price: true,
       title: true,
       content: true,
+      image: true,
+      tags: true,
       createdAt: true,
     },
     });
@@ -72,11 +82,13 @@ export async function productRegisterService(userId: number, price: number, titl
 
 
 // 상품을 등록한 유저만 해당 상품의 정보를 수정
-export async function productPutService(userId: number, productId: number, price: number, title: string, content: string): Promise<{
+export async function productPutService(userId: number, productId: number, price: number, title: string, content: string, image?: string | null, tags?: string[]): Promise<{
   id: number;
   price: number;
   title: string;
   content: string;
+  image: string | null;
+  tags: string[];
   createdAt: Date;
   updatedAt: Date;
   }> {
@@ -104,12 +116,16 @@ export async function productPutService(userId: number, productId: number, price
       title,
       price,
       content,
+      ...(image !== undefined && { image }),
+      ...(tags !== undefined && { tags }),
     },
     select: {
       id: true,
       price: true,
       title: true,
       content: true,
+      image: true,
+      tags: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -170,4 +186,87 @@ export async function productDeleteService(userId: number, productId: number): P
   });
 
   return deletedProduct;
+}
+
+// 상품 상세 조회 (좋아요 개수, 댓글 목록, 작성자 정보 포함)
+export async function productDetailService(productId: number, userId?: number): Promise<{
+  id: number;
+  price: number;
+  title: string;
+  content: string;
+  image: string | null;
+  tags: string[];
+  userId: number;
+  userNickname: string;
+  createdAt: Date;
+  updatedAt: Date;
+  likeCount: number;
+  isLiked: boolean;
+  comments: {
+    id: number;
+    content: string;
+    userId: number;
+    userNickname: string;
+    createdAt: Date;
+  }[];
+}> {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      User: {
+        select: {
+          id: true,
+          nickname: true,
+        },
+      },
+      likes: {
+        select: {
+          id: true,
+          userId: true,
+        },
+      },
+      comments: {
+        include: {
+          User: {
+            select: {
+              id: true,
+              nickname: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      },
+    },
+  });
+
+  if (!product) {
+    throw new HttpError("상품을 찾을 수 없습니다.", 404);
+  }
+
+  const likeCount = product.likes.length;
+  const isLiked = userId ? product.likes.some(like => like.userId === userId) : false;
+
+  return {
+    id: product.id,
+    price: product.price,
+    title: product.title,
+    content: product.content,
+    image: product.image,
+    tags: product.tags,
+    userId: product.userId,
+    userNickname: product.User.nickname,
+    createdAt: product.createdAt,
+    updatedAt: product.updatedAt,
+    likeCount,
+    isLiked,
+    comments: product.comments.map(comment => ({
+      id: comment.id,
+      content: comment.content,
+      userId: comment.userId,
+      userNickname: comment.User.nickname,
+      createdAt: comment.createdAt,
+    })),
+  };
 }

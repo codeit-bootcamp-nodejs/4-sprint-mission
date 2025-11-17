@@ -4,6 +4,7 @@ import {
   postListService,
   postPutService,
   postRegisterService,
+  postDetailService,
 } from "../services/post.service.js";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 
@@ -36,10 +37,14 @@ export async function postRegisterController(req: Request, res: Response, next: 
     const userId = Number(userIdStr);
     
     // 게시글 필요 요소 받아오기
-    const { title, content } = req.body;
+    const { title, content, image } = req.body as {
+      title: string;
+      content: string;
+      image?: string | null;
+    };
 
     // 서비스 로직
-    const CreatePost = await postRegisterService(userId, title, content);
+    const CreatePost = await postRegisterService(userId, title, content, image);
 
     // 응답
     res.status(200).json({
@@ -67,10 +72,14 @@ export async function postPutController(req: Request, res: Response, next: NextF
     const postId = Number(postIdStr);
 
     // 수정할 데이터
-    const { title, content } = req.body;
+    const { title, content, image } = req.body as {
+      title: string;
+      content: string;
+      image?: string | null;
+    };
 
     // 서비스 로직
-    const updatedPost = await postPutService(userId, postId, title, content);
+    const updatedPost = await postPutService(userId, postId, title, content, image);
 
     // 응답
     res.status(200).json({
@@ -104,6 +113,27 @@ export async function postDeleteController(req: Request, res: Response, next: Ne
     res.status(200).json({
       message: "게시글 삭제 성공",
       data: deletedPost,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+// 게시글 상세 조회
+export async function postDetailController(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const postIdStr = req.params.postId;
+    if (!postIdStr) throw new HttpError("게시글 ID가 필요합니다.", 400);
+    
+    const postId = Number(postIdStr);
+    const userIdStr = req.user?.userId;
+    const userId = userIdStr ? Number(userIdStr) : undefined;
+
+    const post = await postDetailService(postId, userId);
+
+    res.status(200).json({
+      message: "게시글 상세 조회 성공",
+      data: post,
     });
   } catch (err) {
     next(err);
