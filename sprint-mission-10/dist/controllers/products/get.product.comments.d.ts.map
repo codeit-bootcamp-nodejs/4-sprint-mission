@@ -1,0 +1,1 @@
+{"version":3,"file":"get.product.comments.d.ts","sourceRoot":"","sources":["../../../src/controllers/products/get.product.comments.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,YAAY,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAE/D,QAAA,MAAM,kBAAkB,GACtB,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,kBAwBnB,CAAC;AAEF,eAAe,kBAAkB,CAAC"}
