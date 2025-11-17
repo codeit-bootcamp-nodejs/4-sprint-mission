@@ -42,5 +42,6 @@ export default [
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'off',
     },
+    include: ['src/**/*.ts', 'tests/*.test.ts'],
   },
 ];
