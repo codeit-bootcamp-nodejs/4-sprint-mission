@@ -4,7 +4,7 @@
 test.sql
 testa.iml
 
-.env
+.env*
 /src/generated/prisma
 
 /node_modules

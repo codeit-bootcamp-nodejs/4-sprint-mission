@@ -1,6 +1,8 @@
 //src/server.ts
 import dotenv from 'dotenv';
-dotenv.config();
+
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
+dotenv.config({ path: envFile });
 
 import http from 'http';
 import { Server } from 'socket.io';
@@ -8,7 +10,6 @@ import app from './app';
 import { setSocketIoInstance } from './services/notification_service';
 
 const PORT = process.env.PORT || 3001;
-
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
@@ -28,9 +29,7 @@ io.on('connection', (socket) => {
             console.warn(`[Socket.IO] 비정상적인 register 이벤트 (userId 없음)`);
             return;
         }
-
         const userRoom = String(userId);
-
         console.log(`[Socket.IO] 유저 등록: ${userRoom} 방에 참가`);
         socket.join(userRoom);
     });
