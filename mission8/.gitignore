@@ -6,3 +6,4 @@ dist
 generated/prisma
 .DS_Store
 logs/app.log
+coverage

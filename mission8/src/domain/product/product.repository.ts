@@ -3,6 +3,11 @@ import { Product } from './product.js';
 import type { UpdatePriceInput } from './product.type.js';
 
 class ProductRepository {
+  findByIdForApi = async (productId: number) => {
+    return await prisma.product.findUnique({
+      where: { id: productId },
+    });
+  };
   findById = async (productId: number) => {
     const product = await prisma.product.findUnique({
       where: { id: productId },

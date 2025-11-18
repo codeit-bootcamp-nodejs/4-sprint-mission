@@ -4,10 +4,22 @@ import jwt from 'jsonwebtoken';
 import { authConfig } from '../../config/auth.config.js';
 import { MESSAGE, STATUS_CODE } from '../../constants/constant.js';
 import { HttpException } from '../../utils/http-exception.js';
+import type { registerInputData } from './auth.type.js';
 import { authLoginService } from './auth-login.service.js';
 import { authRefreshService } from './auth-refresh.service.js';
+import { authRegisterService } from './auth-register.service.js';
 
 class AuthController {
+  register = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const registerData: registerInputData = req.body;
+      const result = await authRegisterService(registerData);
+      return res.status(STATUS_CODE.CREATED).json(result);
+    } catch (err) {
+      return next(err);
+    }
+  };
+
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;

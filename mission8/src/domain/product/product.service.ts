@@ -28,6 +28,14 @@ class ProductService {
 
     return product;
   };
+
+  getByIdForApi = async (productId: number) => {
+    const product = await productRepository.findByIdForApi(productId);
+    if (!product) {
+      throw new HttpException(STATUS_CODE.NOT_FOUND, MESSAGE.productNotFound);
+    }
+    return product;
+  };
 }
 
 export const productService = new ProductService();

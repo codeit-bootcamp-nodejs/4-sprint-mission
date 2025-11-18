@@ -23,5 +23,14 @@ class ProductController {
       next(err);
     }
   };
+  getByIdForApi = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const productId = Number(req.params['productId']);
+      const productData = await productService.getByIdForApi(productId);
+      res.status(STATUS_CODE.OK).json(productData);
+    } catch (err) {
+      next(err);
+    }
+  };
 }
 export const productController = new ProductController();

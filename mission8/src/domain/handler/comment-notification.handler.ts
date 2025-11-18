@@ -19,7 +19,7 @@ export class CommentNotificationHandler implements EventHandler<CommentCreatedEv
       throw new HttpException(STATUS_CODE.NOT_FOUND, MESSAGE.postNotFound);
     }
 
-    // 본인 게시글에 작성한 댓글 알림 제회
+    // 본인 게시글에 작성한 댓글 알림 제외
     if (post.userId === userId) {
       return;
     }

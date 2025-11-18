@@ -9,3 +9,9 @@ export interface TokenPayload {
   iat?: number;
   exp?: number;
 }
+
+export interface registerInputData {
+  email: string;
+  password: string;
+  username: string;
+}

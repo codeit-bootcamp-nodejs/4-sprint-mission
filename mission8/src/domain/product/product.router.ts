@@ -13,3 +13,5 @@ productRouter.patch(
   validateMiddleware(productSchema.updatePrice),
   productController.updatePrice,
 ); // 가격 변경
+
+productRouter.get('/:productId', productController.getByIdForApi); // 특정 상품 조회

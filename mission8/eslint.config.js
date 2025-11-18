@@ -18,11 +18,11 @@ export default [
         sourceType: 'module',
         project: './tsconfig.json',
       },
-      globals: { ...globals.node, process: 'readonly' },
+      globals: { ...globals.node, ...globals.jest, process: 'readonly' },
     },
     plugins: {
-      'simple-import-sort': simpleImportSort,
       import: pluginImport,
+      'simple-import-sort': simpleImportSort,
       '@typescript-eslint': tsPlugin,
     },
     settings: {
@@ -33,6 +33,7 @@ export default [
         },
       },
     },
+
     rules: {
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
@@ -42,6 +43,5 @@ export default [
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-explicit-any': 'off',
     },
-    include: ['src/**/*.ts', 'tests/*.test.ts'],
   },
 ];

@@ -1,4 +1,5 @@
 import prisma from '../../utils/prisma.js';
+import { createDataInput } from './post.type.js';
 
 class PostRepository {
   findById = async (postId: number) => {
@@ -14,6 +15,11 @@ class PostRepository {
           increment: 1,
         },
       },
+    });
+  };
+  create = async (createData: createDataInput) => {
+    return await prisma.post.create({
+      data: createData,
     });
   };
 }
