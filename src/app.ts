@@ -18,7 +18,7 @@ app.use(express.json());
 
 app.use("/article", articleRouter);
 app.use("/product", productRouter);
-app.use("/", loginRouter);
+app.use("/user", loginRouter);
 app.use("/uploads", uploadRouter);
 app.use("/uploads", express.static("uploads"));
 app.use("/user", userRouter);
@@ -50,6 +50,8 @@ export function sendNotification(userId: number, message: string) {
 
 const port = Number(process.env.PORT) || 3000;
 
-server.listen(port, () => {
-  console.log(`서버 실행됨: http://localhost:${port}`);
-});
+// server.listen(port, () => {
+//   console.log(`서버 실행됨: http://localhost:${port}`);
+// });
+
+export default app;

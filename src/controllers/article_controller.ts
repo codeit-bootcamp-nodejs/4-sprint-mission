@@ -32,7 +32,11 @@ export async function createArticleController(
     const result = await createArticleService({ title, content, user });
     res.status(201).json(result);
   } catch (e) {
-    res.status(500).json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -47,7 +51,7 @@ export async function deleteArticleController(
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }
     await deleteArticleService({ id, user });
-    res.send("success");
+    res.status(200).json({ message: "게시글이 삭제되었습니다." });
   } catch (e) {
     if (e instanceof AppError) {
       res.status(e.statusCode).json({ message: e.message });
@@ -70,7 +74,11 @@ export async function getArticleByIdController(
     const result = await getArticleByIdService({ id, user });
     res.json(result);
   } catch (e) {
-    res.status(500).json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -89,7 +97,11 @@ export async function getArticleController(
     const result = await getArticleService({ offset, limit, search, user });
     res.json(result);
   } catch (e) {
-    res.status(500).json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
