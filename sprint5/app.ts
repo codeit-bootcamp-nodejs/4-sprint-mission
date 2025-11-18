@@ -2,14 +2,13 @@ import express from "express";
 import type { Express } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import productRouter from "./routers/productsRouter.js";
-import articleRouter from "./routers/articlesRouter.js";
-import imageRouter from "./routers/imageRouter.js";
-import authRouter from "./routers/authRouter.js";
-import userRouter from "./routers/userRouter.js";
-import notificationRouter from "./routers/notificationRouter.js";
-import { errorHandler } from "./middlewares/errorHandler.js";
-import { PORT } from "./lib/constants.js";
+import productRouter from "./routers/productsRouter";
+import articleRouter from "./routers/articlesRouter";
+import imageRouter from "./routers/imageRouter";
+import authRouter from "./routers/authRouter";
+import userRouter from "./routers/userRouter";
+import notificationRouter from "./routers/notificationRouter";
+import { errorHandler } from "./middlewares/errorHandler";
 
 const app: Express = express();
 

@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { productService } from "../services/productService.js";
+import { productService } from "../services/productService";
 import type {
   GetProductListQuery,
   ProductId,

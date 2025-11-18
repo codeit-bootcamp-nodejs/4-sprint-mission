@@ -1,6 +1,6 @@
-import { productRepository } from "../repositories/productRepository.js";
-import { productCommentsRepository } from "../repositories/productCommentsRepository.js";
-import type { ProductComment } from "../types/dto.js";
+import { productRepository } from "../repositories/productRepository";
+import { productCommentsRepository } from "../repositories/productCommentsRepository";
+import type { ProductComment } from "../types/dto";
 
 export const productCommentsService = {
   getProductsComments: async (

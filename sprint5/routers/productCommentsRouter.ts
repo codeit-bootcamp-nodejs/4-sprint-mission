@@ -3,9 +3,9 @@ import {
   validateNewComment,
   validateCommentUpdate,
   validateId,
-} from "../middlewares/validate.js";
-import { productCommentsController } from "../controllers/productCommentsController.js";
-import passport from "../lib/passport/index.js";
+} from "../middlewares/validate";
+import { productCommentsController } from "../controllers/productCommentsController";
+import passport from "../lib/passport/index";
 
 const productCommentRouter = express.Router({ mergeParams: true });
 

@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { userRepository } from "../repositories/userReposioty.js";
+import { userRepository } from "../repositories/userReposioty";
 import type {
   Product,
   UpdateUserData,

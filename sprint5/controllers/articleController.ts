@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { articleService } from "../services/articleService.js";
+import { articleService } from "../services/articleService";
 import type {
   GetArticleListQuery,
   ArticleId,

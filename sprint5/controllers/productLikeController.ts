@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { toggleProductLike } from "../services/productLikeService.js";
+import { toggleProductLike } from "../services/productLikeService";
 
 export const productLike = async (
   req: Request,

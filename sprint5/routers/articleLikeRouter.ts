@@ -1,7 +1,7 @@
 import express from "express";
-import passport from "../lib/passport/index.js";
-import { articleLike } from "../controllers/articleLikeController.js";
-import { authenticateUser } from "../middlewares/validate.js";
+import passport from "../lib/passport/index";
+import { articleLike } from "../controllers/articleLikeController";
+import { authenticateUser } from "../middlewares/validate";
 
 const router = express.Router({ mergeParams: true });
 

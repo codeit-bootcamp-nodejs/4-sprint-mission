@@ -1,8 +1,8 @@
-import { articleRepository } from "../repositories/articleRepository.js";
-import { articleCommentsRepository } from "../repositories/articleCommentsRepository.js";
-import { notificationRepository } from "../repositories/notificationRepository.js";
-import { emitToUser } from "../utils/notificationSocket.js";
-import type { ArticleComment } from "../types/dto.js";
+import { articleRepository } from "../repositories/articleRepository";
+import { articleCommentsRepository } from "../repositories/articleCommentsRepository";
+import { notificationRepository } from "../repositories/notificationRepository";
+import { emitToUser } from "../utils/notificationSocket";
+import type { ArticleComment } from "../types/dto";
 
 export const articleCommentsService = {
   getArticleComments: async (
@@ -52,7 +52,7 @@ export const articleCommentsService = {
         throw error;
       }
 
-      const comment = articleCommentsRepository.createArticleComment(
+      const comment = await articleCommentsRepository.createArticleComment(
         articleId,
         content,
         userId

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "module": "nodenext",
+    "module": "commonjs",
     "target": "es2024",
     "lib": ["esnext"],
 
-    "types": ["node"], // 필요에 따라 다른 타입만 포함
+    "types": ["node", "jest"], // 필요에 따라 다른 타입만 포함
     "typeRoots": ["./node_modules/@types"], // node_modules의 타입만 사용
 
     "baseUrl": "./",
@@ -33,10 +33,9 @@
     "strict": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "verbatimModuleSyntax": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "esModuleInterop": true
   },
-  "include": ["sprint5/**/*.ts", "sprint5/**/*.d.ts"],
+  "include": ["sprint5/**/*.ts", "sprint5/**/*.d.ts", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

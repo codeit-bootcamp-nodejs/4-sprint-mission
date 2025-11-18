@@ -1,11 +1,11 @@
 import express from "express";
-import passport from "../lib/passport/index.js";
+import passport from "../lib/passport/index";
 import {
   login,
   logout,
   refresh,
   register,
-} from "../controllers/authController.js";
+} from "../controllers/authController";
 
 const router = express.Router();
 

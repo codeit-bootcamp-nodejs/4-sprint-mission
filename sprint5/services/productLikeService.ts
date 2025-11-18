@@ -1,6 +1,6 @@
-import { productLikeReposioty } from "../repositories/productLikeRepository.js";
-import { productRepository } from "../repositories/productRepository.js";
-import type { Like } from "../types/dto.js";
+import { productLikeReposioty } from "../repositories/productLikeRepository";
+import { productRepository } from "../repositories/productRepository";
+import type { Like } from "../types/dto";
 
 export const toggleProductLike = async (
   userId: number,
