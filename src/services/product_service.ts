@@ -64,6 +64,6 @@ export async function updateProductService({
         await createNotificationService(user!.id, message);
       }
     }
-    return updatedProduct;
   }
+  return updatedProduct;
 }

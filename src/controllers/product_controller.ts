@@ -31,7 +31,11 @@ export async function createProductController(
     const result = await createProductService({ data, user });
     res.send(result);
   } catch (e) {
-    res.json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -46,7 +50,7 @@ export async function deleteProductController(
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }
     await deleteProductService({ id, user });
-    res.send("success");
+    res.status(200).json({ message: "상품이 삭제되었습니다." });
   } catch (e) {
     if (e instanceof AppError) {
       res.status(e.statusCode).json({ message: e.message });
@@ -69,7 +73,11 @@ export async function getProductByIdController(
     const result = await getProductByIdService({ id, user });
     res.send(result);
   } catch (e) {
-    res.json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -88,7 +96,11 @@ export async function getProductController(
     const result = await getProductService({ offset, limit, search, user });
     res.send(result);
   } catch (e) {
-    res.json({ message: (e as Error).message });
+    if (e instanceof AppError) {
+      res.status(e.statusCode).json({ message: e.message });
+    } else {
+      res.status(500).json({ message: "서버 에러" });
+    }
   }
 }
 
@@ -111,7 +123,7 @@ export async function updateProductController(
       return res.status(401).json({ message: "로그인이 필요합니다." });
     }
     const result = await updateProductService({ id, updateData, user });
-    res.send(result);
+    res.status(200).json(result);
   } catch (e) {
     if (e instanceof AppError) {
       res.status(e.statusCode).json({ message: e.message });

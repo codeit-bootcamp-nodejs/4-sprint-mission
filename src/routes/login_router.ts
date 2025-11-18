@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/user/register", register);
-router.post("/user/login", login);
-router.post("/user/refresh", refreshTokens);
-router.post("/user/logout", logout);
+router.post("/register", register);
+router.post("/login", login);
+router.post("/refresh", refreshTokens);
+router.post("/logout", logout);
 
 async function register(req: Request<{}, {}, Users.User>, res: Response) {
   const { email, nickname, password } = req.body;
