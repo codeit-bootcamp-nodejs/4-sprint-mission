@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node --files src/app.ts",
+    "dev": "ts-node --files src/server.ts",
     "start": "node dist/app.js",
     "lint": "eslint . --ext .ts",
     "prisma:generate": "prisma generate",

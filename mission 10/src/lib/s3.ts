@@ -20,7 +20,6 @@ export const uploadS3 = multer({
       },
       region: process.env.AWS_REGION,
     }),
-    acl: "public-read-write",
     bucket: process.env.AWS_S3_BUCKET!,
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
