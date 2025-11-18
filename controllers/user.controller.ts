@@ -7,8 +7,10 @@ import {
   loginService,
   refreshService,
   signupService,
+  googleOAuthService,
 } from "../services/user.service.js";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
+import passport from "../config/passport.config.js";
 
 // select 대신에 include 를 사용하면 관계된 다른 테이블 데이터 까지 같이 가져올 수 있음.
 
@@ -186,4 +188,38 @@ export async function listupController(req: Request, res: Response, next: NextFu
   } catch (err) {
     next(err);
   }
+}
+
+// Google OAuth 시작
+export async function googleAuthController(req: Request, res: Response, next: NextFunction): Promise<void> {
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  })(req, res, next);
+}
+
+// Google OAuth 콜백
+export async function googleAuthCallbackController(req: Request, res: Response, next: NextFunction): Promise<void> {
+  passport.authenticate("google", async (err: any, profile: any) => {
+    try {
+      if (err) {
+        return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/login?error=google_auth_failed`);
+      }
+
+      if (!profile) {
+        return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/login?error=no_profile`);
+      }
+
+      const { safeuser, accessToken, refreshToken, isNewUser } = await googleOAuthService(profile);
+
+      // 프론트엔드로 리디렉션하면서 토큰을 쿼리 파라미터로 전달
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      const redirectUrl = `${frontendUrl}/auth/callback?token=${accessToken}&refreshToken=${refreshToken}&isNewUser=${isNewUser}`;
+      
+      res.redirect(redirectUrl);
+    } catch (error) {
+      console.error("Google OAuth 콜백 오류:", error);
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      res.redirect(`${frontendUrl}/login?error=oauth_error`);
+    }
+  })(req, res, next);
 }
