@@ -18,7 +18,7 @@ export class ProductRepository {
   ) {}
 
   async findOwnerById({ productId }: ProductId) {
-    return await this.prisma.product.findUniqueOrThrow({
+    return await this.prisma.product.findUnique({
       where: { id: productId },
       select: { userId: true },
     });
@@ -32,7 +32,7 @@ export class ProductRepository {
   }
   async findById({ productId, userId, tx }: ProductParams) {
     const db = tx || this.prisma;
-    return await db.product.findUniqueOrThrow({
+    return await db.product.findUnique({
       where: {
         id: productId,
       },
@@ -56,9 +56,18 @@ export class ProductRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
+  // 판다마켓 피그마에 보면 최신순, 좋아요 순으로 정렬 가능함
+  // 추후 기능 업데이트
   async findMany({ keyword, page, pageSize, userId }: GetListParams) {
     return await this.prisma.product.findMany({
       where: {
@@ -83,6 +92,13 @@ export class ProductRepository {
             id: true,
             email: true,
             nickname: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
           },
         },
       },
@@ -114,6 +130,13 @@ export class ProductRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -121,13 +144,58 @@ export class ProductRepository {
     const db = tx || this.prisma;
     return await db.product.create({
       data: data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        likeCount: true,
+        userId: true,
+        createdAt: true,
+        tags: true,
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
+      },
     });
   }
-  async update({ productId, tx, patchData: data }: UpdateDTO) {
+  async update({ productId, tx, userId, patchData: data }: UpdateDTO) {
     const db = tx || this.prisma;
     return await db.product.update({
       where: { id: productId },
       data,
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tags: true,
+        createdAt: true,
+        likes: {
+          where: {
+            userId,
+          },
+        },
+        likeCount: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            nickname: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
+      },
     });
   }
   async delete({ productId, tx }: ProductIdWithTx) {

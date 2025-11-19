@@ -4,9 +4,9 @@ import {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
   CLOUDINARY_CLOUD_NAME,
-} from './constants.js';
+} from '@/lib/constants.js';
 import fs from 'fs';
-import { BadRequestError, InternalServerError } from './errors.js';
+import { BadRequestError, InternalServerError } from '@/lib/errors.js';
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,

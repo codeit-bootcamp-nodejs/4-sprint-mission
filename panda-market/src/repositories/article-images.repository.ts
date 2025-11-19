@@ -23,4 +23,12 @@ export class ArticleImageRepository {
       },
     });
   }
+  async deleteMany({ articleId, tx }: ArticleIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.articleImage.deleteMany({
+      where: {
+        articleId,
+      },
+    });
+  }
 }

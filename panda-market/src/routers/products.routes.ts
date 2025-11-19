@@ -14,7 +14,7 @@ import optionalAuthentication from '@/middlewares/optionalAuthentication.js';
 import container from '@/lib/inversify.config.js';
 import type { ProductController } from '@/controllers/product.controller.js';
 import { TYPES } from '@/types/layer.types.js';
-import productCommentRouter from './product-comments.routes.js';
+import productCommentRouter from '@/routers/product-comments.routes.js';
 
 const productRouter = express.Router();
 

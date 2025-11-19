@@ -14,7 +14,7 @@ import {
 import container from '@/lib/inversify.config.js';
 import { TYPES } from '@/types/layer.types.js';
 import type { ArticleController } from '@/controllers/article.controller.js';
-import articleCommentRouter from './article-comments.routes.js';
+import articleCommentRouter from '@/routers/article-comments.routes.js';
 
 const articleRouter = express.Router();
 

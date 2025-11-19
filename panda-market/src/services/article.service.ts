@@ -1,5 +1,5 @@
 import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
-import type { ArticleParams } from '@/dto/articles.dto.js';
+import type { ArticleParams, AuthArticleParams } from '@/dto/articles.dto.js';
 import type { GetListParams } from '@/types/shared.types.js';
 import type { ArticleRepository } from '@/repositories/articles.repository.js';
 import { inject, injectable } from 'inversify';
@@ -27,7 +27,7 @@ export class ArticleService {
   private async authorization({
     userId,
     articleId,
-  }: ArticleParams): Promise<boolean> {
+  }: AuthArticleParams): Promise<boolean> {
     const article = await this.articleRepository.findOwnerById({ articleId });
     return article.userId === userId;
   }
@@ -116,7 +116,10 @@ export class ArticleService {
         });
         await this.articleImageRepository.createMany({ imageData, tx });
       }
-      return article;
+      return await this.articleRepository.findById({
+        articleId: article.id,
+        tx,
+      });
     });
   }
   async patchArticle({ articleId, userId, data }: PatchArticleDTO) {
@@ -137,7 +140,7 @@ export class ArticleService {
         }
       }
       const updatedArticle = await this.prisma.$transaction(async (tx) => {
-        if (newImages && newImages.length > 0) {
+        if (newImages !== undefined) {
           const result = await this.imageUpdate({
             tx,
             articleId,
@@ -166,7 +169,7 @@ export class ArticleService {
     }
   }
 
-  async deleteArticle({ articleId, userId }: ArticleParams) {
+  async deleteArticle({ articleId, userId }: AuthArticleParams) {
     if (await this.authorization({ userId, articleId })) {
       let imageIdsToDelete: string[] = [];
       const deletedArticle = await this.prisma.$transaction(async (tx) => {
@@ -176,6 +179,10 @@ export class ArticleService {
         });
         if (images.length > 0) {
           imageIdsToDelete = images.map((image) => image.publicId);
+          await this.articleImageRepository.deleteMany({
+            articleId,
+            tx,
+          });
         }
         const deleteArticle = await this.articleRepository.delete({
           articleId,

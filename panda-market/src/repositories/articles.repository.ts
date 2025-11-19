@@ -47,9 +47,17 @@ export class ArticleRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
+  // 여기도 판다마켓 피그마에서 좋아요순, 최신순 정렬 함 -> 추가 수정
   async findMany({ keyword, page, pageSize, userId }: GetListParams) {
     return await this.prisma.article.findMany({
       where: {
@@ -74,6 +82,13 @@ export class ArticleRepository {
             id: true,
             email: true,
             nickname: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
           },
         },
       },
@@ -105,6 +120,13 @@ export class ArticleRepository {
             nickname: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
@@ -112,6 +134,21 @@ export class ArticleRepository {
     const db = tx || this.prisma;
     return await db.article.create({
       data: data,
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        likeCount: true,
+        userId: true,
+        createdAt: true,
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
+      },
     });
   }
   async update({ tx, articleId, patchData: data }: UpdateDTO) {

@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types/layer.types.js';
+import { TYPES } from '@/types/layer.types.js';
 import { PrismaClient } from '@prisma/client';
 import { CreateProductImages } from '@/dto/product-images.dto.js';
 import { ProductIdWithTx } from '@/dto/products.dto.js';
@@ -18,6 +18,18 @@ export class ProductImageRepository {
   async findMany({ productId, tx }: ProductIdWithTx) {
     const db = tx || this.prisma;
     return await db.productImage.findMany({
+      where: {
+        productId,
+      },
+      select: {
+        publicId: true,
+        url: true,
+      },
+    });
+  }
+  async deleteMany({ productId, tx }: ProductIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.productImage.deleteMany({
       where: {
         productId,
       },

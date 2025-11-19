@@ -1,4 +1,4 @@
-import { ProductIdWithTx, ProductParams } from '../dto/products.dto.js';
+import { AuthProductParams, ProductIdWithTx } from '@/dto/products.dto.js';
 
 export interface ProductId {
   productId: number;
@@ -20,6 +20,6 @@ export interface ImageUpdateInput extends ProductIdWithTx {
   newImages: string[];
 }
 
-export interface PriceUpdateInput extends ProductParams {
+export interface PriceUpdateInput extends AuthProductParams {
   newPrice: number;
 }

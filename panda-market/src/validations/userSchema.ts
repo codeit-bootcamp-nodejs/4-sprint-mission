@@ -8,7 +8,7 @@ export const patchSchema = z
     nickname: z.string().min(1, '닉네임은 1글자 이상 입력해주세요.'),
     changePassword: z.string().min(8, '비밀번호는 8자 이상 입력해야합니다.'),
     currentPassword: z.string().min(8, '비밀번호는 8자 이상 입력해야합니다.'),
-    image: z.url(),
+    imageUrl: z.url(),
   })
   .refine(
     (data) => {

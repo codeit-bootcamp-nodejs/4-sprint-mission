@@ -3,7 +3,11 @@ import type { Transaction } from '@/types/shared.types.js';
 import { Prisma } from '@prisma/client';
 import { UserId } from '@/types/user.types.js';
 
-export interface ArticleParams extends UserId, ArticleId, Transaction {}
+export interface ArticleParams extends ArticleId, Transaction {
+  userId?: number;
+}
+
+export interface AuthArticleParams extends UserId, ArticleId, Transaction {}
 
 export interface PostArticleDTO extends UserId {
   data: BaseArticleInput;
@@ -13,7 +17,7 @@ export interface CreateDTO extends Transaction {
   createData: Prisma.ArticleCreateInput;
 }
 
-export interface PatchArticleDTO extends ArticleParams {
+export interface PatchArticleDTO extends AuthArticleParams {
   data: Partial<BaseArticleInput>;
 }
 

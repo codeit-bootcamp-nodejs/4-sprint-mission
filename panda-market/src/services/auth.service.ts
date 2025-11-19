@@ -21,11 +21,11 @@ import {
 import type { AuthRepository } from '@/repositories/auths.repository.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
-import client from '@/lib/google-oauth.js';
 import { GetTokenResponse } from 'google-auth-library/build/src/auth/oauth2client.js';
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import crypto from 'crypto';
+import { getGoogleClient } from '@/lib/google-oauth.js';
 
 @injectable()
 export class AuthService {
@@ -72,6 +72,7 @@ export class AuthService {
   }
 
   async googleLogin(frontRedirectUrl: string) {
+    const client = getGoogleClient();
     const authorizeUrl = client.generateAuthUrl({
       access_type: 'offline', // refresh token을 받기 위해 필요
       scope: [
@@ -95,6 +96,7 @@ export class AuthService {
   // 구글 로그인 콜백 처리: code와 state를 받아 토큰과 최종 목적지를 반환
   async googleLoginCallback(code: string, state: string) {
     // 1. authorization code로 access token과 id_token을 받음 (타입 명시)
+    const client = getGoogleClient();
     const { tokens }: GetTokenResponse = await client.getToken(code);
     client.setCredentials(tokens);
 
