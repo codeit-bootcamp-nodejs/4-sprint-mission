@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>판다마켓 알림</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>판다마켓 알림</h1>
+        <div class="status" id="status">연결 중...</div>
+      </header>
+
+      <select id="userSelect">
+        <option value="">사용자 선택</option>
+        <option value="1">사용자 1</option>
+        <option value="2">사용자 2</option>
+        <option value="3">사용자 3</option>
+      </select>
+
+      <div class="notification-panel">
+        <div class="notification-header">
+          <div>
+            <span class="notification-title">알림</span>
+            <span class="unread-badge" id="unreadBadge" style="display:none">0</span>
+          </div>
+          <button id="markAllRead">모두 읽음</button>
+        </div>
+        <div class="notification-list" id="notificationList">
+          <div class="empty-state">사용자를 선택하세요</div>
+        </div>
+      </div>
+
+      <div class="test-panel">
+        <h3>테스트</h3>
+        <div class="test-buttons">
+          <button class="test-btn" onclick="sendTestNotification('PRODUCT_PRICE_CHANGE')">가격 변경</button>
+          <button class="test-btn" onclick="sendTestNotification('POST_COMMENT')">게시글 댓글</button>
+          <button class="test-btn" onclick="sendTestNotification('PRODUCT_COMMENT')">상품 댓글</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

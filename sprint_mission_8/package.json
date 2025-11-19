@@ -1,0 +1,16 @@
+{
+  "name": "panda-market-notification",
+  "version": "1.0.0",
+  "description": "Real-time notification system for Panda Market",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^4.18.2",
+    "pg": "^8.11.3",
+    "socket.io": "^4.7.2"
+  }
+}
