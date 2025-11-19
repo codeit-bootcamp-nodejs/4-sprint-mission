@@ -1,0 +1,267 @@
+import { Prisma } from '@prisma/client';
+
+import { notificationService } from './notification-service.js';
+import type { ProductQuery, UpdateProductDto } from '../dtos/product-dto.js';
+import AppError from '../lib/appError.js';
+import { prisma } from '../lib/prismaClient.js';
+import {
+  productLikeRepository,
+  commentLikeRepository,
+} from '../repositories/like-repository.js';
+import { productRepository } from '../repositories/product-repository.js';
+
+class ProductService {
+  // 전체 상품 조회
+  async getAllProducts(query: ProductQuery, userId?: number) {
+    const page = Number(query.page) || 1;
+    const limit = Number(query.limit) || 10;
+    const skip = (page - 1) * limit;
+    const sort = query.sort === 'old' ? 'old' : 'recent';
+    const search = (query.keyword ?? query.query ?? query.search ?? '').trim();
+
+    const orderBy: Prisma.ProductOrderByWithRelationInput =
+      sort === 'old' ? { createdAt: 'asc' } : { createdAt: 'desc' };
+
+    const where: Prisma.ProductWhereInput = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+
+    const products = await productRepository.findMany({
+      skip,
+      take: limit,
+      where,
+      orderBy,
+      include: {
+        user: { select: { username: true } },
+        comments: {
+          include: { user: { select: { username: true } } },
+        },
+      },
+    });
+
+    const productIds = products.map((p) => p.id);
+    const commentIds = products.flatMap((p) => p.comments.map((c) => c.id));
+
+    const productLikeCounts = productIds.length
+      ? await productLikeRepository.countByTargetIds(productIds)
+      : [];
+    const productLikeCountMap = Object.fromEntries(
+      productLikeCounts.map((pl) => [pl.productId, pl._count.productId])
+    );
+
+    const commentLikeCounts = commentIds.length
+      ? await commentLikeRepository.countByTargetIds(commentIds)
+      : [];
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedProductIds: number[] = [];
+    let myLikedCommentIds: number[] = [];
+
+    if (typeof userId === 'number') {
+      const likedProducts = productIds.length
+        ? await productLikeRepository.findByUserAndTargetIds(userId, productIds)
+        : [];
+      myLikedProductIds = likedProducts.map((l) => l.productId);
+
+      const likedComments = commentIds.length
+        ? await commentLikeRepository.findByUserAndTargetIds(userId, commentIds)
+        : [];
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const productsWithLike = products.map((p) => ({
+      ...p,
+      likeCount: productLikeCountMap[p.id] || 0,
+      isLiked:
+        typeof userId === 'number' ? myLikedProductIds.includes(p.id) : false,
+      comments: p.comments.map((c) => ({
+        ...c,
+        likeCount: commentLikeCountMap[c.id] || 0,
+        isLiked:
+          typeof userId === 'number' ? myLikedCommentIds.includes(c.id) : false,
+      })),
+    }));
+
+    const totalProducts = await productRepository.count(where);
+    const totalPages = Math.ceil(totalProducts / limit);
+
+    return {
+      data: productsWithLike,
+      pagination: { totalProducts, totalPages, currentPage: page, limit },
+    };
+  }
+
+  // 단일 상품 조회
+  async getProductById(productId: number, userId?: number) {
+    const product = await productRepository.findUnique(productId, userId);
+
+    if (!product) throw new AppError('존재하지 않는 상품입니다.', 404);
+
+    const likeCount = await productLikeRepository.count(product.id);
+    const isLiked = userId
+      ? await productLikeRepository.exists(userId, product.id)
+      : false;
+
+    const commentIds = product.comments.map((c) => c.id);
+
+    const commentLikeCounts = await commentLikeRepository.countByTargetIds(
+      commentIds
+    );
+    const commentLikeCountMap = Object.fromEntries(
+      commentLikeCounts.map((cl) => [cl.commentId, cl._count.commentId])
+    );
+
+    let myLikedCommentIds: number[] = [];
+    if (userId) {
+      const likedComments = await commentLikeRepository.findByUserAndTargetIds(
+        userId,
+        commentIds
+      );
+      myLikedCommentIds = likedComments.map((l) => l.commentId);
+    }
+
+    const commentsWithLikes = product.comments.map((c) => ({
+      ...c,
+      likeCount: commentLikeCountMap[c.id] || 0,
+      isLiked: userId ? myLikedCommentIds.includes(c.id) : false,
+    }));
+
+    const productWithLike = {
+      ...product,
+      likeCount,
+      isLiked,
+      comments: commentsWithLikes,
+    };
+
+    return productWithLike;
+  }
+
+  async createProduct(
+    userId: number,
+    name: string,
+    description: string,
+    price: number,
+    tags: string[]
+  ) {
+    const newProduct = await productRepository.create({
+      userId,
+      name,
+      description,
+      price,
+      tags,
+    });
+    if (!newProduct) throw new AppError('제품 등록 실패', 400);
+    return newProduct;
+  }
+
+  async updateProductPrice(
+    productId: number,
+    newPrice: number,
+    _actorUserId: number
+  ) {
+    // 1. 기존 상품
+    const product = await productRepository.findUnique(productId);
+    if (!product) {
+      throw new AppError('존재하지 않는 상품입니다.', 404);
+    }
+
+    // 2. 가격이 같으면 그냥 반환
+    if (product.price === newPrice) {
+      return product;
+    }
+
+    // 3. 트랜잭션: 가격 업데이트 + 좋아요 유저 ID 조회
+    const { updatedProduct, likedUserIds } = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const updatedProduct = await productRepository.updatePriceTx(
+          tx,
+          productId,
+          newPrice
+        );
+
+        const likedUserIds =
+          await productLikeRepository.findUserIdsWhoLikedProductTx(
+            tx,
+            productId
+          );
+
+        return { updatedProduct, likedUserIds };
+      }
+    );
+
+    // 4. 트랜잭션 이후 → 알림 발송 (기존 서비스 그대로 사용)
+    for (const userId of likedUserIds) {
+      await notificationService.pushPriceChange({
+        receiverUserId: userId,
+        productId,
+        oldPrice: product.price,
+        newPrice,
+        productName: product.name,
+      });
+    }
+
+    return updatedProduct;
+  }
+
+  async updateProduct(
+    productId: number,
+    userId: number,
+    updateData: UpdateProductDto
+  ) {
+    const product = await productRepository.findUnique(productId);
+    if (!product) throw new AppError('제품 없음', 404);
+    if (product.userId !== userId) throw new AppError('권한 없음', 403);
+
+    await productRepository.update(productId, userId, updateData);
+
+    return { message: '상품이 수정되었습니다.' };
+  }
+
+  async deleteProduct(productId: number, userId: number) {
+    const deleted = await productRepository.delete(productId, userId);
+    if (deleted.count === 0) throw new AppError('권한 없거나 제품 없음', 403);
+    return { message: '제품 삭제 완료' };
+  }
+
+  // ---------------------------
+  // 본인 상품 조회
+  async getUserProducts(userId: number) {
+    return productRepository.findUserProducts(userId);
+  }
+
+  // 좋아요한 상품 조회
+  async getUserLikedProducts(userId: number) {
+    return productRepository.findLikedProducts(userId);
+  }
+
+  // 상품 좋아요
+  async productLike(userId: number, productId: number) {
+    const alreadyLiked = await productLikeRepository.exists(userId, productId);
+    if (alreadyLiked) {
+      throw new AppError('이미 좋아요를 눌렀습니다.', 400);
+    }
+    await productLikeRepository.create(userId, productId);
+    const count = await productLikeRepository.count(productId);
+    return { message: '좋아요 완료', likeCount: count };
+  }
+
+  // 상품 좋아요 취소
+  async productUnlike(userId: number, productId: number) {
+    const exists = await productLikeRepository.exists(userId, productId);
+    if (!exists) {
+      throw new AppError('좋아요를 누른 기록이 없습니다.', 400);
+    }
+    await productLikeRepository.delete(userId, productId);
+    const count = await productLikeRepository.count(productId);
+    return { message: '좋아요 취소', likeCount: count };
+  }
+}
+
+export const productService = new ProductService();
