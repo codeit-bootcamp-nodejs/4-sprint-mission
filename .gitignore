@@ -6,4 +6,3 @@ node_modules
 
 prisma/seed.js
 prisma/migrations
-/front
