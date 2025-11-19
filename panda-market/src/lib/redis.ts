@@ -5,7 +5,7 @@ import { InternalServerError } from '@/lib/errors.js';
 let redisClient: RedisClientType;
 let isReady = false;
 
-async function connectToRedis() {
+export async function connectToRedis() {
   if (isReady) {
     return;
   }
@@ -31,7 +31,5 @@ async function connectToRedis() {
     console.error('Failed to connect to Redis:', err);
   }
 }
-
-await connectToRedis();
 
 export { redisClient };

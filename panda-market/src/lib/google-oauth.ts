@@ -5,10 +5,15 @@ import {
   GOOGLE_REDIRECT_URI,
 } from '@/lib/constants.js';
 
-const client = new OAuth2Client(
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI,
-);
+let client: OAuth2Client | null = null;
 
-export default client;
+export function getGoogleClient(): OAuth2Client {
+  if (!client) {
+    client = new OAuth2Client(
+      GOOGLE_CLIENT_ID,
+      GOOGLE_CLIENT_SECRET,
+      GOOGLE_REDIRECT_URI,
+    );
+  }
+  return client;
+}

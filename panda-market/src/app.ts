@@ -1,10 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import '@/lib/redis.js';
-import { prismaErrorHandler } from './middlewares/errorHandlers/prismaErrorHandler.js';
-import { zodErrorHandler } from './middlewares/errorHandlers/zodErrorHandler.js';
-import { catchAllErrorHandler } from './middlewares/errorHandlers/catchAllErrorHandler.js';
+import { prismaErrorHandler } from '@/middlewares/errorHandlers/prismaErrorHandler.js';
+import { zodErrorHandler } from '@/middlewares/errorHandlers/zodErrorHandler.js';
+import { catchAllErrorHandler } from '@/middlewares/errorHandlers/catchAllErrorHandler.js';
 import { businessErrorHandler } from '@/middlewares/errorHandlers/businessErrorHandler.js';
 
 import articleRouter from '@/routers/articles.routes.js';
@@ -13,6 +12,7 @@ import fileRouter from '@/routers/images.routes.js';
 import authRouter from '@/routers/auths.routes.js';
 import userRouter from '@/routers/users.routes.js';
 import notificationRouter from '@/routers/notifications.routes.js';
+import { NODE_ENV } from '@/lib/constants.js';
 
 const app = express();
 
@@ -22,7 +22,10 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(morgan('dev'));
+if (NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
+
 app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
 

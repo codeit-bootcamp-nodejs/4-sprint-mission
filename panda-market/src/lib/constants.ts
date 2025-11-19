@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
+import 'dotenv/config';
 import type { Secret } from 'jsonwebtoken';
 import { InternalServerError } from '@/lib/errors.js';
-
-dotenv.config();
 
 const jwtAccessTokenSecret = process.env['JWT_ACCESS_TOKEN_SECRET'];
 const jwtRefreshTokenSecret = process.env['JWT_REFRESH_TOKEN_SECRET'];
