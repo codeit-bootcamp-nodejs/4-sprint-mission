@@ -8,7 +8,16 @@ export const postSchema = z
     tags: z
       .array(z.string())
       .min(1, '1글자 이상 입력해주세요')
-      .max(5, '5글자 이내로 입력해주세요'),
+      .max(5, '5글자 이내로 입력해주세요')
+      .refine(
+        (tags) => {
+          const tagSet = new Set(tags);
+          return tagSet.size === tags.length;
+        },
+        {
+          message: '태그에 중복된 값을 입력할 수 없습니다.',
+        },
+      ),
     imageUrls: z.array(z.string()).optional(),
   })
   .strict();
