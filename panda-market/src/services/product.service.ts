@@ -127,27 +127,31 @@ export class ProductService {
     const recipientIds = likers.map((like) => like.userId);
 
     if (recipientIds.length > 0) {
-      const notificationData = recipientIds.map((id) => ({
-        recipientId: id,
-        senderId: userId,
-        type: NotifyType.PRICE_UPDATE_PRODUCT,
-        targetId: productId,
-      }));
-
-      await this.notificationRepository.createMany({
-        createData: notificationData,
-        tx,
-      });
-      recipientIds.forEach((id) => {
-        if (id === userId) return;
-        const userRoom = `user_${id}`;
-        this.io.to(userRoom).emit('new_notification', {
+      // 자기 자신을 제외하고 실제로 알림발송할 유저만 필터링
+      const recipientsToNotify = recipientIds.filter((id) => id !== userId);
+      if (recipientsToNotify.length > 0) {
+        const notificationData = recipientsToNotify.map((id) => ({
+          recipientId: id,
+          senderId: userId,
           type: NotifyType.PRICE_UPDATE_PRODUCT,
-          message: '좋아요한 상품의 가격이 변동되었습니다!',
-          productId: productId,
-          newPrice: newPrice,
+          targetId: productId,
+        }));
+
+        await this.notificationRepository.createMany({
+          createData: notificationData,
+          tx,
         });
-      });
+        recipientsToNotify.forEach((id) => {
+          if (id === userId) return;
+          const userRoom = `user_${id}`;
+          this.io.to(userRoom).emit('new_notification', {
+            type: NotifyType.PRICE_UPDATE_PRODUCT,
+            message: '좋아요한 상품의 가격이 변동되었습니다!',
+            productId: productId,
+            newPrice: newPrice,
+          });
+        });
+      }
     }
   }
 
@@ -222,7 +226,11 @@ export class ProductService {
           tx,
         });
       }
-      return product;
+      // 이미지 테이블도 연결된 최종 product 생성 상태 조회
+      return await this.productRepository.findById({
+        productId: product.id,
+        tx,
+      });
     });
   }
   async patchProduct({ userId, productId, data }: PatchProductDTO) {
@@ -336,6 +344,10 @@ export class ProductService {
         });
         if (images.length > 0) {
           imageIdsToDelete = images.map((img) => img.publicId);
+          await this.productImageRepository.deleteMany({
+            productId,
+            tx,
+          });
         }
         const deletedProduct = await this.productRepository.delete({
           productId,
