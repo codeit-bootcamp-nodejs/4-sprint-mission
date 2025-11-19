@@ -106,7 +106,7 @@ export const unlikedListResult2 = {
 
 export const createParams = {
   name: 'test',
-  description: 'test',
+  description: 'testtesttest',
   price: 1,
   tags: ['test'],
 };
@@ -140,6 +140,14 @@ export const createData = {
 
 export const createResult = {
   ...createData,
+  images: [
+    {
+      id: 1,
+      publicId: 'test',
+      url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
+    },
+  ],
+  likes: [],
 };
 
 export const updateData = {
