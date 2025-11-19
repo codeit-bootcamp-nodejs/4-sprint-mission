@@ -27,4 +27,12 @@ export class ProductImageRepository {
       },
     });
   }
+  async deleteMany({ productId, tx }: ProductIdWithTx) {
+    const db = tx || this.prisma;
+    return await db.productImage.deleteMany({
+      where: {
+        productId,
+      },
+    });
+  }
 }

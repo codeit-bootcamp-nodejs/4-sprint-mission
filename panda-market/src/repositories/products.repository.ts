@@ -66,6 +66,8 @@ export class ProductRepository {
       },
     });
   }
+  // 판다마켓 피그마에 보면 최신순, 좋아요 순으로 정렬 가능함
+  // 추후 기능 업데이트
   async findMany({ keyword, page, pageSize, userId }: GetListParams) {
     return await this.prisma.product.findMany({
       where: {
@@ -151,7 +153,13 @@ export class ProductRepository {
         userId: true,
         createdAt: true,
         tags: true,
-        images: true,
+        images: {
+          select: {
+            id: true,
+            publicId: true,
+            url: true,
+          },
+        },
       },
     });
   }
