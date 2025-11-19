@@ -16,7 +16,6 @@ import { productRouter } from './domain/product/product.router.js';
 import { errorMiddleware } from './middleware/error.middleware.js';
 import { loggerMiddleware } from './middleware/logger.middleware.js';
 import { eventBus } from './utils/event-bus.js';
-import logger from './utils/logger.js';
 import { limiter } from './utils/rate-limit.js';
 import { setupSocket } from './utils/socket.js';
 
@@ -41,9 +40,4 @@ app.use('/notifications', notificationRouter);
 
 app.use(errorMiddleware);
 
-httpServer.listen(appConfig.port, () => {
-  logger.info(`서버 이름: ${appConfig.app_name}`);
-  logger.info(`서버 실행 포트: ${appConfig.port}`);
-  logger.info(`환경: ${appConfig.node_env}`);
-  logger.info(`CORS 허용: ${appConfig.cors_origin}`);
-});
+export default httpServer;

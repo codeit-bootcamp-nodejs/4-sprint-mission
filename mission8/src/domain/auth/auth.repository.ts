@@ -1,7 +1,18 @@
 import prisma from '../../utils/prisma.js';
-import type { CreateRefreshTokenInput } from './auth.type.js';
+import type { CreateRefreshTokenInput, registerInputData } from './auth.type.js';
 
 class AuthRepository {
+  register = async (registerData: registerInputData) => {
+    return await prisma.user.create({
+      data: {
+        username: registerData.username,
+        email: registerData.email,
+        hashedPassword: registerData.password,
+        lastLogin: new Date(),
+      },
+    });
+  };
+
   findRefreshToken = async (userId: number) => {
     return await prisma.refreshToken.findUnique({
       where: { userId },

@@ -4,6 +4,16 @@
 @refreshTokenName=refreshToken
 @refreshToken={{login.response.body.refreshToken}}
 
+### 회원가입
+POST {{baseUrl}}/auth/register
+content-Type: application/json
+
+{
+  "email": "user@test.com",
+  "password": "testuser",
+  "username": "testUser"
+}
+
 ### 로그인
 # @name login
 POST {{baseUrl}}/auth/login
@@ -58,3 +68,21 @@ Content-Type: application/json
 {
   "price": 10000
 }
+
+### 특정 상품 조회
+GET  {{baseUrl}}/products/2
+Content-Type: application/json
+
+### 게시글 등록
+POST {{baseUrl}}/posts
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "test",
+  "content": "test내용"
+}
+
+### 특정 게시글 조회
+GET {{baseUrl}}/posts/1
+Authorization: Bearer {{accessToken}}
