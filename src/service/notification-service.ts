@@ -108,6 +108,7 @@ export class NotificationService {
       id: notification.id,
       message: notification.message,
       link: notification.link,
+      type: notification.type, // <-- 피드백 반영: type 필드 매핑 추가
       isRead: notification.isRead,
       createdAt: notification.createdAt,
     };
