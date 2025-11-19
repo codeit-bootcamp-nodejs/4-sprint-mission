@@ -183,6 +183,7 @@ describe('ProductService', () => {
       mockProductImgRepo.createMany.mockResolvedValue({
         count: 1,
       });
+      mockProductRepo.findById.mockResolvedValue(createResult);
       // when
       const result = await mockProductService.postProduct({
         userId: 1,
@@ -228,6 +229,17 @@ describe('ProductService', () => {
       mockProductImgRepo.createMany.mockResolvedValue({
         count: 1,
       });
+      mockProductRepo.findById.mockResolvedValue({
+        ...createResult,
+        images: [
+          {
+            id: 1,
+            publicId: 'test',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
+          },
+        ],
+        likes: [],
+      });
       // when
       // then
       await expect(
@@ -260,6 +272,17 @@ describe('ProductService', () => {
       mockProductImgRepo.createMany.mockRejectedValue(
         new BadRequestError('image 에러'),
       );
+      mockProductRepo.findById.mockResolvedValue({
+        ...createResult,
+        images: [
+          {
+            id: 1,
+            publicId: 'test',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
+          },
+        ],
+        likes: [],
+      });
       // when
       // then
       await expect(
@@ -293,6 +316,17 @@ describe('ProductService', () => {
       });
       mockProductImgRepo.createMany.mockResolvedValue({
         count: 1,
+      });
+      mockProductRepo.findById.mockResolvedValue({
+        ...createResult,
+        images: [
+          {
+            id: 1,
+            publicId: 'test',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
+          },
+        ],
+        likes: [],
       });
       // when
       // then
