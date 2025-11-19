@@ -37,6 +37,7 @@ export class ProductLikeService {
         await this.productRepository.update({
           productId,
           patchData,
+          userId,
           tx,
         });
       }
@@ -62,6 +63,7 @@ export class ProductLikeService {
       await this.productRepository.update({
         productId,
         patchData,
+        userId,
         tx,
       });
       return this.productRepository.findById({ productId, userId, tx });
