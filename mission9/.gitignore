@@ -1,0 +1,13 @@
+# Local files
+.vscode/
+node_modules/
+.env*
+!.env.example
+!.env.test.example
+build/
+coverage/
+
+# Uploaded files
+public/*
+!public/.gitkeep
+.DS_Store
