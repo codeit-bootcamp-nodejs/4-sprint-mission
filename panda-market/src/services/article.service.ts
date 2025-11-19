@@ -116,7 +116,10 @@ export class ArticleService {
         });
         await this.articleImageRepository.createMany({ imageData, tx });
       }
-      return article;
+      return await this.articleRepository.findById({
+        articleId: article.id,
+        tx,
+      });
     });
   }
   async patchArticle({ articleId, userId, data }: PatchArticleDTO) {
@@ -176,6 +179,10 @@ export class ArticleService {
         });
         if (images.length > 0) {
           imageIdsToDelete = images.map((image) => image.publicId);
+          await this.articleImageRepository.deleteMany({
+            articleId,
+            tx,
+          });
         }
         const deleteArticle = await this.articleRepository.delete({
           articleId,
