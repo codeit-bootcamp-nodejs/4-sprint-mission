@@ -1,0 +1,8 @@
+node_modules/
+build/
+.env
+public/uploads/
+*.log
+.DS_Store
+.claude/
+USAGE_GUIDE.md
