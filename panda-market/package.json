@@ -7,7 +7,7 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "dev": "tsx watch src/server.ts",
     "dev:prod": "tsx watch --env-file=.env.prod src/server.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
     "start:prod": "node --env-file=.env.prod dist/server.js",
     "lint": "eslint src --ext .ts",
@@ -49,6 +49,7 @@
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"
