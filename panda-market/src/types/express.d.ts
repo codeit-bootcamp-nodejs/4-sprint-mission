@@ -1,8 +1,17 @@
 import type { JwtPayload } from 'jsonwebtoken';
-import type { File } from 'multer';
+import 'multer';
 
 declare global {
   namespace Express {
+    namespace Multer {
+      interface File {
+        location: string;
+        key: string;
+        bucket: string;
+        acl?: string;
+        etag?: string;
+      }
+    }
     export interface Request {
       // middleware를 통과한 후에만 존재하므로 optional로 선언
       parentId?: number; // idSchema가 string을 반환한다고 가정
@@ -21,7 +30,6 @@ declare global {
         page: number;
         pageSize: number;
       };
-      file?: File;
     }
   }
 }
