@@ -18,7 +18,7 @@ export class ArticleRepository {
   ) {}
 
   async findOwnerById({ articleId }: ArticleId) {
-    return await this.prisma.article.findUniqueOrThrow({
+    return await this.prisma.article.findUnique({
       where: { id: articleId },
       select: { userId: true },
     });

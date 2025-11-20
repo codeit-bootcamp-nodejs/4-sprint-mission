@@ -24,10 +24,18 @@ if (!jwtAccessTokenSecret || !jwtRefreshTokenSecret) {
     'JWT 시크릿 키가 .env 파일에 설정되지 않았습니다.',
   );
 }
-if (!cloudinary_cloud_name || !cloudinary_api_key || !cloudinary_api_secret) {
-  throw new InternalServerError(
-    'cloudinary 정보가 .env 파일에 설정되지 않았습니다.',
-  );
+if (process.env.NODE_ENV === 'production') {
+  if (!aws_access_key || !aws_secret_key || !aws_region) {
+    throw new InternalServerError(
+      'aws 정보가 .env 파일에 설정되지 않았습니다.',
+    );
+  }
+} else {
+  if (!cloudinary_cloud_name || !cloudinary_api_key || !cloudinary_api_secret) {
+    throw new InternalServerError(
+      'cloudinary 정보가 .env 파일에 설정되지 않았습니다.',
+    );
+  }
 }
 if (!google_client_id || !google_client_secret || !google_redirect_uri) {
   throw new InternalServerError(
@@ -39,9 +47,7 @@ if (!kakao_client_api_key || !kakao_client_secret || !kakao_redirect_uri) {
     '카카오 로그인 api 정보가 .env 파일에 설정되지 않았습니다.',
   );
 }
-if (!aws_access_key || !aws_secret_key || !aws_region) {
-  throw new InternalServerError('aws 정보가 .env 파일에 설정되지 않았습니다.');
-}
+
 const JWT_ACCESS_TOKEN_SECRET: Secret = jwtAccessTokenSecret;
 const JWT_REFRESH_TOKEN_SECRET: Secret = jwtRefreshTokenSecret;
 const CLOUDINARY_CLOUD_NAME = cloudinary_cloud_name;

@@ -1,4 +1,8 @@
-import { BadRequestError, ForbiddenError } from '@/lib/errors.js';
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from '@/lib/errors.js';
 import type { ArticleParams, AuthArticleParams } from '@/dto/articles.dto.js';
 import type { GetListParams } from '@/types/shared.types.js';
 import type { ArticleRepository } from '@/repositories/articles.repository.js';
@@ -29,6 +33,9 @@ export class ArticleService {
     articleId,
   }: AuthArticleParams): Promise<boolean> {
     const article = await this.articleRepository.findOwnerById({ articleId });
+    if (!article) {
+      throw new NotFoundError();
+    }
     return article.userId === userId;
   }
   private async imageUpdate({ articleId, tx, newImages }: ImageUpdateInput) {

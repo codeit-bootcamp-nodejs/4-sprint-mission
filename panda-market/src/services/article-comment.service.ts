@@ -1,4 +1,4 @@
-import { ForbiddenError } from '@/lib/errors.js';
+import { ForbiddenError, NotFoundError } from '@/lib/errors.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { CommentParams, PatchCommentDTO } from '@/dto/base-comments.dto.js';
@@ -46,9 +46,13 @@ export class ArticleCommentService {
   }
 
   async postComment({ userId, articleId, content }: PostCommentDTO) {
-    const { userId: authorId } = await this.articleRepository.findOwnerById({
+    const user = await this.articleRepository.findOwnerById({
       articleId,
     });
+    if (!user) {
+      throw new NotFoundError();
+    }
+    const { userId: authorId } = user;
     let newNotification: Notification | null = null;
     const createData = {
       user: {
