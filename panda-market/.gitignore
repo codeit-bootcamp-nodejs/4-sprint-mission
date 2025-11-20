@@ -6,7 +6,6 @@ package-lock.json
 
 # 미션관련 추가
 /uploads
-.prettierrc
 /generated/prisma
 .vscode/
 /dist
