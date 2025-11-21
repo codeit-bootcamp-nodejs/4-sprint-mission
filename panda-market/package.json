@@ -9,6 +9,7 @@
     "dev:prod": "tsx watch --env-file=.env.prod src/server.ts",
     "build": "tsc && tsc-alias",
     "start": "node dist/server.js",
+    "start:pm2": "./infra/ec2/start.sh",
     "start:prod": "node --env-file=.env.prod dist/server.js",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
