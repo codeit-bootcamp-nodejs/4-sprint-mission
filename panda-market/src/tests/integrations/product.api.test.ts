@@ -6,6 +6,7 @@ import {
 } from '@/tests/fixtures/product.fixtures.js';
 import prisma from '@/lib/prisma.js';
 import { passwordHashing } from '@/lib/bcrypt.js';
+import { Product } from '@prisma/client';
 
 describe('Product API', () => {
   let userToken: string;
@@ -191,8 +192,14 @@ describe('Product API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
-      expect(response.body[0].isLike).toBeFalsy();
-      expect(response.body[1].isLike).toBeTruthy();
+      const targetLiked = response.body.find(
+        (p: Product) => p.id === productId,
+      );
+      const targetUnliked = response.body.find(
+        (p: Product) => p.id === product2Id,
+      );
+      expect(targetUnliked.isLike).toBeFalsy();
+      expect(targetLiked.isLike).toBeTruthy();
     });
     it('로그인 하지 않은 유저가 상품 목록을 요청할 경우 모든 상품마다 isLike: false를 포함해야한다.', async () => {
       // when
@@ -200,8 +207,14 @@ describe('Product API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
-      expect(response.body[0].isLike).toBeFalsy();
-      expect(response.body[1].isLike).toBeFalsy();
+      const targetLiked = response.body.find(
+        (p: Product) => p.id === productId,
+      );
+      const targetUnliked = response.body.find(
+        (p: Product) => p.id === product2Id,
+      );
+      expect(targetUnliked.isLike).toBeFalsy();
+      expect(targetLiked.isLike).toBeFalsy();
     });
   });
   describe('GET /product/:id', () => {
