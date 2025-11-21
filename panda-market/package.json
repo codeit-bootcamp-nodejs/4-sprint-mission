@@ -1,8 +1,8 @@
 {
-  "name": "ts-express-template",
+  "name": "panda-market",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
     "dev": "tsx watch src/server.ts",
