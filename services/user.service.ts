@@ -160,19 +160,23 @@ export async function googleOAuthService(googleProfile: {
     const randomPassword = await bcrypt.hash(googleId + Date.now(), 10);
     
     // 닉네임이 중복될 수 있으므로 처리
-    let finalNickname = nickname;
-    let nicknameExists = await prisma.user.findUnique({ where: { nickname: finalNickname } });
+    let finalNickname = nickname ?? `user_${Date.now()}`;
+    let nicknameExists;
+
+    if (finalNickname) {
+    nicknameExists = await prisma.user.findUnique({ where: { nickname: finalNickname } }) };
     let counter = 1;
     while (nicknameExists) {
       finalNickname = `${nickname}${counter}`;
       nicknameExists = await prisma.user.findUnique({ where: { nickname: finalNickname } });
       counter++;
     }
+    const validNickname = finalNickname ?? `user_${Date.now()}`;
 
     const newUser = await prisma.user.create({
       data: {
         email,
-        nickname: finalNickname,
+        nickname: validNickname,
         password: randomPassword,
         image,
       },

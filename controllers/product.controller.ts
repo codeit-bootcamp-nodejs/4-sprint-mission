@@ -154,3 +154,4 @@ export async function productDetailController(req: Request, res: Response, next:
     next(err);
   }
 }
+

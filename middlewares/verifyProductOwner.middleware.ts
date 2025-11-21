@@ -4,7 +4,7 @@ import { HttpError } from "./errorHandler.middleware.js";
 
 export async function verifyProductOwner(req: Request, res: Response, next: NextFunction) {
   try {
-    const productId = Number(req.params.id);
+    const productId = Number(req.params.productId);
 
     if (!req.user) {
       throw new HttpError("로그인이 필요합니다.", 401);

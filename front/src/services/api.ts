@@ -1,6 +1,6 @@
 import { getToken, getRefreshToken, setTokens, clearTokens } from '../utils/auth';
 
-const API_BASE_URL = '';
+const API_BASE_URL = 'http://52.79.236.229/api';
 
 // API 요청 헬퍼
 async function apiRequest<T>(
@@ -8,13 +8,11 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const token = getToken();
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
+  const headers = new Headers(options.headers);
+  headers.set('Content-Type', 'application/json');
 
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers.set('Authorization', `Bearer ${token}`);
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -23,7 +21,7 @@ async function apiRequest<T>(
   });
 
   // 토큰 만료 시 재발급 시도
-  if (response.status === 401 && token) {
+  if (response.status === 401) {
     const refreshToken = getRefreshToken();
     if (refreshToken) {
       try {
@@ -34,17 +32,21 @@ async function apiRequest<T>(
         });
 
         if (refreshResponse.ok) {
-          const { accesToken } = await refreshResponse.json();
-          setTokens(accesToken, refreshToken);
+          const { newAccessToken } = await refreshResponse.json();
+          setTokens(newAccessToken, refreshToken);
+
+	  //새로운 토큰으로 재시도
+	  const newHeaders = new Headers(options.headers);
+	  newHeaders.set('Content-Type', 'application/json');
+	  newHeaders.set('Authorization', `Bearer ${newAccessToken}`);
+
           // 원래 요청 재시도
-          headers['Authorization'] = `Bearer ${accesToken}`;
+          
           const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
             ...options,
-            headers,
+            headers: newHeaders,
           });
-          if (!retryResponse.ok) {
-            throw new Error(`API Error: ${retryResponse.status}`);
-          }
+
           return retryResponse.json();
         }
       } catch (error) {
@@ -53,11 +55,13 @@ async function apiRequest<T>(
         throw error;
       }
     }
+    clearTokens();
+    window.location.href = '/login';
+    throw new Error('Unauthorized');
   }
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: '알 수 없는 오류가 발생했습니다.' }));
-    throw new Error(error.message || `API Error: ${response.status}`);
+	  throw new Error('Request failed');
   }
 
   return response.json();

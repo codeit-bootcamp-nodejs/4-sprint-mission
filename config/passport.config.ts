@@ -6,8 +6,7 @@ dotenv.config();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://localhost:8080/auth/google/callback";
-
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://52.79.236.229/auth/google/callback";
 if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
   console.warn("⚠️ Google OAuth 환경변수가 설정되지 않았습니다. GOOGLE_CLIENT_ID와 GOOGLE_CLIENT_SECRET을 설정해주세요.");
 }
@@ -24,7 +23,7 @@ passport.use(
         // Google 프로필 정보를 콜백으로 전달
         return done(null, profile);
       } catch (error) {
-        return done(error, null);
+        return done(error, false);
       }
     }
   )

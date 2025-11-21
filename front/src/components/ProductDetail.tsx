@@ -31,7 +31,7 @@ export default function ProductDetail() {
   const handleLike = async () => {
     if (!id) return;
     try {
-      const response = await likeApi.toggleProduct(Number(id));
+      await likeApi.toggleProduct(Number(id));
       // 좋아요 상태 업데이트
       await loadProduct();
     } catch (err: any) {
