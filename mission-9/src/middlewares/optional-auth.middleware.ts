@@ -1,0 +1,56 @@
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { prisma } from '../utils/prisma.util.js';
+
+// '선택적' 인증 미들웨어
+// 인증에 성공하면 req.user에 사용자 정보를 담고,
+// 인증에 실패해도 에러를 발생시키지 않고 다음 미들웨어로 진행합니다.
+export default async function (req: Request, res: Response, next: NextFunction) {
+  try {
+    const { authorization } = req.headers;
+    // authorization 헤더가 없으면 그냥 통과
+    if (!authorization) {
+      return next();
+    }
+
+    const [tokenType, token] = authorization.split(' ');
+    // Bearer 토큰이 아니면 그냥 통과
+    if (tokenType !== 'Bearer') {
+      return next();
+    }
+
+    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET_KEY;
+    // 시크릿 키가 없으면 인증을 진행할 수 없으므로 그냥 통과
+    if (!accessTokenSecret) {
+        return next();
+    }
+
+    // JWT 검증
+    const decodedToken = jwt.verify(token, accessTokenSecret);
+    
+    if (typeof decodedToken !== 'object' || decodedToken === null || !('userId' in decodedToken)) {
+        return next(); // 유효하지 않은 토큰이면 그냥 통과
+    }
+
+    const userId = (decodedToken as { userId: number }).userId;
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId },
+    });
+    // 사용자가 없으면 그냥 통과
+    if (!user) {
+      return next();
+    }
+
+    // req.user에 사용자 정보 할당
+    req.user = user;
+    next();
+  } catch (err: any) {
+    // JWT 관련 에러가 발생하면 (만료, 형식 오류 등) 그냥 통과
+    // 유효하지 않은 토큰을 가진 사용자는 비로그인 사용자와 동일하게 취급
+    if (err.name === 'TokenExpiredError' || err.name === 'JsonWebTokenError') {
+      return next();
+    }
+    next(err);
+  }
+}
