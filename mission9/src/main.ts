@@ -34,7 +34,7 @@ app.use('/users', usersRouter);
 app.use('/notifications', notificationsRouter);
 
 app.get('/health', (req: Request, res: Response) => {
-  res.json({'status': 'ok'}); 
+  res.json({'status': 'ok.'}); 
 });
 
 app.use(defaultNotFoundHandler);
