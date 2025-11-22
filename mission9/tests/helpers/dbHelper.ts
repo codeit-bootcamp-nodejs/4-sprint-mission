@@ -6,11 +6,11 @@ const prisma = new PrismaClient();
 /**
  * Setup test database - run migrations
  */
-export async function setupTestDatabase() {
+export async function setupTestDatabase(databaseUrl: string) {
   try {
     // Run migrations on test database
     execSync('npx prisma migrate deploy', {
-      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+      env: { ...process.env, DATABASE_URL: databaseUrl },
       stdio: 'inherit',
     });
   } catch (error) {
