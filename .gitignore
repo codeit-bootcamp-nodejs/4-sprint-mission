@@ -17,3 +17,5 @@ sprintMission2/
 .env.test
 
 .env.production
+
+/dist

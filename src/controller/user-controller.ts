@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../service/user-service';
+import { Request, Response, NextFunction } from "express";
+import { UserService } from "../service/user-service.js";
 import {
   ChangePasswordDto,
   SignInDto,
   SignUpDto,
   UpdateUserInfoDto,
-} from '../types/dto';
+} from "../types/dto.js";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -25,7 +25,7 @@ export class UserController {
       const signInDto: SignInDto = req.body;
       const tokens = await this.userService.signIn(signInDto);
       res.status(200).json({
-        message: '로그인에 성공했습니다.',
+        message: "로그인에 성공했습니다.",
         data: tokens,
       });
     } catch (error) {
@@ -37,11 +37,11 @@ export class UserController {
     try {
       const { refreshToken } = req.body;
       if (!refreshToken) {
-        return res.status(400).json({ message: '리프레시 토큰이 필요합니다.' });
+        return res.status(400).json({ message: "리프레시 토큰이 필요합니다." });
       }
       const newAccessToken = await this.userService.refreshToken(refreshToken);
       res.status(200).json({
-        message: '토큰이 성공적으로 재발급되었습니다.',
+        message: "토큰이 성공적으로 재발급되었습니다.",
         data: newAccessToken,
       });
     } catch (error) {
@@ -53,7 +53,7 @@ export class UserController {
     try {
       const userId = req.user!.id;
       await this.userService.signOut(userId);
-      res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
+      res.status(200).json({ message: "성공적으로 로그아웃되었습니다." });
     } catch (error) {
       next(error);
     }
@@ -75,10 +75,10 @@ export class UserController {
       const updateUserInfoDto: UpdateUserInfoDto = req.body;
       const updatedUser = await this.userService.updateUserInfo(
         userId,
-        updateUserInfoDto,
+        updateUserInfoDto
       );
       res.status(200).json({
-        message: '사용자 정보가 성공적으로 수정되었습니다.',
+        message: "사용자 정보가 성공적으로 수정되었습니다.",
         data: updatedUser,
       });
     } catch (error) {
@@ -89,22 +89,25 @@ export class UserController {
   changeMyPassword = async (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ) => {
     try {
       const userId = req.user!.id;
       const changePasswordDto: ChangePasswordDto = req.body;
 
-      if (!changePasswordDto.currentPassword || !changePasswordDto.newPassword) {
+      if (
+        !changePasswordDto.currentPassword ||
+        !changePasswordDto.newPassword
+      ) {
         return res.status(400).json({
-          message: '현재 비밀번호와 새 비밀번호를 모두 입력해주세요.',
+          message: "현재 비밀번호와 새 비밀번호를 모두 입력해주세요.",
         });
       }
 
       await this.userService.changePassword(userId, changePasswordDto);
       res
         .status(200)
-        .json({ message: '비밀번호가 성공적으로 변경되었습니다.' });
+        .json({ message: "비밀번호가 성공적으로 변경되었습니다." });
     } catch (error) {
       next(error);
     }
@@ -123,7 +126,7 @@ export class UserController {
   getLikedProducts = async (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ) => {
     try {
       const userId = req.user!.id;
@@ -137,7 +140,7 @@ export class UserController {
   getLikedArticles = async (
     req: Request,
     res: Response,
-    next: NextFunction,
+    next: NextFunction
   ) => {
     try {
       const userId = req.user!.id;

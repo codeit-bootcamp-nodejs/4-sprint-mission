@@ -6,7 +6,7 @@ import {
   ImageController,
   UserController,
   NotificationController,
-} from "./controller";
+} from "./controller/index.js";
 
 import {
   ProductService,
@@ -15,7 +15,7 @@ import {
   UserService,
   LikeService,
   NotificationService,
-} from "./service";
+} from "./service/index.js";
 
 import {
   ProductRepository,
@@ -24,10 +24,10 @@ import {
   UserRepository,
   LikeRepository,
   NotificationRepository,
-} from "./repository";
+} from "./repository/index.js";
 
-import { ValidationMiddleware } from "./middleware/validation-middleware";
-import { ImageMiddleware } from "./middleware/image-middleware";
+import { ValidationMiddleware } from "./middleware/validation-middleware.js";
+import { ImageMiddleware } from "./middleware/image-middleware.js";
 import { Server } from "socket.io";
 
 const prisma = new PrismaClient();

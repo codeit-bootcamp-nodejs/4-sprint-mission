@@ -1,13 +1,13 @@
 import { Prisma, Product } from "@prisma/client";
-import { ProductRepository } from "../repository/product-repository";
+import { ProductRepository } from "../repository/product-repository.js";
 import {
   CreateProductDto,
   UpdateProductDto,
   ProductListResponseDto,
   ProductDetailResponseDto,
-} from "../types/dto";
-import { LikeRepository } from "../repository/like-repository";
-import { NotificationService } from "./notification-service";
+} from "../types/dto.js";
+import { LikeRepository } from "../repository/like-repository.js";
+import { NotificationService } from "./notification-service.js";
 
 export class ProductService {
   constructor(

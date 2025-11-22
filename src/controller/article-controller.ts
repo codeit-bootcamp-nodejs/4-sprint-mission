@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
-import { ArticleService } from '../service/article-service';
-import { LikeService } from '../service/like-service';
-import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
+import { Request, Response, NextFunction } from "express";
+import { ArticleService } from "../service/article-service.js";
+import { LikeService } from "../service/like-service.js";
+import { CreateArticleDto, UpdateArticleDto } from "../types/dto.js";
 
 export class ArticleController {
   constructor(
     private articleService: ArticleService,
-    private likeService: LikeService,
+    private likeService: LikeService
   ) {}
 
   createArticle = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export class ArticleController {
       const createArticleDto: CreateArticleDto = req.body;
       const newArticle = await this.articleService.createArticle(
         userId,
-        createArticleDto,
+        createArticleDto
       );
       res.status(201).json(newArticle);
     } catch (error) {
@@ -25,15 +25,15 @@ export class ArticleController {
 
   getArticles = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt((req.query.page as string) || '1');
-      const limit = parseInt((req.query.limit as string) || '10');
+      const page = parseInt((req.query.page as string) || "1");
+      const limit = parseInt((req.query.limit as string) || "10");
       const search = req.query.search as string | undefined;
       const userId = req.user?.id;
       const result = await this.articleService.getArticles(
         page,
         limit,
         search,
-        userId,
+        userId
       );
       res.status(200).json(result);
     } catch (error) {
@@ -60,7 +60,7 @@ export class ArticleController {
       const updatedArticle = await this.articleService.updateArticle(
         userId,
         id,
-        updateArticleDto,
+        updateArticleDto
       );
       res.status(200).json(updatedArticle);
     } catch (error) {
@@ -85,7 +85,7 @@ export class ArticleController {
       const { id: articleId } = req.params;
       const result = await this.likeService.toggleArticleLike(
         userId,
-        parseInt(articleId),
+        parseInt(articleId)
       );
       res.status(200).json(result);
     } catch (error) {

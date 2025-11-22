@@ -1,4 +1,4 @@
-import server from "./app"; // 수정된 부분
+import server from "./app.js"; // 수정된 부분
 
 const PORT = process.env.PORT || 3000;
 

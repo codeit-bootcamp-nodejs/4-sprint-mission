@@ -1,5 +1,5 @@
 import request from "supertest";
-import server from "../app";
+import server from "../app.js";
 import { Server } from "http";
 
 let testServer: Server;

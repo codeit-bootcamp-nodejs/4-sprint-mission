@@ -1,6 +1,6 @@
 import express from "express";
-import { ImageController } from "../controller/image-controller";
-import { ImageMiddleware } from "../middleware/image-middleware";
+import { ImageController } from "../controller/image-controller.js";
+import { ImageMiddleware } from "../middleware/image-middleware.js";
 
 const imageRouter = (
   imageController: ImageController,
