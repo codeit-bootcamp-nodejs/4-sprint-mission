@@ -1,9 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { ProductsService } from '../services/products.service.js';
-import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js'; // DTO 임포트
+import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js';
+import { ProductsRepository } from '../repositories/products.repository.js';
 
 export class ProductsController {
-  productsService = new ProductsService();
+  productsService: ProductsService;
+  productsRepository: ProductsRepository;
+
+  constructor() {
+    this.productsRepository = new ProductsRepository();
+    this.productsService = new ProductsService(this.productsRepository);
+  }
 
   // 상품 등록
   createProduct = async (req: Request, res: Response, next: NextFunction) => {

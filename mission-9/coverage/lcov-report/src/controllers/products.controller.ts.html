@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">51.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>44/88</span>
+                <span class='fraction'>46/90</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">51.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>44/88</span>
+                <span class='fraction'>46/90</span>
             </div>
         
             
@@ -220,12 +220,26 @@
 <a name='L155'></a><a href='#L155'>155</a>
 <a name='L156'></a><a href='#L156'>156</a>
 <a name='L157'></a><a href='#L157'>157</a>
-<a name='L158'></a><a href='#L158'>158</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L158'></a><a href='#L158'>158</a>
+<a name='L159'></a><a href='#L159'>159</a>
+<a name='L160'></a><a href='#L160'>160</a>
+<a name='L161'></a><a href='#L161'>161</a>
+<a name='L162'></a><a href='#L162'>162</a>
+<a name='L163'></a><a href='#L163'>163</a>
+<a name='L164'></a><a href='#L164'>164</a>
+<a name='L165'></a><a href='#L165'>165</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
@@ -379,26 +393,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Request, Response, NextFunction } from 'express';
 import { ProductsService } from '../services/products.service.js';
-import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js'; // Import DTOs
+import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js';
+import { ProductsRepository } from '../repositories/products.repository.js';
 &nbsp;
 export class ProductsController {
-  productsService = new ProductsService();
+  productsService: ProductsService;
+  productsRepository: ProductsRepository;
+&nbsp;
+  constructor() {
+    this.productsRepository = new ProductsRepository();
+    this.productsService = new ProductsService(this.productsRepository);
+  }
 &nbsp;
   // 상품 등록
   createProduct = async (req: Request, res: Response, next: NextFunction) =&gt; {
     try {
-      const createProductDto: CreateProductDto = req.body; // Use DTO
+      const createProductDto: CreateProductDto = req.body; // DTO 사용
       const user = req.user;
       <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {
 <span class="cstat-no" title="statement not covered" >        return res.status(401).json({ message: '인증 정보가 없습니다.' });</span>
       }
       const userId = user.id;
 &nbsp;
-      <span class="missing-if-branch" title="if path not taken" >I</span>if (!createProductDto.name || !createProductDto.content) { // Validate DTO fields
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!createProductDto.name || !createProductDto.content) { // DTO 필드 유효성 검사
 <span class="cstat-no" title="statement not covered" >        return res.status(400).json({ message: '상품명과 내용을 모두 입력해주세요.' });</span>
       }
 &nbsp;
-      const newProduct = await this.productsService.createProduct(createProductDto, userId); // Pass DTO
+      const newProduct = await this.productsService.createProduct(createProductDto, userId); // DTO 전달
 &nbsp;
       return res.status(201).json({ data: newProduct });
     } catch (err) {
@@ -438,14 +459,14 @@ export class ProductsController {
   updateProduct = async (req: Request, res: Response, next: NextFunction) =&gt; {
     try {
       const { productId } = req.params;
-      const updateProductDto: UpdateProductDto = req.body; // Use DTO
+      const updateProductDto: UpdateProductDto = req.body; // DTO 사용
       const user = req.user;
       <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {
 <span class="cstat-no" title="statement not covered" >        return res.status(401).json({ message: '인증 정보가 없습니다.' });</span>
       }
       const userId = user.id;
 &nbsp;
-      const updatedProduct = await this.productsService.updateProduct(+productId, userId, updateProductDto); // Pass DTO
+      const updatedProduct = await this.productsService.updateProduct(+productId, userId, updateProductDto); // DTO 전달
 &nbsp;
       return res.status(200).json({ data: updatedProduct });
     } catch (err: any) {
@@ -541,7 +562,7 @@ getLikedProducts = <span class="fstat-no" title="function not covered" >async </
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-21T08:48:58.499Z
+                at 2025-11-22T07:18:34.218Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

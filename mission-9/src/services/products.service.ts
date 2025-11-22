@@ -4,8 +4,12 @@ import { NotificationsService } from './notifications.service.js';
 import { CreateProductDto, UpdateProductDto } from '../dtos/product.dto.js';
 
 export class ProductsService {
-  productsRepository = new ProductsRepository();
+  productsRepository: ProductsRepository;
   notificationsService = NotificationsService.getInstance();
+
+  constructor(productsRepository: ProductsRepository) {
+    this.productsRepository = productsRepository;
+  }
 
   createProduct = async (createProductDto: CreateProductDto, userId: number) => {
     const { name, content, price } = createProductDto;
