@@ -62,6 +62,10 @@ app.use("/notifications", (req, res, next) => {
   notificationRouter(container.notificationController)(req, res, next);
 });
 
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Panda Market API is running!" });
+});
+
 app.use(errorHandler);
 
 io.use((socket, next) => {
