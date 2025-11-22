@@ -1,0 +1,36 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc2MjY5MTg0NCwiZXhwIjoxNzYyNjk1NDQ0fQ.TAqRi-x7S1zNKDHMRqnkGnePXzXA8NVYFky3QTC0dco
+
+### 게시글 목록 조회
+GET http://localhost:3000/posts
+
+### 특정 게시글 상세 조회
+GET http://localhost:3000/posts/2
+Authorization: Bearer {{accessToken}}
+
+### 게시글 등록 (로그인 필요)
+POST http://localhost:3000/posts
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "개인정보 보호: 중고 스마트폰 판매 전 초기화 방법",
+    "content": "스마트폰을 판매하기 전에 개인정보가 유출되지 않도록 완벽하게 초기화하는 방법을 단계별로 안내합니다."
+}
+
+### 게시글 정보 수정 (작성자만 가능)
+PUT http://localhost:3000/posts/2
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "개인정보 보호: 중고 아이폰 판매 전 초기화 방법",
+    "content": "아이폰을 판매하기 전에 개인정보가 유출되지 않도록 완벽하게 초기화하는 방법을 단계별로 안내합니다."
+}
+
+### 게시글 삭제 (작성자만 가능)
+DELETE http://localhost:3000/posts/1
+Authorization: Bearer {{accessToken}}
+
+### 게시글 좋아요 및 취소 (로그인 필요)
+POST http://localhost:3000/posts/2/likes
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Socket.IO 알림 테스트</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .control-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .control-panel label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .control-panel input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            margin-bottom: 12px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-connect {
+            background-color: #4CAF50;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-connect:hover {
+            background-color: #45a049;
+        }
+
+        .btn-disconnect {
+            background-color: #f44336;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-disconnect:hover {
+            background-color: #da190b;
+        }
+
+        .btn-clear {
+            background-color: #9E9E9E;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-clear:hover {
+            background-color: #757575;
+        }
+
+        #status {
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        #notifications {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #notifications h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        #notification-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #notification-list li {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2196F3;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        #notification-list li strong {
+            color: #2196F3;
+        }
+
+        #notification-list li small {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .notification-price-change {
+            border-left-color: #FF9800 !important;
+        }
+
+        .notification-price-change strong {
+            color: #FF9800 !important;
+        }
+
+        .notification-new-comment {
+            border-left-color: #4CAF50 !important;
+        }
+
+        .notification-new-comment strong {
+            color: #4CAF50 !important;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .status-connected {
+            background: #d4edda !important;
+            color: #155724 !important;
+        }
+
+        .status-error {
+            background: #f8d7da !important;
+            color: #721c24 !important;
+        }
+
+        .status-disconnected {
+            background: #fff3cd !important;
+            color: #856404 !important;
+        }
+
+        .help-text {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .help-text code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🔔 Socket.IO 실시간 알림 테스트</h1>
+
+    <div class="control-panel">
+        <label for="token">Access Token:</label>
+        <input type="text" id="token" placeholder="여기에 Access Token을 입력하세요 (예: eyJhbGci...)">
+
+        <div class="button-group">
+            <button class="btn-connect" onclick="connect()">🔌 연결</button>
+            <button class="btn-disconnect" onclick="disconnect()">⛔ 연결 해제</button>
+            <button class="btn-clear" onclick="clearNotifications()">🗑️ 알림 지우기</button>
+        </div>
+    </div>
+
+    <div id="status">
+        상태: ⏳ 연결 대기 중
+    </div>
+
+    <div id="notifications">
+        <h2>📬 받은 알림 (<span id="notification-count">0</span>)</h2>
+        <ul id="notification-list">
+            <div class="empty-state">
+                아직 받은 알림이 없습니다.<br>
+                위에서 연결 버튼을 클릭하고 알림을 기다려보세요!
+            </div>
+        </ul>
+    </div>
+
+    <div class="help-text">
+        <strong>💡 사용 방법:</strong><br>
+        1. <code>POST /auth/login</code>로 로그인하여 Access Token을 복사하세요.<br>
+        2. 위 입력란에 Access Token을 붙여넣고 "연결" 버튼을 클릭하세요.<br>
+        3. 다른 브라우저/탭에서 댓글을 작성하거나 상품 가격을 변경하면 실시간 알림을 받습니다!<br>
+        <br>
+        <strong>✨ 테스트 시나리오:</strong><br>
+        • <strong>댓글 알림:</strong> 내 게시글에 다른 사용자가 댓글 작성<br>
+        • <strong>가격 변경 알림:</strong> 내가 좋아요한 상품의 가격이 변경됨
+    </div>
+
+    <script>
+        let socket = null;
+        let notificationCount = 0;
+
+        function connect() {
+            const token = document.getElementById('token').value.trim();
+            if (!token) {
+                alert('⚠️ Access Token을 입력해주세요!');
+                return;
+            }
+
+            if (socket) {
+                socket.disconnect();
+            }
+
+            updateStatus('⏳ 연결 중...', '');
+
+            socket = io('http://localhost:3000', {
+                auth: { token }
+            });
+
+            socket.on('connect', () => {
+                console.log('✅ Socket.IO connected');
+                updateStatus('✅ 연결됨 - 실시간 알림을 받을 준비가 완료되었습니다!', 'status-connected');
+            });
+
+            socket.on('notification', (notification) => {
+                console.log('📬 알림 받음:', notification);
+                addNotification(notification);
+
+                // 브라우저 알림
+                if (Notification.permission === 'granted') {
+                    new Notification('🔔 새 알림', {
+                        body: notification.message,
+                        icon: '🔔'
+                    });
+                }
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error('❌ Connection error:', error);
+                updateStatus(`❌ 연결 실패: ${error.message}`, 'status-error');
+            });
+
+            socket.on('disconnect', () => {
+                console.log('🔌 Socket.IO disconnected');
+                updateStatus('🔌 연결 해제됨', 'status-disconnected');
+            });
+
+            // 브라우저 알림 권한 요청
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+        }
+
+        function disconnect() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+                updateStatus('⏳ 연결 대기 중', '');
+            }
+        }
+
+        function updateStatus(message, className) {
+            const statusEl = document.getElementById('status');
+            statusEl.innerHTML = `상태: ${message}`;
+            statusEl.className = className;
+        }
+
+        function addNotification(notification) {
+            const list = document.getElementById('notification-list');
+
+            // 빈 상태 메시지 제거
+            const emptyState = list.querySelector('.empty-state');
+            if (emptyState) {
+                emptyState.remove();
+            }
+
+            const item = document.createElement('li');
+
+            // 알림 타입에 따라 클래스 추가
+            if (notification.type === 'PRICE_CHANGE') {
+                item.className = 'notification-price-change';
+            } else if (notification.type === 'NEW_COMMENT') {
+                item.className = 'notification-new-comment';
+            }
+
+            const typeEmoji = notification.type === 'PRICE_CHANGE' ? '💰' : '💬';
+
+            item.innerHTML = `
+                ${typeEmoji} <strong>[${notification.type}]</strong> ${notification.message}
+                <br><small>⏰ ${new Date(notification.createdAt).toLocaleString('ko-KR')}</small>
+            `;
+            list.insertBefore(item, list.firstChild);
+
+            // 카운트 증가
+            notificationCount++;
+            document.getElementById('notification-count').textContent = notificationCount;
+        }
+
+        function clearNotifications() {
+            const list = document.getElementById('notification-list');
+            list.innerHTML = `
+                <div class="empty-state">
+                    아직 받은 알림이 없습니다.<br>
+                    위에서 연결 버튼을 클릭하고 알림을 기다려보세요!
+                </div>
+            `;
+            notificationCount = 0;
+            document.getElementById('notification-count').textContent = '0';
+        }
+
+        // 페이지 로드 시 토큰 저장 기능
+        window.addEventListener('load', () => {
+            const savedToken = localStorage.getItem('socketTestToken');
+            if (savedToken) {
+                document.getElementById('token').value = savedToken;
+            }
+        });
+
+        // 토큰 입력 시 로컬 스토리지에 저장
+        document.getElementById('token').addEventListener('change', (e) => {
+            localStorage.setItem('socketTestToken', e.target.value);
+        });
+    </script>
+</body>
+
+</html>
