@@ -13,36 +13,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  nickname  String   @unique
-  image     String?
-  password  String
-  refreshToken  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  nickname     String   @unique
+  image        String?
+  password     String
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   //관계 필드
-  products Product[]
-  posts    Post[]
-  comments Comment[]
-  likes    Like[]
+  products     Product[]
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  Notification Notification[]
 }
 
 model Product {
   id        Int      @id @default(autoincrement())
+  price     Int
   title     String
   content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   //관계 필드
-  User     User      @relation(fields: [userId], references: [id])
-  userId   Int
-  comments Comment[]
-  likes    Like[]
+  User         User           @relation(fields: [userId], references: [id])
+  userId       Int
+  comments     Comment[]
+  likes        Like[]
+  Notification Notification[]
 }
 
 model Post {
@@ -53,10 +55,11 @@ model Post {
   updatedAt DateTime @updatedAt
 
   //관계 필드
-  User     User      @relation(fields: [userId], references: [id])
-  userId   Int
-  comments Comment[]
-  likes    Like[]
+  User         User           @relation(fields: [userId], references: [id])
+  userId       Int
+  comments     Comment[]
+  likes        Like[]
+  Notification Notification[]
 }
 
 model Comment {
@@ -90,4 +93,21 @@ model Like {
   // 중복 좋아요 방지
   @@unique([userId, productId])
   @@unique([userId, postId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 관계 필드
+  User      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId Int?
+  Post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
 }

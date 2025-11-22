@@ -1,6 +1,8 @@
 import prisma from '../prisma/prisma.js';
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Comment } from "@prisma/client"
+import { sendNotificationToUser } from '../app.js';
+import { createNotification } from './notification.service.js';
 
 // 댓글 목록 조회
 export async function commentListService(userId: number): Promise<{
@@ -34,7 +36,7 @@ export async function commentRegisterProductService(userId: number, productId: n
 }> {
   // 유효성 검사
   if (!content) {
-    throw new HttpError("내용을 입력해주세요.", 404);
+    throw new HttpError("내용을 입력해주세요.", 400);
   };
 
   // 댓글 생성
@@ -64,9 +66,14 @@ export async function commentRegisterPostService(userId: number, postId: number,
 }> {
   // 유효성 검사
   if (!content) {
-    throw new HttpError("내용을 입력해주세요", 404);
+    throw new HttpError("내용을 입력해주세요", 400);
   };
-    
+  
+  const post = await prisma.post.findUnique({
+    where: { id: postId },
+    select: { userId: true, title: true }
+  });
+
   // 댓글 생성
   const createdComment = await prisma.comment.create({
     data: {
@@ -82,6 +89,23 @@ export async function commentRegisterPostService(userId: number, postId: number,
     }
   });
   
+  // 자신이 작성한 게시글에 댓글이 달렸을 떄 알림 전송
+  if (post?.userId !== userId) {
+    await createNotification({
+      userId: post!.userId,
+      type: "새로운 댓글",
+      message: `"${post!.title}" 게시글에 새로운 댓글이 달렸습니다.`,
+      productId: null,
+      postId: postId
+    });
+    // WebSocket으로 실시간 알림 전송
+    sendNotificationToUser(userId, {
+      id: createdComment.id,
+      content: createdComment.content,
+      createdAt: createdComment.createdAt,
+      updatedAt: createdComment.updatedAt,
+    });
+  }
   return createdComment;
 }
 

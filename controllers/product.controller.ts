@@ -41,13 +41,14 @@ export async function productRegisterController(req: Request, res: Response, nex
     const userId = Number(userIdStr);
 
     // 프론트에서 정보 받아오기
-    const { title, content } = req.body as {
+    const { price, title, content } = req.body as {
       title: string;
       content: string;
+      price: number;
     };
 
     // 서비스 로직
-    const fromService = await productRegisterService(userId, title, content);
+    const fromService = await productRegisterService(userId, price, title, content);
 
     // 응답
     res.status(200).json({
@@ -75,15 +76,17 @@ export async function productPutController(req: Request, res: Response, next: Ne
     const productId = Number(productIdStr)
 
     // 수정할 데이터
-    const { title, content } = req.body as {
+    const { price, title, content } = req.body as {
       title: string;
       content: string;
+      price: number;
     };
 
     // 서비스 로직
     const updatedProduct = await productPutService(
       userId,
       productId,
+      price,
       title,
       content
     );
