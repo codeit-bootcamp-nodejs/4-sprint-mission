@@ -1,0 +1,20 @@
+cd panda-market
+
+echo "🧹 코드 스타일을 검사하는 중입니다..."
+
+npx lint-staged || {
+  echo ""
+  echo "❌ 코드 스타일(Lint) 에러가 발생했습니다!"
+  echo "👉 Prettier나 ESLint 오류를 먼저 해결해 주세요."
+  exit 1
+}
+
+echo "🧪 테스트를 시작합니다..."
+npm run test || {
+  echo ""
+  echo "❌ 테스트(Test)에 실패했습니다!"
+  echo "👉 위 에러 로그를 확인하고, 코드를 수정한 뒤 다시 커밋해 주세요."
+  exit 1
+}
+
+echo "✅ 모든 검사를 통과했습니다. 커밋을 진행합니다! 🎉"
