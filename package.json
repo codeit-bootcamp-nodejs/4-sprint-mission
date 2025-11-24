@@ -34,6 +34,7 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "prisma": "^6.16.1",
     "@types/bcrypt": "^6.0.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/express": "^5.0.3",
