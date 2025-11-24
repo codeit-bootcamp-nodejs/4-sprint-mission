@@ -38,7 +38,7 @@ export async function getArticleByIdService({ id, user }: Article.Delete) {
   return {
     ...rest,
     likeCount: _count.like ?? 0,
-    isLiked: !!user.id && like.some((l) => l.userId === user.id),
+    isLiked: !!user.id && like.some((l: LikeType) => l.userId === user.id),
   };
 }
 
