@@ -1,6 +1,14 @@
 import * as articleRepo from "../repository/article_repository";
 import { AppError } from "../utils/error";
 
+type LikeType = {
+  userId: number | null;
+};
+
+type CountType = {
+  like: number | null;
+};
+
 export async function createArticleService({
   title,
   content,
@@ -42,11 +50,13 @@ export async function getArticleService({
 }: Article.Get) {
   try {
     const article = await articleRepo.getArticleRepo(offset, limit, search);
-    return article.map(({ _count, like, ...rest }) => ({
-      ...rest,
-      likeCount: _count.like,
-      isLiked: !!user.id && like.some((l) => l.userId === user.id),
-    }));
+    return article.map(
+      ({ _count, like, ...rest }: { _count: CountType; like: LikeType[] }) => ({
+        ...rest,
+        likeCount: _count.like,
+        isLiked: !!user.id && like.some((l: LikeType) => l.userId === user.id),
+      })
+    );
   } catch (e) {
     console.log(e);
   }
