@@ -20,6 +20,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  console.log('🧹 DB 초기화 시작...');
   await redisClient.flushAll();
   const tableNames = [
     'products',
@@ -36,6 +37,7 @@ beforeEach(async () => {
   await prisma.$executeRawUnsafe(
     `TRUNCATE TABLE ${tableNames.join(', ')} RESTART IDENTITY CASCADE;`,
   );
+  console.log('✨ DB 초기화 완료!');
 });
 
 afterAll(async () => {

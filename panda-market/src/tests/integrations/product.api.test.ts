@@ -1,5 +1,4 @@
 import request from 'supertest';
-import { app } from '@/app.js';
 import {
   createInput,
   createParams,
@@ -9,6 +8,21 @@ import {
 import prisma from '@/lib/prisma.js';
 import { passwordHashing } from '@/lib/bcrypt.js';
 import { Product } from '@prisma/client';
+import { jest } from '@jest/globals';
+
+const mockDeleteS3File = jest.fn();
+jest.unstable_mockModule('@/lib/s3-client.js', () => ({
+  __esModule: true,
+
+  deleteS3File: mockDeleteS3File,
+
+  getS3Client: jest.fn(),
+
+  extractPublicIdFromS3Url: jest.fn((url: string) => {
+    const urlObj = new URL(url);
+    return decodeURIComponent(urlObj.pathname.slice(1));
+  }),
+}));
 
 describe('Product API', () => {
   let userToken: string;
@@ -17,6 +31,12 @@ describe('Product API', () => {
   let user2Id: number;
   let productId: number;
   let product2Id: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let app: any;
+
+  beforeAll(async () => {
+    app = (await import('@/app.js')).app;
+  });
 
   beforeEach(async () => {
     const hashedPassword = await passwordHashing('12345678');
@@ -113,9 +133,16 @@ describe('Product API', () => {
     });
     await prisma.productImage.createMany({
       data: {
-        publicId: 'test1',
+        publicId: 'test_files/test1',
         url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         productId: productId,
+      },
+    });
+    await prisma.productImage.createMany({
+      data: {
+        publicId: 'test/my-image.jpg',
+        url: 'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image.jpg',
+        productId: product2Id,
       },
     });
   });
@@ -132,6 +159,30 @@ describe('Product API', () => {
         .post('/product')
         .set('Authorization', `Bearer ${userToken}`)
         .send(productData);
+      // then
+      expect(response.status).toBe(201);
+      expect(response.body.name).toBe(createParams.name);
+      expect(response.body.description).toBe(createParams.description);
+      expect(response.body.price).toBe(createParams.price);
+
+      expect(response.body.id).toBeDefined();
+      expect(response.body.user.id).toEqual(userId);
+      expect(response.body.createdAt).toBeDefined();
+
+      expect(response.body.tags[0].name).toBe(createParams.tags[0]);
+      expect(response.body.images.length).toBe(1);
+    });
+    it('상품 생성 - s3 이미지', async () => {
+      // when
+      const response = await request(app)
+        .post('/product')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          ...productData,
+          imageUrls: [
+            'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image2.jpg',
+          ],
+        });
       // then
       expect(response.status).toBe(201);
       expect(response.body.name).toBe(createParams.name);
@@ -377,8 +428,8 @@ describe('Product API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.description).toEqual('이미지 수정 테스트1');
-      expect(response.body.images[0].publicId).toBe('test1');
-      expect(response.body.images[1].publicId).toBe('test2');
+      expect(response.body.images[0].publicId).toBe('test_files/test1');
+      expect(response.body.images[1].publicId).toBe('test_files/test2');
       expect(response.body.images.length).toBe(2);
     });
     it('이미지가 삭제되면 해당 이미지의 url이 삭제된 상품을 반환해야 한다.', async () => {
@@ -395,7 +446,7 @@ describe('Product API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.description).toEqual('이미지 수정 테스트2');
-      expect(response.body.images[0].publicId).toBe('test2');
+      expect(response.body.images[0].publicId).toBe('test_files/test2');
       expect(response.body.images.length).toBe(1);
     });
     it('이미지가 추가 / 삭제되면 해당 이미지의 url이 추가 / 삭제된 상품을 반환해야 한다.', async () => {
@@ -413,8 +464,8 @@ describe('Product API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.description).toEqual('이미지 수정 테스트3');
-      expect(response.body.images[0].publicId).toBe('test2');
-      expect(response.body.images[1].publicId).toBe('test3');
+      expect(response.body.images[0].publicId).toBe('test_files/test2');
+      expect(response.body.images[1].publicId).toBe('test_files/test3');
       expect(response.body.images.length).toBe(2);
     });
     it('상품 가격이 변경된 경우 해당 상품에 좋아요를 누른 유저에게 알림이 발송되어야 한다.', async () => {
@@ -538,6 +589,23 @@ describe('Product API', () => {
       const images = await prisma.productImage.findMany({
         where: {
           productId,
+        },
+      });
+      expect(images.length).toBe(0);
+    });
+    it('상품 삭제 - s3 이미지', async () => {
+      // when
+      const response = await request(app)
+        .delete(`/product/${product2Id}`)
+        .set('Authorization', `Bearer ${userToken}`);
+      // then
+      expect(response.status).toBe(200);
+      const tags = await prisma.tag.findMany();
+      expect(tags[0].productCount).toBe(0);
+      expect(tags[1].productCount).toBe(0);
+      const images = await prisma.productImage.findMany({
+        where: {
+          productId: product2Id,
         },
       });
       expect(images.length).toBe(0);
