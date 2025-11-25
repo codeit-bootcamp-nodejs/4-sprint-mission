@@ -7,6 +7,7 @@
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --watch",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules NODE_ENV=test jest --coverage",
     "dev": "nodemon --exec tsx app.ts",
+    "typecheck": "tsc --noEmit",
     "seed": "node prisma/seed.js",
     "build": "tsc",
     "start": "node ./dist/app.js"
