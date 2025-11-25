@@ -64,6 +64,7 @@ const KAKAO_REDIRECT_URI = kakao_redirect_uri;
 const AWS_ACCESS_KEY = aws_access_key;
 const AWS_SECRET_KEY = aws_secret_key;
 const AWS_REGION = aws_region;
+const PORT = process.env['PORT'];
 
 const NODE_ENV = node_env;
 
@@ -85,4 +86,5 @@ export {
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
   AWS_REGION,
+  PORT,
 };

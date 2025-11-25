@@ -69,11 +69,18 @@ export class ArticleService {
     };
   }
 
-  async getArticleList({ keyword, page, pageSize, userId }: GetListParams) {
+  async getArticleList({
+    keyword,
+    page,
+    pageSize,
+    orderBy,
+    userId,
+  }: GetListParams) {
     const articles = await this.articleRepository.findMany({
       keyword,
       page,
       pageSize,
+      orderBy,
       userId,
     });
     const results = articles.map((article) => {

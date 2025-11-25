@@ -14,4 +14,5 @@ export const getListSchema = z.object({
   keyword: z.string().optional().default(''),
   page: z.coerce.number().int({ message: "page는 정수여야 합니다." }).positive().catch(1),
   pageSize: z.coerce.number().int({ message: "pageSize는 정수여야 합니다." }).positive().catch(10),
+  orderBy: z.string().optional().default('recent'),
 }).strict();

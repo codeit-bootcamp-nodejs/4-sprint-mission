@@ -155,11 +155,18 @@ export class ProductService {
     }
   }
 
-  async getProductList({ keyword, page, pageSize, userId }: GetListParams) {
+  async getProductList({
+    keyword,
+    page,
+    pageSize,
+    orderBy,
+    userId,
+  }: GetListParams) {
     const products = await this.productRepository.findMany({
       keyword,
       page,
       pageSize,
+      orderBy,
       userId,
     });
     const results = products.map((product) => {

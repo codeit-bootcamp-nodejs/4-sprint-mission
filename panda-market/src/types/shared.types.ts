@@ -17,4 +17,5 @@ export interface GetListParams {
   keyword: string;
   page: number;
   pageSize: number;
+  orderBy: string;
 }
