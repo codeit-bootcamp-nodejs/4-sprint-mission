@@ -4,12 +4,13 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node --files src/server.ts",
-    "start": "node dist/app.js",
+    "start": "node dist/server.js",
     "lint": "eslint . --ext .ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "test": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",
