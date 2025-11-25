@@ -50,8 +50,10 @@ export function sendNotification(userId: number, message: string) {
 
 const port = Number(process.env.PORT) || 3000;
 
-// server.listen(port, () => {
-//   console.log(`서버 실행됨: http://localhost:${port}`);
-// });
+const ip = process.env.EC2_PUBLIC_IP;
+
+server.listen(port, () => {
+  console.log(`서버 실행됨: http://${ip}:${port}`);
+});
 
 export default app;
