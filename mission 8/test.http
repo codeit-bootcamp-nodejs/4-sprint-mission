@@ -1,0 +1,36 @@
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "nickname": "test", "password": "password123"}' \
+  http://localhost:3000/users/register
+
+###
+  curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "password": "password123"}' \
+  "http://localhost:3000/users/login"
+
+###
+  curl -X POST \
+-H "Content-Type: application/json" \
+-b "access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc2MjIzMzM2MSwiZXhwIjoxNzYyMjM2OTYxfQ.NND1H5Wao2Gq_yYZz31bLtzEw9AaEGNMgD8RE-8bGKU" \
+-d '{ "title": "테스트", "content": "테스트테스트테스트테스트"}' \
+"http://localhost:3000/articles"
+
+###
+  curl -X POST \
+-H "Content-Type: application/json" \
+-b "access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc2MjIzMzM2MSwiZXhwIjoxNzYyMjM2OTYxfQ.NND1H5Wao2Gq_yYZz31bLtzEw9AaEGNMgD8RE-8bGKU" \
+-d '{ "content": "덧글 테스트"}' \
+"http://localhost:3000/comments/articles/1"
+
+###
+  curl -X GET \
+-H "Content-Type: application/json" \
+-b "access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc2MjI0MzQ0MiwiZXhwIjoxNzYyMjQ3MDQyfQ.kGHITSzklAyDEVQWxMZlIlUdwrcy76-UB-t_qXLySto" \
+"http://localhost:3000/comments/articles/1"
+
+###
+  curl -X GET \
+-H "Content-Type: application/json" \
+-b "access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTc2MjI0MzQ0MiwiZXhwIjoxNzYyMjQ3MDQyfQ.kGHITSzklAyDEVQWxMZlIlUdwrcy76-UB-t_qXLySto" \
+"http://localhost:3000/alerts/1"

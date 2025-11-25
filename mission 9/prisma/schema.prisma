@@ -1,0 +1,87 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  nickname  String
+  image     String?
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  article   Article[]
+  product   Product[]
+  comment   Comment[]
+  like      Like[]
+  alert     Alert[]
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  comment     Comment[]
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  like        Like[]
+}
+
+model Article {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comment   Comment[]
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  like      Like[]
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  createdAt DateTime  @default(now())
+  productId Int?
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  articleId Int?
+  article   Article?  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Like {
+  id        Int       @id @default(autoincrement())
+  like      Boolean   @default(true)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int?
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  articleId Int?
+  article   Article?  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  // 유저-상품, 유저-게시글 각각 중복 방지, 좋아요 중첩 방지
+  @@unique([userId, productId])
+  @@unique([userId, articleId])
+}
+
+model Alert {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  message   String
+  link      String?
+  isRead    Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
+}
