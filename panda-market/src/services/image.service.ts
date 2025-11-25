@@ -8,7 +8,7 @@ export class ImageService {
     const { secure_url, public_id } = await cloudinaryStreamUpload(buffer);
     return { imageUrl: secure_url, public_id };
   }
-  async postImageToS3({ location }: S3Params) {
-    return { imageUrl: location };
+  async postImageToS3({ location, key }: S3Params) {
+    return { imageUrl: location, publicId: key };
   }
 }

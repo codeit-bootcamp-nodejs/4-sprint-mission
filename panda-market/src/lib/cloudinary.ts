@@ -56,50 +56,36 @@ export function cloudinaryStreamUpload(buffer: Buffer) {
 export async function deleteCloudinaryFile(publicId: string) {
   try {
     await cloudinary.uploader.destroy(publicId);
-    console.log(`Cloudinary에서 이미지 ${publicId} 삭제 성공`);
+    console.log(`🗑️ Cloudinary에서 이미지 ${publicId} 삭제 성공`);
   } catch (err) {
     if (err instanceof Error) {
       // 타입 가드
-      throw new Error(
-        `Cloudinary에서 이미지 ${publicId} 삭제 실패: ${err.message}`,
+      throw new InternalServerError(
+        `❌ Cloudinary에서 이미지 ${publicId} 삭제 실패: ${err.message}`,
       );
     }
-    throw new Error(
-      `Cloudinary에서 이미지 ${publicId} 삭제 중 알 수 없는 에러 발생: ${String(err)}`,
+    throw new InternalServerError(
+      `❌ Cloudinary에서 이미지 ${publicId} 삭제 중 알 수 없는 에러 발생: ${String(err)}`,
     );
   }
 }
 
 export function extractPublicIdFromCloudinaryUrl(imageUrl: string): string {
   try {
-    const pivot = '/upload/';
-    const uploadIndex = imageUrl.indexOf(pivot);
+    const url = new URL(imageUrl);
+    // 정규식 설명:
+    // \/upload\/        : '/upload/' 문자열 찾기
+    // (?:v\d+\/)?       : 'v123456/' 버전 번호가 있으면 무시 (?: non-capturing group)
+    // (.+)              : [핵심] 나머지 경로(폴더+파일명)를 모두 캡처 (Group 1)
+    // \.[^.]+$          : 맨 뒤의 확장자(.png 등) 제거
+    const regex = /\/upload\/(?:v\d+\/)?(.+)\.[^.]+$/;
 
-    if (uploadIndex === -1) {
-      throw new BadRequestError('올바르지 않는 imageUrl 입니다');
+    const match = url.pathname.match(regex);
+
+    if (match && match[1]) {
+      return match[1]; // 캡처된 Public ID 반환
     }
-
-    let tail = imageUrl.slice(uploadIndex + pivot.length);
-    const segments = tail.split('/');
-
-    // v123456 형태의 버전 번호 제거
-    if (segments[0].startsWith('v') && /^\d+$/.test(segments[0].slice(1))) {
-      segments.shift();
-    }
-
-    // 변환 파라미터 제거 (예: c_fill,w_200 등)
-    while (
-      segments.length &&
-      /[,_]/.test(segments[0]) &&
-      !segments[0].includes('.')
-    ) {
-      segments.shift();
-    }
-
-    const joined = segments.join('/');
-    const lastDotIndex = joined.lastIndexOf('.');
-
-    return lastDotIndex > -1 ? joined.slice(0, lastDotIndex) : joined;
+    throw new BadRequestError('publicId 매칭 실패');
   } catch {
     throw new BadRequestError('올바르지 않는 imageUrl 입니다');
   }

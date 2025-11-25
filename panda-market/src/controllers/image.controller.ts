@@ -17,8 +17,8 @@ export class ImageController {
       throw new BadRequestError();
     }
     if (NODE_ENV === 'production') {
-      const { location } = req.file;
-      const result = await this.imageService.postImageToS3({ location });
+      const { location, key } = req.file;
+      const result = await this.imageService.postImageToS3({ location, key });
       return res.status(201).json(result);
     } else {
       const { buffer } = req.file;
