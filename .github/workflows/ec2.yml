@@ -3,7 +3,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   deploy:
@@ -33,7 +33,7 @@ jobs:
           port: 22
           script: |
             cd /path/to/your/app # EC2 인스턴스 내 프로젝트 경로로 진입
-            git pull origin main # 코드 최신화
+            git pull origin dev # 코드 최신화
             npm install
             npm run build
             npm run prisma:migrate # 예: prisma migrate deploy로 마이그레이션 적용하기
