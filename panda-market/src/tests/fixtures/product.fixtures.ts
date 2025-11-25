@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const MOCK_TIME = new Date('2025-01-01T00:00:00.000Z');
+export const MOCK_TIME2 = new Date('2025-01-02T00:00:00.000Z');
 
 export const baseProductData = {
   id: 1,

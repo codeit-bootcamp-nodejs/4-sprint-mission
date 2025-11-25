@@ -128,6 +128,7 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
         userId: 2,
       });
       // then
@@ -143,6 +144,7 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
         userId: 2,
       });
       // then
@@ -161,12 +163,61 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
       });
       // then
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(2);
       expect(result[0]).toEqual(unlikedListResult);
       expect(result[1]).toEqual(unlikedListResult2);
+    });
+    it('상품목록은 최신순 조회가 가능하다.', async () => {
+      // given
+      const date = new Date('2025-01-02T00:00:00.000Z');
+      mockProductRepo.findMany.mockResolvedValue([
+        unlikedListData,
+        {
+          ...likedListData2,
+          createdAt: date,
+        },
+      ]);
+      // when
+      const result = await mockProductService.getProductList({
+        keyword: '',
+        page: 1,
+        pageSize: 10,
+        orderBy: 'recent',
+      });
+      // then
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+      expect(mockProductRepo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: 'recent',
+        }),
+      );
+    });
+    it('상품목록은 좋아요순 조회가 가능하다.', async () => {
+      // given
+      mockProductRepo.findMany.mockResolvedValue([
+        likedListData2,
+        unlikedListData,
+      ]);
+      // when
+      const result = await mockProductService.getProductList({
+        keyword: '',
+        page: 1,
+        pageSize: 10,
+        orderBy: 'like',
+      });
+      // then
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+      expect(mockProductRepo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: 'like',
+        }),
+      );
     });
   });
   describe('상품 생성', () => {

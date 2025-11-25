@@ -3,6 +3,8 @@ import { app } from '@/app.js';
 import {
   createInput,
   createParams,
+  MOCK_TIME,
+  MOCK_TIME2,
 } from '@/tests/fixtures/product.fixtures.js';
 import prisma from '@/lib/prisma.js';
 import { passwordHashing } from '@/lib/bcrypt.js';
@@ -61,6 +63,7 @@ describe('Product API', () => {
             },
           ],
         },
+        createdAt: MOCK_TIME,
       },
     });
     productId = product1.id;
@@ -81,6 +84,7 @@ describe('Product API', () => {
             },
           ],
         },
+        createdAt: MOCK_TIME2,
       },
     });
     product2Id = product2.id;
@@ -215,6 +219,24 @@ describe('Product API', () => {
       );
       expect(targetUnliked.isLike).toBeFalsy();
       expect(targetLiked.isLike).toBeFalsy();
+    });
+    it('상품 목록은 최신순 조회가 가능하다.', async () => {
+      // when
+      const response = await request(app).get('/product?orderBy=recent');
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body[0].id).toBe(product2Id);
+      expect(response.body[1].id).toBe(productId);
+    });
+    it('상품 목록은 좋아요순 조회가 가능하다.', async () => {
+      // when
+      const response = await request(app).get('/product?orderBy=like');
+      // then
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
+      expect(response.body[0].id).toBe(productId);
+      expect(response.body[1].id).toBe(product2Id);
     });
   });
   describe('GET /product/:id', () => {
