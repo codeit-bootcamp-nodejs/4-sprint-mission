@@ -7,6 +7,8 @@ import notificationRouter from './router/notification_router';
 import productRouter from './router/product_router';
 import postRouter from './router/post_router';
 
+//테스트를 위한 랜덤 주석!!!!
+
 const app: Express = express();
 
 app.use(cors({
