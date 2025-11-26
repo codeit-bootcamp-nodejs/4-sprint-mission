@@ -75,14 +75,17 @@ export class ProductsService {
     // Notification for price change
     if (price !== undefined && product.price !== price) {
       const likedUsers = await this.productsRepository.findProductLikesByProductId(productId);
-      for (const like of likedUsers) {
-        await this.notificationsService.createNotification(
+      
+      const notificationPromises = likedUsers.map(like => 
+        this.notificationsService.createNotification(
           like.userId,
           NotificationType.PRICE_CHANGE,
           `좋아요한 상품 '${product.name}'의 가격이 ${product.price}원에서 ${price}원으로 변경되었습니다.`,
           productId,
-        );
-      }
+        )
+      );
+      
+      await Promise.all(notificationPromises);
     }
 
     return updatedProduct;
