@@ -8,21 +8,11 @@ import {
 import prisma from '@/lib/prisma.js';
 import { passwordHashing } from '@/lib/bcrypt.js';
 import { Product } from '@prisma/client';
-import { jest } from '@jest/globals';
-
-const mockDeleteS3File = jest.fn();
-jest.unstable_mockModule('@/lib/s3-client.js', () => ({
-  __esModule: true,
-
-  deleteS3File: mockDeleteS3File,
-
-  getS3Client: jest.fn(),
-
-  extractPublicIdFromS3Url: jest.fn((url: string) => {
-    const urlObj = new URL(url);
-    return decodeURIComponent(urlObj.pathname.slice(1));
-  }),
-}));
+import {
+  mockDeleteS3File,
+  mockDeleteCloudinaryFile,
+  mockCloudinaryStreamUpload,
+} from '@/tests/mocks/file-storage.js';
 
 describe('Product API', () => {
   let userToken: string;
@@ -145,6 +135,10 @@ describe('Product API', () => {
         productId: product2Id,
       },
     });
+
+    mockDeleteCloudinaryFile.mockClear();
+    mockDeleteS3File.mockClear();
+    mockCloudinaryStreamUpload.mockClear();
   });
   describe('POST /product', () => {
     const productData = {
@@ -448,6 +442,8 @@ describe('Product API', () => {
       expect(response.body.description).toEqual('이미지 수정 테스트2');
       expect(response.body.images[0].publicId).toBe('test_files/test2');
       expect(response.body.images.length).toBe(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('이미지가 추가 / 삭제되면 해당 이미지의 url이 추가 / 삭제된 상품을 반환해야 한다.', async () => {
       // when
@@ -467,6 +463,8 @@ describe('Product API', () => {
       expect(response.body.images[0].publicId).toBe('test_files/test2');
       expect(response.body.images[1].publicId).toBe('test_files/test3');
       expect(response.body.images.length).toBe(2);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('상품 가격이 변경된 경우 해당 상품에 좋아요를 누른 유저에게 알림이 발송되어야 한다.', async () => {
       // when
@@ -592,6 +590,8 @@ describe('Product API', () => {
         },
       });
       expect(images.length).toBe(0);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('상품 삭제 - s3 이미지', async () => {
       // when
@@ -609,6 +609,8 @@ describe('Product API', () => {
         },
       });
       expect(images.length).toBe(0);
+      expect(mockDeleteS3File).toHaveBeenCalledTimes(1);
+      expect(mockDeleteS3File).toHaveBeenCalledWith('test/my-image.jpg');
     });
     it('해당 상품이 유저가 생성한 상품이 아닐 때 403 에러 발생', async () => {
       // when

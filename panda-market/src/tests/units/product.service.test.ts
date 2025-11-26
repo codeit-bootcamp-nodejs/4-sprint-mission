@@ -33,30 +33,11 @@ import {
   updateResult,
   updateTagData,
 } from '@/tests/fixtures/product.fixtures.js';
+import {
+  mockDeleteS3File,
+  mockDeleteCloudinaryFile,
+} from '@/tests/mocks/file-storage.js';
 import type { ProductService } from '@/services/product.service.js';
-// mockDeep이 타입세이프하게 모킹해주는거라고 함
-// (정확히는 해당 객체의 타입만 확인해서 프록시 객체를 생성해주는 모킹방식)
-
-// 기존 jest.mock은 private를 추론할 수 없음
-// 근데 중첩된 의존성을 거슬러 올라가도 prisma 이런 애들을 제대로 인정을 안해줌 -> 왜였더라?
-// 그리고 기능별 개별 mock 방식도 불가 ( 런타임에서 의존성 없어서 오류남 )
-// 반드시 객체와 의존성을 mock 정의하고 인스턴스로 생성해야함
-// mockDeep, DeepMockProxy는 모킹하고자 하는 객체의 타입만 확인해서 프록시 모킹 객체를 만들어준다.
-// 이 과정에서 private, readonly, constructor 같은 실제 구현에 필요한 요소들은 무시된다.
-
-const mockDeleteS3File = jest.fn();
-jest.unstable_mockModule('@/lib/s3-client.js', () => ({
-  __esModule: true,
-
-  deleteS3File: mockDeleteS3File,
-
-  getS3Client: jest.fn(),
-
-  extractPublicIdFromS3Url: jest.fn((url: string) => {
-    const urlObj = new URL(url);
-    return decodeURIComponent(urlObj.pathname.slice(1));
-  }),
-}));
 
 describe('ProductService', () => {
   let mockPrisma: DeepMockProxy<PrismaClient>;
@@ -91,6 +72,9 @@ describe('ProductService', () => {
       mockNotificationRepo,
       mockIo,
     );
+
+    mockDeleteCloudinaryFile.mockClear();
+    mockDeleteS3File.mockClear();
   });
   describe('단일 상품 조회', () => {
     it('좋아요를 누르지 않은 상품은 isLike: false가 포함되어야 한다.', async () => {
@@ -901,6 +885,8 @@ describe('ProductService', () => {
         name: 'test2',
         description: '이미지 수정 테스트2',
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('이미지 추가, 삭제된 경우 url이 추가, 삭제된 상품을 반환해야 한다.', async () => {
       // given
@@ -977,6 +963,8 @@ describe('ProductService', () => {
           },
         ],
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('상품의 가격이 변경된 경우 좋아요 누른 사용자에게 알림이 전송되어야 한다.', async () => {
       // given
@@ -1327,6 +1315,8 @@ describe('ProductService', () => {
         productId: 1,
         tx: mockPrisma,
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('상품 삭제 - s3 이미지 ', async () => {
       // given
@@ -1390,6 +1380,7 @@ describe('ProductService', () => {
         productId: 2,
         tx: mockPrisma,
       });
+      expect(mockDeleteS3File).toHaveBeenCalledTimes(1);
       expect(mockDeleteS3File).toHaveBeenCalledWith('test/delete-me.jpg');
     });
     it('해당 상품이 유저가 생성한 상품이 아닌 경우 403 오류 발생', async () => {

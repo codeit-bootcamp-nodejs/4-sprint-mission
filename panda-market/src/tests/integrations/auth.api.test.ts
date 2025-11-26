@@ -1,7 +1,5 @@
 import request from 'supertest';
 import prisma from '@/lib/prisma.js';
-import { jest } from '@jest/globals';
-import { GenerateAuthUrlOpts } from 'google-auth-library';
 import { redisClient } from '@/lib/redis.js';
 import {
   REDIS_KEY,
@@ -9,42 +7,15 @@ import {
   JWT_REFRESH_TOKEN_SECRET,
 } from '@/lib/constants.js';
 import jwt from 'jsonwebtoken';
-
-const mockGenerateAuthUrl = jest.fn(
-  (_opts: GenerateAuthUrlOpts) => 'http://mocked-url',
-);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockGetToken = jest.fn<() => Promise<any>>();
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockVerifyIdToken = jest.fn<() => Promise<any>>();
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockAxiosPost = jest.fn<(config?: any) => Promise<any>>();
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mockAxiosGet = jest.fn<(config?: any) => Promise<any>>();
-
-jest.unstable_mockModule('@/lib/google-oauth.js', () => ({
-  getGoogleClient: () => ({
-    generateAuthUrl: mockGenerateAuthUrl,
-    getToken: mockGetToken,
-    verifyIdToken: mockVerifyIdToken,
-    setCredentials: jest.fn(),
-  }),
-}));
-
-jest.unstable_mockModule('axios', () => ({
-  __esModule: true,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  default: jest.fn((config: any) => {
-    if (config.method === 'post') {
-      return mockAxiosPost(config);
-    }
-    if (config.method === 'get') {
-      return mockAxiosGet(config);
-    }
-  }),
-  post: mockAxiosPost,
-  get: mockAxiosGet,
-}));
+import {
+  mockAxiosGet,
+  mockAxiosPost,
+  mockGenerateAuthUrl,
+  mockGetToken,
+  mockVerifyIdToken,
+} from '@/tests/mocks/oauth.js';
+import { jest } from '@jest/globals';
+import type { GenerateAuthUrlOpts } from 'google-auth-library';
 
 describe('Auth API', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
