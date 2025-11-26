@@ -1,0 +1,14 @@
+name: Branch Message
+
+on: push
+
+jobs:
+  check-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Message for main branch
+        if: github.ref == 'refs/heads/main'
+        run: echo "Deployed to production"
+      - name: Message for other branches
+        if: github.ref != 'refs/heads/main'
+        run: echo "Development build"
