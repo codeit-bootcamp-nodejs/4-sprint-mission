@@ -1,4 +1,4 @@
-name: Deploy to AWS EC2
+name: for test change name
 
 on:
   push:
