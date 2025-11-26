@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -13,6 +16,7 @@ import usersRouter from './routers/usersRouter';
 import notificationsRouter from './routers/notificationsRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 import { initSocketIO } from './lib/socket';
+import { Request, Response } from 'express';
 
 const app = express();
 
@@ -28,6 +32,10 @@ app.use('/images', imagesRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/notifications', notificationsRouter);
+
+app.get('/health', (req: Request, res: Response) => {
+  res.json({'status': 'ok.'}); 
+});
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
