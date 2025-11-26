@@ -1,0 +1,95 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prisma generate
+        run: npx prisma generate
+
+      - name: Build project
+        run: npm run build
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy
+          cp -r dist node_modules package.json package-lock.json prisma deploy/
+          cp infra/ec2/ecosystem.config.js deploy/
+          cp -r src/generated deploy/dist/
+          cd deploy
+          tar -czf ../deploy.tar.gz .
+
+      - name: Copy files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "deploy.tar.gz"
+          target: "/home/${{ secrets.EC2_USER }}/app-deploy"
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.EC2_USER }}/app-deploy
+            tar -xzf deploy.tar.gz
+            rm deploy.tar.gz
+            
+            cat > .env.production << EOF
+            NODE_ENV=production
+            PORT=3000
+            HOST=0.0.0.0
+            DATABASE_URL=${{ secrets.DATABASE_URL_PROD }}
+            AWS_REGION=${{ secrets.AWS_REGION }}
+            AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+            JWT_SECRET=${{ secrets.JWT_SECRET_PROD }}
+            JWT_EXPIRES_IN=7d
+            CORS_ORIGIN=*
+            UPLOAD_TYPE=s3
+            MAX_FILE_SIZE=5242880
+            API_BASE_URL=http://${{ secrets.EC2_HOST }}:3000
+            EOF
+            
+            npx prisma generate
+            npx prisma migrate deploy
+            
+            rm -rf /home/${{ secrets.EC2_USER }}/4-sprint-mission-backup
+            mv /home/${{ secrets.EC2_USER }}/4-sprint-mission /home/${{ secrets.EC2_USER }}/4-sprint-mission-backup || true
+            mv /home/${{ secrets.EC2_USER }}/app-deploy /home/${{ secrets.EC2_USER }}/4-sprint-mission
+            
+            cd /home/${{ secrets.EC2_USER }}/4-sprint-mission
+            pm2 restart ecosystem.config.js --env production || pm2 start ecosystem.config.js --env production
+            pm2 save
+
+      - name: Notify deployment status
+        if: success()
+        run: echo "✅ Deployment successful!"
+
+      - name: Notify deployment failure
+        if: failure()
+        run: echo "❌ Deployment failed!"
