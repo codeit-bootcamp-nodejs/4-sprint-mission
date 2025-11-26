@@ -1,0 +1,194 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // postgresql, mysql, sqlite
+  url      = env("DATABASE_URL")
+}
+
+// 유저 모델
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String
+  image     String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products      Product[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// 상품 모델
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // FK
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  comments      Comment[]
+  likes         Like[]
+  productTags   ProductTag[]
+  notifications Notification[]
+
+  @@map("products")
+}
+
+// 게시글 모델
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // FK
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  comments      Comment[]
+  likes         Like[]
+  notifications Notification[]
+
+  @@map("posts")
+}
+
+// 댓글 모델 (다형성 구현)
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // FK
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 다형성: Product 또는 Post에 댓글
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  postId Int?
+  post   Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Relations
+  notifications Notification[]
+
+  @@map("comments")
+}
+
+// 좋아요 모델 (다형성 구현)
+model Like {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // FK
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 다형성: Product 또는 Post에 좋아요
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  postId Int?
+  post   Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // 중복 방지: 한 유저는 같은 상품/게시글에 하나의 좋아요만
+  @@unique([userId, productId])
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+// 리프레시 토큰 모델 (심화 기능)
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  createdAt DateTime @default(now())
+  expiredAt DateTime
+
+  // FK
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// 태그 모델
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // 태그명은 유니크
+  createdAt DateTime @default(now())
+
+  // Relations
+  productTags ProductTag[]
+
+  @@map("tags")
+}
+
+// 상품-태그 중간 테이블 (다대다 관계)
+model ProductTag {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  // 복합 FK
+  productId Int
+  tagId     Int
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  // 한 상품에 같은 태그는 하나만
+  @@unique([productId, tagId])
+  @@map("product_tags")
+}
+
+// 알림 모델
+model Notification {
+  id        Int      @id @default(autoincrement())
+  type      String   // "PRICE_CHANGE", "NEW_COMMENT"
+  message   String   // 알림 메시지
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // 알림 받는 사용자
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // 알림과 관련된 리소스 (다형성)
+  productId Int?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  postId Int?
+  post   Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  commentId Int?
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
