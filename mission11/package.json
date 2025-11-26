@@ -10,7 +10,8 @@
     "prisma:migrate": "prisma migrate dev",
     "test": "jest --coverage",
     "test:watch": "jest --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
   },
   "author": "",
   "license": "ISC",
