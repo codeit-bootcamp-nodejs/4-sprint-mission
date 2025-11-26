@@ -1,12 +1,12 @@
-import { CommentRepository } from "../repository/comment-repository";
+import { CommentRepository } from "../repository/comment-repository.js";
 import {
   CreateCommentDto,
   UpdateCommentDto,
   CommentListResponseDto,
-} from "../types/dto";
+} from "../types/dto.js";
 import { Comment, Prisma } from "@prisma/client";
-import { ArticleRepository } from "../repository/article-repository";
-import { NotificationService } from "./notification-service";
+import { ArticleRepository } from "../repository/article-repository.js";
+import { NotificationService } from "./notification-service.js";
 
 export class CommentService {
   constructor(

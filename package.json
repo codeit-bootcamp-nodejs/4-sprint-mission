@@ -1,10 +1,13 @@
 {
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.937.0",
+    "@aws-sdk/lib-storage": "^3.937.0",
     "@prisma/client": "^6.13.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "multer": "^2.0.2",
+    "multer-s3": "^3.0.1",
     "sharp": "^0.34.3"
   },
   "devDependencies": {
@@ -35,7 +38,7 @@
   "prisma": {
     "seed": "node prisma/seed.js"
   },
-"scripts": {
+  "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
     "dev": "nodemon --exec ts-node src/main.ts",

@@ -5,13 +5,13 @@ import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import jwt from "jsonwebtoken";
 
-import container from "./container";
-import productRouter from "./route/product-router";
-import articleRouter from "./route/article-router";
-import imageRouter from "./route/image-router";
-import userRouter from "./route/user-router";
-import notificationRouter from "./route/notification-router";
-import { errorHandler } from "./middleware";
+import container from "./container.js";
+import productRouter from "./route/product-router.js";
+import articleRouter from "./route/article-router.js";
+import imageRouter from "./route/image-router.js";
+import userRouter from "./route/user-router.js";
+import notificationRouter from "./route/notification-router.js";
+import { errorHandler } from "./middleware/error-handler-middleware.js";
 
 dotenv.config();
 
@@ -60,6 +60,10 @@ app.use("/uploads", imageRouter(imageController, imageMiddleware));
 
 app.use("/notifications", (req, res, next) => {
   notificationRouter(container.notificationController)(req, res, next);
+});
+
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Panda Market API is running!" });
 });
 
 app.use(errorHandler);

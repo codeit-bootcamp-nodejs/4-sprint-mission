@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import { CommentService } from "../service/comment-service";
-import { CreateCommentDto, UpdateCommentDto } from "../types/dto";
+import { CommentService } from "../service/comment-service.js";
+import { CreateCommentDto, UpdateCommentDto } from "../types/dto.js";
 
 export class CommentController {
   constructor(private commentService: CommentService) {}

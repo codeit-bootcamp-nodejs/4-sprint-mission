@@ -1,7 +1,7 @@
 import { Notification } from "@prisma/client";
 import { Server } from "socket.io";
-import { NotificationRepository } from "../repository/notification-repository";
-import { NotificationResponseDto } from "../types/dto";
+import { NotificationRepository } from "../repository/notification-repository.js";
+import { NotificationResponseDto } from "../types/dto.js";
 
 export class NotificationService {
   private io: Server;

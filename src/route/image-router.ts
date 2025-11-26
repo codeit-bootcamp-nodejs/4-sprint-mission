@@ -1,18 +1,18 @@
-import express from 'express';
-import { ImageController } from '../controller/image-controller';
-import { ImageMiddleware } from '../middleware/image-middleware';
+import express from "express";
+import { ImageController } from "../controller/image-controller.js";
+import { ImageMiddleware } from "../middleware/image-middleware.js";
 
 const imageRouter = (
   imageController: ImageController,
-  imageMiddleware: ImageMiddleware,
+  imageMiddleware: ImageMiddleware
 ) => {
   const router = express.Router();
 
   router.post(
-    '/',
-    imageMiddleware.upload.single('image'),
-    imageMiddleware.resize,
-    imageController.uploadImage,
+    "/",
+    imageMiddleware.upload.single("image"),
+    imageMiddleware.resizeAndUpload,
+    imageController.uploadImage
   );
 
   return router;

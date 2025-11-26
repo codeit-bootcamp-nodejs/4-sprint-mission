@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
-import { ProductService } from '../service/product-service';
-import { LikeService } from '../service/like-service';
-import { CreateProductDto, UpdateProductDto } from '../types/dto';
+import { Request, Response, NextFunction } from "express";
+import { ProductService } from "../service/product-service.js";
+import { LikeService } from "../service/like-service.js";
+import { CreateProductDto, UpdateProductDto } from "../types/dto.js";
 
 export class ProductController {
   constructor(
     private productService: ProductService,
-    private likeService: LikeService,
+    private likeService: LikeService
   ) {}
 
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +15,7 @@ export class ProductController {
       const createProductDto: CreateProductDto = req.body;
       const newProduct = await this.productService.createProduct(
         userId,
-        createProductDto,
+        createProductDto
       );
       res.status(201).json(newProduct);
     } catch (error) {
@@ -25,15 +25,15 @@ export class ProductController {
 
   getProducts = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = parseInt((req.query.page as string) || '1');
-      const limit = parseInt((req.query.limit as string) || '10');
+      const page = parseInt((req.query.page as string) || "1");
+      const limit = parseInt((req.query.limit as string) || "10");
       const search = req.query.search as string | undefined;
       const userId = req.user?.id;
       const result = await this.productService.getProducts(
         page,
         limit,
         search,
-        userId,
+        userId
       );
       res.status(200).json(result);
     } catch (error) {
@@ -60,7 +60,7 @@ export class ProductController {
       const updatedProduct = await this.productService.updateProduct(
         userId,
         id,
-        updateProductDto,
+        updateProductDto
       );
       res.status(200).json(updatedProduct);
     } catch (error) {
@@ -85,7 +85,7 @@ export class ProductController {
       const { id: productId } = req.params;
       const result = await this.likeService.toggleProductLike(
         userId,
-        parseInt(productId),
+        parseInt(productId)
       );
       res.status(200).json(result);
     } catch (error) {

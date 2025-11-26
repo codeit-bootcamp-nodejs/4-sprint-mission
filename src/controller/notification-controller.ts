@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { NotificationService } from "../service/notification-service";
+import { NotificationService } from "../service/notification-service.js";
 
 export class NotificationController {
   constructor(private notificationService: NotificationService) {}

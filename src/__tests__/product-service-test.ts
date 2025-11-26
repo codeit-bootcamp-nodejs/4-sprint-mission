@@ -1,7 +1,7 @@
-import { ProductService } from "../service/product-service";
-import { ProductRepository } from "../repository/product-repository";
-import { LikeRepository } from "../repository/like-repository";
-import { NotificationService } from "../service/notification-service";
+import { ProductService } from "../service/product-service.js";
+import { ProductRepository } from "../repository/product-repository.js";
+import { LikeRepository } from "../repository/like-repository.js";
+import { NotificationService } from "../service/notification-service.js";
 
 /**
  * 의존성 Mock 생성

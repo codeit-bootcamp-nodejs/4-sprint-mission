@@ -1,30 +1,30 @@
-import express from 'express';
-import { authMiddleware } from '../middleware';
-import { CommentController } from '../controller/comment-controller';
-import { ValidationMiddleware } from '../middleware/validation-middleware';
+import express from "express";
+import { authMiddleware } from "../middleware/index.js";
+import { CommentController } from "../controller/comment-controller.js";
+import { ValidationMiddleware } from "../middleware/validation-middleware.js";
 
 const commentRouter = (
   commentController: CommentController,
-  validationMiddleware: ValidationMiddleware,
+  validationMiddleware: ValidationMiddleware
 ) => {
   const router = express.Router({ mergeParams: true });
 
   router
-    .route('/')
+    .route("/")
     .post(authMiddleware, commentController.createComment)
     .get(commentController.getComments);
 
   router
-    .route('/:commentId')
+    .route("/:commentId")
     .patch(
       authMiddleware,
       validationMiddleware.validateId,
-      commentController.updateComment,
+      commentController.updateComment
     )
     .delete(
       authMiddleware,
       validationMiddleware.validateId,
-      commentController.deleteComment,
+      commentController.deleteComment
     );
 
   return router;
