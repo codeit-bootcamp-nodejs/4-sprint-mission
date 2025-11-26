@@ -6,7 +6,6 @@ package-lock.json
 
 # 미션관련 추가
 /uploads
-.prettierrc
 /generated/prisma
 .vscode/
 /dist
@@ -24,6 +23,7 @@ yarn-error.log*
 .env.local
 .env.*.local
 .env.test
+.env.prod
 
 # Prisma
 prisma/dev.db

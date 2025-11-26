@@ -54,12 +54,7 @@ export function hasCursorQuery(
 }
 
 export function hasFile(req: Request): req is Request & { file: File } {
-  return (
-    typeof req.file === 'object' &&
-    req.file !== null &&
-    'path' in req.file && // file 객체 안에 path가 있는지 확인
-    typeof req.file.path === 'string'
-  );
+  return typeof req.file === 'object' && req.file !== null;
 }
 
 export function hasBuffer(req: Request): req is Request & { file: File } {

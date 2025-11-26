@@ -21,11 +21,14 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization', 'x-refresh-token'],
   }),
 );
-app.use(express.json());
 if (NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
+app.get('/health', (req, res) => {
+  return res.status(200).send('Server is running!');
+});
 
+app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
 

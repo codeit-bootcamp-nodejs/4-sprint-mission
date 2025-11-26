@@ -20,6 +20,7 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  await redisClient.flushAll();
   const tableNames = [
     'products',
     'articles',
@@ -39,6 +40,7 @@ beforeEach(async () => {
 
 afterAll(async () => {
   await prisma.$disconnect();
+  await redisClient.flushAll();
   await redisClient.quit();
 
   console.error = originalConsoleError;
