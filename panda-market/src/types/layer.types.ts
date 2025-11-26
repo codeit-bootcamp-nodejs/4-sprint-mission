@@ -1,6 +1,10 @@
 export const TYPES = {
   SocketIO: Symbol.for('SocketIO'),
 
+  // Strategies
+  S3UploadStrategy: Symbol.for('S3UploadStrategy'),
+  CloudinaryUploadStrategy: Symbol.for('CloudinaryStrategy'),
+
   // Prisma
   PrismaClient: Symbol.for('PrismaClient'),
 

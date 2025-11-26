@@ -21,3 +21,8 @@ export interface ImageUpdateQueryInput {
   }[];
   newImages: string[];
 }
+
+export interface ImageUploadResult {
+  imageUrl: string;
+  publicId: string;
+}

@@ -1,14 +1,22 @@
-import { cloudinaryStreamUpload } from '@/lib/cloudinary.js';
-import { injectable } from 'inversify';
-import { CloudinaryParams, S3Params } from '@/types/image.types.js';
+import { inject, injectable } from 'inversify';
+import { S3UploadStrategy } from '@/strategies/s3-upload.strategy.js';
+import { CloudinaryUploadStrategy } from '@/strategies/cloudinary-upload.strategy.js';
+import { NODE_ENV } from '@/lib/constants.js';
+import { TYPES } from '@/types/layer.types.js';
+import { ImageUploadStrategy } from '@/strategies/image-upload-base.strategy.js';
 
 @injectable()
 export class ImageService {
-  async postImageToCloudinary({ buffer }: CloudinaryParams) {
-    const { secure_url, public_id } = await cloudinaryStreamUpload(buffer);
-    return { imageUrl: secure_url, public_id };
+  private uploadStrategy: ImageUploadStrategy;
+  constructor(
+    @inject(TYPES.S3UploadStrategy) private s3Strategy: S3UploadStrategy,
+    @inject(TYPES.CloudinaryUploadStrategy)
+    private cloudinaryStrategy: CloudinaryUploadStrategy,
+  ) {
+    this.uploadStrategy =
+      NODE_ENV === 'production' ? this.s3Strategy : this.cloudinaryStrategy;
   }
-  async postImageToS3({ location, key }: S3Params) {
-    return { imageUrl: location, publicId: key };
+  async postImage(file: Express.Multer.File) {
+    return await this.uploadStrategy.upload(file);
   }
 }
