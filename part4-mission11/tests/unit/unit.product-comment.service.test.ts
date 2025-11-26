@@ -7,15 +7,15 @@ import {
   jest,
 } from '@jest/globals';
 
-import AppError from '../../lib/appError.js';
-import { commentRepository } from '../../repositories/comments/comment-repository.js';
-import { productCommentRepository } from '../../repositories/comments/product-comment-repository.js';
-import { commentLikeRepository } from '../../repositories/like-repository.js';
-import { notificationRepository } from '../../repositories/notification-repository.js';
-import { productRepository } from '../../repositories/product-repository.js';
-import { userRepository } from '../../repositories/user-repository.js';
-import { productCommentService } from '../../services/comments/product-comment-service.js';
-import { notificationService } from '../../services/notification-service.js';
+import AppError from '../../src/lib/appError.js';
+import { commentRepository } from '../../src/repositories/comments/comment-repository.js';
+import { productCommentRepository } from '../../src/repositories/comments/product-comment-repository.js';
+import { commentLikeRepository } from '../../src/repositories/like-repository.js';
+import { notificationRepository } from '../../src/repositories/notification-repository.js';
+import { productRepository } from '../../src/repositories/product-repository.js';
+import { userRepository } from '../../src/repositories/user-repository.js';
+import { productCommentService } from '../../src/services/comments/product-comment-service.js';
+import { notificationService } from '../../src/services/notification-service.js';
 import {
   makeProductLite,
   makeComment,
@@ -78,7 +78,7 @@ describe('ProductCommentService', () => {
       );
 
     const { notificationService } = await import(
-      '../../services/notification-service.js'
+      '../../src/services/notification-service.js'
     );
     const pushSpy = jest
       .spyOn(notificationService, 'pushProductComment')
@@ -111,7 +111,7 @@ describe('ProductCommentService', () => {
       .mockResolvedValue({ username: 'buyer' });
 
     const { notificationService } = await import(
-      '../../services/notification-service.js'
+      '../../src/services/notification-service.js'
     );
     const pushSpy = jest
       .spyOn(notificationService, 'pushProductComment')

@@ -1,4 +1,4 @@
-import type { NotificationType } from '../../types/notification.js';
+import type { NotificationType } from '../../src/types/notification.js';
 
 export type NotificationRecord = {
   id: number;

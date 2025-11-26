@@ -6,7 +6,7 @@ import {
   publishToUser,
   __resetWsForTest,
   __getUserSocketsForTest,
-} from '../../lib/ws.js';
+} from '../../src/lib/ws.js';
 
 beforeEach(() => __resetWsForTest());
 

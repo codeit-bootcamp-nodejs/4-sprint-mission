@@ -1,4 +1,10 @@
-import { jest } from '@jest/globals';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  jest,
+} from '@jest/globals';
 import bcrypt from 'bcrypt';
 import type { JwtPayload } from 'jsonwebtoken';
 import request from 'supertest';
@@ -7,9 +13,9 @@ import type { Response as SupertestResponse } from 'supertest';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
-} from '../../lib/constants.js';
-import { prisma } from '../../lib/prismaClient.js';
-import { validation } from '../../middlewares/validation.js';
+} from '../../src/lib/constants.js';
+import { prisma } from '../../src/lib/prismaClient.js';
+import { validation } from '../../src/middlewares/validation.js';
 import { asMockFn, type Awaited } from '../_helper/jest-typed.js';
 
 export function extractCookieUnsafe(
@@ -305,7 +311,7 @@ describe('[통합] 인증 (회원가입/로그인)', () => {
     expect(typeof refreshRaw).toBe('string');
 
     const jwt = (await import('jsonwebtoken')).default;
-    const C1 = await import('../../lib/constants.js');
+    const C1 = await import('../../src/lib/constants.js');
 
     const decoded = jwt.decode(refreshRaw!) as JwtPayload | null;
     const sub = (decoded?.sub as unknown as number) ?? 777;
@@ -321,7 +327,7 @@ describe('[통합] 인증 (회원가입/로그인)', () => {
     ).toThrow();
 
     jest.resetModules();
-    const { verifyRefreshToken } = await import('../../lib/token.js');
+    const { verifyRefreshToken } = await import('../../src/lib/token.js');
 
     expect(() => verifyRefreshToken(forged)).toThrow(
       /유효하지 않은 리프레시 토큰/

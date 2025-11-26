@@ -9,9 +9,9 @@ import {
   closeWebSocket,
   __resetWsForTest,
   __getUserSocketsForTest,
-} from '../../lib/ws.js';
+} from '../../src/lib/ws.js';
 
-/** ---- 타입 (any 금지) ---- */
+/** ---- 타입 ---- */
 type Wire = {
   type: 'system' | 'chat' | 'contract-linked';
   message: string;

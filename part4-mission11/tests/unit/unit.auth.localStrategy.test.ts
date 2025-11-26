@@ -2,8 +2,8 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
 
-import { localStrategy } from '../../lib/passport/localStrategy.js';
-import { prisma } from '../../lib/prismaClient.js';
+import { localStrategy } from '../../src/lib/passport/localStrategy.js';
+import { prisma } from '../../src/lib/prismaClient.js';
 import { createPassportTestApp } from '../_helper/test-passport-app.js';
 
 type Done = (err: unknown, user?: unknown, info?: unknown) => void;

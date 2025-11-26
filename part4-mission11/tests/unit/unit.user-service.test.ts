@@ -1,15 +1,15 @@
 import { describe, test, expect, beforeEach, jest } from '@jest/globals';
 import bcrypt from 'bcrypt';
 
-import AppError from '../../lib/appError.js';
+import AppError from '../../src/lib/appError.js';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
-} from '../../lib/constants.js';
-import * as token from '../../lib/token.js';
-import * as likeRepo from '../../repositories/like-repository.js';
-import * as userRepo from '../../repositories/user-repository.js';
-import { userService } from '../../services/user-service.js';
+} from '../../src/lib/constants.js';
+import * as token from '../../src/lib/token.js';
+import * as likeRepo from '../../src/repositories/like-repository.js';
+import * as userRepo from '../../src/repositories/user-repository.js';
+import { userService } from '../../src/services/user-service.js';
 
 /* ──────────────────────────────────────────
    시그니처를 그대로 따르는 안전한 스파이

@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import request from 'supertest';
 
-import { prisma } from '../../lib/prismaClient.js';
+import { prisma } from '../../src/lib/prismaClient.js';
 import { createTestApp } from '../_helper/test-app.js';
 import { loginAndGetSession } from '../_helper/test-utils.js';
 

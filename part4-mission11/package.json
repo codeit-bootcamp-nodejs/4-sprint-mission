@@ -8,7 +8,9 @@
   "main": "dist/server.js",
   "scripts": {
     "seed": "tsx src/prisma/seed.ts",
-    "postinstall": "npx prisma generate && npx prisma migrate deploy && npx prisma db seed",
+    "postinstall": "npx prisma generate",
+    "db:migrate": "npx prisma migrate deploy",
+    "db:seed": "npx prisma db seed",
     "test": "jest",
     "test:unit": "jest --selectProjects unit",
     "test:int": "jest --selectProjects integration",

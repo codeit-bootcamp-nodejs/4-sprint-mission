@@ -1,10 +1,10 @@
-jest.mock('../../lib/token.js', () => ({
+jest.mock('../../src/lib/token.js', () => ({
   __esModule: true,
   verifyAccessToken: jest.fn(),
 }));
 
-import { verifyAccessToken } from '../../lib/token.js';
-import { parseUserIdFromToken } from '../../lib/wsAuth.js';
+import { verifyAccessToken } from '../../src/lib/token.js';
+import { parseUserIdFromToken } from '../../src/lib/wsAuth.js';
 
 test('parseUserIdFromToken → null (non-string)', () => {
   expect(parseUserIdFromToken(undefined)).toBeNull();
