@@ -1,0 +1,59 @@
+name: Deploy to AWS EC2
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2 배포
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          port: 2222 # sk broadband 22번 포트 차단 이슈 -> ec2도 ssh 2222로 세팅 변경
+          envs: ENV_FILE
+          script: |
+            set -e
+
+            echo "🚀 배포 스크립트 시작!"
+
+            # 0. ec2 환경변수 로드
+            echo "👉 환경변수 로드 시도..."
+            [ -f ~/.zshrc ] && source ~/.zshrc || true
+            [ -f ~/.bash_profile ] && source ~/.bash_profile || true
+            [ -f ~/.bashrc ] && source ~/.bashrc || true
+
+            # 1. 경로 변수 설정
+            PROJECT_PATH="/home/${{ secrets.AWS_USERNAME }}/panda-market"
+            echo "👉 [Step 1] 배포 경로: $PROJECT_PATH"
+
+            # 2. 폴더가 있는지 확인하고 분기 처리
+            if [ ! -d "$PROJECT_PATH" ]; then
+              echo "📂 폴더가 없습니다. 깃허브에서 프로젝트를 복제(Clone)합니다..."
+              git clone https://github.com/${{ github.repository }} $PROJECT_PATH
+              cd $PROJECT_PATH
+            else
+              echo "📂 폴더가 이미 존재합니다. 최신 코드로 업데이트(Pull)합니다..."
+              cd $PROJECT_PATH
+              git pull origin main
+            fi
+
+            # 3. 프로젝트 환경변수 로드
+            echo "👉 [Step 2] .env 생성 중..."
+            cd panda-market
+            echo "$ENV_FILE" > .env
+
+            # 4. pm2 스크립트 실행
+            echo "👉 [Step 3] start:pm2 스크립트 실행..."
+
+            chmod +x infra/ec2/start.sh
+
+            npm run start:pm2
+
+            echo "🎉 배포 성공!"
