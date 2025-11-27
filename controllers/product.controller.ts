@@ -4,6 +4,7 @@ import {
   productDeleteService,
   productPutService,
   productRegisterService,
+  productDetailService,
 } from "../services/product.service.js";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 
@@ -13,13 +14,7 @@ import { HttpError } from "../middlewares/errorHandler.middleware.js";
 // 상품 목록 조회
 export async function productListupController(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    
-    const userIdStr = req.user?.userId;
-    if (!userIdStr) throw new HttpError("유저 정보가 없습니다.", 401);
-    
-    const userId = Number(userIdStr);
-    
-    const list = await prodcutListupService(userId)
+    const list = await prodcutListupService()
 
     // 응답
     res.status(200).json({
@@ -41,14 +36,16 @@ export async function productRegisterController(req: Request, res: Response, nex
     const userId = Number(userIdStr);
 
     // 프론트에서 정보 받아오기
-    const { price, title, content } = req.body as {
+    const { price, title, content, image, tags } = req.body as {
       title: string;
       content: string;
       price: number;
+      image?: string | null;
+      tags?: string[];
     };
 
     // 서비스 로직
-    const fromService = await productRegisterService(userId, price, title, content);
+    const fromService = await productRegisterService(userId, price, title, content, image, tags);
 
     // 응답
     res.status(200).json({
@@ -76,10 +73,12 @@ export async function productPutController(req: Request, res: Response, next: Ne
     const productId = Number(productIdStr)
 
     // 수정할 데이터
-    const { price, title, content } = req.body as {
+    const { price, title, content, image, tags } = req.body as {
       title: string;
       content: string;
       price: number;
+      image?: string | null;
+      tags?: string[];
     };
 
     // 서비스 로직
@@ -88,7 +87,9 @@ export async function productPutController(req: Request, res: Response, next: Ne
       productId,
       price,
       title,
-      content
+      content,
+      image,
+      tags
     );
 
     // 응답
@@ -132,3 +133,25 @@ export async function productDeleteController(req: Request, res: Response, next:
     next(err);
   }
 }
+
+// 상품 상세 조회
+export async function productDetailController(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const productIdStr = req.params.productId;
+    if (!productIdStr) throw new HttpError("상품 ID가 필요합니다.", 400);
+    
+    const productId = Number(productIdStr);
+    const userIdStr = req.user?.userId;
+    const userId = userIdStr ? Number(userIdStr) : undefined;
+
+    const product = await productDetailService(productId, userId);
+
+    res.status(200).json({
+      message: "상품 상세 조회 성공",
+      data: product,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+

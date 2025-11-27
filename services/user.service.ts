@@ -106,6 +106,113 @@ export async function loginService(email: string, password: string): Promise<{
   return { safeuser, accessToken, refreshToken , saveRefreshToken };
 }
 
+// Google OAuth 로그인/회원가입
+export async function googleOAuthService(googleProfile: {
+  id: string;
+  emails: Array<{ value: string; verified?: boolean }>;
+  displayName: string;
+  photos?: Array<{ value: string }>;
+}): Promise<{
+  safeuser: Omit<User, "password" | "refreshToken">;
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}> {
+  const email = googleProfile.emails?.[0]?.value;
+  if (!email) {
+    throw new HttpError("Google 계정에서 이메일을 가져올 수 없습니다.", 400);
+  }
+
+  const nickname = googleProfile.displayName || email.split("@")[0];
+  const image = googleProfile.photos?.[0]?.value || null;
+  const googleId = googleProfile.id;
+
+  // 기존 사용자 찾기 (이메일로)
+  let user = await prisma.user.findUnique({ where: { email } });
+
+  if (user) {
+    // 기존 사용자 - 로그인 처리
+    const { password: hashedPassword, refreshToken: oldRefreshToken, ...safeuser } = user;
+
+    // 토큰 발급
+    const accessToken = jwt.sign(
+      { userId: user.id, email: user.email },
+      JWT_SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: user.id },
+      REFRESH_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    // Refresh Token 저장
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken },
+    });
+
+    return { safeuser, accessToken, refreshToken, isNewUser: false };
+  } else {
+    // 새 사용자 - 회원가입 처리
+    // Google OAuth 사용자는 비밀번호가 없으므로 랜덤 비밀번호 생성 (실제로는 사용되지 않음)
+    const randomPassword = await bcrypt.hash(googleId + Date.now(), 10);
+    
+    // 닉네임이 중복될 수 있으므로 처리
+    let finalNickname = nickname ?? `user_${Date.now()}`;
+    let nicknameExists;
+
+    if (finalNickname) {
+    nicknameExists = await prisma.user.findUnique({ where: { nickname: finalNickname } }) };
+    let counter = 1;
+    while (nicknameExists) {
+      finalNickname = `${nickname}${counter}`;
+      nicknameExists = await prisma.user.findUnique({ where: { nickname: finalNickname } });
+      counter++;
+    }
+    const validNickname = finalNickname ?? `user_${Date.now()}`;
+
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        nickname: validNickname,
+        password: randomPassword,
+        image,
+      },
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    // 토큰 발급
+    const accessToken = jwt.sign(
+      { userId: newUser.id, email: newUser.email },
+      JWT_SECRET!,
+      { expiresIn: "1h" }
+    );
+
+    const refreshToken = jwt.sign(
+      { userId: newUser.id },
+      REFRESH_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    // Refresh Token 저장
+    await prisma.user.update({
+      where: { id: newUser.id },
+      data: { refreshToken },
+    });
+
+    return { safeuser: newUser, accessToken, refreshToken, isNewUser: true };
+  }
+}
+
 
 // 내 정보 조회
 export async function inquiryService(userId: number): Promise<{
@@ -273,7 +380,15 @@ export async function refreshService(refreshToken: string): Promise<string>  {
 
 
 // 등록한 상품의 목록 조회 기능
-export async function listupService(userId: number): Promise<Pick<Product, 'id' | 'title' | 'content' | 'createdAt'>[]> {
+export async function listupService(userId: number): Promise<{
+  id: number;
+  title: string;
+  content: string;
+  price: number;
+  image: string | null;
+  tags: string[];
+  createdAt: Date;
+}[]> {
   // 해당 유저가 등록한 상품 목록 가져오기
   const listup = await prisma.product.findMany({
     where: { userId: userId },
@@ -281,6 +396,9 @@ export async function listupService(userId: number): Promise<Pick<Product, 'id' 
       id: true,
       title: true,
       content: true,
+      price: true,
+      image: true,
+      tags: true,
       createdAt: true,
     },
   });

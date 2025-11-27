@@ -2,13 +2,13 @@
   // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
     // File Layout
-    "rootDir": ".",
+    // "rootDir": "./src",
     "outDir": "./dist",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "ES2022",
+    "module": "NodeNext",
+    "target": "ES2020",
     "types": ["node", "express", "jest"],
     // For nodejs:
     // "lib": ["esnext"],
@@ -41,6 +41,8 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-  }
+    "moduleResolution": "nodenext"
+  },
+  "include": ["./**/*.ts"],
+  "exclude": ["node_modules", "dist", "front/**/*", "**/*.spec.ts", "**/*.test.ts"]
 }

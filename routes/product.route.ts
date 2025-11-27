@@ -4,14 +4,17 @@ import {
   productPutController,
   productDeleteController,
   productListupController,
+  productDetailController,
 } from "../controllers/product.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
+import { verifyProductOwner } from "../middlewares/verifyProductOwner.middleware.js";
 
 const router = Router();
 
 router.post("/", authMiddleware, productRegisterController);
-router.put("/:productId", authMiddleware, productPutController);
+router.put("/:productId", authMiddleware, verifyProductOwner, productPutController);
 router.delete("/:productId", authMiddleware, productDeleteController);
-router.get("/", authMiddleware, productListupController);
+router.get("/:productId", productDetailController);
+router.get("/", productListupController);
 
 export default router;
