@@ -1,132 +1,78 @@
+// Prisma Schema for Test Project
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
 }
 
-// 유저 모델
+// User model for authentication
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  nickname  String
-  image     String?
   password  String
+  nickname  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // 유저가 작성한 상품들
+  // Relations
   products Product[]
-  
-  // 유저가 작성한 게시글들
-  posts    Post[]
-  
-  // 유저가 작성한 댓글들
+  articles Article[]
   comments Comment[]
-  
-  // 유저가 좋아요한 상품들
-  productLikes ProductLike[]
-  
-  // 유저가 좋아요한 게시글들
-  postLikes    PostLike[]
-  
-  // 리프레시 토큰
-  refreshTokens RefreshToken[]
+
+  @@map("users")
 }
 
-// 상품 모델
+// Product model
 model Product {
   id          Int      @id @default(autoincrement())
-  title       String
-  content     String
-  image       String?
+  name        String
+  description String
   price       Int
+  tags        String[]
+  userId      Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  // 상품 작성자
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    Int
-  
-  // 상품에 달린 댓글들
-  comments    Comment[]
-  
-  // 상품 좋아요
-  likes       ProductLike[]
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("products")
 }
 
-// 게시글 모델
-model Post {
-  id          Int      @id @default(autoincrement())
-  title       String
-  content     String
-  image       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // 게시글 작성자
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    Int
-  
-  // 게시글에 달린 댓글들
-  comments    Comment[]
-  
-  // 게시글 좋아요
-  likes       PostLike[]
-}
-
-// 댓글 모델
-model Comment {
-  id          Int      @id @default(autoincrement())
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // 댓글 작성자
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    Int
-  
-  // 상품 댓글인 경우
-  product     Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId   Int?
-  
-  // 게시글 댓글인 경우
-  post        Post?    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId      Int?
-}
-
-// 상품 좋아요 모델
-model ProductLike {
-  id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId Int
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, productId])
-}
-
-// 게시글 좋아요 모델
-model PostLike {
-  id        Int     @id @default(autoincrement())
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    Int
-  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int
-  createdAt DateTime @default(now())
-  
-  @@unique([userId, postId])
-}
-
-// 리프레시 토큰 모델
-model RefreshToken {
+// Article model
+model Article {
   id        Int      @id @default(autoincrement())
-  token     String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  content   String
   userId    Int
-  expiresAt DateTime
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@map("articles")
+}
+
+// Comment model (can belong to either Product or Article)
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  productId Int?
+  articleId Int?
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  product Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
 }
