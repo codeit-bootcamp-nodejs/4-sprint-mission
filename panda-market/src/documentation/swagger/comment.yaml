@@ -1,0 +1,302 @@
+tags:
+  - name: comment
+    description: 상품 및 게시글 댓글 관련 API
+
+paths:
+  /product/{productId}/comment:
+    get:
+      tags:
+        - comment
+      summary: 특정 상품의 댓글 목록 조회
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: 댓글을 조회할 상품의 ID
+        - in: query
+          name: cursorId
+          schema:
+            type: integer
+          description: '페이지네이션 커서 ID. 이전 응답의 마지막 댓글 ID를 전달하여 다음 페이지를 조회합니다.'
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+          description: 페이지당 댓글 수
+      responses:
+        '200':
+          description: 댓글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: '상품을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - comment
+      summary: 특정 상품에 댓글 작성
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: 댓글을 작성할 상품의 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '201':
+          description: 댓글 작성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: '상품을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+
+  /product/{productId}/comment/{commentId}:
+    patch:
+      tags:
+        - comment
+      summary: 상품 댓글 수정
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: 댓글이 달린 상품의 ID
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: 수정할 댓글의 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommentRequest'
+      responses:
+        '200':
+          description: 댓글 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: '상품 또는 댓글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - comment
+      summary: 상품 댓글 삭제
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: integer
+          description: 댓글이 달린 상품의 ID
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: 삭제할 댓글의 ID
+      responses:
+        '200':
+          description: 댓글 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '댓글이 성공적으로 삭제되었습니다.'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: '상품 또는 댓글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+
+  /article/{articleId}/comment:
+    get:
+      tags:
+        - comment
+      summary: 특정 게시글의 댓글 목록 조회
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: integer
+          description: 댓글을 조회할 게시글의 ID
+        - in: query
+          name: cursorId
+          schema:
+            type: integer
+          description: '페이지네이션 커서 ID. 이전 응답의 마지막 댓글 ID를 전달하여 다음 페이지를 조회합니다.'
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+          description: 페이지당 댓글 수
+      responses:
+        '200':
+          description: 댓글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: '게시글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - comment
+      summary: 특정 게시글에 댓글 작성
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: integer
+          description: 댓글을 작성할 게시글의 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentRequest'
+      responses:
+        '201':
+          description: 댓글 작성 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: '게시글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+
+  /article/{articleId}/comment/{commentId}:
+    patch:
+      tags:
+        - comment
+      summary: 게시글 댓글 수정
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: integer
+          description: 댓글이 달린 게시글의 ID
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: 수정할 댓글의 ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCommentRequest'
+      responses:
+        '200':
+          description: 댓글 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: '게시글 또는 댓글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - comment
+      summary: 게시글 댓글 삭제
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: articleId
+          required: true
+          schema:
+            type: integer
+          description: 댓글이 달린 게시글의 ID
+        - in: path
+          name: commentId
+          required: true
+          schema:
+            type: integer
+          description: 삭제할 댓글의 ID
+      responses:
+        '200':
+          description: 댓글 삭제 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '댓글이 성공적으로 삭제되었습니다.'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: '게시글 또는 댓글을 찾을 수 없음'
+          $ref: '#/components/responses/NotFound'

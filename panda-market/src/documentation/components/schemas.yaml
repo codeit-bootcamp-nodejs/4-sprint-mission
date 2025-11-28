@@ -1,0 +1,425 @@
+components:
+  schemas:
+    # =============================================
+    #         Base Schemas
+    # =============================================
+    User:
+      type: object
+      description: '비밀번호를 제외한 사용자의 모든 정보를 포함하는 응답'
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        profileImage:
+          type: string
+          format: url
+          nullable: true
+          example: 'http://example.com/profile.jpg'
+        imagePublicId:
+          type: string
+          nullable: true
+          example: 'profile_image_public_id'
+        nickname:
+          type: string
+          example: 'panda'
+        authProvider:
+          type: string
+          enum: [local, google, kakao]
+          example: 'local'
+        providerId:
+          type: string
+          nullable: true
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Image:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        publicId:
+          type: string
+          example: 'test1'
+        url:
+          type: string
+          format: url
+          example: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png'
+
+    # =============================================
+    #         Auth Schemas
+    # =============================================
+    SignupRequest:
+      type: object
+      required:
+        - email
+        - nickname
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        nickname:
+          type: string
+          example: 'panda'
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: 'password123'
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: 'user@example.com'
+        password:
+          type: string
+          format: password
+          example: 'password123'
+
+    AuthTokens:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        refreshToken:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+
+    # =============================================
+    #         User Schemas
+    # =============================================
+    UpdateUserRequest:
+      type: object
+      properties:
+        nickname:
+          type: string
+          minLength: 1
+          example: '수정할 닉네임'
+        imageUrl:
+          type: string
+          format: url
+          example: 'http://example.com/new_profile.jpg'
+        currentPassword:
+          type: string
+          minLength: 8
+          description: '비밀번호 변경 시에만 필요'
+          example: 'current_password'
+        changePassword:
+          type: string
+          minLength: 8
+          description: '비밀번호 변경 시에만 필요'
+          example: 'new_password'
+
+    # =============================================
+    #         Product Schemas
+    # =============================================
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: '수정된 상품'
+        price:
+          type: number
+          example: 35000
+        isLike:
+          type: boolean
+          description: '인증된 사용자의 경우에만 포함됨'
+          example: false
+        likeCount:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-11-28T12:26:19.782Z'
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            email:
+              type: string
+              format: email
+              example: 'user@example.com'
+            nickname:
+              type: string
+              example: 'panda'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - tags
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 10
+          example: '새 상품'
+        description:
+          type: string
+          minLength: 10
+          example: '이 상품은 아주 좋습니다.'
+        price:
+          type: number
+          example: 20000
+        tags:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            minLength: 1
+          example: ['new', 'item']
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: url
+          example: ['http://example.com/new_image.jpg']
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 10
+          example: '수정된 상품'
+        description:
+          type: string
+          minLength: 10
+          example: '이 상품은 더 좋아졌습니다.'
+        price:
+          type: number
+          example: 25000
+        tags:
+          type: array
+          maxItems: 5
+          items:
+            type: string
+            minLength: 1
+          example: ['updated', 'item']
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: url
+          example: ['http://example.com/updated_image.jpg']
+
+    # =============================================
+    #         Article Schemas
+    # =============================================
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: '게시글 제목'
+        content:
+          type: string
+          example: '게시글 내용입니다.'
+        likeCount:
+          type: integer
+          example: 10
+        isLike:
+          type: boolean
+          description: '인증된 사용자의 경우에만 포함됨'
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            nickname:
+              type: string
+              example: 'testUser1'
+            email:
+              type: string
+              format: email
+              example: 'test@email.com'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/Image'
+
+    CreateArticleRequest:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 1
+          example: '새로운 게시글 제목'
+        content:
+          type: string
+          minLength: 1
+          example: '새로운 게시글 내용입니다.'
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: url
+          example: ['http://example.com/image1.jpg']
+
+    UpdateArticleRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          example: '수정된 게시글 제목'
+        content:
+          type: string
+          minLength: 1
+          example: '수정된 게시글 내용입니다.'
+        imageUrls:
+          type: array
+          items:
+            type: string
+            format: url
+          example: ['http://example.com/image1.jpg', 'http://example.com/image2.jpg']
+
+    # =============================================
+    #         Comment Schemas
+    # =============================================
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: '댓글 내용입니다.'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            nickname:
+              type: string
+              example: 'commenter'
+            profileImage:
+              type: string
+              format: url
+              nullable: true
+              example: 'http://example.com/profile.jpg'
+
+    CreateCommentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          example: '새로운 댓글 내용'
+
+    UpdateCommentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          type: string
+          minLength: 1
+          example: '수정된 댓글 내용'
+
+    # =============================================
+    #         Notification Schemas
+    # =============================================
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: '새로운 댓글이 달렸습니다: 안녕하세요'
+        notificationType:
+          type: string
+          enum: [like, comment]
+          example: 'comment'
+        relatedId:
+          type: integer
+          description: '알림과 관련된 리소스의 ID (게시글, 상품 등)'
+          example: 101
+        isRead:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+        sender:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 2
+            nickname:
+              type: string
+              example: '알림 보낸 사람'
+
+    UnreadNotificationCount:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 5
+
+    # =============================================
+    #         Image Schemas
+    # =============================================
+    ImageUploadResponse:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+          format: url
+          example: 'http://res.cloudinary.com/demo/image/upload/v12345/sample.jpg'
