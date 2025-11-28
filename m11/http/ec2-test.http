@@ -1,0 +1,333 @@
+###
+### 🚀 EC2 배포 테스트 (AWS S3 이미지 업로드 포함)
+###
+
+@host = 52.78.206.41
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2MzMyMDgwMCwiZXhwIjoxNzYzMzI0NDAwfQ.j3rXjk3-6oah558duGrSanI8ybcqNFIcZbpDrBqdMQ0
+
+###
+### ========================
+### 🔹 System
+### ========================
+
+###
+### 🟢 Health Check
+GET http://{{host}}/health
+
+###
+### 🟢 API 목록
+GET http://{{host}}/
+
+###
+### ========================
+### 🔹 Auth
+### ========================
+
+###
+### 🟢 회원가입
+POST http://{{host}}/auth/signup
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "nickname": "mone",
+    "password": "mone1234"
+}
+
+###
+### 🟢 로그인
+# @name login
+POST http://{{host}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "password": "mone1234"
+}
+
+###
+### 🔸 로그인 후 자동으로 토큰 저장
+@accessToken = {{login.response.body.data.accessToken}}
+
+###
+### 🟢 토큰 갱신
+POST http://{{host}}/auth/refresh
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 로그아웃
+POST http://{{host}}/auth/logout
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Users
+### ========================
+
+###
+### 🟢 내 프로필 조회
+GET http://{{host}}/users/profile
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 프로필 수정 (닉네임만)
+PUT http://{{host}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "mone_updated"
+}
+
+###
+### 🟢 비밀번호 변경
+PUT http://{{host}}/users/me/password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "currentPassword": "mone1234",
+    "newPassword": "nemo1234"
+}
+
+###
+### 🟢 내 상품 목록
+GET http://{{host}}/users/me/products
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 내가 좋아요한 상품 목록
+GET http://{{host}}/users/me/likes/products
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 내가 좋아요한 게시글 목록
+GET http://{{host}}/users/me/likes/posts
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Images (S3 Upload)
+### ========================
+
+###
+### 🟢 이미지 업로드 (S3)
+# @name uploadImage
+POST http://{{host}}/images/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="NewJeans.jpeg"
+Content-Type: image/jpeg
+
+< ./NewJeans.jpeg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+### 🔸 업로드된 이미지 URL 자동 저장
+@imageUrl = {{uploadImage.response.body.data.imageUrl}}
+
+###
+### 🟢 프로필 이미지 업데이트 (업로드한 이미지 사용)
+PUT http://{{host}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "image": "{{imageUrl}}"
+}
+
+###
+### 🟢 프로필 이미지 + 닉네임 동시 업데이트
+PUT http://{{host}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "MoneDev",
+    "image": "{{imageUrl}}"
+}
+
+###
+### ========================
+### 🔹 Products
+### ========================
+
+###
+### 🟢 상품 목록 조회
+GET http://{{host}}/products
+
+###
+### 🟢 상품 등록
+# @name createProduct
+POST http://{{host}}/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰",
+    "description": "최고의 음질과 편안함 제공",
+    "price": 299000,
+    "tags": ["헤드폰", "무선", "노이즈캔슬링"]
+}
+
+###
+### 🔸 생성된 상품 ID 자동 저장
+@productId = {{createProduct.response.body.data.id}}
+
+###
+### 🟢 상품 상세 조회
+GET http://{{host}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 상품 수정
+PUT http://{{host}}/products/{{productId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰 Pro",
+    "description": "노이즈 캔슬링 + 프리미엄 사운드",
+    "price": 399000,
+    "tags": ["헤드폰", "무선", "프리미엄"]
+}
+
+###
+### 🟢 상품 좋아요 토글
+POST http://{{host}}/products/{{productId}}/likes
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 상품 댓글 작성
+POST http://{{host}}/products/{{productId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "정말 좋은 상품이네요!"
+}
+
+###
+### 🟢 상품 댓글 목록
+GET http://{{host}}/products/{{productId}}/comments
+
+###
+### 🟢 상품 삭제
+DELETE http://{{host}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Posts
+### ========================
+
+###
+### 🟢 게시글 목록 조회
+GET http://{{host}}/posts
+
+###
+### 🟢 게시글 등록
+# @name createPost
+POST http://{{host}}/posts
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "첫 번째 게시글",
+    "content": "안녕하세요! EC2 배포 테스트입니다."
+}
+
+###
+### 🔸 생성된 게시글 ID 자동 저장
+@postId = {{createPost.response.body.data.id}}
+
+###
+### 🟢 게시글 상세 조회
+GET http://{{host}}/posts/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 게시글 수정
+PUT http://{{host}}/posts/{{postId}}
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "수정된 게시글",
+    "content": "내용이 수정되었습니다."
+}
+
+###
+### 🟢 게시글 좋아요 토글
+POST http://{{host}}/posts/{{postId}}/likes
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 게시글 댓글 작성
+POST http://{{host}}/posts/{{postId}}/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "좋은 글 감사합니다!"
+}
+
+###
+### 🟢 게시글 댓글 목록
+GET http://{{host}}/posts/{{postId}}/comments
+
+###
+### 🟢 게시글 삭제
+DELETE http://{{host}}/posts/{{postId}}
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Comments
+### ========================
+
+###
+### 🟢 댓글 상세 조회
+GET http://{{host}}/comments/1
+
+###
+### 🟢 댓글 수정
+PUT http://{{host}}/comments/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "수정된 댓글입니다."
+}
+
+###
+### 🟢 댓글 삭제
+DELETE http://{{host}}/comments/1
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Notifications
+### ========================
+
+###
+### 🟢 알림 목록 조회
+GET http://{{host}}/notifications
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 안 읽은 알림 개수
+GET http://{{host}}/notifications/unread-count
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 특정 알림 읽음 처리
+PUT http://{{host}}/notifications/1/read
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 모든 알림 읽음 처리
+PUT http://{{host}}/notifications/read-all
+Authorization: Bearer {{accessToken}}

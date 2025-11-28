@@ -1,0 +1,143 @@
+###
+### 🧑 User API Tests
+###
+
+@baseUrl = http://localhost:3000
+@accessToken =
+@imageUrl =
+
+###
+### ========================
+### 🔹 Auth
+### ========================
+
+###
+### 🟢 회원가입
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "nickname": "mone",
+    "password": "mone1234"
+}
+
+###
+### 🟢 로그인
+# @name userLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "password": "mone1234"
+}
+
+###
+### 🔸 로그인 후 자동으로 토큰 저장
+@accessToken = {{userLogin.response.body.data.accessToken}}
+
+###
+### ========================
+### 🔹 Images
+### ========================
+
+###
+### 🟢 이미지 업로드
+# @name uploadImage
+POST {{baseUrl}}/images/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="image"; filename="NewJeans.jpeg"
+Content-Type: image/jpeg
+
+< ./http/NewJeans.jpeg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+###
+### 🔸 업로드된 이미지 URL 자동 저장
+@imageUrl = {{uploadImage.response.body.data.imageUrl}}
+
+###
+### ========================
+### 🔹 User Profile
+### ========================
+
+###
+### 🟢 유저 정보 조회
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 유저 정보 수정 - 닉네임만
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "mone"
+}
+
+###
+### 🟢 유저 프로필 이미지 업데이트 (업로드한 이미지 사용)
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "image": "{{imageUrl}}"
+}
+
+###
+### 🟢 유저 프로필 이미지 + 닉네임 동시 업데이트
+PUT {{baseUrl}}/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "MoneDev",
+    "image": "{{imageUrl}}"
+}
+
+###
+### 🟢 유저 정보 조회 - 프로필 이미지 확인
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{accessToken}}
+
+###
+### ========================
+### 🔹 Password
+### ========================
+
+###
+### 🟢 유저 정보 패스워드 변경
+PUT {{baseUrl}}/users/me/password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "currentPassword": "mone1234",
+    "newPassword": "nemo1234"
+}
+
+###
+### ========================
+### 🔹 User Likes & Products
+### ========================
+
+###
+### 🟢 유저 좋아요 게시글 리스트 조회
+GET {{baseUrl}}/users/me/likes/posts
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 유저 좋아요 상품 리스트 조회
+GET {{baseUrl}}/users/me/likes/products
+Authorization: Bearer {{accessToken}}
+
+###
+### 🟢 유저 등록 상품 리스트 조회
+GET {{baseUrl}}/users/me/products
+Authorization: Bearer {{accessToken}}

@@ -1,0 +1,28 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc2MzQzODc3OCwiZXhwIjoxNzYzNDQyMzc4fQ.BLgiF8R1Lieu8Q_5btrkM0gw3vkrAwr8u0cvxNRrcV0
+
+### 유저 등록
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "nickname": "mone",
+    "password": "mone1234"
+}
+
+### 유저 로그인
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "password": "mone1234"
+}
+
+### 유저 로그아웃
+POST http://localhost:3000/auth/logout
+
+### 유저 엑세스 토큰 재발급
+POST http://localhost:3000/auth/refresh
+
+

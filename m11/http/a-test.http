@@ -1,0 +1,185 @@
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1Nzg0MTU0MiwiZXhwIjoxNzU3ODQ1MTQyfQ.LQYwrg1s_RK51__99rp28T4InXyD4qghPADG4JnLUpI
+
+### 유저 로그인
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "password": "mone1234"
+}
+
+### 유저 등록
+POST http://localhost:3000/auth/signup
+Content-Type: application/json
+
+{
+    "email": "mone@example.com",
+    "nickname": "mone",
+    "password": "mone1234"
+}
+
+### 유저 로그아웃
+POST http://localhost:3000/auth/logout
+
+### 유저 엑세스 토큰 재발급
+POST http://localhost:3000/auth/refresh
+
+### 유저 정보 조회 (로그인 필요)
+GET http://localhost:3000/users/profile
+Authorization: Bearer {{accessToken}}
+
+### 유저 정보 수정 (해당 유저만 가능 / 패스워드 변경 무시됨)
+PUT http://localhost:3000/users/me
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "nickname": "moen",
+    "password": "nemo1234"
+}
+
+### 유저 정보 패스워드 변경 (해당 유저만 가능)
+PUT http://localhost:3000/users/me/password
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "currentPassword": "mone1234",
+    "newPassword": "nemo1234"
+}
+
+### 유저 좋아요 게시글 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/likes/posts
+Authorization: Bearer {{accessToken}}
+
+### 유저 좋아요 상품 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/likes/products
+Authorization: Bearer {{accessToken}}
+
+### 유저 등록 상품 리스트 조회 (해당 유저만 가능)
+GET http://localhost:3000/users/me/products
+Authorization: Bearer {{accessToken}}
+
+### 모든 좋아요 리스트 조회 (로그인 필요)
+GET http://localhost:3000/likes
+Authorization: Bearer {{accessToken}}
+
+
+### 게시글 목록 조회
+GET http://localhost:3000/posts
+
+### 특정 게시글 상세 조회
+GET http://localhost:3000/posts/2
+Authorization: Bearer {{accessToken}}
+
+### 게시글 등록 (로그인 필요)
+POST http://localhost:3000/posts
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "개인정보 보호: 중고 스마트폰 판매 전 초기화 방법",
+    "content": "스마트폰을 판매하기 전에 개인정보가 유출되지 않도록 완벽하게 초기화하는 방법을 단계별로 안내합니다."
+}
+
+### 게시글 정보 수정 (작성자만 가능)
+PUT http://localhost:3000/posts/2
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "title": "개인정보 보호: 중고 아이폰 판매 전 초기화 방법",
+    "content": "아이폰을 판매하기 전에 개인정보가 유출되지 않도록 완벽하게 초기화하는 방법을 단계별로 안내합니다."
+}
+
+### 게시글 삭제 (작성자만 가능)
+DELETE http://localhost:3000/posts/1
+Authorization: Bearer {{accessToken}}
+
+### 게시글 좋아요 및 취소 (로그인 필요)
+POST http://localhost:3000/posts/2/likes
+Authorization: Bearer {{accessToken}}
+
+
+### 상품 목록 조회
+GET http://localhost:3000/products
+
+### 특정 상품 상세 조회
+GET http://localhost:3000/products/2
+Authorization: Bearer {{accessToken}}
+
+### 상품 등록 (로그인 필요)
+POST http://localhost:3000/products
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰",
+    "description": "최고의 음질과 편안함을 선사하는 노이즈 캔슬링 무선 헤드폰입니다. 30시간 연속 재생이 가능하며, 초고속 충전을 지원합니다.",
+    "price": 299000,
+    "tags": ["헤드폰", "무선", "노이즈캔슬링"]
+}
+
+### 상품 정보 수정 (작성자만 가능)
+PUT http://localhost:3000/products/1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "name": "프리미엄 무선 헤드폰",
+    "description": "최고의 음질과 편안함을 선사하는 노이즈 캔슬링 무선 헤드폰입니다. 30시간 연속 재생이 가능하며, 초고속 충전을 지원합니다.",
+    "price": 399000,
+    "tags": ["헤드폰", "무선", "노이즈캔슬링"]
+}
+
+### 상품 삭제 (작성자만 가능)
+DELETE http://localhost:3000/products/1
+Authorization: Bearer {{accessToken}}
+
+### 상품 좋아요 및 취소 (로그인 필요)
+POST http://localhost:3000/products/2/likes
+Authorization: Bearer {{accessToken}}
+
+### 특정 게시글 댓글 조회
+GET http://localhost:3000/posts/2/comments
+
+### 특정 댓글 조회
+GET http://localhost:3000/comments/1
+
+
+### 특정 상품 댓글 조회
+GET http://localhost:3000/products/2/comments
+
+
+### 특정 게시글 댓글 생성 (로그인 필요)
+POST http://localhost:3000/posts/2/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "소중한 게시글 정보 감사합니다."
+}
+
+
+### 특정 상품 댓글 생성 (로그인 필요)
+POST http://localhost:3000/products/2/comments
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "소중한 상품 정보 감사합니다."
+}
+
+### 특정 댓글 수정 (작성자만 가능)
+PUT http://localhost:3000/comments/3
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+    "content": "Thank you for your precious information."
+}
+
+### 특정 댓글 삭제 (작성자만 가능)
+DELETE http://localhost:3000/comments/2
+Authorization: Bearer {{accessToken}}

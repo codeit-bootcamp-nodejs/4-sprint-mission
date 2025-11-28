@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+
+# Documentation
+docs/
+
+# Environment variables
+
+# 개발/운영 환경별 진짜 env 파일은 무시
+.env
+.env.*
+
+# 하지만 예시 파일은 꼭 포함
+!.env.example
+!.env.*.example
+
+# OS / IDE files
+.DS_Store
+*.log
+*.tmp
+
+# Prisma generated files
+/generated/prisma/
+src/generated/prisma/
+
+# Test database
+prisma/test.db
+prisma/test.db-journal
+test.db
+test.db-journal
+
+# Test coverage
+coverage/
+
+# Uploads (runtime generated files)
+uploads/
+
+# TypeScript build info
+*.tsbuildinfo

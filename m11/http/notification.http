@@ -1,0 +1,95 @@
+@baseUrl = http://localhost:3000
+# 로그인 후 받은 Access Token으로 교체하세요
+@tokenA = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMsImlhdCI6MTc2MjY5MTcxNCwiZXhwIjoxNzYyNjk1MzE0fQ.sLwWg6wfy5yAALoCowcGZ_7SRWLsmemXaCXn5QrpQsI
+@tokenB = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjQsImlhdCI6MTc2MjY5MTg0NCwiZXhwIjoxNzYyNjk1NDQ0fQ.TAqRi-x7S1zNKDHMRqnkGnePXzXA8NVYFky3QTC0dco
+
+### 1. 알림 목록 조회 (페이지네이션)
+GET {{baseUrl}}/notifications?limit=20&offset=0
+Authorization: Bearer {{tokenA}}
+
+### 2. 안 읽은 알림 개수 조회
+GET {{baseUrl}}/notifications/unread-count
+Authorization: Bearer {{tokenA}}
+
+### 3. 특정 알림 읽음 처리
+PUT {{baseUrl}}/notifications/1/read
+Authorization: Bearer {{tokenA}}
+
+### 4. 모든 알림 읽음 처리
+PUT {{baseUrl}}/notifications/read-all
+Authorization: Bearer {{tokenA}}
+
+###############################################
+# 알림 생성 테스트 (트리거)
+###############################################
+
+### 5. 게시글 작성 (댓글 알림 테스트용)
+# User A로 실행
+POST {{baseUrl}}/posts
+Authorization: Bearer {{tokenA}}
+Content-Type: application/json
+
+{
+    "title": "알림 테스트 게시글",
+    "content": "댓글을 달면 알림이 갑니다."
+}
+
+### 6. 게시글에 댓글 작성 (알림 발생)
+# User B로 실행 → User A에게 알림 전송
+POST {{baseUrl}}/posts/5/comments
+Authorization: Bearer {{tokenB}}
+Content-Type: application/json
+
+{
+    "content": "댓글입니다! 알림 가나요?"
+}
+
+### 7. 상품 등록 (가격 변경 알림 테스트용)
+# User A로 실행
+POST {{baseUrl}}/products
+Authorization: Bearer {{tokenA}}
+Content-Type: application/json
+
+{
+    "name": "알림 테스트 상품",
+    "description": "가격 변경하면 알림이 갑니다",
+    "price": 10000,
+    "tags": ["테스트"]
+}
+
+### 8. 상품 좋아요 (다른 사용자로)
+# User B로 실행
+POST {{baseUrl}}/products/2/likes
+Authorization: Bearer {{tokenB}}
+
+### 9. 상품 가격 변경 (알림 발생)
+# User A로 실행 → User B에게 알림 전송
+PUT {{baseUrl}}/products/2
+Authorization: Bearer {{tokenA}}
+Content-Type: application/json
+
+{
+    "name": "알림 테스트 상품",
+    "description": "가격 변경하면 알림이 갑니다",
+    "price": 9000,
+    "tags": ["테스트"]
+}
+
+###############################################
+# 통합 테스트 시나리오
+###############################################
+
+### 시나리오 1: 게시글 댓글 알림
+# 1. 사용자 A로 로그인 → accessToken 받기
+# 2. 위의 "5. 게시글 작성" 실행
+# 3. 사용자 B로 로그인 → 다른 accessToken 받기
+# 4. 사용자 B의 토큰으로 "6. 게시글에 댓글 작성" 실행
+# 5. 사용자 A의 토큰으로 "1. 알림 목록 조회" 실행 → 알림 확인!
+
+### 시나리오 2: 상품 가격 변경 알림
+# 1. 사용자 A로 로그인 → accessToken 받기
+# 2. 위의 "7. 상품 등록" 실행
+# 3. 사용자 B로 로그인 → 다른 accessToken 받기
+# 4. 사용자 B의 토큰으로 "8. 상품 좋아요" 실행
+# 5. 사용자 A의 토큰으로 "9. 상품 가격 변경" 실행
+# 6. 사용자 B의 토큰으로 "1. 알림 목록 조회" 실행 → 알림 확인!
