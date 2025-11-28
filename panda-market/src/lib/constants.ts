@@ -67,6 +67,7 @@ const AWS_SECRET_KEY = aws_secret_key;
 const AWS_REGION = aws_region;
 const AWS_BUCKET = aws_bucket;
 const PORT = process.env['PORT'];
+const PUBLIC_URL = process.env['PUBLIC_URL'];
 
 const NODE_ENV = node_env;
 
@@ -90,4 +91,5 @@ export {
   AWS_REGION,
   AWS_BUCKET,
   PORT,
+  PUBLIC_URL,
 };
