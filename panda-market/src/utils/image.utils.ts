@@ -3,8 +3,13 @@ import {
   extractPublicIdFromCloudinaryUrl,
 } from '@/lib/cloudinary.js';
 import { deleteS3File, extractPublicIdFromS3Url } from '@/lib/s3-client.js';
-import { v4 as uuidv4 } from 'uuid';
 import { ImageUpdateQueryInput, ImageUtils } from '@/types/image.types.js';
+
+function extractPublicIdFromlocalTestUrl(imageUrl: string) {
+  const urlObj = new URL(imageUrl);
+  const publicId = urlObj.pathname.slice(1);
+  return decodeURIComponent(publicId);
+}
 
 export function getImageInfo(url: string) {
   if (url.includes('cloudinary.com')) {
@@ -22,7 +27,7 @@ export function getImageInfo(url: string) {
   } else {
     return {
       url,
-      publicId: uuidv4(),
+      publicId: extractPublicIdFromlocalTestUrl(url),
       storageType: 'local',
     };
   }

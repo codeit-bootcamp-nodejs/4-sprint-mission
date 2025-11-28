@@ -283,7 +283,7 @@ export class ProductService {
             });
           }
         }
-        const updatedProduct = await this.productRepository.update({
+        await this.productRepository.update({
           productId,
           patchData,
           userId,
@@ -302,7 +302,7 @@ export class ProductService {
             tx,
           });
         }
-        return updatedProduct;
+        return this.productRepository.findById({ productId, userId, tx });
       });
       if (deletedImages.length > 0) {
         // 클라우디너리 이미지 삭제

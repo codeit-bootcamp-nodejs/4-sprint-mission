@@ -353,9 +353,7 @@ describe('ProductService', () => {
         imageData: [
           {
             // publicId가 UUID인지 확인 (문자열이고 길이가 36인지 등)
-            publicId: expect.stringMatching(
-              /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
-            ),
+            publicId: 'image.png',
             url: 'http://example.com/image.png',
             productId: createData.id,
           },
@@ -531,6 +529,27 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test']);
       mockTagRepo.incrementCounts.mockResolvedValue({ count: 1 });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '태그 수정 테스트1',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+          {
+            id: 2,
+            name: 'test2',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -625,6 +644,20 @@ describe('ProductService', () => {
           tags: ['test'],
         },
       });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '태그 수정 테스트2',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // then
       expect(mockProductRepo.update).toHaveBeenCalledWith({
         ...baseUpdateInput,
@@ -691,6 +724,27 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test', 'test2']);
       mockTagRepo.decrementCounts.mockResolvedValue({ count: 0 });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '태그 수정 테스트3',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+          {
+            id: 3,
+            name: 'test3',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -780,6 +834,23 @@ describe('ProductService', () => {
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '이미지 수정 테스트1',
+        images: [
+          {
+            id: 1,
+            publicId: 'test_files/test1',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
+          },
+          {
+            id: 2,
+            publicId: 'test_files/test2',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -851,6 +922,11 @@ describe('ProductService', () => {
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '이미지 수정 테스트2',
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -915,6 +991,18 @@ describe('ProductService', () => {
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '이미지 수정 테스트3',
+        images: [
+          {
+            id: 2,
+            publicId: 'test_files/test2',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -1003,6 +1091,20 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '가격 수정 테스트1',
+        price: 2,
+        likes: [
+          {
+            userId: 2,
+            productId: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -1088,6 +1190,12 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '가격 수정 테스트2',
+        price: 2,
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -1159,6 +1267,20 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '가격 수정 테스트3',
+        price: 2,
+        likes: [
+          {
+            userId: 1,
+            productId: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
