@@ -633,17 +633,6 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test', 'test2']);
       mockTagRepo.decrementCounts.mockResolvedValue({ count: 0 });
-      // when
-      const result = await mockProductService.patchProduct({
-        userId: 1,
-        productId: 1,
-        data: {
-          name: 'test2',
-          description: '태그 수정 테스트2',
-          price: 1,
-          tags: ['test'],
-        },
-      });
       mockProductRepo.findById.mockResolvedValue({
         ...updateResult,
         name: 'test2',
@@ -657,6 +646,17 @@ describe('ProductService', () => {
             updatedAt: MOCK_TIME,
           },
         ],
+      });
+      // when
+      const result = await mockProductService.patchProduct({
+        userId: 1,
+        productId: 1,
+        data: {
+          name: 'test2',
+          description: '태그 수정 테스트2',
+          price: 1,
+          tags: ['test'],
+        },
       });
       // then
       expect(mockProductRepo.update).toHaveBeenCalledWith({
