@@ -1,0 +1,28 @@
+name: panda-market-prod
+services:
+  server:
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/panda-market-ecr:latest
+    env_file:
+      - .env
+    container_name: panda-market-server
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - panda-market-network
+    entrypoint: sh -c "npx prisma migrate deploy && npm run start"
+
+  nginx:
+    image: nginx:1.28.0-alpine
+    container_name: panda-market-nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./infra/ec2/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - panda-market-network
+    depends_on:
+      - server
+
+networks:
+  panda-market-network:
+    name: panda-market-network

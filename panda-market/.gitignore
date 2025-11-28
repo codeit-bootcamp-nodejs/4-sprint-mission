@@ -21,7 +21,10 @@ yarn-error.log*
 .env.local
 .env.*.local
 .env.test
-.env.prod
+# 배포 로컬용
+.env.prod 
+# 배포 ec2용
+.env.prod.ec2
 
 # Prisma
 prisma/dev.db

@@ -1,0 +1,81 @@
+name: Deploy to AWS EC2
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 소스코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: AWS 인증
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_KEY}}
+          aws-region: ap-northeast-2
+
+      - name: ECR 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 도커 이미지 빌드 및 ECR 푸시
+        env:
+          ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
+          ECR_REPOSITORY: ${{secrets.AWS_ECR_REPO_NAME}}
+          IMAGE_TAG: latest
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG --build-arg NODE_VERSION=22.16.0 ./panda-market
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+  deploy-to-ec2:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: EC2 접속 및 배포
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          ENV_FILE: ${{ secrets.ENV_FILE }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_REGION: ap-northeast-2
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+        with:
+          host: ${{secrets.AWS_HOST}}
+          username: ${{ secrets.AWS_USERNAME }}
+          key: ${{ secrets.AWS_KEY }}
+          port: 2222
+          envs: ENV_FILE,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_REGION,AWS_ACCOUNT_ID
+          script: |
+            set -e
+
+            echo "🚀 배포 시작! (Docker & ECR)"
+
+            PROJECT_PATH="/home/${{ secrets.AWS_USERNAME }}/deploy"
+
+            if [ ! -d "$PROJECT_PATH" ]; then
+              git clone https://github.com/${{ github.repository }} $PROJECT_PATH
+            fi
+
+            cd $PROJECT_PATH
+            git pull origin main # 코드 최신화
+
+            cd panda-market
+
+            echo "$ENV_FILE" > .env
+
+            echo "👉 ECR 로그인 중..."
+            aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+            echo "👉 최신 이미지 Pull 및 컨테이너 재시작..."
+
+            docker compose -f docker-compose.prod.yaml pull
+
+            docker compose -f docker-compose.prod.yaml up -d
+
+            docker image prune -f
+
+            echo "🎉 배포 완료!"
