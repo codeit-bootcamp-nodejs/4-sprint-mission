@@ -1,0 +1,65 @@
+# Dependencies (installed fresh in container)
+node_modules
+
+# Build output (built fresh in container)
+dist
+
+# Environment files (passed via docker-compose or secrets)
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+*.swo
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Test
+tests
+coverage
+jest.config.js
+*.test.ts
+*.spec.ts
+
+# Documentation
+docs
+*.md
+
+# Linting / Formatting (dev-only)
+.prettierrc
+.prettierignore
+.eslintrc*
+.eslintignore
+.editorconfig
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files (not needed inside container)
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github
+
+# Infrastructure configs (not needed in app container)
+infra
+
+# HTTP client files (for testing APIs)
+http
+
+# Uploaded files (mounted as volume)
+uploads/*
+!uploads/.gitkeep
