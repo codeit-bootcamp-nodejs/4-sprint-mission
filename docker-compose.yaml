@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    image: kimdolmeng/express-app:latest
+    container_name: express-app
+    ports:
+      - 3000:3000
+    volumes:
+      - upload_data:/app/uploads
+    environment:
+      DB_HOST: postgres
+      DB_USER: user_mbti
+      DB_PASSWORD: pw_mbti
+      DB_NAME: db_mbti
+    depends_on: 
+      - db
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: db_mbti
+      POSTGRES_USER: user_mbti
+      POSTGRES_PASSWORD: pw_mbti
+
+volumes:
+  upload_data:
+  postgres_data: 
