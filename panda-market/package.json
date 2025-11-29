@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint src --ext .ts --fix",
     "db:migrate:test": "dotenv -e .env.test -- prisma migrate dev",
-    "prepare": "husky"
+    "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky; fi"
   },
   "keywords": [],
   "author": "",

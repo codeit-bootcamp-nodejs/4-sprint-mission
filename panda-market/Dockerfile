@@ -16,6 +16,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # 실행 스테이지
+ARG NODE_VERSION
 FROM node:${NODE_VERSION}-alpine AS runner
 
 WORKDIR /app
