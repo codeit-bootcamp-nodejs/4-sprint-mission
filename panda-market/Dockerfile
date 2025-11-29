@@ -24,7 +24,10 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/documentation ./dist/documentation
 
 RUN npm ci --only=prod && npm cache clean --force
+
+RUN npx prisma generate
 
 ENTRYPOINT [ "npm", "run", "start" ]
