@@ -1,4 +1,4 @@
-import prisma from '../prisma/prisma.js';
+import { prisma } from '../prisma/prisma.js';
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Post } from "@prisma/client";
 // 게시글 목록 조회
@@ -184,7 +184,9 @@ export async function postDetailService(postId: number, userId?: number): Promis
   }
 
   const likeCount = post.likes.length;
-  const isLiked = userId ? post.likes.some(like => like.userId === userId) : false;
+  const isLiked = userId
+  ? post.likes.some((like: { userId: number }) => like.userId === userId)
+  : false;
 
   return {
     id: post.id,
@@ -197,7 +199,7 @@ export async function postDetailService(postId: number, userId?: number): Promis
     updatedAt: post.updatedAt,
     likeCount,
     isLiked,
-    comments: post.comments.map(comment => ({
+    comments: post.comments.map((comment:any) => ({
       id: comment.id,
       content: comment.content,
       userId: comment.userId,

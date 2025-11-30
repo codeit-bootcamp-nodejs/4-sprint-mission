@@ -1,4 +1,4 @@
-import prisma from "../prisma/prisma.js";
+import { prisma } from "../prisma/prisma.js";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Like } from "@prisma/client";
 import { createNotification } from "./notification.service.js";
@@ -244,7 +244,10 @@ export async function likeProductListService(userId: number): Promise<{
     throw new HttpError("좋아요를 표시한 상품이 없습니다.", 404);
   }
   return list
-    .map(item => item.Product)
-    .filter((product): product is { id: number; title: string; content: string } => product !== null);
+    .map((item: { Product: { id: number; title: string; content: string } | null }) => item.Product)
+    .filter((product: { id: number; title: string; content: string } | null):
+  product is { id: number; title: string; content: string } =>
+  product !== null
+);
 }
 

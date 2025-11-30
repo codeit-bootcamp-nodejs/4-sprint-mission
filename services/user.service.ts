@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import prisma from "../prisma/prisma.js"
+import { prisma } from "../prisma/prisma.js"
 import bcrypt from "bcrypt";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import dotenv from "dotenv";

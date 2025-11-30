@@ -1,4 +1,4 @@
-import prisma from '../prisma/prisma.js'
+import { prisma } from '../prisma/prisma.js'
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import dotenv from "dotenv";
 import type { Product } from "@prisma/client";
@@ -246,7 +246,9 @@ export async function productDetailService(productId: number, userId?: number): 
   }
 
   const likeCount = product.likes.length;
-  const isLiked = userId ? product.likes.some(like => like.userId === userId) : false;
+  const isLiked = userId
+  ? product.likes.some((like: { userId: number }) => like.userId === userId)
+  : false;
 
   return {
     id: product.id,
@@ -261,7 +263,7 @@ export async function productDetailService(productId: number, userId?: number): 
     updatedAt: product.updatedAt,
     likeCount,
     isLiked,
-    comments: product.comments.map(comment => ({
+    comments: product.comments.map((comment: any) => ({
       id: comment.id,
       content: comment.content,
       userId: comment.userId,
