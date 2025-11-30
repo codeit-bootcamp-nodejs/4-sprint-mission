@@ -13,7 +13,7 @@ Node.js, Express, Prisma를 사용하여 JWT 기반 인증(Access/Refresh Token)
 - **Authentication**: JSON Web Token (JWT)
 - **Password Hashing**: bcrypt
 - **Development Tool**: nodemon
-
+.
 ---
 
 ## 프로젝트 아키텍처
