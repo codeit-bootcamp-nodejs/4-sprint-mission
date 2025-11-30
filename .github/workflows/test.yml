@@ -8,8 +8,30 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
+    # PostgreSQL 서비스 컨테이너 추가
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
     env:
       NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      JWT_SECRET: test-jwt-secret-key-for-ci
+      REFRESH_SECRET: test-refresh-secret-key-for-ci
+      PORT: 3000
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -24,6 +46,15 @@ jobs:
       
       - name: Generate Prisma Client
         run: yarn prisma generate
+      
+      - name: Setup Database Schema
+        run: yarn prisma db push --skip-generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
 
-      - name: Run unit tests
-        run: yarn test 
+      - name: Run tests
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          JWT_SECRET: test-jwt-secret-key-for-ci
+          REFRESH_SECRET: test-refresh-secret-key-for-ci 
