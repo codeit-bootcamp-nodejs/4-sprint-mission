@@ -48,7 +48,7 @@ jobs:
         run: yarn prisma generate
       
       - name: Setup Database Schema
-        run: yarn prisma db push --skip-generate
+        run: yarn prisma db push
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
 
@@ -57,4 +57,4 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
           JWT_SECRET: test-jwt-secret-key-for-ci
-          REFRESH_SECRET: test-refresh-secret-key-for-ci 
+          REFRESH_SECRET: test-refresh-secret-key-for-ci
