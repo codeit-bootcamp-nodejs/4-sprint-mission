@@ -13,6 +13,7 @@ import productsRouter from './routes/products.router.js';
 import articlesRouter from './routes/articles.router.js';
 import commentsRouter from './routes/comments.router.js';
 import notificationsRouter from './routes/notifications.router.js'; // Import notifications router
+import { errorHandler } from './middlewares/error-handler.middleware.js';
 import { NotificationsService } from './services/notifications.service.js'; // Import NotificationsService
 
 // uploads 폴더가 존재하지 않으면, 폴더를 생성합니다.
@@ -39,10 +40,8 @@ const JWT_SECRET = process.env.JWT_SECRET_KEY!;
 app.use(express.json()); //body-parser middleware
 app.use('/api', [usersRouter, productsRouter, articlesRouter, commentsRouter, notificationsRouter]); // Add notifications router
 
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-    console.error(`[${req.method}] ${req.originalUrl} :`, err);
-    res.status(500).json({ message: "서버 내부 오류 발생"});
-});
+// 전역 에러 핸들러 미들웨어 등록
+app.use(errorHandler);
 
 // Socket.IO authentication middleware
 io.use((socket, next) => {

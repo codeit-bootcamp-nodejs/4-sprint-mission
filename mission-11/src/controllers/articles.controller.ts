@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ArticlesService } from '../services/articles.service.js';
-import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js'; // Import DTOs
+import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js';
+import { BadRequestError, UnauthorizedError } from '../errors/http-error.js';
 
 export class ArticlesController {
   articlesService = new ArticlesService();
@@ -8,19 +9,22 @@ export class ArticlesController {
   // 게시글 생성
   createArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const createArticleDto: CreateArticleDto = req.body; // Use DTO
+      const createArticleDto: CreateArticleDto = req.body;
       const user = req.user;
 
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        throw new UnauthorizedError('인증 정보가 없습니다.');
       }
       const userId = user.id;
 
-      if (!createArticleDto.title || !createArticleDto.content) { // Validate DTO fields
-        return res.status(400).json({ message: '제목과 내용을 모두 입력해주세요.' });
+      if (!createArticleDto.title || !createArticleDto.content) {
+        throw new BadRequestError('제목과 내용을 모두 입력해주세요.');
       }
 
-      const newArticle = await this.articlesService.createArticle(createArticleDto, userId); // Pass DTO
+      const newArticle = await this.articlesService.createArticle(
+        createArticleDto,
+        userId,
+      );
 
       return res.status(201).json({ data: newArticle });
     } catch (err) {
@@ -42,19 +46,19 @@ export class ArticlesController {
   getArticleById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { articleId } = req.params;
-      const user = req.user; // Optional user for isLiked check
+      const user = req.user;
 
       if (isNaN(parseInt(articleId))) {
-        return res.status(400).json({ message: '유효하지 않은 게시글 ID입니다.' });
+        throw new BadRequestError('유효하지 않은 게시글 ID입니다.');
       }
 
-      const article = await this.articlesService.getArticleById(+articleId, user?.id);
+      const article = await this.articlesService.getArticleById(
+        +articleId,
+        user?.id,
+      );
 
       return res.status(200).json({ data: article });
-    } catch (err: any) {
-      if (err.name === "NotFoundError") {
-        return res.status(404).json({ message: err.message });
-      }
+    } catch (err) {
       next(err);
     }
   };
@@ -63,74 +67,69 @@ export class ArticlesController {
   updateArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { articleId } = req.params;
-      const updateArticleDto: UpdateArticleDto = req.body; // Use DTO
+      const updateArticleDto: UpdateArticleDto = req.body;
       const user = req.user;
 
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        throw new UnauthorizedError('인증 정보가 없습니다.');
       }
       const userId = user.id;
 
-      const updatedArticle = await this.articlesService.updateArticle(+articleId, userId, updateArticleDto); // Pass DTO
+      const updatedArticle = await this.articlesService.updateArticle(
+        +articleId,
+        userId,
+        updateArticleDto,
+      );
 
       return res.status(200).json({ data: updatedArticle });
-    } catch (err: any) {
-      if (err.name === "NotFoundError") {
-        return res.status(404).json({ message: err.message });
-      }
-      if (err.name === "ForbiddenError") {
-        return res.status(403).json({ message: err.message });
-      }
-      if (err.name === "BadRequestError") {
-        return res.status(400).json({ message: err.message });
-      }
+    } catch (err) {
       next(err);
     }
   };
 
-  // 게시글 삭제 
+  // 게시글 삭제
   deleteArticle = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { articleId } = req.params;
       const user = req.user;
 
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        throw new UnauthorizedError('인증 정보가 없습니다.');
       }
       const userId = user.id;
 
       await this.articlesService.deleteArticle(+articleId, userId);
 
-      return res.status(200).json({ message: '게시글이 성공적으로 삭제되었습니다.' });
-    } catch (err: any) {
-      if (err.name === "NotFoundError") {
-        return res.status(404).json({ message: err.message });
-      }
-      if (err.name === "ForbiddenError") {
-        return res.status(403).json({ message: err.message });
-      }
+      return res
+        .status(200)
+        .json({ message: '게시글이 성공적으로 삭제되었습니다.' });
+    } catch (err) {
       next(err);
     }
   };
 
   // 게시글 좋아요/좋아요 취소
-  toggleArticleLike = async (req: Request, res: Response, next: NextFunction) => {
+  toggleArticleLike = async (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const { articleId } = req.params;
       const user = req.user;
 
       if (!user) {
-        return res.status(401).json({ message: "인증 정보가 없습니다." });
+        throw new UnauthorizedError('인증 정보가 없습니다.');
       }
       const userId = user.id;
 
-      const result = await this.articlesService.toggleArticleLike(+articleId, userId);
+      const result = await this.articlesService.toggleArticleLike(
+        +articleId,
+        userId,
+      );
 
       return res.status(200).json(result);
-    } catch (err: any) {
-      if (err.name === "NotFoundError") {
-        return res.status(404).json({ message: err.message });
-      }
+    } catch (err) {
       next(err);
     }
   };

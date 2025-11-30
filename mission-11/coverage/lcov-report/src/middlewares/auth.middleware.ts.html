@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.41% </span>
+                <span class="strong">78.26% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>21/29</span>
+                <span class='fraction'>18/23</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.15% </span>
+                <span class="strong">64.28% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>6/13</span>
+                <span class='fraction'>9/14</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.41% </span>
+                <span class="strong">78.26% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>21/29</span>
+                <span class='fraction'>18/23</span>
             </div>
         
             
@@ -116,6 +116,7 @@
 <a name='L51'></a><a href='#L51'>51</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">10x</span>
@@ -130,89 +131,88 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { prisma } from "../utils/prisma.util.js";
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { prisma } from '../utils/prisma.util.js';
+import { UnauthorizedError } from '../errors/http-error.js';
 &nbsp;
-export default async function(req: Request, res: Response, next: NextFunction) {
-    try {
-        const { authorization } = req.headers;
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (!authorization) {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json( { message: "인증 정보가 없습니다."});</span>
-        }
-&nbsp;
-        const [tokenType, token] = authorization.split(' ');
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (tokenType !== "Bearer") {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json( { message: "지원하지 않는 토큰 형식입니다."});</span>
-        }
-&nbsp;
-        const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET_KEY;
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (!accessTokenSecret) {
-<span class="cstat-no" title="statement not covered" >            return res.status(500).json({ message: "서버에 ACCESS_TOKEN_SECRET_KEY가 설정되지 않았습니다." });</span>
-        }
-&nbsp;
-        const decodedToken = jwt.verify(token, accessTokenSecret);
-&nbsp;
-        <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof decodedToken !== 'object' || decodedToken === null || !('userId' in decodedToken)) {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json({ message: "인증 정보가 유효하지 않습니다." });</span>
-        }
-        
-        const userId = (decodedToken as { userId: number }).userId;
-&nbsp;
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-        });
-        <span class="missing-if-branch" title="if path not taken" >I</span>if(!user) {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json( { message: "인증정보와 일치하는 사용자가 없습니다."});</span>
-        }
-&nbsp;
-        req.user = user;
-        next();
-    } catch(err: any){
-        <span class="missing-if-branch" title="if path not taken" >I</span>if(err instanceof SyntaxError) {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json( { message: "인증 정보가 유효하지 않습니다."});</span>
-        }
-        else <span class="missing-if-branch" title="if path not taken" >I</span>if(err.name === "TokenExpiredError") {
-<span class="cstat-no" title="statement not covered" >            return res.status(401).json( { message: "인증 정보 만료"});</span>
-        }
-        else if( err.name === "JsonWebTokenError") {
-            return res.status(401).json( { message: "인증 정보가 유효하지 않습니다."});
-        }
-<span class="cstat-no" title="statement not covered" >        next(err);</span>
+export default async function (req: Request, res: Response, next: NextFunction) {
+  try {
+    const { authorization } = req.headers;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!authorization) {
+<span class="cstat-no" title="statement not covered" >      throw new UnauthorizedError('인증 정보가 없습니다.');</span>
     }
+&nbsp;
+    const [tokenType, token] = authorization.split(' ');
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (tokenType !== 'Bearer' || !token) {
+<span class="cstat-no" title="statement not covered" >      throw new UnauthorizedError('지원하지 않는 토큰 형식입니다.');</span>
+    }
+&nbsp;
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY!);
+&nbsp;
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (
+      typeof decodedToken !== 'object' ||
+      decodedToken === null ||
+      !('userId' in decodedToken)
+    ) {
+<span class="cstat-no" title="statement not covered" >      throw new UnauthorizedError('인증 정보가 유효하지 않습니다.');</span>
+    }
+&nbsp;
+    const userId = (decodedToken as { userId: number }).userId;
+&nbsp;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!user) {
+<span class="cstat-no" title="statement not covered" >      throw new UnauthorizedError('인증정보와 일치하는 사용자가 없습니다.');</span>
+    }
+&nbsp;
+    req.user = user;
+    next();
+  } catch (err: any) {
+    // JWT 관련 에러들을 일관되게 처리
+    if (
+      err instanceof SyntaxError ||
+      err.name === 'TokenExpiredError' ||
+      err.name === 'JsonWebTokenError'
+    ) {
+      next(new UnauthorizedError('인증 정보가 유효하지 않습니다.'));
+    } else <span class="missing-if-branch" title="else path not taken" >E</span>{
+<span class="cstat-no" title="statement not covered" >      next(err);</span>
+    }
+  }
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -220,7 +220,7 @@ export default async function(req: Request, res: Response, next: NextFunction) {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-22T07:18:34.218Z
+                at 2025-11-30T14:32:10.843Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

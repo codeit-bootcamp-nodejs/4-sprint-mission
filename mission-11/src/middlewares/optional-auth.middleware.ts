@@ -15,21 +15,25 @@ export default async function (req: Request, res: Response, next: NextFunction) 
 
     const [tokenType, token] = authorization.split(' ');
     // Bearer 토큰이 아니면 그냥 통과
-    if (tokenType !== 'Bearer') {
+    if (tokenType !== 'Bearer' || !token) {
       return next();
     }
 
-    const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET_KEY;
+    const accessTokenSecret = process.env.JWT_SECRET_KEY;
     // 시크릿 키가 없으면 인증을 진행할 수 없으므로 그냥 통과
     if (!accessTokenSecret) {
-        return next();
+      return next();
     }
 
     // JWT 검증
     const decodedToken = jwt.verify(token, accessTokenSecret);
-    
-    if (typeof decodedToken !== 'object' || decodedToken === null || !('userId' in decodedToken)) {
-        return next(); // 유효하지 않은 토큰이면 그냥 통과
+
+    if (
+      typeof decodedToken !== 'object' ||
+      decodedToken === null ||
+      !('userId' in decodedToken)
+    ) {
+      return next(); // 유효하지 않은 토큰이면 그냥 통과
     }
 
     const userId = (decodedToken as { userId: number }).userId;

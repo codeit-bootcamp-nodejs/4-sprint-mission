@@ -1,12 +1,17 @@
 import { ArticlesRepository } from '../repositories/articles.repository.js';
 import { Prisma } from '@prisma/client';
-import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js'; // Import DTOs
+import { CreateArticleDto, UpdateArticleDto } from '../dtos/article.dto.js';
+import {
+  NotFoundError,
+  ForbiddenError,
+  BadRequestError,
+} from '../errors/http-error.js';
 
 export class ArticlesService {
   articlesRepository = new ArticlesRepository();
 
-  createArticle = async (createArticleDto: CreateArticleDto, userId: number) => { // Use DTO
-    const { title, content } = createArticleDto; // Destructure DTO
+  createArticle = async (createArticleDto: CreateArticleDto, userId: number) => {
+    const { title, content } = createArticleDto;
     const newArticle = await this.articlesRepository.createArticle({
       title,
       content,
@@ -25,9 +30,7 @@ export class ArticlesService {
   getArticleById = async (articleId: number, userId?: number) => {
     const article = await this.articlesRepository.findArticleById(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
 
     let isLiked = false;
@@ -42,45 +45,42 @@ export class ArticlesService {
     return responseArticle;
   };
 
-  updateArticle = async (articleId: number, userId: number, updateArticleDto: UpdateArticleDto) => { // Use DTO
-    const { title, content } = updateArticleDto; // Destructure DTO
+  updateArticle = async (
+    articleId: number,
+    userId: number,
+    updateArticleDto: UpdateArticleDto,
+  ) => {
+    const { title, content } = updateArticleDto;
     const article = await this.articlesRepository.findArticleByIdSimple(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
     if (article.authorId !== userId) {
-      const err = new Error("게시글을 수정할 권한이 없습니다.");
-      err.name = "ForbiddenError";
-      throw err;
+      throw new ForbiddenError('게시글을 수정할 권한이 없습니다.');
     }
 
     if (!title && !content) {
-      const err = new Error("수정할 정보를 하나 이상 입력해주세요.");
-      err.name = "BadRequestError";
-      throw err;
+      throw new BadRequestError('수정할 정보를 하나 이상 입력해주세요.');
     }
 
     const dataToUpdate: Prisma.ArticleUpdateInput = {};
     if (title) dataToUpdate.title = title;
     if (content) dataToUpdate.content = content;
 
-    const updatedArticle = await this.articlesRepository.updateArticle(articleId, dataToUpdate);
+    const updatedArticle = await this.articlesRepository.updateArticle(
+      articleId,
+      dataToUpdate,
+    );
     return updatedArticle;
   };
 
   deleteArticle = async (articleId: number, userId: number) => {
     const article = await this.articlesRepository.findArticleByIdSimple(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
     if (article.authorId !== userId) {
-      const err = new Error("게시글을 삭제할 권한이 없습니다.");
-      err.name = "ForbiddenError";
-      throw err;
+      throw new ForbiddenError('게시글을 삭제할 권한이 없습니다.');
     }
 
     await this.articlesRepository.deleteArticle(articleId);
@@ -89,12 +89,13 @@ export class ArticlesService {
   toggleArticleLike = async (articleId: number, userId: number) => {
     const article = await this.articlesRepository.findArticleByIdSimple(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
 
-    const existingLike = await this.articlesRepository.findArticleLike(userId, articleId);
+    const existingLike = await this.articlesRepository.findArticleLike(
+      userId,
+      articleId,
+    );
 
     if (existingLike) {
       await this.articlesRepository.deleteArticleLike(userId, articleId);

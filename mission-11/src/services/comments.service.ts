@@ -1,25 +1,30 @@
 import { CommentsRepository } from '../repositories/comments.repository.js';
-import { Prisma, NotificationType } from '@prisma/client'; // Import NotificationType
-import { NotificationsService } from './notifications.service.js'; // Import NotificationsService
-import { CreateCommentDto, UpdateCommentDto } from '../dtos/comment.dto.js'; // Import DTOs
+import { Prisma, NotificationType } from '@prisma/client';
+import { NotificationsService } from './notifications.service.js';
+import { CreateCommentDto, UpdateCommentDto } from '../dtos/comment.dto.js';
+import {
+  NotFoundError,
+  ForbiddenError,
+  BadRequestError,
+} from '../errors/http-error.js';
 
 export class CommentsService {
   commentsRepository = new CommentsRepository();
-  notificationsService = NotificationsService.getInstance(); // Get singleton instance
+  notificationsService = NotificationsService.getInstance();
 
-  createArticleComment = async (articleId: number, createCommentDto: CreateCommentDto, userId: number) => { // Use DTO
-    const { content } = createCommentDto; // Destructure DTO
+  createArticleComment = async (
+    articleId: number,
+    createCommentDto: CreateCommentDto,
+    userId: number,
+  ) => {
+    const { content } = createCommentDto;
     if (!content) {
-      const err = new Error("댓글 내용을 입력해주세요.");
-      err.name = "BadRequestError";
-      throw err;
+      throw new BadRequestError('댓글 내용을 입력해주세요.');
     }
 
     const article = await this.commentsRepository.findArticleById(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
 
     const newComment = await this.commentsRepository.createArticleComment(
@@ -29,12 +34,12 @@ export class CommentsService {
     );
 
     // Notification for new comment on article
-    if (article.authorId !== userId) { // If comment author is not article author
+    if (article.authorId !== userId) {
       await this.notificationsService.createNotification(
         article.authorId,
         NotificationType.NEW_COMMENT,
         `작성하신 게시글 '${article.title}'에 새로운 댓글이 달렸습니다.`,
-        undefined, // No related product
+        undefined,
         articleId,
       );
     }
@@ -42,19 +47,19 @@ export class CommentsService {
     return newComment;
   };
 
-  createProductComment = async (productId: number, createCommentDto: CreateCommentDto, userId: number) => { // Use DTO
-    const { content } = createCommentDto; // Destructure DTO
+  createProductComment = async (
+    productId: number,
+    createCommentDto: CreateCommentDto,
+    userId: number,
+  ) => {
+    const { content } = createCommentDto;
     if (!content) {
-      const err = new Error("댓글 내용을 입력해주세요.");
-      err.name = "BadRequestError";
-      throw err;
+      throw new BadRequestError('댓글 내용을 입력해주세요.');
     }
 
     const product = await this.commentsRepository.findProductById(productId);
     if (!product) {
-      const err = new Error("상품을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('상품을 찾을 수 없습니다.');
     }
 
     const newComment = await this.commentsRepository.createProductComment(
@@ -68,62 +73,59 @@ export class CommentsService {
   getArticleComments = async (articleId: number) => {
     const article = await this.commentsRepository.findArticleById(articleId);
     if (!article) {
-      const err = new Error("게시글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
 
-    const comments = await this.commentsRepository.findCommentsByArticleId(articleId);
+    const comments = await this.commentsRepository.findCommentsByArticleId(
+      articleId,
+    );
     return comments;
   };
 
   getProductComments = async (productId: number) => {
     const product = await this.commentsRepository.findProductById(productId);
     if (!product) {
-      const err = new Error("상품을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('상품을 찾을 수 없습니다.');
     }
 
-    const comments = await this.commentsRepository.findCommentsByProductId(productId);
+    const comments = await this.commentsRepository.findCommentsByProductId(
+      productId,
+    );
     return comments;
   };
 
-  updateComment = async (commentId: number, updateCommentDto: UpdateCommentDto, userId: number) => { // Use DTO
-    const { content } = updateCommentDto; // Destructure DTO
+  updateComment = async (
+    commentId: number,
+    updateCommentDto: UpdateCommentDto,
+    userId: number,
+  ) => {
+    const { content } = updateCommentDto;
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) {
-      const err = new Error("댓글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
     if (comment.authorId !== userId) {
-      const err = new Error("댓글을 수정할 권한이 없습니다.");
-      err.name = "ForbiddenError";
-      throw err;
+      throw new ForbiddenError('댓글을 수정할 권한이 없습니다.');
     }
 
     if (!content) {
-      const err = new Error("수정할 내용을 입력해주세요.");
-      err.name = "BadRequestError";
-      throw err;
+      throw new BadRequestError('수정할 내용을 입력해주세요.');
     }
 
-    const updatedComment = await this.commentsRepository.updateComment(commentId, content);
+    const updatedComment = await this.commentsRepository.updateComment(
+      commentId,
+      content,
+    );
     return updatedComment;
   };
 
   deleteComment = async (commentId: number, userId: number) => {
     const comment = await this.commentsRepository.findCommentById(commentId);
     if (!comment) {
-      const err = new Error("댓글을 찾을 수 없습니다.");
-      err.name = "NotFoundError";
-      throw err;
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
     if (comment.authorId !== userId) {
-      const err = new Error("댓글을 삭제할 권한이 없습니다.");
-      err.name = "ForbiddenError";
-      throw err;
+      throw new ForbiddenError('댓글을 삭제할 권한이 없습니다.');
     }
 
     await this.commentsRepository.deleteComment(commentId);
