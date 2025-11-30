@@ -18,6 +18,11 @@ module.exports = {
       },
     ],
   },
+  globals: {
+    "ts-jest": {
+      useESM: true,
+    },
+  },
   testMatch: ["**/jest/**/*.test.ts"],
   collectCoverageFrom: [
     "controllers/**/*.ts",
@@ -39,6 +44,6 @@ module.exports = {
   },
   setupFilesAfterEnv: ["<rootDir>/jest/setup.js"],
   transformIgnorePatterns: [
-    "node_modules/(?!(.*\\.mjs$|dotenv))",
+    "node_modules/(?!(.*\\.mjs$|dotenv|@prisma/.+))",
   ],
 };
