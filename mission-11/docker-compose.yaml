@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./uploads:/app/uploads # Local folder bind mount for file uploads
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/mydatabase?schema=public
+      JWT_SECRET_KEY: your_jwt_secret_key
+      JWT_REFRESH_SECRET_KEY: your_jwt_refresh_secret_key
+      PORT: 3000
+      NODE_ENV: development
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - db-data:/var/lib/postgresql/data # Named volume for database persistence
+    restart: always
+
+volumes:
+  db-data:
