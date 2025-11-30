@@ -42,7 +42,8 @@
     "pg": "^8.16.3",
     "save-dev": "^0.0.1-security",
     "url": "^0.11.4",
-    "ws": "^8.18.3"
+    "ws": "^8.18.3",
+    "yarn": "^1.22.22"
   },
   "description": "",
   "devDependencies": {

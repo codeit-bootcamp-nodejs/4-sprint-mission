@@ -6,9 +6,10 @@ dotenv.config();
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || "http://52.79.236.229/auth/google/callback";
+const GOOGLE_CALLBACK_URL =
+  process.env.GOOGLE_CALLBACK_URL || "http://52.79.236.229/auth/google/callback";
 
-// 테스트 환경이면 Google OAuth 등록 건너뛰기
+// ✅ 테스트 환경이면 Google OAuth 등록 건너뛰기
 if (process.env.NODE_ENV !== "test") {
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
     console.warn(
@@ -19,8 +20,8 @@ if (process.env.NODE_ENV !== "test") {
   passport.use(
     new GoogleStrategy(
       {
-        clientID: GOOGLE_CLIENT_ID || "",
-        clientSecret: GOOGLE_CLIENT_SECRET || "",
+        clientID: GOOGLE_CLIENT_ID || "DUMMY_CLIENT_ID", // test 환경 대비 안전하게 dummy
+        clientSecret: GOOGLE_CLIENT_SECRET || "DUMMY_CLIENT_SECRET",
         callbackURL: GOOGLE_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
