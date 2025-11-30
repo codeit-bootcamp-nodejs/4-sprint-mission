@@ -4,7 +4,6 @@ module.exports = {
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts"],
   moduleNameMapper: {
-    "^@prisma/client$": "<rootDir>/__mocks__/prisma.ts",
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
   transform: {

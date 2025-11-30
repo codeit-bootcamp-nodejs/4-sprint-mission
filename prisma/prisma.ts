@@ -6,15 +6,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 let prisma: PrismaClient;
 
-if (process.env.NODE_ENV === 'test') {
-  // 테스트 환경: 실제 DB 연결 없이 prisma stub 생성
-  prisma = new PrismaClient() as any; // 타입 캐스팅으로 임시 stub
+if (!DATABASE_URL) {
+  // DATABASE_URL이 없으면 기본 PrismaClient 사용 (유닛 테스트에서 모킹될 예정)
+  prisma = new PrismaClient();
 } else {
-  if (!DATABASE_URL) {
-    console.error("❌ DATABASE_URL 환경 변수가 로드되지 않았습니다.");
-    process.exit(1);
-  }
-
+  // DATABASE_URL이 있으면 실제 DB 연결 (통합 테스트 및 프로덕션)
   const pool = new Pool({ connectionString: DATABASE_URL });
   const adapter = new PrismaPg(pool);
 
