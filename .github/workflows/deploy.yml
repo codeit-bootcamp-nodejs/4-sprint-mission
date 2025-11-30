@@ -1,0 +1,35 @@
+name: 🚀 Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - dev 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      # 1. SSH 접속 및 배포 명령 실행
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            # 1. 프로젝트 디렉토리로 이동
+            cd /home/ec2-user/4-sprint-mission
+
+            # 2. 최신 코드 반영
+            git pull origin main
+
+            # 3. 의존성 설치 및 빌드
+            yarn install --frozen-lockfile
+            yarn build
+            
+            # 4. PM2를 이용하여 앱 재시작
+            pm2 reload ecosystem.config.cjs --env production
