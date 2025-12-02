@@ -1,0 +1,18 @@
+name: Commit Message Check
+
+on: push
+
+jobs:
+    verify-commit:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            
+            - name: Check commit message
+              run: |
+                MESSAGE=$(git log -1 --pretty=%B)
+                echo "Commit message: $MESSAGE"
+                if [[ "$MESSAGE" != feat:* && "$MESSAGE" != fix:* ]]; then
+                echo "Commit message must start with 'feat:' or 'fix:'"
+                exit 1
+                fi

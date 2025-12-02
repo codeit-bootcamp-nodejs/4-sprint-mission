@@ -1,0 +1,50 @@
+name: test with create .env test
+
+on: [pull_request]
+
+jobs:
+  build:
+    name: React build & test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser" 
+          --health-interval 5s 
+          --health-timeout 5s 
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create .env
+        run: |
+          echo "Port=3000" >> .env
+          echo "SESSION_SECRET=your_session_secret" >> .env
+          echo "JWT_ACCESS_TOKEN_SECRET=your_jwt_access_token_secret" >> .env
+          echo "JWT_REFRESH_TOKEN_SECRET=your_jwt_refresh_token_secret" >> .env
+          # 테스트용 로컬 Postgres
+          echo "DATABASE_URL=postgres://testuser:testpass@localhost:5432/testdb" >> .env
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> .env
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> .env
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> .env
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prisma Generate
+        run: npx prisma generate
+
+      - name: Prisma Migrate Dev
+        run: npx prisma migrate deploy
+
+      - name: Run tests
+        run: npm test -- --runInBand
