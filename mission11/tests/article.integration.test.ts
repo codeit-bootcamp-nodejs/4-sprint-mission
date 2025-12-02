@@ -1,36 +1,66 @@
 import request from "supertest";
 import { app, server } from "../src/app";
-import { loginAndGetToken } from "./helpers/auth";
 import { ArticleRepository } from "../src/repositories/articleRepository";
+import { UserRepository } from "../src/repositories/userRepository";
+import bcrypt from "bcrypt";
 
 describe("Article API Integration Test", () => {
   let accessToken: string;
-  let articleId: number;
   let userId: number;
+  let articleId: number;
 
   beforeAll(async () => {
-    const tokens = await loginAndGetToken();
-    accessToken = tokens.accessToken;
-    userId = tokens.userId;
-
-
     if (!server.listening) {
       await new Promise<void>((resolve) => server.listen(0, resolve));
     }
 
+    const userRepo = new UserRepository();
+    const testEmail = `test_${Date.now()}@example.com`;
+
+    const hashedPassword = await bcrypt.hash("test1234", 10);
+
+    const user = await userRepo.createUser(
+      testEmail,
+      "테스트유저",
+      hashedPassword
+    );
+
+    userId = user.id;
+
+    // 2. 로그인 후 accessToken 획득
+    const loginRes = await request(app)
+      .post("/users/login")
+      .send({
+        email: testEmail,
+        password: "test1234",
+      })
+      .expect(200);
+
+    accessToken = loginRes.body.accessToken;
+
+    // 3. 게시글 생성
     const articleRepo = new ArticleRepository();
     const article = await articleRepo.createArticle({
       userId,
       title: "테스트 게시글",
-      content: "테스트용 내용",
+      content: "테스트 내용",
     });
+
     articleId = article.id;
   });
 
   afterAll(async () => {
-    await new Promise<void>((resolve, reject) => {
-      server.close((err) => (err ? reject(err) : resolve()));
-    });
+    const userRepo = new UserRepository();
+
+    // 생성된 유저 삭제
+    if (userId) {
+      await userRepo.deleteUser(userId);
+    }
+
+    // 서버 종료
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => (err ? reject(err) : resolve()))
+    );
   });
 
   describe("Public Article API", () => {

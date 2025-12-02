@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/16</span>
+                <span class='fraction'>0/8</span>
             </div>
         
             
@@ -256,7 +256,7 @@ const commentListSchema = z.object({
 export class CommentController {
 <span class="fstat-no" title="function not covered" >  async </span>createProductComment(req: Request, res: Response, next: NextFunction) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
       const productId = <span class="cstat-no" title="statement not covered" >Number(req.params.id);</span>
       const parsed = <span class="cstat-no" title="statement not covered" >commentSchema.parse(req.body);</span>
       const comment = <span class="cstat-no" title="statement not covered" >await commentService.createProductComment(req.user.id, productId, parsed.content);</span>
@@ -268,7 +268,7 @@ export class CommentController {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>createArticleComment(req: Request, res: Response, next: NextFunction) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
       const articleId = <span class="cstat-no" title="statement not covered" >Number(req.params.id);</span>
       const parsed = <span class="cstat-no" title="statement not covered" >commentSchema.parse(req.body);</span>
       const comment = <span class="cstat-no" title="statement not covered" >await commentService.createArticleComment(req.user.id, articleId, parsed.content);</span>
@@ -280,27 +280,27 @@ export class CommentController {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>modifyComment(req: Request, res: Response, next: NextFunction) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
       const commentId = <span class="cstat-no" title="statement not covered" >Number(req.params.id);</span>
       const parsed = <span class="cstat-no" title="statement not covered" >commentSchema.parse(req.body);</span>
       const updated = <span class="cstat-no" title="statement not covered" >await commentService.updateComment(req.user.id, commentId, parsed.content);</span>
 <span class="cstat-no" title="statement not covered" >      res.status(status.OK).json(updated);</span>
     } catch (err: any) {
-<span class="cstat-no" title="statement not covered" >      if (err.message === "NOT_FOUND") <span class="cstat-no" title="statement not covered" >return res.status(status.NOT_FOUND).json({ message: "Comment not found" });</span></span>
-<span class="cstat-no" title="statement not covered" >      if (err.message === "FORBIDDEN") <span class="cstat-no" title="statement not covered" >return res.status(status.FORBIDDEN).json({ message: "User not matched" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (err.message === "NOT_FOUND") <span class="cstat-no" title="statement not covered" >return res.status(status.NOT_FOUND).json({ message: "Comment not found" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (err.message === "FORBIDDEN") <span class="cstat-no" title="statement not covered" >return res.status(status.FORBIDDEN).json({ message: "User not matched" });</span></span>
 <span class="cstat-no" title="statement not covered" >      next(err);</span>
     }
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>deleteComment(req: Request, res: Response, next: NextFunction) {
 <span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >      if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (!req.user) <span class="cstat-no" title="statement not covered" >return res.status(status.UNAUTHORIZED).json({ message: "Unauthorized" });</span></span>
       const commentId = <span class="cstat-no" title="statement not covered" >Number(req.params.id);</span>
 <span class="cstat-no" title="statement not covered" >      await commentService.deleteComment(req.user.id, commentId);</span>
 <span class="cstat-no" title="statement not covered" >      res.status(status.NO_CONTENT).end();</span>
     } catch (err: any) {
-<span class="cstat-no" title="statement not covered" >      if (err.message === "NOT_FOUND") <span class="cstat-no" title="statement not covered" >return res.status(status.NOT_FOUND).json({ message: "Comment not found" });</span></span>
-<span class="cstat-no" title="statement not covered" >      if (err.message === "FORBIDDEN") <span class="cstat-no" title="statement not covered" >return res.status(status.FORBIDDEN).json({ message: "User not matched" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (err.message === "NOT_FOUND") <span class="cstat-no" title="statement not covered" >return res.status(status.NOT_FOUND).json({ message: "Comment not found" });</span></span>
+<span class="cstat-no" title="statement not covered" >      <span class="missing-if-branch" title="if path not taken" >I</span>if (err.message === "FORBIDDEN") <span class="cstat-no" title="statement not covered" >return res.status(status.FORBIDDEN).json({ message: "User not matched" });</span></span>
 <span class="cstat-no" title="statement not covered" >      next(err);</span>
     }
   }
@@ -331,7 +331,7 @@ export class CommentController {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-14T06:32:50.917Z
+                at 2025-11-28T02:07:47.651Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

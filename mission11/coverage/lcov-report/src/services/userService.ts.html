@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">48.14% </span>
+                <span class="strong">20.68% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/27</span>
+                <span class='fraction'>6/29</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">25% </span>
-                <span class="quiet">Branches</span>
+                <span class="quiet">Functions</span>
                 <span class='fraction'>2/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>3/7</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">52.17% </span>
+                <span class="strong">24% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/23</span>
+                <span class='fraction'>6/25</span>
             </div>
         
             
@@ -111,25 +111,48 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -138,15 +161,10 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -162,20 +180,24 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/userRepository";
 import { generateTokens } from "../lib/token";
-import type { UserRegisterDTO, UserUpdateDTO, UserPasswordDTO } from "../dtos/user.dto";
+import type {
+  UserRegisterDTO,
+  UserUpdateDTO,
+  UserPasswordDTO,
+} from "../dtos/user.dto";
 &nbsp;
 export class UserService {
   private userRepo = new UserRepository();
 &nbsp;
-  async register(data: UserRegisterDTO) {
-    const exists = await this.userRepo.findByEmail(data.email);
-    if (exists) throw new Error("EMAIL_EXISTS");
+<span class="fstat-no" title="function not covered" >  async </span>register(data: UserRegisterDTO) {
+    const exists = <span class="cstat-no" title="statement not covered" >await this.userRepo.findByEmail(data.email);</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (exists) <span class="cstat-no" title="statement not covered" >throw new Error("EMAIL_EXISTS");</span></span>
 &nbsp;
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(data.password, salt);
+    const salt = <span class="cstat-no" title="statement not covered" >await bcrypt.genSalt(10);</span>
+    const hashedPassword = <span class="cstat-no" title="statement not covered" >await bcrypt.hash(data.password, salt);</span>
 &nbsp;
-    await this.userRepo.createUser(data.email, data.nickname, hashedPassword);
-    return { message: "User registered successfully" };
+<span class="cstat-no" title="statement not covered" >    await this.userRepo.createUser(data.email, data.nickname, hashedPassword);</span>
+<span class="cstat-no" title="statement not covered" >    return { message: "User registered successfully" };</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>getProfile(userId: number) {
@@ -184,10 +206,10 @@ export class UserService {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>updateInformation(userId: number, nickname?: string, image?: string) {
     const updateData: Record&lt;string, string&gt; = <span class="cstat-no" title="statement not covered" >{};</span>
-<span class="cstat-no" title="statement not covered" >    if (nickname) <span class="cstat-no" title="statement not covered" >updateData.nickname = nickname;</span></span>
-<span class="cstat-no" title="statement not covered" >    if (image) <span class="cstat-no" title="statement not covered" >updateData.image = image;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (nickname) <span class="cstat-no" title="statement not covered" >updateData.nickname = nickname;</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (image) <span class="cstat-no" title="statement not covered" >updateData.image = image;</span></span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (Object.keys(updateData).length === 0) <span class="cstat-no" title="statement not covered" >throw new Error("NO_DATA");</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (Object.keys(updateData).length === 0) <span class="cstat-no" title="statement not covered" >throw new Error("NO_DATA");</span></span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    return this.userRepo.updateUser(userId, updateData);</span>
   }
@@ -197,6 +219,11 @@ export class UserService {
     const hashedPassword = <span class="cstat-no" title="statement not covered" >await bcrypt.hash(data.password, salt);</span>
 <span class="cstat-no" title="statement not covered" >    await this.userRepo.updateUser(userId, { password: hashedPassword });</span>
 <span class="cstat-no" title="statement not covered" >    return { message: "Password updated successfully" };</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  async </span>deleteAccount(userId: number) {
+<span class="cstat-no" title="statement not covered" >    await this.userRepo.deleteUser(userId);</span>
+<span class="cstat-no" title="statement not covered" >    return { message: "User deleted successfully" };</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>getProducts(userId: number) {
@@ -214,7 +241,7 @@ export class UserService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-14T06:32:50.917Z
+                at 2025-11-28T02:07:47.651Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

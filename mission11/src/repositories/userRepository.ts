@@ -8,7 +8,14 @@ export class UserRepository {
   async findById(id: number) {
     return prisma.user.findUnique({
       where: { id },
-      select: { id: true, email: true, nickname: true, image: true, createdAt: true, updatedAt: true },
+      select: {
+        id: true,
+        email: true,
+        nickname: true,
+        image: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -16,8 +23,15 @@ export class UserRepository {
     return prisma.user.create({ data: { email, nickname, password } });
   }
 
-  async updateUser(id: number, data: Partial<{ nickname: string; image: string; password: string }>) {
+  async updateUser(
+    id: number,
+    data: Partial<{ nickname: string; image: string; password: string }>
+  ) {
     return prisma.user.update({ where: { id }, data });
+  }
+
+  async deleteUser(id: number) {
+    return prisma.user.delete({ where: { id } });
   }
 
   async findProductsByUserId(userId: number) {

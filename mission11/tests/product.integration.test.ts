@@ -1,7 +1,8 @@
 import request from "supertest";
 import { app, server } from "../src/app";
-import { loginAndGetToken } from "./helpers/auth";
 import { ProductRepository } from "../src/repositories/productRepository";
+import { UserRepository } from "../src/repositories/userRepository";
+import bcrypt from "bcrypt";
 
 describe("Product API Integration Test", () => {
   let accessToken: string;
@@ -9,14 +10,34 @@ describe("Product API Integration Test", () => {
   let productId: number;
 
   beforeAll(async () => {
-    const tokens = await loginAndGetToken();
-    accessToken = tokens.accessToken;
-    userId = tokens.userId;
-
     if (!server.listening) {
       await new Promise<void>((resolve) => server.listen(0, resolve));
     }
 
+    // 1. 테스트 전용 유저 생성
+    const userRepo = new UserRepository();
+    const testEmail = `test_${Date.now()}@example.com`;
+    const hashedPassword = await bcrypt.hash("test1234", 10);
+
+    const user = await userRepo.createUser(
+      testEmail,
+      "테스트유저",
+      hashedPassword
+    );
+    userId = user.id;
+
+    // 2. 로그인 후 accessToken 획득
+    const loginRes = await request(app)
+      .post("/users/login")
+      .send({
+        email: testEmail,
+        password: "test1234",
+      })
+      .expect(200);
+
+    accessToken = loginRes.body.accessToken;
+
+    // 3. 제품 생성
     const productRepo = new ProductRepository();
     const product = await productRepo.createProduct({
       userId,
@@ -25,13 +46,32 @@ describe("Product API Integration Test", () => {
       price: 1000,
       tags: "상품",
     });
-    productId = product.id; 
+
+    productId = product.id;
   });
 
   afterAll(async () => {
-    await new Promise<void>((resolve, reject) => {
-      server.close((err) => (err ? reject(err) : resolve()));
-    });
+    const productRepo = new ProductRepository();
+    const userRepo = new UserRepository();
+
+    // 생성된 상품 삭제 (이미 API 테스트로 삭제됐다면 catch 후 무시)
+    if (productId) {
+      try {
+        await productRepo.deleteProduct(productId);
+      } catch (e) {}
+    }
+
+    // 생성된 유저 삭제
+    if (userId) {
+      try {
+        await userRepo.deleteUser(userId);
+      } catch (e) {}
+    }
+
+    // 서버 종료
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => (err ? reject(err) : resolve()))
+    );
   });
 
   describe("Public Product API", () => {
@@ -41,9 +81,7 @@ describe("Product API Integration Test", () => {
     });
 
     it("상품 상세 조회", async () => {
-      const res = await request(app)
-        .get(`/products/${productId}`)
-        .expect(200);
+      const res = await request(app).get(`/products/${productId}`).expect(200);
 
       expect(res.body).toHaveProperty("id", productId);
       expect(res.body).toHaveProperty("name", "상품");

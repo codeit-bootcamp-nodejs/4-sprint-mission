@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
 import { UserRepository } from "../repositories/userRepository";
 import { generateTokens } from "../lib/token";
-import type { UserRegisterDTO, UserUpdateDTO, UserPasswordDTO } from "../dtos/user.dto";
+import type {
+  UserRegisterDTO,
+  UserUpdateDTO,
+  UserPasswordDTO,
+} from "../dtos/user.dto";
 
 export class UserService {
   private userRepo = new UserRepository();
@@ -36,6 +40,11 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(data.password, salt);
     await this.userRepo.updateUser(userId, { password: hashedPassword });
     return { message: "Password updated successfully" };
+  }
+
+  async deleteAccount(userId: number) {
+    await this.userRepo.deleteUser(userId);
+    return { message: "User deleted successfully" };
   }
 
   async getProducts(userId: number) {

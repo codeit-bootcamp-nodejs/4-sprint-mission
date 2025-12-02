@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/20</span>
+                <span class='fraction'>0/12</span>
             </div>
         
             
@@ -254,7 +254,7 @@ export class CommentService {
     content: string
   ) {
     const article = <span class="cstat-no" title="statement not covered" >await this.articleRepo.findById(articleId);</span>
-<span class="cstat-no" title="statement not covered" >    if (!article) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!article) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error("Article not found");</span>
     }
 &nbsp;
@@ -264,7 +264,7 @@ export class CommentService {
       content
     );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (article &amp;&amp; article.userId !== userId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (article &amp;&amp; article.userId !== userId) {</span>
 <span class="cstat-no" title="statement not covered" >      await this.alertService.create(</span>
         article.userId,
         "내 게시글에 새로운 댓글이 달렸습니다.",
@@ -281,7 +281,7 @@ export class CommentService {
     content: string
   ) {
     const product = <span class="cstat-no" title="statement not covered" >await this.productRepo.findById(productId);</span>
-<span class="cstat-no" title="statement not covered" >    if (!product) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!product) {</span>
 <span class="cstat-no" title="statement not covered" >      throw new Error("Product not found");</span>
     }
 &nbsp;
@@ -291,7 +291,7 @@ export class CommentService {
       content
     );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    if (product &amp;&amp; product.userId !== userId) {</span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (product &amp;&amp; product.userId !== userId) {</span>
 <span class="cstat-no" title="statement not covered" >      await this.alertService.create(</span>
         product.userId,
         "내 판매글에 새로운 댓글이 달렸습니다.",
@@ -304,15 +304,15 @@ export class CommentService {
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>updateComment(userId: number, commentId: number, content: string) {
     const comment = <span class="cstat-no" title="statement not covered" >await this.repo.findById(commentId);</span>
-<span class="cstat-no" title="statement not covered" >    if (!comment) <span class="cstat-no" title="statement not covered" >throw new Error("NOT_FOUND");</span></span>
-<span class="cstat-no" title="statement not covered" >    if (comment.userId !== userId) <span class="cstat-no" title="statement not covered" >throw new Error("FORBIDDEN");</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!comment) <span class="cstat-no" title="statement not covered" >throw new Error("NOT_FOUND");</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (comment.userId !== userId) <span class="cstat-no" title="statement not covered" >throw new Error("FORBIDDEN");</span></span>
 <span class="cstat-no" title="statement not covered" >    return this.repo.updateComment(commentId, content);</span>
   }
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>deleteComment(userId: number, commentId: number) {
     const comment = <span class="cstat-no" title="statement not covered" >await this.repo.findById(commentId);</span>
-<span class="cstat-no" title="statement not covered" >    if (!comment) <span class="cstat-no" title="statement not covered" >throw new Error("NOT_FOUND");</span></span>
-<span class="cstat-no" title="statement not covered" >    if (comment.userId !== userId) <span class="cstat-no" title="statement not covered" >throw new Error("FORBIDDEN");</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!comment) <span class="cstat-no" title="statement not covered" >throw new Error("NOT_FOUND");</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (comment.userId !== userId) <span class="cstat-no" title="statement not covered" >throw new Error("FORBIDDEN");</span></span>
 <span class="cstat-no" title="statement not covered" >    await this.repo.deleteComment(commentId);</span>
   }
 &nbsp;
@@ -331,7 +331,7 @@ export class CommentService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-14T06:32:50.917Z
+                at 2025-11-28T02:07:47.651Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

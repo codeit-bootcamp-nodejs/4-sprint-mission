@@ -58,6 +58,11 @@ router.post(
   passport.authenticate("refresh-token", { session: false }),
   controller.refreshTokens
 );
+router.delete(
+  "/delete",
+  passport.authenticate("access-token", { session: false}),
+  controller.deleteUser
+);
 router.post("/logout", controller.logout);
 
 export default router;

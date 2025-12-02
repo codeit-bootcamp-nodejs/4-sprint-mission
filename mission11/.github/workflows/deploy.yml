@@ -1,0 +1,29 @@
+name: deploy mission11 auto
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs: 
+      deploy:
+        name: deploy
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Build and deploy
+          uses: appleboy/ssh-action@v0.1.6
+          with:
+            host: ${{ secrets.REMOTE_IP }}
+            username: ec2-user
+            key: ${{ secrets.DEV_TEST }}
+            port: 22
+            script: |
+              cd /home/ec2-user/app
+              find . -mindepth 1 -not -name '.git' -delete
+              git fetch --all
+              git reset --hard origin/main
+              docker compose down
+              docker compose up -d --build
+              docker ps
