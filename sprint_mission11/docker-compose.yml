@@ -1,0 +1,30 @@
+services:
+  app:
+    build: .
+    container_name: sprint11-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    command: sh -c "ls -la && npm start"
+    volumes:
+      - ./uploads:/usr/src/app/uploads
+
+  db:
+    image: postgres:16
+    container_name: sprint11-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: apple
+      POSTGRES_PASSWORD: "4869"
+      POSTGRES_DB: m11
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
