@@ -4,25 +4,37 @@ on:
   pull_request:
     branches: [ "main", "develop", "feature/*", "김지헌-sprint11" ]
   push:
-    branches: [ "김지헌-sprint11" ] # 테스트를 위해 푸시 트리거 잠시 추가
+    branches: [ "김지헌-sprint11" ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    - name: Debug - List files
-      run: ls -R
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
-  
     - name: Install dependencies
       working-directory: ./mission-11
       run: npm install
@@ -35,7 +47,7 @@ jobs:
       working-directory: ./mission-11
       run: npm test
       env:
-        DATABASE_URL: "postgresql://test:test@localhost:5432/test"
+        DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
         JWT_SECRET_KEY: "test-secret"
         JWT_REFRESH_SECRET_KEY: "test-refresh-secret"
         PORT: 3000
