@@ -7,6 +7,8 @@ import notificationRouter from './router/notification_router';
 import productRouter from './router/product_router';
 import postRouter from './router/post_router';
 
+//테스트를 위한 랜덤 주석!!!!
+
 const app: Express = express();
 
 app.use(cors({
@@ -20,6 +22,15 @@ app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).send('Server is running!');
+});
+
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).json({
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
 
 app.use('/api/auth', authRouter);

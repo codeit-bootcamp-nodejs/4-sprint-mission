@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+dist
+.env*
+.git
+.gitignore
+.DS_Store
+coverage
+*.md
+.github
+infra
+uploads
+prisma.config.ts.backup
+test.sql
+sprint-mission-*
