@@ -57,10 +57,17 @@ app.use("/api/notification", notificationRouter);
 const FRONTEND_BUILD_PATH = path.join(__dirname, '..', 'front', 'dist');
 
 // 2. 정적 파일 제공 미들웨어 설정
-app.use(express.static(FRONTEND_BUILD_PATH));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(express.static(FRONTEND_BUILD_PATH));
+}
 
 // 3. SPA 라우팅 핸들러 설정 
 app.use((req, res, next) => {
+    // 테스트 환경에서는 정적 파일 서빙 로직을 건너뜀
+    if (process.env.NODE_ENV === 'test') {
+        return next();
+    }
+    
     // 1. 요청이 API 경로로 시작하지 않아야 하며, 
     // 2. 요청 메서드가 GET (페이지 요청) 이어야 합니다.
     // 이 조건을 만족하면 index.html을 반환합니다.

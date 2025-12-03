@@ -9,9 +9,11 @@ describe("사용자 인증 API 통합 테스트", () => {
     // 테스트용 사용자 삭제
     await prisma.user.deleteMany({
       where: {
-        email: {
-          in: ["test@example.com", "test2@example.com"],
-        },
+        OR: [
+          { email: { contains: "@example.com" } },
+          { nickname: { contains: "test" } },
+          { nickname: { contains: "user" } }
+        ]
       },
     });
   });
@@ -20,9 +22,11 @@ describe("사용자 인증 API 통합 테스트", () => {
     // 테스트 후 정리
     await prisma.user.deleteMany({
       where: {
-        email: {
-          in: ["test@example.com", "test2@example.com"],
-        },
+        OR: [
+          { email: { contains: "@example.com" } },
+          { nickname: { contains: "test" } },
+          { nickname: { contains: "user" } }
+        ]
       },
     });
   });
