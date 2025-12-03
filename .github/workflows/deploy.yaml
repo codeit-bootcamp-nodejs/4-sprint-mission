@@ -14,7 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-    
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -22,15 +21,19 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # EC2 내부 경로로 이동 (사용자 이름 ubuntu 확인!)
+            # ▼▼▼ [핵심] NVM(Node.js) 설정을 강제로 불러오는 코드 ▼▼▼
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # 경로 이동
             cd /home/ubuntu/4-sprint-mission/mission-11
             
             # 최신 코드 받기
             git pull origin 김지헌-sprint11
             
-            # 패키지 설치 및 빌드 (EC2 내부에서 실행됨)
+            # 이제 npm과 pm2를 알 수 있습니다!
             npm install
             npm run build
             
-            # 서버 재시작 (PM2 Reload)
+            # 서버 재시작
             pm2 reload panda-market
