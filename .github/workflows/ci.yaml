@@ -3,35 +3,37 @@ name: CI (Test)
 on:
   pull_request:
     branches: [ "main", "develop", "feature/*", "김지헌-sprint11" ]
+  push:
+    branches: [ "김지헌-sprint11" ] # 테스트를 위해 푸시 트리거 잠시 추가
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
-   
-    defaults:
-      run:
-        working-directory: ./mission-11
-    
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+
+    - name: Debug - List files
+      run: ls -R
 
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '20'
 
+  
     - name: Install dependencies
+      working-directory: ./mission-11
       run: npm install
 
     - name: Generate Prisma Client
+      working-directory: ./mission-11
       run: npx prisma generate
 
     - name: Run Tests
+      working-directory: ./mission-11
       run: npm test
-      # 테스트 통과를 위해 가짜 환경변수 주입 (env.validation 통과용)
       env:
         DATABASE_URL: "postgresql://test:test@localhost:5432/test"
         JWT_SECRET_KEY: "test-secret"
