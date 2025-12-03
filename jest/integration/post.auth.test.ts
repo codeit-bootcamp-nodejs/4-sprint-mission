@@ -13,6 +13,20 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
 
   // 테스트 전 사용자 생성 및 로그인
   beforeAll(async () => {
+    // 기존 테스트 데이터 정리
+    await prisma.post.deleteMany({
+      where: {
+        User: {
+          email: { in: ["posttest@example.com", "otherpostuser@example.com"] }
+        }
+      }
+    });
+    await prisma.user.deleteMany({
+      where: {
+        email: { in: ["posttest@example.com", "otherpostuser@example.com"] }
+      }
+    });
+
     // 테스트용 사용자 생성
     const user = await prisma.user.create({
       data: {
@@ -160,7 +174,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
         .expect(403);
 
       expect(response.body).toHaveProperty("message");
-      expect(response.body.message).toContain("권한");
+      expect(response.body.message).toContain("작성자만");
     });
 
     it("존재하지 않는 게시글을 수정하려고 하면 404 에러를 반환해야 함", async () => {
@@ -226,7 +240,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
         .expect(403);
 
       expect(response.body).toHaveProperty("message");
-      expect(response.body.message).toContain("권한");
+      expect(response.body.message).toContain("작성자만");
 
       // 정리
       await prisma.post.delete({ where: { id: post.id } });

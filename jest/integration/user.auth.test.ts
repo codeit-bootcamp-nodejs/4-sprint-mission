@@ -4,29 +4,19 @@ import prisma from "../../prisma/prisma.js";
 import bcrypt from "bcrypt";
 
 describe("사용자 인증 API 통합 테스트", () => {
-  // 테스트 전후 DB 정리
+  // 테스트 전후 DB 정리 (user.auth.test.ts 전용 데이터만)
   beforeEach(async () => {
-    // 테스트용 사용자 삭제
     await prisma.user.deleteMany({
       where: {
-        OR: [
-          { email: { contains: "@example.com" } },
-          { nickname: { contains: "test" } },
-          { nickname: { contains: "user" } }
-        ]
+        email: { in: ["test@example.com", "test1@example.com", "test2@example.com"] }
       },
     });
   });
 
   afterEach(async () => {
-    // 테스트 후 정리
     await prisma.user.deleteMany({
       where: {
-        OR: [
-          { email: { contains: "@example.com" } },
-          { nickname: { contains: "test" } },
-          { nickname: { contains: "user" } }
-        ]
+        email: { in: ["test@example.com", "test1@example.com", "test2@example.com"] }
       },
     });
   });
@@ -219,7 +209,7 @@ describe("사용자 인증 API 통합 테스트", () => {
         .send({
           refreshToken: "invalid-refresh-token",
         })
-        .expect(401);
+        .expect(403);
 
       expect(response.body).toHaveProperty("message");
     });

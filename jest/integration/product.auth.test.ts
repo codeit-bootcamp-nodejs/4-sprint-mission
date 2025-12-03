@@ -13,6 +13,20 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
 
   // 테스트 전 사용자 생성 및 로그인
   beforeAll(async () => {
+    // 기존 테스트 데이터 정리
+    await prisma.product.deleteMany({
+      where: {
+        User: {
+          email: { in: ["producttest@example.com", "otheruser@example.com"] }
+        }
+      }
+    });
+    await prisma.user.deleteMany({
+      where: {
+        email: { in: ["producttest@example.com", "otheruser@example.com"] }
+      }
+    });
+
     // 테스트용 사용자 생성
     const user = await prisma.user.create({
       data: {

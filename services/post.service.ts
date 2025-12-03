@@ -37,7 +37,7 @@ export async function postRegisterService(userId: number, title: string, content
 }> {
   // 유효성 검사
   if (!title || !content) {
-    throw new HttpError("제목과 내용을 입력해주세요.", 404);
+    throw new HttpError("제목과 내용을 입력해주세요.", 400);
   };
   // 게시글 생성
   const CreatePost = await prisma.post.create({

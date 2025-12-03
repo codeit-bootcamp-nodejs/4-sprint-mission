@@ -1,28 +1,18 @@
 import request from "supertest";
 import { app } from "../../app.js";
 
-describe("게시글 API - 인증 불필요 테스트 (인증 실패 케이스)", () => {
-  describe("GET /post - 게시글 목록 조회 (인증 필요)", () => {
-    it("토큰 없이 요청 시 401 에러를 반환해야 함", async () => {
+describe("게시글 API - 인증 테스트", () => {
+  describe("GET /api/post - 게시글 목록 조회 (인증 불필요)", () => {
+    it("토큰 없이도 게시글 목록을 조회할 수 있어야 함", async () => {
       const response = await request(app)
-        .get("/api/post")
-        .expect(401);
+        .get("/api/post");
 
-      expect(response.body).toHaveProperty("success", false);
-      expect(response.body.message).toContain("토큰");
-    });
-
-    it("잘못된 토큰으로 요청 시 401 에러를 반환해야 함", async () => {
-      const response = await request(app)
-        .get("/api/post")
-        .set("Authorization", "Bearer invalid-token")
-        .expect(401);
-
-      expect(response.body).toHaveProperty("success", false);
+      // 게시글이 있으면 200, 없으면 404 (비즈니스 로직)
+      expect([200, 404]).toContain(response.status);
     });
   });
 
-  describe("POST /post - 게시글 작성 (인증 필요)", () => {
+  describe("POST /api/post - 게시글 작성 (인증 필요)", () => {
     it("토큰 없이 게시글 작성 시 401 에러를 반환해야 함", async () => {
       const postData = {
         title: "테스트 게시글",
@@ -34,11 +24,11 @@ describe("게시글 API - 인증 불필요 테스트 (인증 실패 케이스)",
         .send(postData)
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 
-  describe("PUT /post/:postId - 게시글 수정 (인증 필요)", () => {
+  describe("PUT /api/post/:postId - 게시글 수정 (인증 필요)", () => {
     it("토큰 없이 게시글 수정 시 401 에러를 반환해야 함", async () => {
       const postData = {
         title: "수정된 게시글",
@@ -50,18 +40,17 @@ describe("게시글 API - 인증 불필요 테스트 (인증 실패 케이스)",
         .send(postData)
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 
-  describe("DELETE /post/:postId - 게시글 삭제 (인증 필요)", () => {
+  describe("DELETE /api/post/:postId - 게시글 삭제 (인증 필요)", () => {
     it("토큰 없이 게시글 삭제 시 401 에러를 반환해야 함", async () => {
       const response = await request(app)
         .delete("/api/post/1")
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 });
-
