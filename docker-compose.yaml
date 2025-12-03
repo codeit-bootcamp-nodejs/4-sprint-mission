@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  # Express App
+  app:
+    build: .
+    container_name: panda-market-app
+    ports:
+      - "3000:3000" # 호스트 3000 -> 컨테이너 3000
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/panda_market?schema=public
+      - PORT=3000
+      - JWT_SECRET=your_jwt_secret_key # 개발용 임의 키
+      # S3 관련 키는 .env 파일을 통해 주입하거나 여기에 직접 작성하지 마세요 (보안)
+    volumes:
+      - ./uploads:/usr/src/app/uploads # 파일 업로드 폴더 Volume 매핑
+    env_file:
+      - .env # 로컬 테스트 시 .env 파일 사용
+
+  # Postgres Database
+  db:
+    image: postgres:15-alpine
+    container_name: panda-market-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: panda_market
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # DB 데이터 영구 보존
+
+volumes:
+  postgres_data:

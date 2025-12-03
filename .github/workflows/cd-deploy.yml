@@ -1,0 +1,42 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy using SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          port: 22
+          script: |
+            # 1. 프로젝트 폴더로 이동 (경로는 실제 서버 환경에 맞게 수정 필요)
+            cd /home/ubuntu/4-sprint-mission/4-sprint-mission--sprint10
+
+            # 2. 최신 코드 가져오기
+            git pull origin main
+
+            # 3. 의존성 설치
+            npm ci
+
+            # 4. Prisma 클라이언트 재생성 (스키마 변경 대비)
+            npx prisma generate
+
+            # 5. DB 마이그레이션 (필요시)
+            # npx prisma migrate deploy
+
+            # 6. 빌드
+            npm run build
+
+            # 7. PM2로 서버 재시작 (Zero downtime deployment)
+            pm2 reload ecosystem.config.cjs --env production
