@@ -1,0 +1,220 @@
+tags:
+  - name: auth
+    description: 인증 관련 API
+
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: 로컬 회원가입
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignupRequest'
+      responses:
+        '201':
+          description: 회원가입 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: 이미 가입된 이메일 또는 닉네임
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '이미 가입된 이메일입니다.'
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: 로컬 로그인
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 로그인 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        '401':
+          description: 이메일이 존재하지 않거나, 비밀번호가 틀렸거나, 간편 로그인 회원인 경우
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '가입되어 있지 않은 사용자입니다.'
+
+  /auth/google:
+    get:
+      tags:
+        - auth
+      summary: 구글 소셜 로그인 시작
+      description: 구글 로그인 페이지로 리다이렉트합니다.
+      parameters:
+        - in: query
+          name: redirectUrl
+          required: true
+          schema:
+            type: string
+            format: url
+          description: 로그인이 완료된 후 최종적으로 리다이렉트될 프론트엔드 URL
+      responses:
+        '302':
+          description: 구글 인증 페이지로 리다이렉트
+
+  /auth/google/callback:
+    get:
+      tags:
+        - auth
+      summary: 구글 소셜 로그인 콜백
+      description: |
+        구글 로그인 성공 후 호출되는 콜백 API입니다.
+        로그인/회원가입 처리 후, /auth/google 요청 시 전달했던 `redirectUrl`로 최종 리다이렉트합니다.
+        이때 `accessToken`은 쿼리 파라미터로, `refreshToken`은 `Set-Cookie` 헤더를 통해 전달됩니다.
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: 구글에서 발급한 authorization code
+        - in: query
+          name: state
+          required: true
+          schema:
+            type: string
+          description: 최종 리다이렉트될 프론트엔드 URL
+      responses:
+        '302':
+          description: 최종 목적지(state)로 리다이렉트.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: url
+              description: '리다이렉트될 최종 URL. accessToken이 쿼리 파라미터로 포함됩니다.'
+            Set-Cookie:
+              schema:
+                type: string
+              description: 'HttpOnly, Secure 속성이 적용된 refreshToken 쿠키.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/kakao:
+    get:
+      tags:
+        - auth
+      summary: 카카오 소셜 로그인 시작
+      description: 카카오 로그인 페이지로 리다이렉트합니다.
+      parameters:
+        - in: query
+          name: redirectUrl
+          required: true
+          schema:
+            type: string
+            format: url
+          description: 로그인이 완료된 후 최종적으로 리다이렉트될 프론트엔드 URL
+      responses:
+        '302':
+          description: 카카오 인증 페이지로 리다이렉트
+
+  /auth/kakao/callback:
+    get:
+      tags:
+        - auth
+      summary: 카카오 소셜 로그인 콜백
+      description: |
+        카카오 로그인 성공 후 호출되는 콜백 API입니다.
+        로그인/회원가입 처리 후, /auth/kakao 요청 시 전달했던 `redirectUrl`로 최종 리다이렉트합니다.
+        이때 `accessToken`은 쿼리 파라미터로, `refreshToken`은 `Set-Cookie` 헤더를 통해 전달됩니다.
+      parameters:
+        - in: query
+          name: code
+          required: true
+          schema:
+            type: string
+          description: 카카오에서 발급한 authorization code
+        - in: query
+          name: state
+          required: true
+          schema:
+            type: string
+          description: 최종 리다이렉트될 프론트엔드 URL
+      responses:
+        '302':
+          description: 최종 목적지(state)로 리다이렉트.
+          headers:
+            Location:
+              schema:
+                type: string
+                format: url
+              description: '리다이렉트될 최종 URL. accessToken이 쿼리 파라미터로 포함됩니다.'
+            Set-Cookie:
+              schema:
+                type: string
+              description: 'HttpOnly, Secure 속성이 적용된 refreshToken 쿠키.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: 로그아웃
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 로그아웃 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '로그아웃 되었습니다.'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: 토큰 재발급
+      parameters:
+        - in: header
+          name: x-refresh-token
+          required: true
+          schema:
+            type: string
+          description: 재발급에 사용할 Refresh Token
+      responses:
+        '200':
+          description: 토큰 재발급 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokens'
+        '401':
+          description: 리프레시 토큰이 만료되었거나 유효하지 않은 경우
+          $ref: '#/components/responses/Unauthorized'

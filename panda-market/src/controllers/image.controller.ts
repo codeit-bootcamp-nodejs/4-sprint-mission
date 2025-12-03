@@ -4,7 +4,6 @@ import { BadRequestError } from '@/lib/errors.js';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { ImageService } from '@/services/image.service.js';
-import { NODE_ENV } from '@/lib/constants.js';
 
 @injectable()
 export class ImageController {
@@ -16,14 +15,7 @@ export class ImageController {
     if (!hasFile(req) || !hasTokenPayload(req)) {
       throw new BadRequestError();
     }
-    if (NODE_ENV === 'production') {
-      const { location } = req.file;
-      const result = await this.imageService.postImageToS3({ location });
-      return res.status(201).json(result);
-    } else {
-      const { buffer } = req.file;
-      const result = await this.imageService.postImageToCloudinary({ buffer });
-      return res.status(201).json(result);
-    }
+    const result = await this.imageService.postImage(req.file);
+    return res.status(201).json(result);
   };
 }

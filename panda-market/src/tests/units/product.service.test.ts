@@ -6,7 +6,6 @@ import { ProductImageRepository } from '@/repositories/product-images.repository
 import { ProductLikeRepository } from '@/repositories/product-likes.repository.js';
 import { NotificationRepository } from '@/repositories/notification.repository.js';
 import { Server } from 'socket.io';
-import { ProductService } from '@/services/product.service.js';
 import {
   BadRequestError,
   ForbiddenError,
@@ -34,15 +33,11 @@ import {
   updateResult,
   updateTagData,
 } from '@/tests/fixtures/product.fixtures.js';
-// mockDeep이 타입세이프하게 모킹해주는거라고 함
-// (정확히는 해당 객체의 타입만 확인해서 프록시 객체를 생성해주는 모킹방식)
-
-// 기존 jest.mock은 private를 추론할 수 없음
-// 근데 중첩된 의존성을 거슬러 올라가도 prisma 이런 애들을 제대로 인정을 안해줌 -> 왜였더라?
-// 그리고 기능별 개별 mock 방식도 불가 ( 런타임에서 의존성 없어서 오류남 )
-// 반드시 객체와 의존성을 mock 정의하고 인스턴스로 생성해야함
-// mockDeep, DeepMockProxy는 모킹하고자 하는 객체의 타입만 확인해서 프록시 모킹 객체를 만들어준다.
-// 이 과정에서 private, readonly, constructor 같은 실제 구현에 필요한 요소들은 무시된다.
+import {
+  mockDeleteS3File,
+  mockDeleteCloudinaryFile,
+} from '@/tests/mocks/file-storage.js';
+import type { ProductService } from '@/services/product.service.js';
 
 describe('ProductService', () => {
   let mockPrisma: DeepMockProxy<PrismaClient>;
@@ -54,7 +49,12 @@ describe('ProductService', () => {
   let mockIo: DeepMockProxy<Server>;
   let mockProductService: ProductService;
 
-  beforeEach(() => {
+  beforeAll(async () => {
+    await import('@/services/product.service.js');
+  });
+
+  beforeEach(async () => {
+    const { ProductService } = await import('@/services/product.service.js');
     mockPrisma = mockDeep<PrismaClient>();
     mockProductRepo = mockDeep<ProductRepository>();
     mockTagRepo = mockDeep<TagRepository>();
@@ -72,6 +72,9 @@ describe('ProductService', () => {
       mockNotificationRepo,
       mockIo,
     );
+
+    mockDeleteCloudinaryFile.mockClear();
+    mockDeleteS3File.mockClear();
   });
   describe('단일 상품 조회', () => {
     it('좋아요를 누르지 않은 상품은 isLike: false가 포함되어야 한다.', async () => {
@@ -128,6 +131,7 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
         userId: 2,
       });
       // then
@@ -143,6 +147,7 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
         userId: 2,
       });
       // then
@@ -161,6 +166,7 @@ describe('ProductService', () => {
         keyword: '',
         page: 1,
         pageSize: 10,
+        orderBy: '',
       });
       // then
       expect(Array.isArray(result)).toBe(true);
@@ -168,9 +174,57 @@ describe('ProductService', () => {
       expect(result[0]).toEqual(unlikedListResult);
       expect(result[1]).toEqual(unlikedListResult2);
     });
+    it('상품목록은 최신순 조회가 가능하다.', async () => {
+      // given
+      const date = new Date('2025-01-02T00:00:00.000Z');
+      mockProductRepo.findMany.mockResolvedValue([
+        unlikedListData,
+        {
+          ...likedListData2,
+          createdAt: date,
+        },
+      ]);
+      // when
+      const result = await mockProductService.getProductList({
+        keyword: '',
+        page: 1,
+        pageSize: 10,
+        orderBy: 'recent',
+      });
+      // then
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+      expect(mockProductRepo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: 'recent',
+        }),
+      );
+    });
+    it('상품목록은 좋아요순 조회가 가능하다.', async () => {
+      // given
+      mockProductRepo.findMany.mockResolvedValue([
+        likedListData2,
+        unlikedListData,
+      ]);
+      // when
+      const result = await mockProductService.getProductList({
+        keyword: '',
+        page: 1,
+        pageSize: 10,
+        orderBy: 'like',
+      });
+      // then
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+      expect(mockProductRepo.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          orderBy: 'like',
+        }),
+      );
+    });
   });
   describe('상품 생성', () => {
-    it('상품 생성 성공', async () => {
+    it('상품 생성 성공 - cloudinary 이미지', async () => {
       // given
       mockProductRepo.create.mockResolvedValue(createData);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -208,8 +262,99 @@ describe('ProductService', () => {
       expect(mockProductImgRepo.createMany).toHaveBeenCalledWith({
         imageData: [
           {
-            publicId: 'test', // extractPublicIdFromCloudinaryUrl 결과
+            publicId: 'test_files/test',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
+            productId: createData.id,
+          },
+        ],
+        tx: mockPrisma,
+      });
+    });
+    it('상품 생성 성공 - s3 이미지', async () => {
+      // given
+      mockProductRepo.create.mockResolvedValue(createData);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockPrisma.$transaction.mockImplementation(async (cb: any) =>
+        cb(mockPrisma),
+      );
+      mockTagRepo.incrementCounts.mockResolvedValue({
+        count: 1,
+      });
+      mockProductImgRepo.createMany.mockResolvedValue({
+        count: 1,
+      });
+      mockProductRepo.findById.mockResolvedValue(createResult);
+      // when
+      const result = await mockProductService.postProduct({
+        userId: 1,
+        data: {
+          ...createParams,
+          imageUrls: [
+            'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image.jpg',
+          ],
+        },
+      });
+      // then
+      expect(result).toEqual(createResult);
+      expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
+      expect(mockProductRepo.create).toHaveBeenCalledWith({
+        createData: createInput,
+        tx: mockPrisma,
+      });
+      expect(mockTagRepo.incrementCounts).toHaveBeenCalledWith({
+        tags: ['test'],
+        tx: mockPrisma,
+      });
+      expect(mockProductImgRepo.createMany).toHaveBeenCalledWith({
+        imageData: [
+          {
+            publicId: 'test/my-image.jpg',
+            url: 'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image.jpg',
+            productId: createData.id,
+          },
+        ],
+        tx: mockPrisma,
+      });
+    });
+    it('상품 생성 성공 - 로컬 이미지', async () => {
+      // given
+      mockProductRepo.create.mockResolvedValue(createData);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockPrisma.$transaction.mockImplementation(async (cb: any) =>
+        cb(mockPrisma),
+      );
+      mockTagRepo.incrementCounts.mockResolvedValue({
+        count: 1,
+      });
+      mockProductImgRepo.createMany.mockResolvedValue({
+        count: 1,
+      });
+      mockProductRepo.findById.mockResolvedValue(createResult);
+      // when
+      const result = await mockProductService.postProduct({
+        userId: 1,
+        data: {
+          ...createParams,
+          imageUrls: ['http://example.com/image.png'],
+        },
+      });
+      // then
+      expect(result).toEqual(createResult);
+      expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
+      expect(mockProductRepo.create).toHaveBeenCalledWith({
+        createData: createInput,
+        tx: mockPrisma,
+      });
+      expect(mockTagRepo.incrementCounts).toHaveBeenCalledWith({
+        tags: ['test'],
+        tx: mockPrisma,
+      });
+      expect(mockProductImgRepo.createMany).toHaveBeenCalledWith({
+        imageData: [
+          {
+            // publicId가 UUID인지 확인 (문자열이고 길이가 36인지 등)
+            publicId: 'image.png',
+            url: 'http://example.com/image.png',
             productId: createData.id,
           },
         ],
@@ -234,7 +379,7 @@ describe('ProductService', () => {
         images: [
           {
             id: 1,
-            publicId: 'test',
+            publicId: 'test_files/test',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
           },
         ],
@@ -277,7 +422,7 @@ describe('ProductService', () => {
         images: [
           {
             id: 1,
-            publicId: 'test',
+            publicId: 'test_files/test',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
           },
         ],
@@ -322,7 +467,7 @@ describe('ProductService', () => {
         images: [
           {
             id: 1,
-            publicId: 'test',
+            publicId: 'test_files/test',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test.png',
           },
         ],
@@ -384,6 +529,27 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test']);
       mockTagRepo.incrementCounts.mockResolvedValue({ count: 1 });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '태그 수정 테스트1',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+          {
+            id: 2,
+            name: 'test2',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -467,6 +633,20 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test', 'test2']);
       mockTagRepo.decrementCounts.mockResolvedValue({ count: 0 });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '태그 수정 테스트2',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -544,6 +724,27 @@ describe('ProductService', () => {
       });
       mockTagRepo.findMany.mockResolvedValue(['test', 'test2']);
       mockTagRepo.decrementCounts.mockResolvedValue({ count: 0 });
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '태그 수정 테스트3',
+        tags: [
+          {
+            id: 1,
+            name: 'test',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+          {
+            id: 3,
+            name: 'test3',
+            productCount: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -610,12 +811,12 @@ describe('ProductService', () => {
         images: [
           {
             id: 1,
-            publicId: 'test1',
+            publicId: 'test_files/test1',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
           },
           {
             id: 2,
-            publicId: 'test2',
+            publicId: 'test_files/test2',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
           },
         ],
@@ -629,10 +830,27 @@ describe('ProductService', () => {
       });
       mockProductImgRepo.findMany.mockResolvedValue([
         {
-          publicId: 'test1',
+          publicId: 'test_files/test1',
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '이미지 수정 테스트1',
+        images: [
+          {
+            id: 1,
+            publicId: 'test_files/test1',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
+          },
+          {
+            id: 2,
+            publicId: 'test_files/test2',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -659,7 +877,7 @@ describe('ProductService', () => {
             create: [
               {
                 url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
-                publicId: 'test2',
+                publicId: 'test_files/test2',
               },
             ],
           },
@@ -673,12 +891,12 @@ describe('ProductService', () => {
         images: [
           {
             id: 1,
-            publicId: 'test1',
+            publicId: 'test_files/test1',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
           },
           {
             id: 2,
-            publicId: 'test2',
+            publicId: 'test_files/test2',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
           },
         ],
@@ -700,10 +918,15 @@ describe('ProductService', () => {
       });
       mockProductImgRepo.findMany.mockResolvedValue([
         {
-          publicId: 'test1',
+          publicId: 'test_files/test1',
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '이미지 수정 테스트2',
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -725,7 +948,7 @@ describe('ProductService', () => {
           images: {
             deleteMany: [
               {
-                publicId: 'test1',
+                publicId: 'test_files/test1',
               },
             ],
             create: [],
@@ -738,6 +961,8 @@ describe('ProductService', () => {
         name: 'test2',
         description: '이미지 수정 테스트2',
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('이미지 추가, 삭제된 경우 url이 추가, 삭제된 상품을 반환해야 한다.', async () => {
       // given
@@ -748,7 +973,7 @@ describe('ProductService', () => {
         images: [
           {
             id: 2,
-            publicId: 'test2',
+            publicId: 'test_files/test2',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
           },
         ],
@@ -762,10 +987,22 @@ describe('ProductService', () => {
       });
       mockProductImgRepo.findMany.mockResolvedValue([
         {
-          publicId: 'test1',
+          publicId: 'test_files/test1',
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '이미지 수정 테스트3',
+        images: [
+          {
+            id: 2,
+            publicId: 'test_files/test2',
+            url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -789,13 +1026,13 @@ describe('ProductService', () => {
           images: {
             deleteMany: [
               {
-                publicId: 'test1',
+                publicId: 'test_files/test1',
               },
             ],
             create: [
               {
                 url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
-                publicId: 'test2',
+                publicId: 'test_files/test2',
               },
             ],
           },
@@ -809,11 +1046,13 @@ describe('ProductService', () => {
         images: [
           {
             id: 2,
-            publicId: 'test2',
+            publicId: 'test_files/test2',
             url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test2.png',
           },
         ],
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('상품의 가격이 변경된 경우 좋아요 누른 사용자에게 알림이 전송되어야 한다.', async () => {
       // given
@@ -852,6 +1091,20 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test1',
+        description: '가격 수정 테스트1',
+        price: 2,
+        likes: [
+          {
+            userId: 2,
+            productId: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -937,6 +1190,12 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test2',
+        description: '가격 수정 테스트2',
+        price: 2,
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -1008,6 +1267,20 @@ describe('ProductService', () => {
       } as any);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (mockIo as any).emitMock = emitMock;
+      mockProductRepo.findById.mockResolvedValue({
+        ...updateResult,
+        name: 'test3',
+        description: '가격 수정 테스트3',
+        price: 2,
+        likes: [
+          {
+            userId: 1,
+            productId: 1,
+            createdAt: MOCK_TIME,
+            updatedAt: MOCK_TIME,
+          },
+        ],
+      });
       // when
       const result = await mockProductService.patchProduct({
         userId: 1,
@@ -1123,7 +1396,7 @@ describe('ProductService', () => {
       });
       mockProductImgRepo.findMany.mockResolvedValue([
         {
-          publicId: 'test1',
+          publicId: 'test_files/test1',
           url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         },
       ]);
@@ -1164,6 +1437,73 @@ describe('ProductService', () => {
         productId: 1,
         tx: mockPrisma,
       });
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
+    });
+    it('상품 삭제 - s3 이미지 ', async () => {
+      // given
+      mockProductRepo.delete.mockResolvedValue({
+        id: 2,
+        name: 'test2',
+        description: '삭제 테스트2',
+        price: 1,
+        likeCount: 0,
+        userId: 1,
+        createdAt: MOCK_TIME,
+        updatedAt: MOCK_TIME,
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockPrisma.$transaction.mockImplementation(async (cb: any) =>
+        cb(mockPrisma),
+      );
+      mockProductRepo.findOwnerById.mockResolvedValue({
+        userId: 1,
+      });
+      mockProductImgRepo.findMany.mockResolvedValue([
+        {
+          publicId: 'test/delete-me.jpg',
+          url: 'https://panda-market-s3-bucket.s3.amazonaws.com/test/delete-me.jpg',
+        },
+      ]);
+      mockTagRepo.findMany.mockResolvedValue(['test1']);
+      mockTagRepo.decrementCounts.mockResolvedValue({ count: 0 });
+      // when
+      const result = await mockProductService.deleteProduct({
+        userId: 1,
+        productId: 2,
+      });
+      // then
+      expect(result).toEqual({
+        id: 2,
+        name: 'test2',
+        description: '삭제 테스트2',
+        price: 1,
+        likeCount: 0,
+        userId: 1,
+        createdAt: MOCK_TIME,
+        updatedAt: MOCK_TIME,
+      });
+      expect(mockProductRepo.findOwnerById).toHaveBeenCalledWith({
+        productId: 2,
+      });
+      expect(mockTagRepo.findMany).toHaveBeenCalledWith({
+        productId: 2,
+        tx: mockPrisma,
+      });
+      expect(mockTagRepo.decrementCounts).toHaveBeenCalledWith({
+        tags: ['test1'],
+        tx: mockPrisma,
+      });
+      expect(mockProductImgRepo.findMany).toHaveBeenCalledWith({
+        productId: 2,
+        tx: mockPrisma,
+      });
+      expect(mockProductRepo.delete).toHaveBeenCalledWith({
+        productId: 2,
+        tx: mockPrisma,
+      });
+      expect(mockDeleteS3File).toHaveBeenCalledTimes(1);
+      expect(mockDeleteS3File).toHaveBeenCalledWith('test/delete-me.jpg');
     });
     it('해당 상품이 유저가 생성한 상품이 아닌 경우 403 오류 발생', async () => {
       // given

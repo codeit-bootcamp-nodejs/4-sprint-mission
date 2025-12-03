@@ -1,0 +1,63 @@
+name: panda-market-dev
+services:
+  server:
+    image: panda-market-image
+    env_file:
+      - .env
+    environment: # .env에서 db 호스트가 localhost라서 덮어씌움
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
+    build:
+      tags:
+        - panda-market-server:latest
+        - panda-market-server:1.0.0-express
+      args:
+        - NODE_VERSION=22.16.0
+      dockerfile: Dockerfile
+      pull: true
+      context: .
+    container_name: panda-market-server
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - panda-market-network
+    ports:
+      - 3000:3000
+    depends_on:
+      - db
+    entrypoint: sh -c "npx prisma migrate deploy && npm run start"
+
+  db:
+    image: postgres:16.10
+    env_file:
+      - .env
+    container_name: panda-market-db
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - panda-market-volume:/var/lib/postgresql/data
+    networks:
+      - panda-market-network
+    ports:
+      - 5432:5432
+
+  nginx:
+    image: nginx:1.28.0-alpine
+    container_name: panda-market-nginx
+    ports:
+      - 80:80
+    volumes:
+      - ./infra/ec2/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - panda-market-network
+    depends_on:
+      - server
+
+networks:
+  panda-market-network:
+    name: panda-market-network
+
+volumes:
+  panda-market-volume:
+    name: panda-market-volume

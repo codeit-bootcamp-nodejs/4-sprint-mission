@@ -5,7 +5,7 @@ import type {
   UpdateDTO,
 } from '@/dto/products.dto.js';
 import type { ProductId } from '@/types/product.types.js';
-import type { PrismaClient } from '@prisma/client';
+import type { Prisma, PrismaClient } from '@prisma/client';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '@/types/layer.types.js';
 import { GetListParams } from '@/types/shared.types.js';
@@ -66,9 +66,17 @@ export class ProductRepository {
       },
     });
   }
-  // 판다마켓 피그마에 보면 최신순, 좋아요 순으로 정렬 가능함
-  // 추후 기능 업데이트
-  async findMany({ keyword, page, pageSize, userId }: GetListParams) {
+  async findMany({ keyword, page, pageSize, orderBy, userId }: GetListParams) {
+    let orderOption: Prisma.ProductOrderByWithRelationInput;
+    if (orderBy === 'like') {
+      orderOption = {
+        likeCount: 'desc',
+      };
+    } else {
+      orderOption = {
+        createdAt: 'desc',
+      };
+    }
     return await this.prisma.product.findMany({
       where: {
         OR: [
@@ -104,9 +112,7 @@ export class ProductRepository {
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: orderOption,
     });
   }
   async findManyByUserId({ userId }: UserId) {
@@ -137,6 +143,9 @@ export class ProductRepository {
             url: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

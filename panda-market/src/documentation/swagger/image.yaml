@@ -1,0 +1,38 @@
+tags:
+  - name: image
+    description: 이미지 업로드 관련 API
+
+paths:
+  /image:
+    post:
+      tags:
+        - image
+      summary: 이미지 업로드
+      description: |
+        이미지를 서버에 업로드하고, 해당 이미지에 접근할 수 있는 URL을 반환받습니다.
+        이 URL은 상품 또는 게시글 생성/수정 시 `imageUrls` 필드에 사용됩니다.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: 업로드할 이미지 파일
+      responses:
+        '201':
+          description: 이미지 업로드 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponse'
+        '400':
+          description: '이미지 파일이 없거나 잘못된 형식일 경우'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'

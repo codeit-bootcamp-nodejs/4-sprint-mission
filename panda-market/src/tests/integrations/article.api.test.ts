@@ -1,7 +1,11 @@
-import { app } from '@/app.js';
 import { passwordHashing } from '@/lib/bcrypt.js';
 import prisma from '@/lib/prisma.js';
 import request from 'supertest';
+import {
+  mockDeleteS3File,
+  mockDeleteCloudinaryFile,
+  mockCloudinaryStreamUpload,
+} from '@/tests/mocks/file-storage.js';
 
 describe('Article API', () => {
   let userToken: string;
@@ -10,6 +14,12 @@ describe('Article API', () => {
   let user2Id: number;
   let articleId: number;
   let article2Id: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let app: any;
+
+  beforeAll(async () => {
+    app = (await import('@/app.js')).app;
+  });
 
   beforeEach(async () => {
     const hashedPassword = await passwordHashing('12345678');
@@ -89,11 +99,21 @@ describe('Article API', () => {
     });
     await prisma.articleImage.createMany({
       data: {
-        publicId: 'test1',
+        publicId: 'test_files/test1',
         url: 'https://res.cloudinary.com/testtest/image/upload/v99999999/test_files/test1.png',
         articleId: articleId,
       },
     });
+    await prisma.articleImage.createMany({
+      data: {
+        publicId: 'test/my-image.jpg',
+        url: 'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image.jpg',
+        articleId: article2Id,
+      },
+    });
+    mockDeleteCloudinaryFile.mockClear();
+    mockDeleteS3File.mockClear();
+    mockCloudinaryStreamUpload.mockClear();
   });
   describe('POST /article', () => {
     const articleData = {
@@ -109,6 +129,27 @@ describe('Article API', () => {
         .post('/article')
         .set('Authorization', `Bearer ${userToken}`)
         .send(articleData);
+      // then
+      expect(response.status).toBe(201);
+      expect(response.body.id).toBeDefined();
+      expect(response.body.title).toBe('test1');
+      expect(response.body.content).toBe('test1');
+      expect(response.body.user.id).toEqual(userId);
+      expect(response.body.likeCount).toBe(0);
+      expect(response.body.createdAt).toBeDefined();
+      expect(response.body.images.length).toBe(1);
+    });
+    it('게시글 생성 - s3 이미지', async () => {
+      // when
+      const response = await request(app)
+        .post('/article')
+        .set('Authorization', `Bearer ${userToken}`)
+        .send({
+          ...articleData,
+          imageUrls: [
+            'https://panda-market-s3-bucket.s3.ap-northeast-2.amazonaws.com/test/my-image2.jpg',
+          ],
+        });
       // then
       expect(response.status).toBe(201);
       expect(response.body.id).toBeDefined();
@@ -241,8 +282,8 @@ describe('Article API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.content).toEqual('이미지 수정 테스트1');
-      expect(response.body.images[0].publicId).toBe('test1');
-      expect(response.body.images[1].publicId).toBe('test2');
+      expect(response.body.images[0].publicId).toBe('test_files/test1');
+      expect(response.body.images[1].publicId).toBe('test_files/test2');
       expect(response.body.images.length).toBe(2);
     });
     it('이미지 삭제되면 해당 이미지의 url이 삭제된 상품을 반환해야 한다.', async () => {
@@ -259,8 +300,10 @@ describe('Article API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.content).toEqual('이미지 수정 테스트2');
-      expect(response.body.images[0].publicId).toBe('test2');
+      expect(response.body.images[0].publicId).toBe('test_files/test2');
       expect(response.body.images.length).toBe(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('이미지 추가 / 삭제되면 해당 이미지의 url이 추가 / 삭제된 상품을 반환해야 한다.', async () => {
       // when
@@ -277,9 +320,11 @@ describe('Article API', () => {
       // then
       expect(response.status).toBe(200);
       expect(response.body.content).toEqual('이미지 수정 테스트3');
-      expect(response.body.images[0].publicId).toBe('test2');
-      expect(response.body.images[1].publicId).toBe('test3');
+      expect(response.body.images[0].publicId).toBe('test_files/test2');
+      expect(response.body.images[1].publicId).toBe('test_files/test3');
       expect(response.body.images.length).toBe(2);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
     });
     it('존재하지 않는 게시글 id를 조회하면 404 에러 반환', async () => {
       // when
@@ -345,6 +390,24 @@ describe('Article API', () => {
         },
       });
       expect(images.length).toBe(0);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledTimes(1);
+      expect(mockDeleteCloudinaryFile).toHaveBeenCalledWith('test_files/test1');
+    });
+    it('게시글 삭제 - s3 이미지', async () => {
+      // when
+      const response = await request(app)
+        .delete(`/article/${article2Id}`)
+        .set('Authorization', `Bearer ${userToken}`);
+      // then
+      expect(response.status).toBe(200);
+      const images = await prisma.productImage.findMany({
+        where: {
+          productId: article2Id,
+        },
+      });
+      expect(images.length).toBe(0);
+      expect(mockDeleteS3File).toHaveBeenCalledTimes(1);
+      expect(mockDeleteS3File).toHaveBeenCalledWith('test/my-image.jpg');
     });
     it('존재하지 않는 게시글 id를 조회하면 404 에러 반환', async () => {
       // when

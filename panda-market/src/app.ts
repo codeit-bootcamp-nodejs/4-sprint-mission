@@ -5,12 +5,13 @@ import { prismaErrorHandler } from '@/middlewares/errorHandlers/prismaErrorHandl
 import { zodErrorHandler } from '@/middlewares/errorHandlers/zodErrorHandler.js';
 import { catchAllErrorHandler } from '@/middlewares/errorHandlers/catchAllErrorHandler.js';
 import { businessErrorHandler } from '@/middlewares/errorHandlers/businessErrorHandler.js';
-
+import swaggerUi from 'swagger-ui-express';
 import articleRouter from '@/routers/articles.routes.js';
 import productRouter from '@/routers/products.routes.js';
 import fileRouter from '@/routers/images.routes.js';
 import authRouter from '@/routers/auths.routes.js';
 import userRouter from '@/routers/users.routes.js';
+import { specs } from '@/documentation/options.js';
 import notificationRouter from '@/routers/notifications.routes.js';
 import { NODE_ENV } from '@/lib/constants.js';
 
@@ -31,6 +32,8 @@ app.get('/health', (req, res) => {
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 app.use('/article', articleRouter);
 app.use('/product', productRouter);

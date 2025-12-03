@@ -24,6 +24,7 @@ declare global {
         keyword: string;
         page: number;
         pageSize: number;
+        orderBy: string;
       };
       parsedCursorQuery?: {
         cursorId?: number;

@@ -1,0 +1,81 @@
+name: Test before PR
+run-name: PR Test by ${{github.actor}}
+on:
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./panda-market
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: 1. 코드 다운로드
+        uses: actions/checkout@v4
+
+      - name: 2. Node.js 설치
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: 3. 의존성 설치
+        run: npm ci
+
+      - name: 4. 환경변수 설정
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:password@localhost:5432/postgres?schema=public" >> .env.test
+          echo "REDIS_URL=redis://localhost:6379" >> .env.test
+
+          echo "JWT_ACCESS_TOKEN_SECRET=test" >> .env.test
+          echo "JWT_REFRESH_TOKEN_SECRET=test" >> .env.test
+          echo "JWT_SECRET_KEY=test" >> .env.test
+
+          echo "AWS_ACCESS_KEY=test" >> .env.test
+          echo "AWS_SECRET_KEY=test" >> .env.test
+          echo "AWS_REGION=test" >> .env.test
+          echo "AWS_BUCKET=test" >> .env.test
+
+          echo "CLOUDINARY_CLOUD_NAME=test" >> .env.test
+          echo "CLOUDINARY_API_KEY=test" >> .env.test
+          echo "CLOUDINARY_API_SECRET=test" >> .env.test
+
+          echo "GOOGLE_CLIENT_ID=test" >> .env.test
+          echo "GOOGLE_CLIENT_SECRET=test" >> .env.test
+          echo "GOOGLE_REDIRECT_URI=test" >> .env.test
+
+          echo "KAKAO_CLIENT_API_KEY=test" >> .env.test
+          echo "KAKAO_CLIENT_SECRET=test" >> .env.test
+          echo "KAKAO_REDIRECT_URI=test" >> .env.test
+
+          echo "PORT=3000" >> .env.test
+          echo "NODE_ENV=test" >> .env.test
+
+          cat .env.test >> $GITHUB_ENV
+
+      - name: 5. DB 스키마 동기화
+        run: npx prisma db push
+
+      - name: 6. 테스트 실행
+        run: npm run test

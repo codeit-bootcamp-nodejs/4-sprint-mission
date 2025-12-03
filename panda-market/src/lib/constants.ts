@@ -17,6 +17,7 @@ const node_env = process.env['NODE_ENV'];
 const aws_access_key = process.env['AWS_ACCESS_KEY'];
 const aws_secret_key = process.env['AWS_SECRET_KEY'];
 const aws_region = process.env['AWS_REGION'];
+const aws_bucket = process.env['AWS_BUCKET'];
 
 // (타입 가드 역할)
 if (!jwtAccessTokenSecret || !jwtRefreshTokenSecret) {
@@ -25,7 +26,7 @@ if (!jwtAccessTokenSecret || !jwtRefreshTokenSecret) {
   );
 }
 if (process.env.NODE_ENV === 'production') {
-  if (!aws_access_key || !aws_secret_key || !aws_region) {
+  if (!aws_access_key || !aws_secret_key || !aws_region || !aws_bucket) {
     throw new InternalServerError(
       'aws 정보가 .env 파일에 설정되지 않았습니다.',
     );
@@ -64,6 +65,9 @@ const KAKAO_REDIRECT_URI = kakao_redirect_uri;
 const AWS_ACCESS_KEY = aws_access_key;
 const AWS_SECRET_KEY = aws_secret_key;
 const AWS_REGION = aws_region;
+const AWS_BUCKET = aws_bucket;
+const PORT = process.env['PORT'];
+const PUBLIC_URL = process.env['PUBLIC_URL'];
 
 const NODE_ENV = node_env;
 
@@ -85,4 +89,7 @@ export {
   AWS_ACCESS_KEY,
   AWS_SECRET_KEY,
   AWS_REGION,
+  AWS_BUCKET,
+  PORT,
+  PUBLIC_URL,
 };

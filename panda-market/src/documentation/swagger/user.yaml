@@ -1,0 +1,183 @@
+tags:
+  - name: user
+    description: 사용자 정보 및 활동 내역 관련 API
+
+paths:
+  /user:
+    get:
+      tags:
+        - user
+      summary: 내 정보 조회
+      description: 현재 로그인된 사용자의 상세 정보를 조회합니다.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 사용자 정보 조회 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      tags:
+        - user
+      summary: 내 정보 수정
+      description: 현재 로그인된 사용자의 정보(닉네임, 프로필 사진, 비밀번호)를 수정합니다.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: 사용자 정보 수정 성공
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: '요청 본문 유효성 검사 실패. 예: 비밀번호 변경 시 현재 비밀번호 미입력'
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: '이미 사용 중인 닉네임'
+    delete:
+      tags:
+        - user
+      summary: 회원 탈퇴
+      description: 현재 로그인된 사용자를 탈퇴 처리합니다.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 회원 탈퇴 성공
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: '회원 탈퇴가 완료되었습니다.'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/products:
+    get:
+      tags:
+        - user
+      summary: 내가 작성한 상품 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 작성한 상품 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/articles:
+    get:
+      tags:
+        - user
+      summary: 내가 작성한 게시글 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 작성한 게시글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/products/likes:
+    get:
+      tags:
+        - user
+      summary: 내가 좋아요한 상품 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 좋아요한 상품 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/articles/likes:
+    get:
+      tags:
+        - user
+      summary: 내가 좋아요한 게시글 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 좋아요한 게시글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/products/comments:
+    get:
+      tags:
+        - user
+      summary: 내가 작성한 상품 댓글 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 작성한 상품 댓글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /user/articles/comments:
+    get:
+      tags:
+        - user
+      summary: 내가 작성한 게시글 댓글 목록 조회
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: 내가 작성한 게시글 댓글 목록 조회 성공
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'

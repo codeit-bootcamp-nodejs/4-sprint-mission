@@ -11,11 +11,12 @@ import { TYPES } from '@/types/layer.types.js';
 import { PatchArticleDTO, PostArticleDTO } from '@/dto/articles.dto.js';
 import { ArticleImageRepository } from '@/repositories/article-images.repository.js';
 import { Prisma, PrismaClient } from '@prisma/client';
-import {
-  deleteCloudinaryFile,
-  extractPublicIdFromCloudinaryUrl,
-} from '@/lib/cloudinary.js';
 import { ImageUpdateInput } from '@/types/article.types.js';
+import {
+  buildUpdateImageQuery,
+  deleteImageFile,
+  getImageInfo,
+} from '@/utils/image.utils.js';
 
 @injectable()
 export class ArticleService {
@@ -43,37 +44,21 @@ export class ArticleService {
       articleId,
       tx,
     });
-    const imageSet = new Set(images.map((img) => img.publicId));
-    const newImageList = newImages.map((imageUrl) =>
-      extractPublicIdFromCloudinaryUrl(imageUrl),
-    );
-    const newImageSet = new Set(newImageList);
-    // 삭제할 이미지들
-    const imagesToDelete = images
-      .filter((img) => !newImageSet.has(img.publicId))
-      .map((img) => ({ publicId: img.publicId }));
-    const deletedImageIds = imagesToDelete.map((img) => img.publicId);
-    // 새로 생성할 이미지들
-    const imagesToCreate = newImages.filter(
-      (url) => !imageSet.has(extractPublicIdFromCloudinaryUrl(url)),
-    );
-    return {
-      deletedImageIds,
-      query: {
-        deleteMany: imagesToDelete,
-        create: imagesToCreate.map((url) => ({
-          url: url,
-          publicId: extractPublicIdFromCloudinaryUrl(url),
-        })),
-      },
-    };
+    return buildUpdateImageQuery({ images, newImages });
   }
 
-  async getArticleList({ keyword, page, pageSize, userId }: GetListParams) {
+  async getArticleList({
+    keyword,
+    page,
+    pageSize,
+    orderBy,
+    userId,
+  }: GetListParams) {
     const articles = await this.articleRepository.findMany({
       keyword,
       page,
       pageSize,
+      orderBy,
       userId,
     });
     const results = articles.map((article) => {
@@ -115,9 +100,10 @@ export class ArticleService {
       });
       if (imageUrls && imageUrls.length > 0) {
         const imageData = imageUrls.map((imageUrl) => {
+          const { url, publicId } = getImageInfo(imageUrl);
           return {
-            publicId: extractPublicIdFromCloudinaryUrl(imageUrl),
-            url: imageUrl,
+            publicId,
+            url,
             articleId: article.id,
           };
         });
@@ -135,7 +121,7 @@ export class ArticleService {
       const patchData: Prisma.ArticleUpdateInput = {
         ...restData,
       };
-      let deletedImages: string[] = [];
+      let deletedImages: { publicId: string; storageType: string }[] = [];
       if (!newImages) {
         if (Object.keys(patchData).length > 0) {
           return await this.articleRepository.update({
@@ -153,7 +139,7 @@ export class ArticleService {
             articleId,
             newImages,
           });
-          deletedImages = result.deletedImageIds;
+          deletedImages = result.imagesToDelete;
           patchData.images = result.query;
         }
         await this.articleRepository.update({
@@ -166,7 +152,12 @@ export class ArticleService {
       if (deletedImages.length > 0) {
         // 클라우디너리 이미지 삭제
         await Promise.all(
-          deletedImages.map(async (publicId) => deleteCloudinaryFile(publicId)),
+          deletedImages.map((img) =>
+            deleteImageFile({
+              publicId: img.publicId,
+              storageType: img.storageType,
+            }),
+          ),
         );
       }
 
@@ -178,14 +169,20 @@ export class ArticleService {
 
   async deleteArticle({ articleId, userId }: AuthArticleParams) {
     if (await this.authorization({ userId, articleId })) {
-      let imageIdsToDelete: string[] = [];
+      let imagesToDelete: { publicId: string; storageType: string }[] = [];
       const deletedArticle = await this.prisma.$transaction(async (tx) => {
         const images = await this.articleImageRepository.findMany({
           articleId,
           tx,
         });
         if (images.length > 0) {
-          imageIdsToDelete = images.map((image) => image.publicId);
+          imagesToDelete = images.map((image) => {
+            const { publicId, storageType } = getImageInfo(image.url);
+            return {
+              publicId,
+              storageType,
+            };
+          });
           await this.articleImageRepository.deleteMany({
             articleId,
             tx,
@@ -198,9 +195,14 @@ export class ArticleService {
         return deleteArticle;
       });
 
-      if (imageIdsToDelete.length > 0) {
+      if (imagesToDelete.length > 0) {
         await Promise.all(
-          imageIdsToDelete.map((publicId) => deleteCloudinaryFile(publicId)),
+          imagesToDelete.map((img) =>
+            deleteImageFile({
+              publicId: img.publicId,
+              storageType: img.storageType,
+            }),
+          ),
         );
       }
       return deletedArticle;

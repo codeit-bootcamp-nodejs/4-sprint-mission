@@ -38,7 +38,8 @@ export function hasParsedQuery(req: Request): req is Request & {
     req.parsedQuery !== null &&
     'keyword' in req.parsedQuery &&
     'page' in req.parsedQuery &&
-    'pageSize' in req.parsedQuery
+    'pageSize' in req.parsedQuery &&
+    'orderBy' in req.parsedQuery
   );
 }
 

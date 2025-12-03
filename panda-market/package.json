@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "lint:fix": "eslint src --ext .ts --fix",
     "db:migrate:test": "dotenv -e .env.test -- prisma migrate dev",
-    "prepare": "husky"
+    "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky; fi"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +43,8 @@
     "@types/redis": "^4.0.10",
     "@types/streamifier": "^0.1.2",
     "@types/supertest": "^6.0.3",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "babel-jest": "^30.2.0",
@@ -55,7 +57,6 @@
     "jest-mock-extended": "^4.0.0",
     "lint-staged": "^16.2.7",
     "prettier": "^3.6.2",
-    "prisma": "^6.18.0",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5",
     "ts-node": "^10.9.2",
@@ -67,6 +68,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.936.0",
     "@prisma/client": "^6.18.0",
+    "prisma": "^6.18.0",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.8.0",
@@ -83,6 +85,8 @@
     "redis": "^5.9.0",
     "socket.io": "^4.8.1",
     "streamifier": "^0.1.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "tslib": "^2.8.1",
     "zod": "^4.1.12"
   }
