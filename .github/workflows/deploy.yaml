@@ -5,35 +5,32 @@ on:
     branches:
       - main
       - 김지헌-sprint11
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Install dependencies
-      run: npm install
-
-    # Removed: Build project step (as requested)
-    # - name: Build project
-    #   run: npm run build
-
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USERNAME }}
-        key: ${{ secrets.EC2_SSH_KEY }} # Use SSH key for authentication
-        script: |
-          cd /home/ubuntu/4-sprint-mission/mission-11 # Updated path
-          git pull origin 김지헌-sprint11 # Updated branch
-          npm install --production
-          npm run build # Build on EC2
-          pm2 reload panda-market # Changed to reload
+    
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # EC2 내부 경로로 이동 (사용자 이름 ubuntu 확인!)
+            cd /home/ubuntu/4-sprint-mission/mission-11
+            
+            # 최신 코드 받기
+            git pull origin 김지헌-sprint11
+            
+            # 패키지 설치 및 빌드 (EC2 내부에서 실행됨)
+            npm install
+            npm run build
+            
+            # 서버 재시작 (PM2 Reload)
+            pm2 reload panda-market
