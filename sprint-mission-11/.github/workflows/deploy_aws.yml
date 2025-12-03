@@ -1,0 +1,65 @@
+name: Deploy Docker App to EC2
+
+on:
+  push:
+    branches:
+      - main # main 브랜치에 푸시될 때만 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+      IMAGE_TAG: ${{ github.sha }} # Git Commit SHA를 이미지 태그로 사용 (고유성 확보)
+      CONTAINER_NAME: my_express_container # 실행할 컨테이너 이름
+
+    steps:
+      - name: 리포지토리 체크아웃
+        uses: actions/checkout@v4
+
+      - name: AWS 환경 변수 설정
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: AWS ECR(아마존 도커) 로그인
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 도커 이미지 만들기
+        run: |
+          docker build -t ${{ env.ECR_REGISTRY }}:${{ env.IMAGE_TAG }} .
+          docker tag ${{ env.ECR_REGISTRY }}:${{ env.IMAGE_TAG }} ${{ env.ECR_REGISTRY }}/:latest
+
+      - name: ECR에 도커 올리기
+        run: |
+          docker push ${{ env.ECR_REGISTRY }}:${{ env.IMAGE_TAG }}
+          docker push ${{ env.ECR_REGISTRY }}:latest
+
+      - name: SSH 환경 설정
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          database-url: ${{ secrets.DATABASE_URL }}
+          ec2-user: ${{ secrets.EC2_USER }}
+          ec2-host: ${{ secrets.EC2_HOST }}
+
+      - name: EC2에 업로드
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            
+            $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }})
+
+            docker pull ${{ env.ECR_REGISTRY }}:latest
+
+            docker stop ${{ env.CONTAINER_NAME }} || true 
+            docker rm ${{ env.CONTAINER_NAME }} || true
+            
+            docker run -d \
+              --name ${{ env.CONTAINER_NAME }} \
+              -p 3000:3000 \
+              -e DATABASE_URL=${{ secrets.DATABASE_URL }}
+              ${{ env.ECR_REGISTRY }}:latest
+          EOF

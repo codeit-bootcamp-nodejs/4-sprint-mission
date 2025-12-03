@@ -1,0 +1,1 @@
+{"version":3,"file":"delete.article.d.ts","sourceRoot":"","sources":["../../../src/controllers/articles/delete.article.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,YAAY,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAE/D,QAAA,MAAM,aAAa,GACjB,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,kBAgBnB,CAAC;AAEF,eAAe,aAAa,CAAC"}

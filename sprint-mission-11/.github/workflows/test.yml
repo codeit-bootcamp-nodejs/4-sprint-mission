@@ -1,0 +1,25 @@
+name: Pull Request and Tests
+
+on:
+  pull_request:
+    branches:
+      - "**" # 모든 브랜치에 대해 PR이 열리거나 업데이트될 때 실행
+
+jobs:
+  run_tests:
+    runs-on: ubuntu-latest # 워크플로우가 실행될 환경 지정
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4 # 저장소 코드 체크아웃
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install NPM
+        run: npm install
+
+      - name: Run Tests
+        run: npm test # 프로젝트의 테스트 실행 명령어
