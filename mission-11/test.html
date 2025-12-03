@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Tester</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        #log { border: 1px solid #ccc; padding: 10px; width: 80%; height: 300px; overflow-y: scroll; margin-top: 10px; } 
+        .controls { margin-top: 10px; }
+        input { width: 400px; padding: 5px; }
+        button { padding: 5px 10px; }
+    </style>
+</head>
+<body>
+    <h1>Socket.IO Tester</h1>
+    <div class="controls">
+        <label for="token">Auth Token:</label>
+        <input type="text" id="token" placeholder="로그인 후 받은 accessToken을 여기에 붙여넣으세요">
+        <button id="connectBtn">Connect</button>
+        <button id="disconnectBtn">Disconnect</button>
+    </div>
+    <div id="log"></div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+        const tokenInput = document.getElementById('token');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const logDiv = document.getElementById('log');
+        let socket;
+
+        function log(message) {
+            const p = document.createElement('p');
+            p.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        connectBtn.addEventListener('click', () => {
+            const token = tokenInput.value;
+            if (!token) {
+                log('ERROR: Auth Token을 입력해주세요.');
+                return;
+            }
+
+            if (socket) {
+                socket.disconnect();
+            }
+
+            log('Connecting to ws://localhost:3000...');
+            
+            // 서버의 io.use() 미들웨어와 통신하기 위해 auth 객체에 토큰을 담아 보냅니다.
+            socket = io('ws://localhost:3000', {
+                auth: {
+                    token: token
+                }
+            });
+
+            socket.on('connect', () => {
+                log('SUCCESS: 서버에 성공적으로 연결되었습니다.');
+            });
+
+            socket.on('connect_error', (err) => {
+                log(`ERROR: 연결 실패 - ${err.message}`);
+            });
+
+            socket.on('disconnect', () => {
+                log('INFO: 연결이 끊어졌습니다.');
+            });
+
+            // 'newNotification' 이벤트를 리스닝합니다.
+            socket.on('newNotification', (data) => {
+                log('EVENT (newNotification): ' + JSON.stringify(data));
+            });
+        });
+
+        disconnectBtn.addEventListener('click', () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+      - 김지헌-sprint11
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # ▼▼▼ [핵심] NVM(Node.js) 설정을 강제로 불러오는 코드 ▼▼▼
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # 경로 이동
+            cd /home/ubuntu/4-sprint-mission/mission-11
+            
+            # 최신 코드 받기
+            git pull origin 김지헌-sprint11
+            
+            # 이제 npm과 pm2를 알 수 있습니다!
+            npm install
+            npm run build
+            
+            # 서버 재시작
+            pm2 reload panda-market

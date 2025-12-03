@@ -1,0 +1,53 @@
+name: CI (Test)
+
+on:
+  pull_request:
+    branches: [ "main", "develop", "feature/*", "김지헌-sprint11" ]
+  push:
+    branches: [ "김지헌-sprint11" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: ./mission-11
+      run: npm install
+
+    - name: Generate Prisma Client
+      working-directory: ./mission-11
+      run: npx prisma generate
+
+    - name: Run Tests
+      working-directory: ./mission-11
+      run: npm test
+      env:
+        DATABASE_URL: "postgresql://test:test@localhost:5432/test?schema=public"
+        JWT_SECRET_KEY: "test-secret"
+        JWT_REFRESH_SECRET_KEY: "test-refresh-secret"
+        PORT: 3000
