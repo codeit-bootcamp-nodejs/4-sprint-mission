@@ -1,0 +1,68 @@
+name: PR test Check (DB 포함)
+
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16.5
+        env:
+          POSTGRES_USER: ci_user
+          POSTGRES_PASSWORD: ci_password
+
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Integration Tests
+        run: |
+          echo "Waiting for PostgreSQL service to be fully ready..."
+          sleep 5 
+
+          echo "Running Prisma migrate deploy..."
+          npx prisma migrate deploy
+
+          echo "Running Prisma generate..."
+          npx prisma generate
+
+          echo "Running npm tests..."
+          npm test && echo "✅ Test Passed" || (echo "❌ Test Failed" && exit 1)
+        env:
+          DATABASE_URL: postgres://ci_user:ci_password@localhost:5432/test_db?schema=public
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: ci_user
+          DB_PASSWORD: ci_password
+          DB_NAME: test_db
+
+          JWT_ACCESS_TOKEN_SECRET: 'ci_test_access_token_secret_123'
+          JWT_REFRESH_TOKEN_SECRET: 'ci_test_refresh_token_secret_456'
+
+          CLOUDINARY_CLOUD_NAME: 'ci-test-cloud'
+          CLOUDINARY_API_KEY: '123456789012345'
+          CLOUDINARY_API_SECRET: 'ci_test_cloudinary_secret_key'
+
+          AWS_S3_BUCKET_NAME: 'ci-test-bucket'
+          AWS_S3_REGION: 'us-east-1'
+          AWS_ACCESS_KEY_ID: 'ASIA_CI_TEST_KEY'
+          AWS_SECRET_ACCESS_KEY: 'ci_test_aws_secret_key_abcdef'

@@ -1,0 +1,94 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: ap-northeast-2 # 서울 리전
+  ECR_REPOSITORY: uju-api-sever # ECR 리포지토리 이름
+  DOCKER_CONTAINER_NAME: 4-sprint-mission-server # EC2에서 실행할 컨테이너 이름
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          IMAGE_URI=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker build --build-arg NODE_VERSION=22.17.1 -t $IMAGE_URI .
+          docker push $IMAGE_URI
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
+      - name: Get GitHub Actions Runner IP
+        id: get_ip
+        run: echo "ip=$(curl -s http://checkip.amazonaws.com)" >> $GITHUB_OUTPUT
+
+      - name: Add Runner IP to EC2 Security Group
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.get_ip.outputs.ip }}/32
+
+      - name: Get ECR Login Password
+        id: ecr_password
+        run: echo "ECR_PASSWORD=$(aws ecr get-login-password --region ${{ env.AWS_REGION }})" >> $GITHUB_ENV
+
+      - name: Deploy to EC2 instance
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            echo ${{ env.ECR_PASSWORD }} | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}
+
+            cd /home/ec2-user/4-sprint-mission
+
+            docker stop ${{ env.DOCKER_CONTAINER_NAME }} || true
+            docker rm ${{ env.DOCKER_CONTAINER_NAME }} || true
+
+            docker image prune -a -f
+
+            docker pull ${{ env.IMAGE_URI }}
+
+            docker run \
+              -d \
+              --name ${{ env.DOCKER_CONTAINER_NAME }} \
+              --restart always \
+              -p 3000:3000 \
+              --env-file ./.env \
+              -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+              ${{ env.IMAGE_URI }}
+
+      - name: Remove Runner IP from EC2 Security Group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.EC2_SECURITY_GROUP_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.get_ip.outputs.ip }}/32

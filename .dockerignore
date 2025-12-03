@@ -6,6 +6,20 @@ node_modules
 /generated/prisma
 .DS_Store
 
+# 기타 파일
+erd/
+archive/
+http/
+infra/
+scripts/
+test/
+DockerImage.txt
+
+# Git
+.git
+.gitignore
+.github
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

@@ -1,0 +1,27 @@
+도커 빌드
+docker image build \
+	-t parkdaseul/uju-api:1.0.0-slim-express \
+	--build-arg NODE_VERSION=22.17.1 \
+	-f ./Dockerfile \
+  --pull \
+.
+
+도커 허브 push
+docker push parkdaseul/uju-api:1.0.0-express
+
+도커 컨테이너 마이그레이션 1회성 생성
+docker run \
+  --rm \
+  --name uju-api-migration \
+  --env-file ./.env \
+  parkdaseul/uju-api:1.0.0-slim-express \
+  npx prisma migrate deploy
+
+도커 컨테이터 생성
+docker run \
+  -d \
+  --rm \
+  --name uju-api-container \
+  -p 3000:3000 \
+  --env-file ./.env \
+  parkdaseul/uju-api:1.0.0-slim-express
