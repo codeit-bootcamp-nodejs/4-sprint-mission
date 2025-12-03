@@ -74,7 +74,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/product")
+        .post("/api/product")
         .set("Authorization", `Bearer ${authToken}`)
         .send(productData)
         .expect(200);
@@ -95,7 +95,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/product")
+        .post("/api/product")
         .set("Authorization", `Bearer ${authToken}`)
         .send(productData)
         .expect(400);
@@ -110,7 +110,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/product")
+        .post("/api/product")
         .set("Authorization", `Bearer ${authToken}`)
         .send(productData)
         .expect(400);
@@ -122,7 +122,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
   describe("GET /product - 상품 목록 조회", () => {
     it("인증된 사용자가 자신의 상품 목록을 조회할 수 있어야 함", async () => {
       const response = await request(app)
-        .get("/product")
+        .get("/api/product")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
@@ -142,7 +142,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put(`/product/${testProductId}`)
+        .put(`/api/product/${testProductId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send(updateData)
         .expect(200);
@@ -160,7 +160,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put(`/product/${testProductId}`)
+        .put(`/api/product/${testProductId}`)
         .set("Authorization", `Bearer ${otherUserToken}`)
         .send(updateData)
         .expect(403);
@@ -177,7 +177,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put("/product/99999")
+        .put("/api/product/99999")
         .set("Authorization", `Bearer ${authToken}`)
         .send(updateData)
         .expect(404);
@@ -204,7 +204,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
 
     it("상품 소유자가 자신의 상품을 삭제할 수 있어야 함", async () => {
       const response = await request(app)
-        .delete(`/product/${deleteTestProductId}`)
+        .delete(`/api/product/${deleteTestProductId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
@@ -230,7 +230,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
       });
 
       const response = await request(app)
-        .delete(`/product/${product.id}`)
+        .delete(`/api/product/${product.id}`)
         .set("Authorization", `Bearer ${otherUserToken}`)
         .expect(403);
 
@@ -243,7 +243,7 @@ describe("상품 API - 인증 필요 통합 테스트", () => {
 
     it("존재하지 않는 상품을 삭제하려고 하면 404 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .delete("/product/99999")
+        .delete("/api/product/99999")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(404);
 
