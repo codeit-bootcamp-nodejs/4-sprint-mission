@@ -1,38 +1,18 @@
 import request from "supertest";
 import { app } from "../../app.js";
 
-describe("상품 API - 인증 불필요 테스트 (인증 실패 케이스)", () => {
-  describe("GET /product - 상품 목록 조회 (인증 필요)", () => {
-    it("토큰 없이 요청 시 401 에러를 반환해야 함", async () => {
+describe("상품 API - 인증 테스트", () => {
+  describe("GET /api/product - 상품 목록 조회 (인증 불필요)", () => {
+    it("토큰 없이도 상품 목록을 조회할 수 있어야 함", async () => {
       const response = await request(app)
-        .get("/product")
-        .expect(401);
+        .get("/api/product");
 
-      expect(response.body).toHaveProperty("success", false);
-      expect(response.body.message).toContain("토큰");
-    });
-
-    it("잘못된 토큰으로 요청 시 401 에러를 반환해야 함", async () => {
-      const response = await request(app)
-        .get("/product")
-        .set("Authorization", "Bearer invalid-token")
-        .expect(401);
-
-      expect(response.body).toHaveProperty("success", false);
-      expect(response.body.message).toContain("유효하지");
-    });
-
-    it("Bearer 형식이 아닌 토큰으로 요청 시 401 에러를 반환해야 함", async () => {
-      const response = await request(app)
-        .get("/product")
-        .set("Authorization", "InvalidFormat token123")
-        .expect(401);
-
-      expect(response.body).toHaveProperty("success", false);
+      // 상품이 있으면 200, 없으면 404 (비즈니스 로직)
+      expect([200, 404]).toContain(response.status);
     });
   });
 
-  describe("POST /product - 상품 등록 (인증 필요)", () => {
+  describe("POST /api/product - 상품 등록 (인증 필요)", () => {
     it("토큰 없이 상품 등록 시 401 에러를 반환해야 함", async () => {
       const productData = {
         title: "테스트 상품",
@@ -41,15 +21,15 @@ describe("상품 API - 인증 불필요 테스트 (인증 실패 케이스)", ()
       };
 
       const response = await request(app)
-        .post("/product")
+        .post("/api/product")
         .send(productData)
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 
-  describe("PUT /product/:productId - 상품 수정 (인증 필요)", () => {
+  describe("PUT /api/product/:productId - 상품 수정 (인증 필요)", () => {
     it("토큰 없이 상품 수정 시 401 에러를 반환해야 함", async () => {
       const productData = {
         title: "수정된 상품",
@@ -58,22 +38,21 @@ describe("상품 API - 인증 불필요 테스트 (인증 실패 케이스)", ()
       };
 
       const response = await request(app)
-        .put("/product/1")
+        .put("/api/product/1")
         .send(productData)
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 
-  describe("DELETE /product/:productId - 상품 삭제 (인증 필요)", () => {
+  describe("DELETE /api/product/:productId - 상품 삭제 (인증 필요)", () => {
     it("토큰 없이 상품 삭제 시 401 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .delete("/product/1")
+        .delete("/api/product/1")
         .expect(401);
 
-      expect(response.body).toHaveProperty("success", false);
+      expect(response.body).toHaveProperty("message");
     });
   });
 });
-

@@ -1,4 +1,4 @@
-import prisma from '../prisma/prisma.js';
+import { prisma } from '../prisma/prisma.js';
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import type { Comment } from "@prisma/client"
 import { sendNotificationToUser } from '../app.js';

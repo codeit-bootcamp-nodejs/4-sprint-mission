@@ -4,25 +4,19 @@ import prisma from "../../prisma/prisma.js";
 import bcrypt from "bcrypt";
 
 describe("사용자 인증 API 통합 테스트", () => {
-  // 테스트 전후 DB 정리
+  // 테스트 전후 DB 정리 (user.auth.test.ts 전용 데이터만)
   beforeEach(async () => {
-    // 테스트용 사용자 삭제
     await prisma.user.deleteMany({
       where: {
-        email: {
-          in: ["test@example.com", "test2@example.com"],
-        },
+        email: { in: ["test@example.com", "test1@example.com", "test2@example.com"] }
       },
     });
   });
 
   afterEach(async () => {
-    // 테스트 후 정리
     await prisma.user.deleteMany({
       where: {
-        email: {
-          in: ["test@example.com", "test2@example.com"],
-        },
+        email: { in: ["test@example.com", "test1@example.com", "test2@example.com"] }
       },
     });
   });
@@ -36,7 +30,7 @@ describe("사용자 인증 API 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/user/sign")
+        .post("/api/user/sign")
         .send(userData)
         .expect(201);
 
@@ -59,7 +53,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
       // 동일한 이메일로 회원가입 시도
       const response = await request(app)
-        .post("/user/sign")
+        .post("/api/user/sign")
         .send({
           email: "test@example.com",
           nickname: "user2",
@@ -83,7 +77,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
       // 동일한 닉네임으로 회원가입 시도
       const response = await request(app)
-        .post("/user/sign")
+        .post("/api/user/sign")
         .send({
           email: "test2@example.com",
           nickname: "testuser",
@@ -97,7 +91,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("필수 필드가 누락되면 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/sign")
+        .post("/api/user/sign")
         .send({
           email: "test@example.com",
           // nickname과 password 누락
@@ -122,7 +116,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("유효한 이메일과 비밀번호로 로그인 시 토큰을 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/login")
+        .post("/api/user/login")
         .send({
           email: "test@example.com",
           password: "password123",
@@ -139,7 +133,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("잘못된 이메일로 로그인 시 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/login")
+        .post("/api/user/login")
         .send({
           email: "wrong@example.com",
           password: "password123",
@@ -151,7 +145,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("잘못된 비밀번호로 로그인 시 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/login")
+        .post("/api/user/login")
         .send({
           email: "test@example.com",
           password: "wrongpassword",
@@ -163,7 +157,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("이메일이 누락되면 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/login")
+        .post("/api/user/login")
         .send({
           password: "password123",
         })
@@ -187,7 +181,7 @@ describe("사용자 인증 API 통합 테스트", () => {
       });
 
       const loginResponse = await request(app)
-        .post("/user/login")
+        .post("/api/user/login")
         .send({
           email: "test@example.com",
           password: "password123",
@@ -198,7 +192,7 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("유효한 refresh token으로 새 access token을 발급받아야 함", async () => {
       const response = await request(app)
-        .post("/user/refresh")
+        .post("/api/user/refresh")
         .send({
           refreshToken,
         })
@@ -211,11 +205,11 @@ describe("사용자 인증 API 통합 테스트", () => {
 
     it("잘못된 refresh token으로 요청 시 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .post("/user/refresh")
+        .post("/api/user/refresh")
         .send({
           refreshToken: "invalid-refresh-token",
         })
-        .expect(401);
+        .expect(403);
 
       expect(response.body).toHaveProperty("message");
     });

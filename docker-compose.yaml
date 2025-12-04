@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  # 1. Express 서버 컨테이너
+  app:
+    build: .
+    container_name: express-server
+    restart: always
+    ports:
+      - "3000:3000" # 호스트(EC2)의 3000번 포트로 연결
+    environment:
+      # 컨테이너 내부에서 db 서비스 이름으로 PostgreSQL에 접속
+      DATABASE_URL: postgresql://porstgres:1234qwer@arn:aws:rds:ap-northeast-2:516861152013:db:panda/panda
+      PORT: 3000
+      NODE_ENV: production
+      # 다른 환경 변수들 추가
+    volumes:
+      # 파일 업로드 폴더를 호스트 머신에 영구 저장 (Volume)
+      - uploads_data:/app/uploads
+    
+# 3. 볼륨 정의
+volumes:
+  uploads_data:

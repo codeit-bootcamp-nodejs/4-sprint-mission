@@ -13,6 +13,20 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
 
   // 테스트 전 사용자 생성 및 로그인
   beforeAll(async () => {
+    // 기존 테스트 데이터 정리
+    await prisma.post.deleteMany({
+      where: {
+        User: {
+          email: { in: ["posttest@example.com", "otherpostuser@example.com"] }
+        }
+      }
+    });
+    await prisma.user.deleteMany({
+      where: {
+        email: { in: ["posttest@example.com", "otherpostuser@example.com"] }
+      }
+    });
+
     // 테스트용 사용자 생성
     const user = await prisma.user.create({
       data: {
@@ -73,7 +87,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/post")
+        .post("/api/post")
         .set("Authorization", `Bearer ${authToken}`)
         .send(postData)
         .expect(200);
@@ -92,7 +106,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/post")
+        .post("/api/post")
         .set("Authorization", `Bearer ${authToken}`)
         .send(postData)
         .expect(400);
@@ -106,7 +120,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .post("/post")
+        .post("/api/post")
         .set("Authorization", `Bearer ${authToken}`)
         .send(postData)
         .expect(400);
@@ -118,7 +132,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
   describe("GET /post - 게시글 목록 조회", () => {
     it("인증된 사용자가 자신의 게시글 목록을 조회할 수 있어야 함", async () => {
       const response = await request(app)
-        .get("/post")
+        .get("/api/post")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
@@ -137,7 +151,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put(`/post/${testPostId}`)
+        .put(`/api/post/${testPostId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .send(updateData)
         .expect(200);
@@ -154,13 +168,13 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put(`/post/${testPostId}`)
+        .put(`/api/post/${testPostId}`)
         .set("Authorization", `Bearer ${otherUserToken}`)
         .send(updateData)
         .expect(403);
 
       expect(response.body).toHaveProperty("message");
-      expect(response.body.message).toContain("권한");
+      expect(response.body.message).toContain("작성자만");
     });
 
     it("존재하지 않는 게시글을 수정하려고 하면 404 에러를 반환해야 함", async () => {
@@ -170,7 +184,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       };
 
       const response = await request(app)
-        .put("/post/99999")
+        .put("/api/post/99999")
         .set("Authorization", `Bearer ${authToken}`)
         .send(updateData)
         .expect(404);
@@ -196,7 +210,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
 
     it("게시글 작성자가 자신의 게시글을 삭제할 수 있어야 함", async () => {
       const response = await request(app)
-        .delete(`/post/${deleteTestPostId}`)
+        .delete(`/api/post/${deleteTestPostId}`)
         .set("Authorization", `Bearer ${authToken}`)
         .expect(200);
 
@@ -221,12 +235,12 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
       });
 
       const response = await request(app)
-        .delete(`/post/${post.id}`)
+        .delete(`/api/post/${post.id}`)
         .set("Authorization", `Bearer ${otherUserToken}`)
         .expect(403);
 
       expect(response.body).toHaveProperty("message");
-      expect(response.body.message).toContain("권한");
+      expect(response.body.message).toContain("작성자만");
 
       // 정리
       await prisma.post.delete({ where: { id: post.id } });
@@ -234,7 +248,7 @@ describe("게시글 API - 인증 필요 통합 테스트", () => {
 
     it("존재하지 않는 게시글을 삭제하려고 하면 404 에러를 반환해야 함", async () => {
       const response = await request(app)
-        .delete("/post/99999")
+        .delete("/api/post/99999")
         .set("Authorization", `Bearer ${authToken}`)
         .expect(404);
 

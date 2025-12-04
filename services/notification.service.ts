@@ -1,5 +1,5 @@
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
-import prisma from "../prisma/prisma.js";
+import { prisma } from "../prisma/prisma.js";
 import { sendNotificationToUser } from "../app.js";
 
 // 알림 목록 조회

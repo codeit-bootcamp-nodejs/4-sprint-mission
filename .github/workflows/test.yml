@@ -1,0 +1,60 @@
+name: 🧪 Run Tests on Pull Request
+
+on:
+  pull_request:
+    branches:
+      - "*" # 모든 브랜치에서 PR 발생 시 동작
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    # PostgreSQL 서비스 컨테이너 추가
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      JWT_SECRET: test-jwt-secret-key-for-ci
+      REFRESH_SECRET: test-refresh-secret-key-for-ci
+      PORT: 3000
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: yarn prisma generate
+
+      - name: Setup Database Schema
+        run: yarn prisma db push
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+
+      - name: Run All Tests
+        run: yarn test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+          JWT_SECRET: test-jwt-secret-key-for-ci
+          REFRESH_SECRET: test-refresh-secret-key-for-ci

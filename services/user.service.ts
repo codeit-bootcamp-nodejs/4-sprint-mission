@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import prisma from "../prisma/prisma.js"
+import { prisma } from "../prisma/prisma.js"
 import bcrypt from "bcrypt";
 import { HttpError } from "../middlewares/errorHandler.middleware.js";
 import dotenv from "dotenv";
@@ -23,7 +23,7 @@ export async function signupService(email: string, nickname: string, password: s
 }> {
   // 유효성 검사
   if (!email || !nickname || !password) {
-    throw new HttpError("이메일과 닉네임과 패스워드는 필수입니다.", 404);
+    throw new HttpError("이메일과 닉네임과 패스워드는 필수입니다.", 400);
   }
 
   // 중복 이메일//닉네임 검사
@@ -71,7 +71,7 @@ export async function loginService(email: string, password: string): Promise<{
   // 이메일로 유저 찾기
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    throw new HttpError("존재하지 않는 이메일입니다.", 404);
+    throw new HttpError("존재하지 않는 이메일입니다.", 401);
   }
 
   // 비밀번호 검증

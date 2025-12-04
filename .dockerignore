@@ -1,0 +1,38 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Logs
+logs
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Environment files
+.env
+.env.*  
+
+# OS / Editor files
+.DS_Store
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Build output
+dist
+build
+coverage
+
+# Docker-related
+Dockerfile.dev
+docker-compose*.yml
+
+# Tests 
+jest/
+tests/
+__tests__/

@@ -53,8 +53,36 @@ app.use("/api/comment", commentRouter);
 app.use("/api/like", likeRouter);
 app.use("/api/notification", notificationRouter);
 
-app.get('/', (req, res) => {
-  res.send('서버 정상 동작!');
+// 1. 프론트엔드 빌드 파일의 경로 정의
+const FRONTEND_BUILD_PATH = path.join(__dirname, '..', 'front', 'dist');
+
+// 2. 정적 파일 제공 미들웨어 설정
+if (process.env.NODE_ENV !== 'test') {
+  app.use(express.static(FRONTEND_BUILD_PATH));
+}
+
+// 3. SPA 라우팅 핸들러 설정 
+app.use((req, res, next) => {
+    // 테스트 환경에서는 정적 파일 서빙 로직을 건너뜀
+    if (process.env.NODE_ENV === 'test') {
+        return next();
+    }
+    
+    // 1. 요청이 API 경로로 시작하지 않아야 하며, 
+    // 2. 요청 메서드가 GET (페이지 요청) 이어야 합니다.
+    // 이 조건을 만족하면 index.html을 반환합니다.
+
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+        // 이미 위에 express.static(FRONTEND_BUILD_PATH) 설정이 있어야 합니다!
+        
+        // 브라우저 캐싱 문제 방지를 위해 Cache-Control 헤더 추가
+        res.setHeader('Cache-Control', 'no-cache'); 
+        
+        res.sendFile(path.join(FRONTEND_BUILD_PATH, 'index.html'));
+    } else {
+        // API 요청이나 다른 메서드(POST, PUT 등)는 다음 미들웨어로 전달
+        next();
+    }
 });
 
 app.use("/auth", googleauthRouter);
