@@ -1,1 +1,0 @@
-# codeit-publishing-sprint

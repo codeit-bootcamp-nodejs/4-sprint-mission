@@ -1,1 +1,0 @@
-{"version":3,"file":"delete.article.comment.d.ts","sourceRoot":"","sources":["../../../src/controllers/articles/delete.article.comment.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,YAAY,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAI/D,QAAA,MAAM,oBAAoB,GACxB,KAAK,OAAO,EACZ,KAAK,QAAQ,EACb,MAAM,YAAY,kBAgBnB,CAAC;AAEF,eAAe,oBAAoB,CAAC"}
