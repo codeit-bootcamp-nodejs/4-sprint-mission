@@ -21,4 +21,4 @@ generated/
 dist/
 
 # Settings
-.vscode/Settings.json
+.vscode/settings.json
