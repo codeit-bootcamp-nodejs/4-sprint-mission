@@ -19,3 +19,6 @@ generated/
 
 # Build output
 dist/
+
+# Settings
+.vscode/Settings.json
