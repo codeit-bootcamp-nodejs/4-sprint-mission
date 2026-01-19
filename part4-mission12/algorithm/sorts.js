@@ -89,10 +89,10 @@ const test2 = [...nums];
 insertionSort(test2);
 console.log('Insertion:', test2); // [1, 2, 3, 4, 5]
 
-// 병합 정렬 테스트 (새 배열)
+// 병합 정렬 테스트
 const sortedMerge = mergeSort(nums);
 console.log('Merge (New Array):', sortedMerge); // [1, 2, 3, 4, 5]
-console.log('Original:', nums); // [3, 1, 2, 5, 4] (기본 배열)
+console.log('Original:', nums); // [3, 1, 2, 5, 4]
 
 // 퀵 정렬 테스트
 const test4 = [...nums];
