@@ -1,0 +1,18 @@
+# 빌드/런타임에 필요 없는 것들
+
+coverage
+node_modules
+dist
+infra
+
+# VCS / 설정 / 도구 파일
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+
+# 로그
+
+npm-debug.log
+*.log
+
