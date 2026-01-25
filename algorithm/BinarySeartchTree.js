@@ -1,4 +1,4 @@
-class BSTNode {
+class Node {
   constructor(value) {
     this.value = value;
     this.left = null;
@@ -12,7 +12,7 @@ class BinarySearchTree {
   }
 
   insert(value) {
-    const newNode = new BSTNode(value);
+    const newNode = new Node(value);
     if (!this.root) {
       this.root = newNode;
       return;
@@ -61,3 +61,12 @@ class BinarySearchTree {
     this.root = removeNode(this.root, value);
   }
 }
+
+//테스트 코드
+const list = new BinarySearchTree();
+list.insert(10);
+list.insert(15);
+list.insert(30);
+console.log(list.find(15));
+list.remove(15);
+console.log(list.find(15));

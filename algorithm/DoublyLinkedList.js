@@ -34,16 +34,7 @@ class DoublyLinkedList {
     }
   }
 
-  findNode(value) {
-    let current = this.head;
-    while (current) {
-      if (current.value === value) return current;
-      current = current.next;
-    }
-    return null;
-  }
-
-  insertAfter(targetValue, newValue) {
+    insertAfter(targetValue, newValue) {
     const targetNode = this.findNode(targetValue);
     if (targetNode) {
       const newNode = new DoublyNode(newValue);
@@ -58,6 +49,15 @@ class DoublyLinkedList {
     }
   }
 
+  findNode(value) {
+    let current = this.head;
+    while (current) {
+      if (current.value === value) return current;
+      current = current.next;
+    }
+    return null;
+  }
+
   removeNode(value) {
     const targetNode = this.findNode(value);
     if (!targetNode) return;
@@ -68,3 +68,13 @@ class DoublyLinkedList {
     if (targetNode.next) targetNode.next.prev = targetNode.prev;
   }
 }
+
+//테스트 코드
+const list = new DoublyLinkedList();
+list.addToHead(10);
+list.addToHead(30);
+list.addToTail(20);
+list.insertAfter(30, 15);
+console.log(list.findNode(15));
+list.removeNode(15);
+console.log(list.findNode(15));
