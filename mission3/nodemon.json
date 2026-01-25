@@ -1,8 +1,0 @@
-{
-  "watch": ["src", ".env"],
-  "ext": "js, json",
-  "exec": "node src/app.js",
-  "events": {
-    "restart": "clear"
-  }
-}

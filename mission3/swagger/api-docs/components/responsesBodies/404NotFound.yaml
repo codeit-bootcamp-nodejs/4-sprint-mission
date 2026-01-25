@@ -1,8 +1,0 @@
-description: 지정된 자원을 찾을 수 없음
-ImageResponse:
-  description: An image.
-  content:
-    image/*:
-      schema:
-        type: string
-        format: binary

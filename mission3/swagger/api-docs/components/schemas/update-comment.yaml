@@ -1,8 +1,0 @@
-type: object
-properties:
-  content:
-    type: string
-    description: 수정할 댓글 내용
-    example: "수정된 댓글입니다."
-required:
-  - content

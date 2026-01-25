@@ -1,7 +1,0 @@
-name: search
-in: query
-description: 검색 키워드
-required: false
-schema:
-  type: string
-  default: ''

@@ -1,8 +1,0 @@
-name: sort
-in: query
-description: 정렬 기준. 'recent'면 최신순 정렬
-required: false
-schema:
-  type: string
-  enum: [recent, '']
-  default: ''

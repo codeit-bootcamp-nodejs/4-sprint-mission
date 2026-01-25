@@ -1,6 +1,0 @@
-parameters:
-  $ref: ./parameters/index.yaml
-responses:
-  $ref: ./responsesBodies/index.yaml
-schemas:
-  $ref: ./schemas/index.yaml

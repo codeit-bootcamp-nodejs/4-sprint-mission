@@ -1,5 +1,0 @@
-description: 에러 발생
-content:
-  application/json:
-    schema:
-      $ref: '../schemas/error.yaml'

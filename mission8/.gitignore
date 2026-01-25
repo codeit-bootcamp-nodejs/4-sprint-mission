@@ -1,7 +1,0 @@
-node_modules
-dist
-.env
-.vscode
-generated/prisma
-.DS_Store
-logs/app.log

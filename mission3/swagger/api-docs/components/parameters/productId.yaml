@@ -1,7 +1,0 @@
-name: productId
-in: path
-required: true
-description: 상품 ID
-schema:
-  type: integer
-  example: 1

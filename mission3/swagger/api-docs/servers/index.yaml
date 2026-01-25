@@ -1,4 +1,0 @@
-- url: SERVER_URL
-  description: Render 서버
-- url: http://localhost:3000
-  description: 로컬 서버
