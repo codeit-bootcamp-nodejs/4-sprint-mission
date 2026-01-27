@@ -98,3 +98,32 @@ console.log('Original:', nums); // [3, 1, 2, 5, 4]
 const test4 = [...nums];
 quickSort(test4);
 console.log('Quick:', test4); // [1, 2, 3, 4, 5]
+
+function heapsort(arr) {
+  const n = arr.length;
+
+  const heapify = (a, size, i) => {
+    let largest = i;
+    let left = 2 * i + 1;
+    let right = 2 * i + 2;
+
+    if (left < size && a[left] > a[largest]) largest = left;
+    if (right < size && a[right] > a[largest]) largest = right;
+
+    if (largest !== i) {
+      [a[i], a[largest]] = [a[largest], a[i]];
+      heapify(a, size, largest);
+    }
+  };
+
+  // Build Max Heap
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(arr, n, i);
+  }
+
+  // Extract elements from heap
+  for (let i = n - 1; i > 0; i--) {
+    [arr[0], arr[i]] = [arr[i], arr[0]];
+    heapify(arr, i, 0);
+  }
+}
