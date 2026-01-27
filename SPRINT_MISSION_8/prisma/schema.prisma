@@ -1,0 +1,129 @@
+// schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  nickname      String          @unique
+  image         String?
+  password      String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  products      Product[]
+  posts         Post[]
+  productComments ProductComment[]
+  postComments  PostComment[]
+  productLikes  ProductLike[]
+  postLikes     PostLike[]
+  refreshTokens RefreshToken[]
+  notifications Notification[]
+}
+
+model Product {
+  id         Int              @id @default(autoincrement())
+  title      String
+  description String?
+  price      Int
+  userId     Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   ProductComment[]
+  likes      ProductLike[]
+}
+
+model Post {
+  id         Int              @id @default(autoincrement())
+  title      String
+  content    String
+  userId     Int
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments   PostComment[]
+  likes      PostLike[]
+}
+
+model ProductComment {
+  id         Int       @id @default(autoincrement())
+  content    String
+  userId     Int
+  productId  Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model PostComment {
+  id         Int       @id @default(autoincrement())
+  content    String
+  userId     Int
+  postId     Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post       Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model ProductLike {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  productId  Int
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId]) // 중복 좋아요 방지
+}
+
+model PostLike {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  postId     Int
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post       Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // 중복 좋아요 방지
+}
+
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  jti        String    @unique    // 토큰 식별자 (uuid)
+  hashed     String                 // refresh token 해시값
+  userId     Int
+  revoked    Boolean   @default(false)
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revoked])
+  @@index([expiresAt])
+}
+
+model Notification {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  type        String    // e.g. "PRICE_CHANGE", "COMMENT"
+  message     String
+  isRead      Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id])
+}
