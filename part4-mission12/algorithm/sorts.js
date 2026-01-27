@@ -116,14 +116,19 @@ function heapsort(arr) {
     }
   };
 
-  // Build Max Heap
   for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
     heapify(arr, n, i);
   }
 
-  // Extract elements from heap
   for (let i = n - 1; i > 0; i--) {
     [arr[0], arr[i]] = [arr[i], arr[0]];
     heapify(arr, i, 0);
   }
 }
+
+// 힙 정렬 테스트
+const data = [16, 4, 10, 14, 7, 9, 3, 2, 8, 1];
+console.log('Original:', [...data]);
+
+heapsort(data);
+console.log('Sorted:', data); // [1, 2, 3, 4, 7, 8, 9, 10, 14, 16]

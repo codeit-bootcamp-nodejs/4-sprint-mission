@@ -67,3 +67,17 @@ class BinarySearchTree {
     this.root = removeNode(this.root, value);
   }
 }
+
+const myBST = new BinarySearchTree();
+myBST.insert(50);
+myBST.insert(30);
+myBST.insert(70);
+myBST.insert(20);
+myBST.insert(40);
+
+console.log('BST Find 30:', myBST.find(30)?.value); // 30
+console.log('BST Root Left:', myBST.root.left.value); // 30
+console.log('BST Root Right:', myBST.root.right.value); // 70
+
+myBST.remove(30); // 자식이 둘 있는 노드 삭제 테스트
+console.log('BST Find 30 after remove:', myBST.find(30)); // null

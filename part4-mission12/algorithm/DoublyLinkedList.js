@@ -77,3 +77,12 @@ class DoublyLinkedList {
     }
   }
 }
+
+// DoublyLinkedList 테스트
+const myDLL = new DoublyLinkedList();
+myDLL.addToHead(10);
+myDLL.addToTail(30);
+myDLL.insertAfter(10, 20); // 10 뒤에 20 삽입
+console.log('DLL Tail Prev:', myDLL.tail.prev.value); // 20
+myDLL.removeNode(20);
+console.log('DLL After Remove:', myDLL.head.next.value); // 3

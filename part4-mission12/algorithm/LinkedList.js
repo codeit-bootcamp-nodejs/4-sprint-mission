@@ -50,3 +50,12 @@ class LinkedList {
     if (nodeToRemove === this.tail) this.tail = targetNode;
   }
 }
+
+// LinkedList 테스트
+const myLL = new LinkedList();
+myLL.addNode(10);
+myLL.addNode(20);
+myLL.insertAfter(10, 15); // 10 뒤에 15 삽입
+console.log('LL Find 15:', myLL.findNode(15)?.value); // 15
+myLL.removeAfter(10); // 10 뒤의 15 삭제
+console.log('LL After Remove:', myLL.head.next.value); // 20 (15가 지워짐)
