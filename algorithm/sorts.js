@@ -87,6 +87,35 @@ function partition(arr, left, right) {
   return i;
 }
 
+//  힙 정렬
+function heapify(arr, n, i) {
+  let largest = i;
+  let left = 2 * i + 1;
+  let right = 2 * i + 2;
+
+  if (left < n && arr[left] > arr[largest]) largest = left;
+  if (right < n && arr[right] > arr[largest]) largest = right;
+
+  if (largest !== i) {
+    [arr[i], arr[largest]] = [arr[largest], arr[i]];
+    heapify(arr, n, largest);
+  }
+}
+
+function heapsort(arr) {
+  let n = arr.length;
+
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(arr, n, i);
+  }
+
+  for (let i = n - 1; i > 0; i--) {
+    [arr[0], arr[i]] = [arr[i], arr[0]];
+    heapify(arr, i, 0);
+  }
+  return arr;
+}
+
 // 테스트 데이터: 무작위 숫자 배열
 const getTestData = () => [64, 34, 25, 12, 22, 11, 90];
 
@@ -114,3 +143,9 @@ const data4 = getTestData();
 console.log("정렬 전:", data4);
 quickSort(data4); // 원본 수정
 console.log("정렬 후:", data4);
+
+console.log("\n--- 5. 힙 정렬 ---");
+const data5 = getTestData();
+console.log("정렬 전:", data5);
+heapsort(data5); // 원본 수정
+console.log("정렬 후:", data5);
