@@ -10,7 +10,7 @@ function selectionSort(arr) {
       }
     }
 
-    // 구조 분해 할당을 통해 최소값을 '현재 위치'로 변경
+    //구조 분해 할당을 통해 최소값을 '현재 위치'로 변경
     if (minIndex !== i) {
       [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
     }
@@ -28,12 +28,12 @@ function insertionSort(arr) {
     let currentVal = arr[i];
     let j = i - 1;
 
-    // 현재 값을 정렬된 앞부분의 값들과 비교하며 뒤로 밀어냄
+    //현재 값을 정렬된 앞부분의 값들과 비교하며 뒤로 밀어냄
     while (j >= 0 && arr[j] > currentVal) {
       arr[j + 1] = arr[j];
       j--;
     }
-    // 적절한 위치에 값 삽입
+    //적절한 위치에 값 삽입
     arr[j + 1] = currentVal;
   }
   return arr;
@@ -68,7 +68,7 @@ function merge(left, right) {
     }
   }
 
-  // 남은 요소들을 합침
+  //남은 요소들을 합침
   return [...result, ...left.slice(i), ...right.slice(j)];
 }
 
@@ -82,14 +82,14 @@ function quickSort(arr, left = 0, right = arr.length - 1) {
   if (left < right) {
     const pivotIndex = partition(arr, left, right);
 
-    // 피벗을 기준으로 좌우 재귀 호출
+    //피벗을 기준으로 좌우 재귀 호출
     quickSort(arr, left, pivotIndex - 1);
     quickSort(arr, pivotIndex + 1, right);
   }
 }
 
 function partition(arr, left, right) {
-  const pivot = arr[right]; // 마지막 요소를 피벗으로 설정
+  const pivot = arr[right]; //마지막 요소를 피벗으로 설정
   let i = left - 1;
 
   for (let j = left; j < right; j++) {
@@ -108,3 +108,52 @@ console.log("\n퀵 정렬 전 : " + testArr3);
 
 quickSort(testArr3);
 console.log("퀵 정렬 후 : " + testArr3);
+
+function heapsort(array) {
+  const n = array.length;
+
+  //최대 힙(Max Heap) 구조 만들기
+  //마지막 노드의 부모 인덱스부터 시작해서 루트(0)까지 heapify 수행
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(array, n, i);
+  }
+
+  //하나씩 꺼내서 정렬하기
+  for (let i = n - 1; i > 0; i--) {
+    //현재 루트(최대값)를 가장 뒤로 보냄
+    [array[0], array[i]] = [array[i], array[0]];
+
+    //크기를 줄인 힙에서 다시 최대 힙 구조를 유지하도록 heapify 수행
+    heapify(array, i, 0);
+  }
+
+  return array;
+}
+
+function heapify(array, size, i) {
+  let largest = i; //부모 노드
+  const left = 2 * i + 1; //왼쪽 자식
+  const right = 2 * i + 2; //오른쪽 자식
+
+  //왼쪽 자식이 부모보다 크다면
+  if (left < size && array[left] > array[largest]) {
+    largest = left;
+  }
+
+  //오른쪽 자식이 현재까지의 최대값보다 크다면
+  if (right < size && array[right] > array[largest]) {
+    largest = right;
+  }
+
+  //최대값이 부모가 아니라면 스왑 후 재귀적으로 heapify 호출
+  if (largest !== i) {
+    [array[i], array[largest]] = [array[largest], array[i]];
+    heapify(array, size, largest);
+  }
+}
+
+const testArr4 = [5, 9, 12, 1, 3, 6, 8];
+console.log("선택 정렬 전 : " + testArr4);
+
+heapsort(testArr4);
+console.log("선택 정렬 후 : " + testArr);
