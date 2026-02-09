@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Test Client</title>
+    <style>
+      body { font-family: sans-serif; padding: 20px; display: flex; gap: 40px; }
+      h1, h2 { margin-top: 0; }
+      input[type="text"] { padding: 8px; width: 250px; margin-bottom: 10px; display: block; }
+      button { padding: 8px 12px; cursor: pointer; }
+      .container { display: flex; flex-direction: column; }
+      #log { margin-top: 20px; border: 1px solid #ccc; padding: 10px; height: 500px; width: 500px; overflow-y: scroll; background-color: #f9f9f9; }
+      .event { border-bottom: 1px solid #eee; padding: 8px 2px; font-family: monospace; white-space: pre-wrap; }
+      .event-name { font-weight: bold; }
+      .event-name.connect { color: #28a745; }
+      .event-name.disconnect { color: #dc3545; }
+      .event-name.join { color: #17a2b8; }
+      .event-name.api-request { color: #fd7e14; }
+      .event-name.api-response { color: #6f42c1; }
+      .event-name.new_notification { color: #007bff; }
+      .event-name.unread_count { color: #ffc107; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>1. 실시간 알림 수신 설정</h2>
+      <input type="text" id="userIdInput" placeholder="알림 받을 사용자 ID 입력 (게시글 작성자)" />
+      <button id="joinBtn">소켓 연결 및 채널 참가</button>
+      
+      <h2>2. 알림 트리거 (댓글 작성)</h2>
+      <input type="text" id="accessTokenInput" placeholder="Access Token 입력 (댓글 작성자)" />
+      <input type="text" id="articleIdInput" placeholder="게시글 ID 입력" />
+      <input type="text" id="commentInput" placeholder="댓글 내용 입력" />
+      <button id="postCommentBtn">댓글 작성으로 알림 생성</button>
+    </div>
+
+    <div class="container">
+      <h2>서버 로그</h2>
+      <div id="log">
+        <p>서버 로그가 여기에 표시됩니다...</p>
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      const log = document.getElementById('log');
+      const userIdInput = document.getElementById('userIdInput');
+      const joinBtn = document.getElementById('joinBtn');
+      const accessTokenInput = document.getElementById('accessTokenInput');
+      const articleIdInput = document.getElementById('articleIdInput');
+      const commentInput = document.getElementById('commentInput');
+      const postCommentBtn = document.getElementById('postCommentBtn');
+      let socket;
+
+      function logEvent(eventName, data, className) {
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('event');
+        
+        const nameSpan = document.createElement('span');
+        nameSpan.classList.add('event-name', className || eventName.toLowerCase());
+        nameSpan.textContent = `[${eventName}]`;
+        
+        eventDiv.appendChild(nameSpan);
+        eventDiv.append(`: ${JSON.stringify(data, null, 2)}`);
+        
+        log.appendChild(eventDiv);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      joinBtn.addEventListener('click', () => {
+        const userId = userIdInput.value;
+        if (!userId) {
+          alert('사용자 ID를 입력하세요.');
+          return;
+        }
+
+        if (socket) {
+          socket.disconnect();
+        }
+        
+        log.innerHTML = ''; // Clear log
+
+        socket = io('http://localhost:3000');
+
+        socket.on('connect', () => {
+          logEvent('CONNECT', { id: socket.id });
+          socket.emit('join', userId);
+          logEvent('JOIN', `Sent join request for userId: ${userId}`);
+        });
+
+        socket.on('disconnect', () => {
+          logEvent('DISCONNECT', 'Connection lost');
+        });
+
+        socket.on('new_notification', (data) => {
+          logEvent('NEW_NOTIFICATION', data);
+        });
+
+        socket.on('unread_count', (data) => {
+          logEvent('UNREAD_COUNT', data);
+        });
+      });
+
+      postCommentBtn.addEventListener('click', async () => {
+        const token = accessTokenInput.value;
+        const articleId = articleIdInput.value;
+        const comment = commentInput.value;
+
+        if (!token || !articleId || !comment) {
+          alert('Access Token, 게시글 ID, 댓글 내용을 모두 입력하세요.');
+          return;
+        }
+
+        const url = `http://localhost:3000/articles/${articleId}/comments`;
+        const payload = { content: comment };
+
+        logEvent('API_REQUEST', { method: 'POST', url, body: payload });
+
+        try {
+          const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const responseData = await response.json();
+          logEvent('API_RESPONSE', { status: response.status, ok: response.ok, data: responseData });
+
+          if (response.ok) {
+            commentInput.value = '';
+          }
+        } catch (error) {
+          logEvent('API_RESPONSE', { status: 'Error', error: error.message });
+        }
+      });
+    </script>
+  </body>
+</html>
